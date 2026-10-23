@@ -12,6 +12,7 @@
 - **In progress:** BE-02 (48/54). G1 is decided: nsjail (spec v1.5, [S1b report](../spikes/s1b-sandbox.md)). The nsjail adapter passes `sandboxtest`, and `make check` runs the suite against both adapters. What's left waits on other tasks; see the task file.
 - **Done except signing:** BE-03 (34/35). The Python tracer, its runner image and manifest, `vizctl trace`/`validate`, and eight golden fixtures traced from real code. Signing the image waits on a registry (BE-13). Spike S2 recommends `sys.monitoring` for G2 ([S2 report](../spikes/s2-python-hook.md)); the tracer uses `settrace` until G2 decides.
 - **In progress:** BE-04 (21/31). `tracecore` (§2) was built early, inside BE-03, so `vizctl` prints real traces. The S4 spike (§1), sparse arrays (§3) and running the goldens on both architectures in CI are open.
+- **Done except one decision:** BE-05 (29/30). `vizd --role=worker` (and `all`) runs trace jobs end to end: claim, build, trace, upload the chunks, complete, with requeue on infra errors, a lease watcher, the 25 s drain and a periodic sandbox sweep. Checked against the local Compose stack. Cancel of a running job waits on your decision below.
 - **Next, by the suggested order:** BE-04 §1 (spike S4, input to G3). On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
@@ -34,9 +35,9 @@
 | [BE-02](backend/BE-02-sandbox.md) Sandbox ⚠ | M0–M1, M3 | 🟡 | 48/54 | G1: nsjail. Docker and nsjail adapters pass `sandboxtest`. Open: Compose socket (BE-13 §1), per-image seccomp allowlist (before GA), first CI run with `test-nsjail`, fake fd-3 (BE-03/04), `ptrace` and runner image checks (BE-07) |
 | [BE-03](backend/BE-03-python-tracer.md) Python tracer | M0–M1 | 🟡 | 34/35 | Done except cosign signing (needs a registry, BE-13). S2 report in; G2 (Fri 13 Nov) open |
 | [BE-04](backend/BE-04-trace-processing.md) Trace processing | M0–M2 | 🟡 | 21/31 | §2 done in the BE-03 run. Open: §1 spike S4 (input to G3, Fri 13 Nov), goldens on both architectures in CI, §3 after BE-09 |
-| [BE-05](backend/BE-05-job-queue-worker.md) Job queue & worker | M1 | 🟡 | 10/30 | §1 queue adapter and its property test done. Next: §2 worker (`vizd --role=worker`) on the `JobQueue` port |
+| [BE-05](backend/BE-05-job-queue-worker.md) Job queue & worker | M1 | 🟡 | 29/30 | Queue and worker done: `vizd --role=worker` claims, builds, traces, uploads and completes, and drains on SIGTERM. Open: cancel while running (your decision, above) |
 | [BE-06](backend/BE-06-visualization-api.md) Visualization API | M0–M1 | 🟡 | 8/50 | §2 tables, sqlc and `InTx` done. Next: §3 `BlobStore`, §4 endpoints; §1 spike S5 (stretch) can start |
-| [BE-07](backend/BE-07-cpp-build.md) C++ build | M2 | ⏳ | 0/20 | BE-02, BE-05 |
+| [BE-07](backend/BE-07-cpp-build.md) C++ build | M2 | ⏳ | 0/20 | BE-02. The worker's build stage (BE-05) is in |
 | [BE-08](backend/BE-08-cpp-tracer.md) C++ tracer ⚠ | M0, M2 | 🟡 | 4/33 | §1 done (prototype in `adapters/cpp/trace.py`, measured in S1b). §2+ need BE-07 |
 | [BE-09](backend/BE-09-cpp-stl-big-arrays.md) C++ STL & big arrays | M2 | ⏳ | 0/24 | BE-08 |
 | [BE-10](backend/BE-10-friendly-errors.md) Friendly errors | M3 | ⏳ | 0/14 | BE-03, BE-07, BE-08 |
@@ -44,7 +45,7 @@
 | [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/10 | BE-06 |
 | [BE-13](backend/BE-13-environments-launch.md) Environments & launch | M1–M5 | 🟢 | 0/48 | §1 can start. BE-01 §6 already covers part of it (Compose with MySQL + SeaweedFS, `migrate up` on start); not ticked yet |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | ⏳ | 0/10 | BE-07–09 |
-| **Total** | | | **166/427** | |
+| **Total** | | | **185/427** | |
 
 ### BE-01 open items
 
@@ -54,7 +55,7 @@
 | §2 Done: a PR shows every check | The first PR |
 | §6 sandbox tests on Linux runners | The first CI run with `make test-nsjail` (wired into `make check`) |
 | §6 multi-arch runner images | BE-03, BE-08 (`vizd` already builds for both) |
-| §6 Done: clone to completed local job | BE-02, BE-05, BE-06, BE-13 §1 |
+| §6 Done: clone to completed local job | BE-02, BE-06, BE-13 §1 |
 
 ## Frontend
 
