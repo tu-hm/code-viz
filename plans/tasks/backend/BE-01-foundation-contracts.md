@@ -26,7 +26,7 @@ The Go repo, CI, and the three contracts everything else is built on.
 ## 2. CI (M0-03 · 1 d)
 
 - [x] GitHub Actions workflow: `golangci-lint`, `go test ./...`, `govulncheck` — one job runs `make check`
-- [ ] Add the web checks job (lint/test; FE owns the contents) — added when FE-01 §1 creates the web workspace
+- [x] Add the web checks job (lint/test; FE owns the contents) — the `web` job runs `pnpm check`
 - [x] Codegen drift check: run `make gen`, fail if `git diff` is non-empty — part of `make check`
 - [ ] Mark all checks as required on PRs to `main` — not set; it would block the direct pushes to `main` this repo uses now
 - [ ] **Done:** a PR shows every check — no PR opened yet
@@ -43,7 +43,7 @@ The Go repo, CI, and the three contracts everything else is built on.
 - [x] v1.1 optional fields (§19.9): `sparse` + `patch`, `access[]`, `summary.lineHits` + `lineHitsSource`, `stdinPos`, `summary.untracedTail`, `callId` / `parentCallId`
 - [x] Allow unknown fields (forward compatibility, §9.7)
 - [x] Valid examples: every fixture; invalid examples: one per required field / bad enum
-- [ ] Generate Go structs (`go-jsonschema`) and TS types (`json-schema-to-typescript`) via `make gen` — Go done; the TS step goes into `make gen` with FE-01 §2
+- [x] Generate Go structs (`go-jsonschema`) and TS types (`json-schema-to-typescript`) via `make gen` — `make gen` runs `pnpm gen` in `web/` after the Go step
 - [x] **Done:** validates every fixture; invalid examples rejected in tests
 
 ## 4. Wire schema — `schema/wire.v1.schema.json` (M0-06 · 1 d)
@@ -62,7 +62,7 @@ The Go repo, CI, and the three contracts everything else is built on.
 - [x] Response states: tracing (`progress`), completed (`trace.header`, `chunks[]`, `urlsExpireAt`), failed (`failure`, `build.diagnostics`, `raw`)
 - [x] Error envelope (§8.7) and every status code from the §8.2 table
 - [x] Copy the §8 JSON examples into the spec as `examples` (used by contract tests and FE's MSW mocks)
-- [ ] Generate oapi-codegen strict-server stubs + `openapi-typescript` client in `make gen` — server stubs done; the TS client goes into `make gen` with FE-01 §2
+- [x] Generate oapi-codegen strict-server stubs + `openapi-typescript` client in `make gen` — TS types in `web/apps/ide/src/gen/api.ts`; the fetch client itself is FE-04
 - [x] **Done:** server stubs and TS client both generate from it
 
 ## 6. Containers & dev workflow (new · 1 d · M1 week 4)
