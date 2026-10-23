@@ -1,0 +1,3923 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "py-settrace/0.1.0",
+    "id": "python3",
+    "runtime": "CPython 3.12.15"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 26
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 1,
+          "locals": [],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 1,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 2,
+          "locals": [],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 1,
+      "keyframe": false,
+      "line": 2,
+      "prevLine": 1,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 5,
+          "locals": [],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 2,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "dfs",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "kind": "function",
+          "name": "dfs",
+          "signature": "dfs(v, adj, seen)"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 24,
+          "locals": [
+            {
+              "name": "dfs",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "main",
+              "value": {
+                "id": "o2",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "kind": "function",
+          "name": "main",
+          "signature": "main()"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 24,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 25,
+          "locals": [
+            {
+              "name": "dfs",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "main",
+              "value": {
+                "id": "o2",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 25,
+      "prevLine": 24,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 26,
+          "locals": [
+            {
+              "name": "dfs",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "main",
+              "value": {
+                "id": "o2",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 26,
+      "prevLine": 25,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 13,
+          "locals": [],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 13,
+      "parentCallId": 0,
+      "prevLine": 26,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 11,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 12,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o3": {
+          "items": [
+            {
+              "id": "o4",
+              "t": "ref"
+            },
+            {
+              "id": "o5",
+              "t": "ref"
+            },
+            {
+              "id": "o6",
+              "t": "ref"
+            },
+            {
+              "id": "o7",
+              "t": "ref"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "list"
+        },
+        "o4": {
+          "items": [],
+          "kind": "sequence",
+          "length": 0,
+          "truncated": false,
+          "type": "list"
+        },
+        "o5": {
+          "items": [],
+          "kind": "sequence",
+          "length": 0,
+          "truncated": false,
+          "type": "list"
+        },
+        "o6": {
+          "items": [],
+          "kind": "sequence",
+          "length": 0,
+          "truncated": false,
+          "type": "list"
+        },
+        "o7": {
+          "items": [],
+          "kind": "sequence",
+          "length": 0,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 13,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 14,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 15,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 6,
+        "inferred": false,
+        "token": 3
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 18,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o4": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 16,
+      "keyframe": false,
+      "line": 18,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 6,
+        "inferred": false,
+        "token": 3
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o5": {
+          "items": [
+            {
+              "t": "int",
+              "v": "0"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 17,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 18,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 6,
+        "inferred": false,
+        "token": 3
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 18,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 6,
+        "inferred": false,
+        "token": 3
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 19,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 10,
+        "inferred": false,
+        "token": 5
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 18,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o5": {
+          "items": [
+            {
+              "t": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 20,
+      "keyframe": false,
+      "line": 18,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 10,
+        "inferred": false,
+        "token": 5
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o6": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 21,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 18,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 10,
+        "inferred": false,
+        "token": 5
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 22,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 10,
+        "inferred": false,
+        "token": 5
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 23,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 18,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o6": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "v": "3"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 24,
+      "keyframe": false,
+      "line": 18,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o7": {
+          "items": [
+            {
+              "t": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 25,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 18,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 19,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 26,
+      "keyframe": false,
+      "line": 19,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 20,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o8": {
+          "items": [
+            {
+              "t": "bool",
+              "v": "False"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 27,
+      "keyframe": false,
+      "line": 20,
+      "prevLine": 19,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 28,
+      "keyframe": false,
+      "line": 6,
+      "parentCallId": 1,
+      "prevLine": 20,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o8": {
+          "items": [
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 29,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 30,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 31,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 3,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 32,
+      "keyframe": false,
+      "line": 6,
+      "parentCallId": 2,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o8": {
+          "items": [
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 33,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 34,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 35,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 36,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 37,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 4,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 38,
+      "keyframe": false,
+      "line": 6,
+      "parentCallId": 3,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o8": {
+          "items": [
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "False"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 39,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 40,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 41,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 42,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 43,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 5,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f5": {
+          "id": "f5",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 44,
+      "keyframe": false,
+      "line": 6,
+      "parentCallId": 4,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f5": {
+          "id": "f5",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o8": {
+          "items": [
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 45,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f5": {
+          "id": "f5",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 46,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f5": {
+          "id": "f5",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 47,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 5,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f5": {
+          "id": "f5",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": {
+            "t": "none"
+          }
+        }
+      },
+      "heap": {},
+      "i": 48,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 49,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 4,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 26,
+          "locals": [
+            {
+              "name": "dfs",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "main",
+              "value": {
+                "id": "o2",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 20,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        },
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        },
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        },
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": {
+            "t": "none"
+          }
+        }
+      },
+      "heap": {
+        "o1": {
+          "kind": "function",
+          "name": "dfs",
+          "signature": "dfs(v, adj, seen)"
+        },
+        "o2": {
+          "kind": "function",
+          "name": "main",
+          "signature": "main()"
+        },
+        "o3": {
+          "items": [
+            {
+              "id": "o4",
+              "t": "ref"
+            },
+            {
+              "id": "o5",
+              "t": "ref"
+            },
+            {
+              "id": "o6",
+              "t": "ref"
+            },
+            {
+              "id": "o7",
+              "t": "ref"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "list"
+        },
+        "o4": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "truncated": false,
+          "type": "list"
+        },
+        "o5": {
+          "items": [
+            {
+              "t": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "list"
+        },
+        "o6": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "v": "3"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "list"
+        },
+        "o7": {
+          "items": [
+            {
+              "t": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "truncated": false,
+          "type": "list"
+        },
+        "o8": {
+          "items": [
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            },
+            {
+              "t": "bool",
+              "v": "True"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 50,
+      "keyframe": true,
+      "line": 7,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 51,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 3,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": {
+            "t": "none"
+          }
+        }
+      },
+      "heap": {},
+      "i": 52,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 53,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": {
+            "t": "none"
+          }
+        }
+      },
+      "heap": {},
+      "i": 54,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 21,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 55,
+      "keyframe": false,
+      "line": 21,
+      "prevLine": 20,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 21,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "adj",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "seen",
+              "value": {
+                "id": "o8",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "none"
+          }
+        }
+      },
+      "heap": {},
+      "i": 56,
+      "keyframe": false,
+      "line": 21,
+      "prevLine": 21,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": "4\n"
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {},
+      "i": 57,
+      "keyframe": false,
+      "line": 26,
+      "prevLine": 26,
+      "removedObjects": [
+        "o3",
+        "o8",
+        "o4",
+        "o5",
+        "o6",
+        "o7"
+      ],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 14,
+        "inferred": false,
+        "token": 7
+      },
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "lineHits": {
+      "1": 1,
+      "12": 1,
+      "13": 1,
+      "14": 5,
+      "15": 4,
+      "16": 3,
+      "17": 3,
+      "18": 3,
+      "19": 1,
+      "2": 1,
+      "20": 1,
+      "21": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1,
+      "5": 1,
+      "6": 4,
+      "7": 10,
+      "8": 6,
+      "9": 3
+    },
+    "lineHitsSource": "counter",
+    "stepCount": 58,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

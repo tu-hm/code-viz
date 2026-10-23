@@ -1,0 +1,735 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "py-settrace/0.1.0",
+    "id": "python3",
+    "runtime": "CPython 3.12.15"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 7
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 1,
+          "locals": [],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 1,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 2,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 1,
+      "keyframe": false,
+      "line": 2,
+      "prevLine": 1,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 3,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [],
+          "kind": "sequence",
+          "length": 0,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 3,
+      "prevLine": 2,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 4,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 3,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 3,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 3,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "t": "str",
+              "v": "ann"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 3,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 6,
+        "inferred": false,
+        "token": 2
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 4,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 3,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 6,
+        "inferred": false,
+        "token": 2
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 3,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "t": "str",
+              "v": "ann"
+            },
+            {
+              "t": "str",
+              "v": "bob"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 6,
+      "keyframe": false,
+      "line": 3,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 10,
+        "inferred": false,
+        "token": 3
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 4,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 3,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 10,
+        "inferred": false,
+        "token": 3
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 3,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "t": "str",
+              "v": "ann"
+            },
+            {
+              "t": "str",
+              "v": "bob"
+            },
+            {
+              "t": "str",
+              "v": "cy"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 8,
+      "keyframe": false,
+      "line": 3,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 13,
+        "inferred": false,
+        "token": 4
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 5,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 3,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 13,
+        "inferred": false,
+        "token": 4
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 6,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "x",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "y",
+              "value": {
+                "t": "int",
+                "v": "5"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 17,
+        "inferred": false,
+        "token": 6
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 7,
+          "locals": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "names",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "_",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "x",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "y",
+              "value": {
+                "t": "int",
+                "v": "5"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 11,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 17,
+        "inferred": false,
+        "token": 6
+      },
+      "stdout": "3 9\n"
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {},
+      "i": 12,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 17,
+        "inferred": false,
+        "token": 6
+      },
+      "stdout": "cy bob ann\n"
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "lineHits": {
+      "1": 1,
+      "2": 1,
+      "3": 4,
+      "4": 3,
+      "5": 1,
+      "6": 1,
+      "7": 1
+    },
+    "lineHitsSource": "counter",
+    "stepCount": 13,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}
