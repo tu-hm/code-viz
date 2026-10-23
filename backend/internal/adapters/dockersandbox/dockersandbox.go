@@ -165,7 +165,7 @@ func (b *box) Run(ctx context.Context, cmd ports.Command) (ports.Exit, error) {
 		close(copied)
 	}()
 
-	exit, demuxErr := demux(frames, cmd)
+	exitFrame, demuxErr := shim.Demux(frames, cmd.Stdout, cmd.Stderr, cmd.Wire)
 	frames.Close() //nolint:gosec // io.PipeReader.Close always returns nil; closing unblocks StdCopy when demux stops early
 	var killErr error
 	if demuxErr != nil {
@@ -187,6 +187,7 @@ func (b *box) Run(ctx context.Context, cmd ports.Command) (ports.Exit, error) {
 		return ports.Exit{}, errors.Join(fmt.Errorf("run %s: %w (viz-shim stderr: %q)", cmd.Args[0], demuxErr, shimStderr.buf), killErr)
 	}
 
+	exit := ports.Exit{Code: exitFrame.Code, Signal: exitFrame.Signal}
 	if exit.Signal != int(syscall.SIGKILL) {
 		return exit, nil
 	}
@@ -296,34 +297,6 @@ func (b *box) writeFiles(ctx context.Context, files map[string][]byte) error {
 		return fmt.Errorf("tar exited %d: %q", inspect.ExitCode, output.buf)
 	}
 	return nil
-}
-
-func demux(r io.Reader, cmd ports.Command) (ports.Exit, error) {
-	writers := map[byte]io.Writer{shim.Stdout: cmd.Stdout, shim.Stderr: cmd.Stderr, shim.Wire: cmd.Wire}
-	frames := shim.NewReader(r)
-	var exit *ports.Exit
-	for {
-		f, err := frames.Next()
-		if errors.Is(err, io.EOF) && exit != nil {
-			return *exit, nil
-		}
-		if errors.Is(err, io.EOF) {
-			return ports.Exit{}, errors.New("stream ended without an exit frame")
-		}
-		if err != nil {
-			return ports.Exit{}, err
-		}
-		if exit != nil {
-			return ports.Exit{}, errors.New("frame after the exit frame")
-		}
-		if f.Stream == shim.Exit {
-			exit = &ports.Exit{Code: f.Code, Signal: f.Signal}
-			continue
-		}
-		if _, err := writers[f.Stream].Write(f.Data); err != nil {
-			return ports.Exit{}, fmt.Errorf("write stream %d: %w", f.Stream, err)
-		}
-	}
 }
 
 func infra(op string, err error) error {

@@ -110,3 +110,33 @@ func (r *Reader) Next() (Frame, error) {
 	}
 	return Frame{Stream: Exit, Code: int(code), Signal: int(signal)}, nil
 }
+
+// Demux copies frames from r to stdout, stderr and wire until the exit frame, and returns that frame.
+// It stops at the first writer error and returns it wrapped.
+func Demux(r io.Reader, stdout, stderr, wire io.Writer) (Frame, error) {
+	writers := map[byte]io.Writer{Stdout: stdout, Stderr: stderr, Wire: wire}
+	frames := NewReader(r)
+	var exit *Frame
+	for {
+		f, err := frames.Next()
+		if errors.Is(err, io.EOF) && exit != nil {
+			return *exit, nil
+		}
+		if errors.Is(err, io.EOF) {
+			return Frame{}, errors.New("stream ended without an exit frame")
+		}
+		if err != nil {
+			return Frame{}, err
+		}
+		if exit != nil {
+			return Frame{}, errors.New("frame after the exit frame")
+		}
+		if f.Stream == Exit {
+			exit = &f
+			continue
+		}
+		if _, err := writers[f.Stream].Write(f.Data); err != nil {
+			return Frame{}, fmt.Errorf("write stream %d: %w", f.Stream, err)
+		}
+	}
+}
