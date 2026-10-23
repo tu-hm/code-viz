@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zustand": "5.0.16"
+    "zustand": "5.0.15"
   },
   "devDependencies": {
     "react": "19.3.1"
