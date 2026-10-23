@@ -81,6 +81,10 @@ else
 	need "docker compose v2" "$(pick 'ships with OrbStack and Docker Desktop' "$pkg docker-compose-plugin")"
 fi
 
+if [ -z "${DOCKER_HOST:-}" ] && [ ! -S /var/run/docker.sock ] && host=$(docker context inspect --format '{{.Endpoints.docker.Host}}' 2>/dev/null); then
+	need "DOCKER_HOST, so testcontainers finds Docker in make test" "add to your shell profile: export DOCKER_HOST=$host"
+fi
+
 if command -v cc >/dev/null 2>&1; then
 	ok "C compiler, for go test -race"
 else
@@ -89,7 +93,7 @@ fi
 
 if [ "$missing" = 1 ]; then
 	echo
-	echo "install what is missing, then run this again"
+	echo "fix each need line above, then run this again"
 	exit 1
 fi
 
