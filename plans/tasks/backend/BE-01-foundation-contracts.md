@@ -68,7 +68,7 @@ The Go repo, CI, and the three contracts everything else is built on.
 ## 6. Containers & dev workflow (new · 1 d · M1 week 4)
 
 **`vizd` image**
-- [ ] One multi-stage `Dockerfile` for `vizd`: Go build stage, then two targets — `viz-shim` missing until BE-02 §2 builds it
+- [x] One multi-stage `Dockerfile` for `vizd`: Go build stage, then two targets
   - `api`: distroless/static, non-root, only the `vizd` binary
   - `worker`: `vizd` + the sandbox tooling chosen at G1 (`runsc` or nsjail) + `viz-shim`
 - [x] `vizd migrate up|down|status` subcommand (goose embedded), used by `make dev` and the Kubernetes migration Job (BE-13 §3)
@@ -83,7 +83,7 @@ The Go repo, CI, and the three contracts everything else is built on.
 - [x] Dev README: prerequisites (Go, Docker), first-run steps, common problems (architecture mismatch, Docker not running)
 
 **CI**
-- [ ] Run tests that use `testcontainers-go` and the real sandbox on Linux runners — testcontainers tests run in CI; sandbox tests come with BE-02
+- [ ] Run tests that use `testcontainers-go` and the real sandbox on Linux runners — testcontainers tests and the Docker sandbox tests run in CI; the production sandbox's come with BE-02 §3
 
 - [ ] **Done:** a new developer on a Mac or Linux goes from clone to a completed local job with `make dev` and the README only — blocked on BE-02 (sandbox), BE-05 (worker), BE-06 (API, tables) and BE-13 §1 (seed data)
 

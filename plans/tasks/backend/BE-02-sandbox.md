@@ -29,32 +29,34 @@ Input: the GDB prototype from M0-09 (loop, recursion, STL programs).
 Local dev runs on macOS (arm64), where gVisor and nsjail don't run. This adapter lets `vizd --role=all` and `vizctl trace` run real jobs on any machine with Docker. **It is not a security boundary** and must never run in staging or production.
 
 **Port**
-- [ ] Define the `Sandbox` port in `internal/ports`: run a build or trace step with limits; return the fd 1/2/3 streams and exit info (exit code, signal, killed-by-limit reason)
-- [ ] Write a shared port test suite (`sandboxtest`) that every adapter must pass: exit codes, timeouts, the three streams, the limits
+- [x] Define the `Sandbox` port in `internal/ports`: run a build or trace step with limits; return the fd 1/2/3 streams and exit info (exit code, signal, killed-by-limit reason). One box per job runs the build and the trace over a shared `/work`
+- [x] Write a shared port test suite (`sandboxtest`) that every adapter must pass: exit codes, timeouts, the three streams, the limits
 
 **fd 3 transport**
-- [ ] `docker run` can't hand fd 3 to the host, and FIFOs don't cross the Docker Desktop VM boundary. Add a small static Go binary, `viz-shim`, as the runner images' entrypoint. It starts the tracer with pipes on fd 1/2/3 and writes one framed stream (`stream id + length + bytes`) to its own stdout
-- [ ] The adapter reads that stream over the Docker attach API and splits it back into stdout, stderr and wire messages
+- [x] `docker run` can't hand fd 3 to the host, and FIFOs don't cross the Docker Desktop VM boundary. Add a small static Go binary, `viz-shim`, as the runner images' entrypoint. It starts the tracer with pipes on fd 1/2/3 and writes one framed stream (`stream id + length + bytes`) to its own stdout
+- [x] The adapter reads that stream over the Docker attach API and splits it back into stdout, stderr and wire messages
 - [ ] Decide at G1 whether the production adapter uses the shim too (one code path) or passes fd 3 directly
 
 **Adapter: `internal/adapters/dockersandbox`**
-- [ ] Use the Docker Engine API (Go client) instead of shelling out to `docker`
-- [ ] Create the container, copy `main.*` and `stdin` in with `CopyToContainer` (no bind mounts, so it works from the host or from inside Compose), start it, attach, wait, remove
-- [ ] Limits: `--network=none`, `--read-only`, `--tmpfs /work:size=64m`, `--pids-limit 32`, `--memory` = `--memory-swap` (256 MB / 512 MB), `--cpus 1`, `--ulimit stack=256MB`, non-root `--user`
-- [ ] Hardening: `--cap-drop ALL`, `--security-opt no-new-privileges`
-- [ ] Seccomp: ship `deploy/dev/seccomp-viz.json` = Docker's default profile **plus** `personality(ADDR_NO_RANDOMIZE)`, so GDB can turn ASLR off and runs stay deterministic (§7.12). Docker's default profile allows `ptrace`, but not this `personality` flag
-- [ ] Wall-clock watchdog in the adapter: kill the container when the deadline passes
-- [ ] Labels `viz.job=<id>` and `viz.started=<ts>`; on start, remove leftover `viz.*` containers (dev janitor)
-- [ ] Image architecture must match the host. Refuse to run an emulated image, because GDB `ptrace` fails under emulation; tell the user to run `make images`
-- [ ] Map Docker errors (daemon down, image missing) to **infra errors**
+- [x] Use the Docker Engine API (Go client) instead of shelling out to `docker`
+- [x] Create the container, copy `main.*` and `stdin` in with `CopyToContainer` (no bind mounts, so it works from the host or from inside Compose), start it, attach, wait, remove. `CopyToContainer` can't write to a tmpfs on a read-only root, so the files go in as a tar on the stdin of `tar -x` in the box
+- [x] Limits: `--network=none`, `--read-only`, `--tmpfs /work:size=64m`, `--pids-limit 32`, `--memory` = `--memory-swap` (256 MB / 512 MB), `--cpus 1`, `--ulimit stack=256MB`, non-root `--user`
+- [x] Hardening: `--cap-drop ALL`, `--security-opt no-new-privileges`
+- [x] Seccomp: ship `deploy/dev/seccomp-viz.json` = Docker's default profile **plus** `personality(ADDR_NO_RANDOMIZE)`, so GDB can turn ASLR off and runs stay deterministic (§7.12). Docker's default profile allows `ptrace`, but not this `personality` flag. Lives at `internal/adapters/dockersandbox/seccomp.json` instead, because `go:embed` can't reach outside the package
+- [x] Wall-clock watchdog in the adapter: kill the container when the deadline passes
+- [x] Labels `viz.job=<id>` and `viz.started=<ts>`; on start, remove leftover `viz.*` containers (dev janitor)
+- [x] Image architecture must match the host. Refuse to run an emulated image, because GDB `ptrace` fails under emulation; tell the user to run `make images`
+- [x] Map Docker errors (daemon down, image missing) to **infra errors**
 
 **Guardrails and config**
-- [ ] `VIZ_SANDBOX=docker|runsc|nsjail`; `docker` is the default when `VIZ_ENV=dev`
-- [ ] `vizd` refuses to start with `VIZ_SANDBOX=docker` unless `VIZ_ENV` is `dev` or `test`, and logs a warning on every start
+- [x] `VIZ_SANDBOX=docker|runsc|nsjail`; `docker` is the default when `VIZ_ENV=dev`
+- [x] `vizd` refuses to start with `VIZ_SANDBOX=docker` unless `VIZ_ENV` is `dev` or `test`, and logs a warning on every start
 - [ ] Works with `vizd` on the host (Docker Desktop socket) and with `vizd` inside Compose (mounted `/var/run/docker.sock`)
-- [ ] Document it in the dev README: needs Docker, run `make images` once for your architecture
+- [x] Document it in the dev README: needs Docker, run `make images` once for your architecture
 
 **Done:** `vizctl trace --lang python3 main.py` and `vizd --role=all` complete a real job on a Mac, and the port test suite passes against this adapter.
+
+Left open in §2: the shim decision waits on G1. The Compose item waits on vizd running in Compose (BE-13 §1); the client reads `DOCKER_HOST` or the default socket, but only the host path is tested. The Done line waits on `vizctl trace` (BE-03, BE-04) and the worker (BE-05); `sandboxtest` already passes against this adapter.
 
 ## 3. Production adapter (M1-07 · 2 d)
 
@@ -73,11 +75,13 @@ Local dev runs on macOS (arm64), where gVisor and nsjail don't run. This adapter
 
 ## 4. Basic containment tests (part of M1-07)
 
-- [ ] Fork bomb is stopped by the PID limit
-- [ ] Network attempt (socket, DNS) fails
-- [ ] Write outside `/work` fails
+- [x] Fork bomb is stopped by the PID limit
+- [x] Network attempt (socket, DNS) fails
+- [x] Write outside `/work` fails
 - [ ] Run against **both** adapters (the Docker one locally, the production one in CI on Linux runners)
 - [ ] **Done:** these three run in CI
+
+The three tests are cases in `sandboxtest`, so `make check` runs them against the Docker adapter on every CI run. The two open items wait on the production adapter (§3).
 
 ## 5. Security test suite (M3-B08 · 2 d)
 
