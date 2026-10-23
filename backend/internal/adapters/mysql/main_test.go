@@ -79,6 +79,15 @@ func emptyDB(t *testing.T) *sql.DB {
 	return open(t, newDatabase(t))
 }
 
+func migratedDB(t *testing.T) *sql.DB {
+	t.Helper()
+	db := emptyDB(t)
+	if err := mysql.Migrate(t.Context(), db, "up"); err != nil {
+		t.Fatal(err)
+	}
+	return db
+}
+
 func closeDB(t *testing.T, db *sql.DB) {
 	t.Helper()
 	if err := db.Close(); err != nil {
