@@ -1,4 +1,4 @@
-.PHONY: gen gen-go test test-nsjail golden-update images dev down reset seed lint fmt vuln check
+.PHONY: gen gen-go test test-nsjail golden-update images runner-images dev down reset seed lint fmt vuln check
 
 include .env.example
 -include .env
@@ -23,7 +23,7 @@ gen-go:
 		schema/trace.v1.schema.json schema/wire.v1.schema.json
 	go tool oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
 
-test:
+test: runner-images
 	go test ./...
 
 test-nsjail:
@@ -32,12 +32,15 @@ test-nsjail:
 		-v viz-go-mod:/go/pkg/mod -v viz-go-build:/root/.cache/go-build viz-nsjail-test:dev \
 		scripts/nsjail-cgroups.sh sh -c 'CGO_ENABLED=0 go build -o $$VIZ_NSJAIL_TEST_ROOTFS/opt/viz/viz-shim ./cmd/viz-shim && go test ./internal/adapters/nsjail'
 
-golden-update:
-	@echo "golden-update: no golden tests yet; added with the first tracer fixtures (BE-03, BE-04)" >&2; exit 1
+golden-update: runner-images
+	go test -run Golden ./internal/tracecore ./cmd/vizctl -update
 
-images:
+images: runner-images
 	docker build --target api --tag vizd-api:dev .
 	docker build --target worker --tag vizd-worker:dev .
+
+runner-images:
+	docker build --file adapters/python/Dockerfile --tag "$$(sed -n 's/^image: //p' adapters/python/manifest.yaml)" .
 
 dev:
 	docker compose up --detach --wait
