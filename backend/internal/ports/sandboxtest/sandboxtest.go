@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -81,7 +83,7 @@ func Run(t *testing.T, sb ports.Sandbox, image string) {
 		},
 		{
 			name:  "memory over the limit ends with memory limit",
-			steps: []step{{args: sh(`x=$(head -c 300000000 /dev/zero | tr '\0' a)`), want: result{Exit: ports.Exit{Signal: 9, Limit: ports.LimitMemory}}}},
+			steps: []step{{args: sh("exec sort /dev/zero"), want: result{Exit: ports.Exit{Signal: 9, Limit: ports.LimitMemory}}}},
 		},
 		{
 			name: "spawning under the pid limit works",
@@ -105,6 +107,34 @@ func Run(t *testing.T, sb ports.Sandbox, image string) {
 			steps: []step{{
 				args: sh("wget -q -T 2 -O /dev/null http://1.1.1.1/ 2>/dev/null || echo tcp failed; nslookup example.com 1.1.1.1 >/dev/null 2>&1 || echo dns failed"),
 				want: result{Stdout: "tcp failed\ndns failed\n"},
+			}},
+		},
+		{
+			name: "udp is unreachable",
+			steps: []step{{
+				args: sh("echo x | nc -u -w 1 1.1.1.1 53 2>/dev/null || echo udp failed"),
+				want: result{Stdout: "udp failed\n"},
+			}},
+		},
+		{
+			name: "processes outside the box are out of reach",
+			steps: []step{{
+				args: sh(fmt.Sprintf("kill -0 %d 2>/dev/null && echo reachable || echo unreachable", os.Getpid())),
+				want: result{Stdout: "unreachable\n"},
+			}},
+		},
+		{
+			name: "deep recursion ends with memory limit and the box survives",
+			steps: []step{
+				{args: sh("f() { f; }; f"), want: result{Exit: ports.Exit{Signal: 9, Limit: ports.LimitMemory}}},
+				{args: sh("echo alive"), want: result{Stdout: "alive\n"}},
+			},
+		},
+		{
+			name: "new namespaces are refused",
+			steps: []step{{
+				args: sh("unshare -U true 2>/dev/null || echo refused"),
+				want: result{Stdout: "refused\n"},
 			}},
 		},
 		{
@@ -153,22 +183,22 @@ func Run(t *testing.T, sb ports.Sandbox, image string) {
 		})
 	}
 
-	t.Run("large single-line output arrives intact", func(t *testing.T) {
+	t.Run("50 MB single-line output arrives intact", func(t *testing.T) {
 		t.Parallel()
 		box := start(t, sb, image, nil)
-		got, err := run(t.Context(), box, sh(`head -c 5000000 /dev/zero | tr '\0' o; head -c 3000000 /dev/zero | tr '\0' w >&3`), nil, nil)
+		got, err := run(t.Context(), box, sh(`head -c 50000000 /dev/zero | tr '\0' o; head -c 3000000 /dev/zero | tr '\0' w >&3`), nil, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if got.Stdout != strings.Repeat("o", 5000000) {
-			t.Errorf("stdout: %d bytes, want 5000000 bytes of o", len(got.Stdout))
+		if got.Stdout != strings.Repeat("o", 50000000) {
+			t.Errorf("stdout: %d bytes, want 50000000 bytes of o", len(got.Stdout))
 		}
 		if got.Wire != strings.Repeat("w", 3000000) {
 			t.Errorf("wire: %d bytes, want 3000000 bytes of w", len(got.Wire))
 		}
 	})
 
-	t.Run("deadline kills the box and ends with time limit", func(t *testing.T) {
+	t.Run("deadline kills a busy loop and ends with time limit", func(t *testing.T) {
 		t.Parallel()
 		box := start(t, sb, image, nil)
 		ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
@@ -181,7 +211,7 @@ func Run(t *testing.T, sb ports.Sandbox, image string) {
 		ctx, cancel = context.WithTimeout(t.Context(), time.Second)
 		defer cancel()
 		began := time.Now()
-		got, err = run(ctx, box, sh("sleep 60"), nil, nil)
+		got, err = run(ctx, box, sh("while :; do :; done"), nil, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
