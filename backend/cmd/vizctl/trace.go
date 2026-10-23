@@ -10,14 +10,13 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"maps"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/dockersandbox"
+	"github.com/tu-hm/code-viz/backend/internal/domain"
 	"github.com/tu-hm/code-viz/backend/internal/gen/api"
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
 	"github.com/tu-hm/code-viz/backend/internal/ports"
@@ -89,7 +88,7 @@ func readAtMost(r io.Reader, limit int, name string) ([]byte, error) {
 	return b, nil
 }
 
-func record(ctx context.Context, m manifest, src, stdin []byte) (res *tracecore.Result, err error) {
+func record(ctx context.Context, m domain.Manifest, src, stdin []byte) (res *tracecore.Result, err error) {
 	val, err := schema.New()
 	if err != nil {
 		return nil, err
@@ -112,28 +111,10 @@ func record(ctx context.Context, m manifest, src, stdin []byte) (res *tracecore.
 	}
 	defer func() { err = errors.Join(err, box.Close(context.WithoutCancel(ctx))) }()
 
-	buildCtx, cancelBuild := context.WithTimeout(ctx, time.Duration(m.Build.TimeoutMs)*time.Millisecond)
-	defer cancelBuild()
-	diag := &capped{max: maxDiag}
-	build, err := box.Run(buildCtx, ports.Command{
-		Args:   m.Build.Cmd,
-		Env:    []string{"VIZ_MODULES_ALLOW=" + strings.Join(m.Modules.Allow, ",")},
-		Stdout: diag,
-		Stderr: diag,
-		Wire:   io.Discard,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("build: %w", err)
-	}
-	if build.Limit == ports.LimitTime {
-		return nil, fmt.Errorf("%s: build timed out", api.FailureKindCompileError)
-	}
-	if build != (ports.Exit{}) {
-		kind := api.FailureKindCompileError
-		if build.Code != 0 && build.Code == m.Build.UnsupportedModuleExit {
-			kind = api.FailureKindUnsupportedModule
+	if m.Build != nil {
+		if err := runBuild(ctx, box, *m.Build, m.AllowedModules); err != nil {
+			return nil, err
 		}
-		return nil, fmt.Errorf("%s:\n%s", kind, bytes.TrimRight(diag.buf, "\n"))
 	}
 
 	rec := tracecore.NewRecorder(tracecore.Config{
@@ -143,15 +124,11 @@ func record(ctx context.Context, m manifest, src, stdin []byte) (res *tracecore.
 		Limits:   tracecore.DefaultLimits,
 		Validate: val.Wire,
 	})
-	env := []string{"VIZ_MAX_STEPS=" + strconv.Itoa(maxSteps)}
-	for _, k := range slices.Sorted(maps.Keys(m.Trace.Env)) {
-		env = append(env, k+"="+m.Trace.Env[k])
-	}
 	traceCtx, cancelTrace := context.WithTimeout(ctx, wallTime)
 	defer cancelTrace()
 	exit, err := box.Run(traceCtx, ports.Command{
-		Args:   m.Trace.Cmd,
-		Env:    env,
+		Args:   m.TraceCmd,
+		Env:    append([]string{"VIZ_MAX_STEPS=" + strconv.Itoa(maxSteps)}, m.TraceEnv...),
 		Stdout: rec.Stdout(),
 		Stderr: rec.Stderr(),
 		Wire:   rec.Wire(),
@@ -166,6 +143,33 @@ func record(ctx context.Context, m manifest, src, stdin []byte) (res *tracecore.
 		return nil, fmt.Errorf("trace: %w", err)
 	}
 	return res, nil
+}
+
+func runBuild(ctx context.Context, box ports.Box, b domain.Build, allowedModules []string) error {
+	ctx, cancel := context.WithTimeout(ctx, b.Timeout)
+	defer cancel()
+	diag := &capped{max: maxDiag}
+	exit, err := box.Run(ctx, ports.Command{
+		Args:   b.Cmd,
+		Env:    []string{"VIZ_MODULES_ALLOW=" + strings.Join(allowedModules, ",")},
+		Stdout: diag,
+		Stderr: diag,
+		Wire:   io.Discard,
+	})
+	if err != nil {
+		return fmt.Errorf("build: %w", err)
+	}
+	if exit.Limit == ports.LimitTime {
+		return fmt.Errorf("%s: build timed out", api.FailureKindCompileError)
+	}
+	if exit != (ports.Exit{}) {
+		kind := api.FailureKindCompileError
+		if exit.Code != 0 && exit.Code == b.UnsupportedModuleExit {
+			kind = api.FailureKindUnsupportedModule
+		}
+		return fmt.Errorf("%s:\n%s", kind, bytes.TrimRight(diag.buf, "\n"))
+	}
+	return nil
 }
 
 func newTraceID() string {

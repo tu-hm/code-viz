@@ -14,6 +14,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	"github.com/tu-hm/code-viz/backend/internal/adapters/manifest"
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
 	"github.com/tu-hm/code-viz/backend/schema"
 )
@@ -35,7 +36,7 @@ func TestGoldenTraces(t *testing.T) {
 	}
 
 	for _, path := range paths {
-		m, err := readManifest(path)
+		m, err := manifest.Read(path)
 		if err != nil {
 			t.Fatal(err)
 		}
