@@ -6,7 +6,7 @@
 
 ## Now
 
-- **In progress:** BE-01 (34/48). §2 CI is written and in review.
+- **In progress:** BE-01 (36/46). CI runs `make check` on every push and PR to `main`, and the first run is green. Every item left waits on another task or on a decision; see [BE-01 open items](#be-01-open-items).
 - **Next, by the suggested order:** BE-08 §1 (GDB prototype, feeds G1 and the S1 traces due Fri 6 Nov), then BE-02 §1. On FE: FE-01 §1–2. The trace schema and OpenAPI are both on `main`, so FE codegen can start.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
@@ -23,7 +23,7 @@
 
 | Task | Milestone | Status | Done | Next step, or what it waits on |
 |---|---|---|---|---|
-| [BE-01](backend/BE-01-foundation-contracts.md) Foundation & contracts | M0–M1 | 🟡 | 34/48 | §2 CI in review. Other open items: see [BE-01 open items](#be-01-open-items) |
+| [BE-01](backend/BE-01-foundation-contracts.md) Foundation & contracts | M0–M1 | 🟡 | 36/46 | CI runs `make check`. Open items: see [BE-01 open items](#be-01-open-items) |
 | [BE-02](backend/BE-02-sandbox.md) Sandbox ⚠ | M0–M1, M3 | ⏳ | 0/54 | §1 spike S1b needs the BE-08 §1 prototype; result decides G1 (Fri 6 Nov) |
 | [BE-03](backend/BE-03-python-tracer.md) Python tracer | M0–M1 | ⏳ | 0/35 | §1 spike S2 comes after BE-02 §1 in the M0 order; decides G2 (Fri 13 Nov). §2+ need BE-02 §2, BE-04 |
 | [BE-04](backend/BE-04-trace-processing.md) Trace processing | M0–M2 | 🟢 | 0/31 | §1 spike S4 (input to G3, Fri 13 Nov); needs only BE-01 |
@@ -37,15 +37,16 @@
 | [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/10 | BE-06 |
 | [BE-13](backend/BE-13-environments-launch.md) Environments & launch | M1–M5 | 🟢 | 0/48 | §1 can start. BE-01 §6 already covers part of it (Compose with MySQL + SeaweedFS, `migrate up` on start); not ticked yet |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | ⏳ | 0/10 | BE-07–09 |
-| **Total** | | | **34/429** | |
+| **Total** | | | **36/427** | |
 
 ### BE-01 open items
 
 | Item | Waits on |
 |---|---|
-| §2 CI: workflow, web job, drift check, "a PR shows every check" | CI in review; ticked after the first green run |
+| §2 web checks job | FE-01 §1 (the web workspace) |
 | §2 required checks on `main` | Your decision (above) |
-| §6 push images by git SHA, Trivy + cosign, testcontainers on Linux runners | Same CI work |
+| §2 Done: a PR shows every check | The first PR |
+| §6 sandbox tests on Linux runners | BE-02 (testcontainers tests already run in CI) |
 | §3 and §5 TypeScript output from `make gen` | FE-01 §2 (the Go side is done) |
 | §4 Done: validates S1 prototype output | BE-08 §1 |
 | §6 `viz-shim` in the worker image | BE-02 §2 |

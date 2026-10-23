@@ -25,11 +25,11 @@ The Go repo, CI, and the three contracts everything else is built on.
 
 ## 2. CI (M0-03 · 1 d)
 
-- [ ] GitHub Actions workflow: `golangci-lint`, `go test ./...`, `govulncheck`
-- [ ] Add the web checks job (lint/test; FE owns the contents)
-- [ ] Codegen drift check: run `make gen`, fail if `git diff` is non-empty
-- [ ] Mark all checks as required on PRs to `main`
-- [ ] **Done:** a PR shows every check
+- [x] GitHub Actions workflow: `golangci-lint`, `go test ./...`, `govulncheck` — one job runs `make check`
+- [ ] Add the web checks job (lint/test; FE owns the contents) — added when FE-01 §1 creates the web workspace
+- [x] Codegen drift check: run `make gen`, fail if `git diff` is non-empty — part of `make check`
+- [ ] Mark all checks as required on PRs to `main` — not set; it would block the direct pushes to `main` this repo uses now
+- [ ] **Done:** a PR shows every check — no PR opened yet
 
 ## 3. Trace schema — `schema/trace.v1.schema.json` (M0-05 · 2 d)
 
@@ -76,8 +76,6 @@ The Go repo, CI, and the three contracts everything else is built on.
 
 **Multi-arch**
 - [ ] Build `vizd` and all runner images for `linux/amd64` and `linux/arm64` with `docker buildx` — `vizd` builds for both; runner images come with BE-03 and BE-08
-- [ ] Push to the registry with tags by git SHA; deploy by digest
-- [ ] Trivy scan + cosign sign in CI for every image
 
 **Dev workflow**
 - [x] Makefile targets: `make dev` (Compose up → migrate → seed → `vizd --role=all` with hot reload), `make down`, `make reset` (drop volumes), `make seed`, `make images` (host architecture only, fast)
@@ -85,7 +83,7 @@ The Go repo, CI, and the three contracts everything else is built on.
 - [x] Dev README: prerequisites (Go, Docker), first-run steps, common problems (architecture mismatch, Docker not running)
 
 **CI**
-- [ ] Run tests that use `testcontainers-go` and the real sandbox on Linux runners
+- [ ] Run tests that use `testcontainers-go` and the real sandbox on Linux runners — testcontainers tests run in CI; sandbox tests come with BE-02
 
 - [ ] **Done:** a new developer on a Mac or Linux goes from clone to a completed local job with `make dev` and the README only — blocked on BE-02 (sandbox), BE-05 (worker), BE-06 (API, tables) and BE-13 §1 (seed data)
 
