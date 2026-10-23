@@ -24,6 +24,8 @@ const drainTimeout = 25 * time.Second // §13
 type config struct {
 	HTTPAddr string `env:"VIZ_HTTP_ADDR" envDefault:":8080"`
 	MySQLDSN string `env:"MYSQL_DSN,required"`
+	Env      string `env:"VIZ_ENV,required"`
+	Sandbox  string `env:"VIZ_SANDBOX"`
 }
 
 func main() {
@@ -43,6 +45,14 @@ func run() (err error) {
 	if err := env.Parse(&cfg); err != nil {
 		return fmt.Errorf("load config: %w", err)
 	}
+	sandbox, err := pickSandbox(cfg.Env, cfg.Sandbox)
+	if err != nil {
+		return fmt.Errorf("load config: %w", err)
+	}
+	if sandbox == "docker" {
+		slog.Warn("docker sandbox is not a security boundary", "viz_env", cfg.Env)
+	}
+
 	db, err := mysql.Open(cfg.MySQLDSN)
 	if err != nil {
 		return fmt.Errorf("open mysql: %w", err)
@@ -68,6 +78,27 @@ func run() (err error) {
 	httptransport.HandleProbes(mux, ctx.Done(), db.PingContext)
 	// TODO(tu-hm): claim and run jobs under worker and all once BE-05 lands; drain them before http shutdown
 	return serve(ctx, cfg.HTTPAddr, mux)
+}
+
+func pickSandbox(vizEnv, sandbox string) (string, error) {
+	switch vizEnv {
+	case "dev", "test", "staging", "prod":
+	default:
+		return "", fmt.Errorf("VIZ_ENV must be dev, test, staging or prod, got %q", vizEnv)
+	}
+	if sandbox == "" && vizEnv == "dev" {
+		return "docker", nil
+	}
+	switch sandbox {
+	case "runsc", "nsjail":
+		return sandbox, nil
+	case "docker":
+		if vizEnv != "dev" && vizEnv != "test" {
+			return "", fmt.Errorf("VIZ_SANDBOX=docker is not a security boundary, refused with VIZ_ENV=%s", vizEnv)
+		}
+		return sandbox, nil
+	}
+	return "", fmt.Errorf("VIZ_SANDBOX must be docker, runsc or nsjail, got %q", sandbox)
 }
 
 func serve(ctx context.Context, addr string, h http.Handler) error {
