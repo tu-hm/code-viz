@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/dockersandbox"
+	"github.com/tu-hm/code-viz/backend/internal/app"
 	"github.com/tu-hm/code-viz/backend/internal/domain"
-	"github.com/tu-hm/code-viz/backend/internal/gen/api"
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
 	"github.com/tu-hm/code-viz/backend/internal/ports"
 	"github.com/tu-hm/code-viz/backend/internal/tracecore"
@@ -31,7 +31,6 @@ const (
 	maxSteps  = 1000
 	wallTime  = 15 * time.Second
 	memory    = 256 << 20
-	maxDiag   = 64 << 10
 )
 
 func traceCommand(ctx context.Context, args []string, stdin io.Reader, stdout, stderr io.Writer) error {
@@ -112,8 +111,16 @@ func record(ctx context.Context, m domain.Manifest, src, stdin []byte) (res *tra
 	defer func() { err = errors.Join(err, box.Close(context.WithoutCancel(ctx))) }()
 
 	if m.Build != nil {
-		if err := runBuild(ctx, box, *m.Build, m.AllowedModules); err != nil {
+		b, kind, err := app.Build(ctx, box, m)
+		if err != nil {
 			return nil, err
+		}
+		if !b.Ok {
+			var raw string
+			if b.Raw != nil {
+				raw = strings.TrimRight(*b.Raw, "\n")
+			}
+			return nil, fmt.Errorf("%s:\n%s", kind, raw)
 		}
 	}
 
@@ -145,33 +152,6 @@ func record(ctx context.Context, m domain.Manifest, src, stdin []byte) (res *tra
 	return res, nil
 }
 
-func runBuild(ctx context.Context, box ports.Box, b domain.Build, allowedModules []string) error {
-	ctx, cancel := context.WithTimeout(ctx, b.Timeout)
-	defer cancel()
-	diag := &capped{max: maxDiag}
-	exit, err := box.Run(ctx, ports.Command{
-		Args:   b.Cmd,
-		Env:    []string{"VIZ_MODULES_ALLOW=" + strings.Join(allowedModules, ",")},
-		Stdout: diag,
-		Stderr: diag,
-		Wire:   io.Discard,
-	})
-	if err != nil {
-		return fmt.Errorf("build: %w", err)
-	}
-	if exit.Limit == ports.LimitTime {
-		return fmt.Errorf("%s: build timed out", api.FailureKindCompileError)
-	}
-	if exit != (ports.Exit{}) {
-		kind := api.FailureKindCompileError
-		if exit.Code != 0 && exit.Code == b.UnsupportedModuleExit {
-			kind = api.FailureKindUnsupportedModule
-		}
-		return fmt.Errorf("%s:\n%s", kind, bytes.TrimRight(diag.buf, "\n"))
-	}
-	return nil
-}
-
 func newTraceID() string {
 	b := make([]byte, 16)
 	rand.Read(b)
@@ -184,15 +164,4 @@ func lineCount(src []byte) int {
 		n++
 	}
 	return n
-}
-
-type capped struct {
-	buf []byte
-	max int
-}
-
-func (c *capped) Write(p []byte) (int, error) {
-	room := max(c.max-len(c.buf), 0)
-	c.buf = append(c.buf, p[:min(room, len(p))]...)
-	return len(p), nil
 }
