@@ -13,7 +13,11 @@ backend/        Go: vizd (API and worker roles), vizctl, schemas, OpenAPI contra
   cmd/          vizd and vizctl entrypoints
   internal/     domain, tracecore, app, ports, adapters, transport; gen/ is generated
   fixtures/     golden traces per language
-docs/guides/    how we write code here: comments, tests, migrations, the sandbox
+web/            TypeScript: pnpm workspace for the browser app
+  apps/ide/     IDE app (Vite, React)
+  packages/     @viz/player, @viz/ui (design system)
+  fixtures/     traces every view is built against
+docs/guides/    how we write code here: comments, tests, migrations, the sandbox, the design system
 plans/          spec, work plans, one file per backend and frontend task
 ```
 
@@ -31,12 +35,25 @@ Go comes from the version in `backend/go.mod`. Any Go 1.21 or newer downloads it
 
 The local stack (MySQL 8.4 and SeaweedFS in Docker), `make dev`, and fixes for common problems are in [backend/README.md](backend/README.md).
 
+The web app needs Node 24 and pnpm 12. `make gen` needs them too, because it regenerates the TypeScript types:
+
+```bash
+cd web
+pnpm install
+pnpm dev
+```
+
+The mock API, fixtures and configuration are in [web/README.md](web/README.md).
+
 ## Where to read
 
 | Read | For |
 |---|---|
 | [Spec](plans/code-visualizer-spec_2.md) | Behavior, locked decisions (§0.1), API (§8), trace format (§9), limits (§11), security (§12), tests (§15) |
 | [Backend tasks](plans/tasks/backend/) | What to build, BE-01 to BE-14, each with its spec sections and done criteria |
+| [Frontend tasks](plans/tasks/frontend/) | FE-01 to FE-14, the same shape |
+| [Web README](web/README.md) | Running the web app, the mock API, fixtures, generated types |
+| [Design system](docs/guides/design-system.md) | Tokens, the trace palette, type, frame, components, contrast rules |
 | [Task tracking](plans/tasks/README.md) | Milestones, decision gates, handoffs between backend and frontend |
 | [CLAUDE.md](CLAUDE.md) | Backend rules: plain Go (S1 to S12), architecture, trust boundary, MySQL, errors and logs, git |
 | [Comments cheat sheet](docs/guides/comments-cheat-sheet.md) | Default zero comments; the eight kinds that earn one |

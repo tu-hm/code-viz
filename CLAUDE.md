@@ -6,7 +6,7 @@ The spec is [plans/code-visualizer-spec_2.md](plans/code-visualizer-spec_2.md); 
 
 ## Commands
 
-Run from `backend/`. Works on macOS and Linux; the prerequisites are Go, Docker with Compose v2, make and git.
+Run from `backend/`. Works on macOS and Linux; the prerequisites are Go, Docker with Compose v2, make and git. `make gen` also needs Node 24 and pnpm, for the TypeScript half (`web/`).
 
 ```bash
 scripts/setup.sh      # checks prerequisites, prints the install command for this OS
@@ -18,7 +18,7 @@ make golden-update    # rewrites expected.trace.json; read the diff before commi
 make lint             # golangci-lint v2.15.0, pinned through go run
 make fmt              # goimports, then gofmt
 make vuln             # govulncheck v1.9.0, pinned
-make check            # lint, vuln, test, go mod tidy and codegen drift; run before pushing
+make check            # lint, vuln, test, go mod tidy and Go codegen drift; run before pushing
 go test ./internal/tracecore -run TestName
 ```
 
