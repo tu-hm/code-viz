@@ -19,7 +19,7 @@ flowchart TB
   app["internal/app"]
   ports["internal/ports<br/>the only interfaces"]
   pure["internal/domain · internal/tracecore<br/>standard library only"]
-  impl["internal/adapters<br/>dockersandbox · nsjail · mysql"]
+  impl["internal/adapters<br/>dockersandbox · nsjail · mysql · blobstore · manifest"]
   cmd --> transport --> app
   app --> ports
   app --> pure
@@ -31,13 +31,15 @@ Dependencies point one way: `transport → app → domain`. `domain` and `tracec
 
 | Package | What it holds | Status |
 |---|---|---|
-| `internal/domain` | Sentinel errors (`ErrInfra`); later the job states, limits and IDs | Started |
+| `internal/domain` | Sentinel errors (`ErrInfra`), the language `Manifest` and `ChunkKey`; later the job states, limits and IDs | Started |
 | `internal/tracecore` | Wire stream in, trace out: stable IDs, keyframes and deltas, limits, chunks | Done (BE-04 §2). See [tracing](tracing.md) |
 | `internal/app` | Use cases: create, get and wait, run a trace job | Empty (BE-05, BE-06) |
-| `internal/ports` | `Sandbox` and its shared test suite `sandboxtest`. Later `MetaStore`, `JobQueue`, `Events`, `BlobStore`, `Adapters` | `Sandbox` done. See [sandbox](sandbox.md) |
+| `internal/ports` | `Sandbox` and its shared test suite `sandboxtest`, `BlobStore` and `Adapters`. Later `MetaStore`, `JobQueue`, `Events` | `Sandbox` and `Adapters` done; `BlobStore` puts only. See [sandbox](sandbox.md) |
 | `internal/adapters/nsjail` | The production sandbox (D10, G1) | Done |
 | `internal/adapters/dockersandbox` | The dev sandbox for laptops; not a security boundary | Done |
 | `internal/adapters/mysql` | The connection pool and goose migrations | Open and migrate only; no tables yet (BE-06) |
+| `internal/adapters/blobstore` | `BlobStore` on any S3 API (aws-sdk-go-v2); SeaweedFS in dev | Put with 3 retries; presign and copy come with BE-06 |
+| `internal/adapters/manifest` | `Adapters`: every `*/manifest.yaml` in a directory, checked once at load | Done; `vizctl` uses it, the worker and `GET /languages` will |
 | `internal/shim` | The `viz-shim` frame codec, shared by both sandboxes | Done |
 | `internal/transport/http` | HTTP handlers | Health probes only (BE-06) |
 | `internal/gen/{api,trace,wire}` | Types generated from the contracts by `make gen`. Never edited | Generated |

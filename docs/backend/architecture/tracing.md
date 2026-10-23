@@ -51,10 +51,10 @@ box, err := sb.Start(ctx, ports.SandboxSpec{
 	Memory: 256 << 20,
 })
 
-// build: for Python, the syntax and import check
+// build, when m.Build != nil: for Python, the syntax and import check
 build, err := box.Run(buildCtx, ports.Command{
 	Args: m.Build.Cmd,
-	Env:  []string{"VIZ_MODULES_ALLOW=" + strings.Join(m.Modules.Allow, ",")},
+	Env:  []string{"VIZ_MODULES_ALLOW=" + strings.Join(m.AllowedModules, ",")},
 	Stdout: diag, Stderr: diag, Wire: io.Discard,
 })
 
@@ -67,8 +67,8 @@ rec := tracecore.NewRecorder(tracecore.Config{
 	Validate: val.Wire,
 })
 exit, err := box.Run(traceCtx, ports.Command{
-	Args:   m.Trace.Cmd,
-	Env:    append([]string{"VIZ_MAX_STEPS=1000"}, traceEnv...),
+	Args:   m.TraceCmd,
+	Env:    append([]string{"VIZ_MAX_STEPS=1000"}, m.TraceEnv...),
 	Stdout: rec.Stdout(), Stderr: rec.Stderr(), Wire: rec.Wire(),
 })
 res, err := rec.Finish(tracecore.Outcome{
@@ -77,12 +77,12 @@ res, err := rec.Finish(tracecore.Outcome{
 }, err)
 ```
 
-1. **Load the manifest** whose `id` matches `--lang`, from `adapters/*/manifest.yaml`.
+1. **Load the manifest** whose `id` matches `--lang`. `manifest.Load("adapters")` (`internal/adapters/manifest`, the `Adapters` port) reads and checks every `adapters/*/manifest.yaml` once and hands out a `domain.Manifest`: the build timeout as a `time.Duration`, `trace.env` as sorted `KEY=value` strings, and `Build` nil for a language with no build step.
 2. **Start one box** with the source and `stdin` written into `/work`. Stdin is a file, never fd 0 (sandbox guide, Rules for callers).
-3. **Build** under `build.timeoutMs`. A non-zero exit fails the run before anything is traced: `unsupported_module` when the code equals `build.unsupportedModuleExit`, `compile_error` otherwise, with the build output as diagnostics.
+3. **Build** under `build.timeoutMs`, if the manifest has a build. A non-zero exit fails the run before anything is traced: `unsupported_module` when the code equals `build.unsupportedModuleExit`, `compile_error` otherwise, with the build output as diagnostics.
 4. **Trace** under the wall-time deadline (15 s by default, §11), with the recorder's three writers. When a writer returns an error, the sandbox kills the box. That's how the core enforces its hard limits.
 5. **Finish**: pass `Run`'s outcome and error in. A kill caused by one of the core's own limits still gives a trace. Any other error (infra, cancel, malformed output) comes back as an error.
-6. **Use the result**: `res.Trace()` is the whole document (what `vizctl` prints), `res.Chunks()` the gzipped chunks to store, `res.Tail` the output after the step limit (`tail.txt.gz`, §19.9.5), and `res.Logs` the adapter's `log` messages, for internal logs only.
+6. **Use the result**: `res.Trace()` is the whole document (what `vizctl` prints), `res.Chunks()` the gzipped chunks to store (chunk `i` goes to `BlobStore.Put` under `domain.ChunkKey("t7", id, i)`, §7.5), `res.Tail` the output after the step limit (`tail.txt.gz`, §19.9.5), and `res.Logs` the adapter's `log` messages, for internal logs only.
 
 ### What the caller passes
 

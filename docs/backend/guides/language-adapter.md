@@ -5,14 +5,16 @@ An adapter is everything specific to one language: a manifest, a runner image an
 ## Add a language
 
 1. **Create `backend/adapters/<dir>/`** with a `manifest.yaml`, a `Dockerfile` and the tracer. The C++ prototype lives in `adapters/cpp/`; the Python adapter in `adapters/python/` is the complete example.
-2. **Write the manifest** (§10.2). `vizctl` and the worker read:
+2. **Write the manifest** (§10.2). `vizctl` and the worker load every `adapters/*/manifest.yaml` through `internal/adapters/manifest`, which checks them all at once: one bad manifest, or two with the same `id`, fails the load. They read:
 
    | Field | Meaning |
    |---|---|
    | `id` | The `--lang` and `language.id` value, for example `python3` |
+   | `displayName`, `editorMode` | Required. For `GET /languages` (BE-06) |
+   | `enabled` | `true` to offer the language. A manifest without it loads as disabled; `vizctl` traces it anyway |
    | `image` | The runner image tag. The adapter's line in `make runner-images` reads it from the manifest |
    | `sourceFile` | The file name in `/work`, for example `main.py` |
-   | `build.cmd`, `build.timeoutMs` | The build, or for an interpreted language a check. A non-zero exit is `compile_error`, and its output becomes the diagnostics |
+   | `build.cmd`, `build.timeoutMs` | The build, or for an interpreted language a check. A non-zero exit is `compile_error`, and its output becomes the diagnostics. Leave out `build` for a language that needs neither |
    | `build.unsupportedModuleExit` | Optional. The exit code that means `unsupported_module` instead |
    | `trace.cmd`, `trace.env` | The tracer command and its environment. The caller adds `VIZ_MAX_STEPS` |
    | `modules.allow` | Optional. Passed to the build as `VIZ_MODULES_ALLOW`, comma-separated |
