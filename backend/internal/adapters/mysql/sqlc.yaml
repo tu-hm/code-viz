@@ -1,0 +1,12 @@
+version: "2"
+sql:
+  - engine: mysql
+    schema: migrations
+    queries: queries
+    gen:
+      go:
+        package: sqlc
+        out: ../../gen/sqlc
+        overrides:
+          - db_type: int
+            go_type: int

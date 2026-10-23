@@ -8,6 +8,7 @@ SCHEMA_ID := https://github.com/tu-hm/code-viz/schema
 GEN_PKG := github.com/tu-hm/code-viz/backend/internal/gen
 GOLANGCI_LINT := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
 GOVULNCHECK := go run golang.org/x/vuln/cmd/govulncheck@v1.9.0
+SQLC := go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1
 
 gen: gen-go
 	pnpm --dir ../web gen
@@ -22,6 +23,8 @@ gen-go:
 		--schema-root-type $(SCHEMA_ID)/wire.v1.schema.json=Message \
 		schema/trace.v1.schema.json schema/wire.v1.schema.json
 	go tool oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
+	rm -rf internal/gen/sqlc
+	$(SQLC) generate --file internal/adapters/mysql/sqlc.yaml
 
 test: runner-images
 	go test ./...
