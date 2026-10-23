@@ -109,7 +109,7 @@ def heap_object(value, printer, hint, heap):
     return {"kind": "sequence", "type": type_name, "length": len(items), "items": items, "meta": meta}
 
 
-def local_values(frame, line, heap):
+def local_values(frame, line, heap, scope):
     blocks = []
     block = frame.block()
     while block is not None:
@@ -117,12 +117,26 @@ def local_values(frame, line, heap):
         if block.function is not None:
             break
         block = block.superblock
+
+    keys = [(b.start, b.end) for b in blocks]
+    if scope["line"] is not None and scope["line"] != line:
+        for k in scope["live"]:
+            scope["ran"][k].add(scope["line"])
+    for k in keys:
+        if k not in scope["live"]:
+            scope["ran"][k] = set()
+    scope["line"], scope["live"] = line, keys
+
     out = []
-    for block in reversed(blocks):
+    for block, k in reversed(list(zip(blocks, keys))):
         for sym in block:
             if not (sym.is_variable or sym.is_argument) or (not sym.is_argument and sym.line > line):
                 continue
-            local = {"name": sym.name, "value": encode(sym.value(frame), heap)}
+            if not sym.is_argument and sym.line == line and line not in scope["ran"][k]:
+                value = {"t": "uninit", "type": str(sym.type)}
+            else:
+                value = encode(sym.value(frame), heap)
+            local = {"name": sym.name, "value": value}
             if sym.name.startswith("__"):
                 local["internal"] = True
             out.append(local)
@@ -147,7 +161,7 @@ def user_frames():
     return frames
 
 
-def step_message(event, prev_line, frames, ids, globals_):
+def step_message(event, prev_line, frames, ids, scopes, globals_):
     heap = {}
     line = frames[-1].find_sal().line
     stack = []
@@ -158,7 +172,7 @@ def step_message(event, prev_line, frames, ids, globals_):
     for frame, call_id in zip(frames, ids):
         frame_line = frame.find_sal().line
         stack.append({"id": str(call_id), "name": frame.name(), "kind": "function", "line": frame_line,
-                      "locals": local_values(frame, frame_line, heap), "returnValue": None})
+                      "locals": local_values(frame, frame_line, heap, scopes[call_id]), "returnValue": None})
     msg = {"type": "step", "event": event, "line": line, "prevLine": prev_line, "stack": stack, "heap": heap,
            "error": None}
     if event == "call":
@@ -191,6 +205,7 @@ def trace():
 
     prev_frames, prev_ids, prev_line = [], [], None
     next_id = 1
+    scopes = {}
     while True:
         stop = stops[-1]
         stops.clear()
@@ -222,8 +237,9 @@ def trace():
                 ids.append(prev_ids[i])
             else:
                 ids.append(next_id)
+                scopes[next_id] = {"line": None, "live": [], "ran": {}}
                 next_id += 1
-        msg = step_message("call" if entered else "line", prev_line, frames, ids, globals_)
+        msg = step_message("call" if entered else "line", prev_line, frames, ids, scopes, globals_)
         send(msg)
         prev_frames, prev_ids, prev_line = frames, ids, msg["line"]
         run("step")
