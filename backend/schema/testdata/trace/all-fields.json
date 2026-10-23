@@ -1,0 +1,170 @@
+{
+  "version": "1.1",
+  "id": "trc_0f3a9c1e7b2d4a6890e1c5b7d3f2a4c6",
+  "language": { "id": "cpp17-gcc", "runtime": "GCC 13.2", "adapter": "cpp-gdb/1.0.0" },
+  "source": { "file": "main.cpp", "lineCount": 16 },
+  "options": { "maxSteps": 1000, "startAtLines": [8], "captureRanges": { "depth": [[0, 50]] }, "showInternals": true },
+  "summary": {
+    "stepCount": 3,
+    "truncated": true,
+    "truncation": { "reason": "step_limit", "atLine": 13 },
+    "exit": { "kind": "step_limit", "code": null, "signal": null, "message": null },
+    "lineHits": { "8": 1, "12": 1, "13": 1, "15": 0 },
+    "lineHitsSource": "gcov",
+    "untracedTail": {
+      "completed": true,
+      "exit": { "kind": "normal", "code": 0, "signal": null, "message": null },
+      "stdoutBytes": 1234
+    }
+  },
+  "encoding": { "mode": "delta", "keyframeInterval": 50 },
+  "steps": [
+    {
+      "i": 0,
+      "event": "call",
+      "prevLine": null,
+      "line": 8,
+      "keyframe": true,
+      "stack": ["f0", "f1"],
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "name": "Globals",
+          "kind": "global",
+          "line": 8,
+          "locals": [
+            { "name": "MAXN", "value": { "t": "int", "v": "200005", "type": "const int" } },
+            { "name": "depth", "value": { "t": "ref", "id": "o1" } }
+          ],
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "name": "main",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            { "name": "v", "value": { "t": "ref", "id": "o2", "type": "vector<int>" } },
+            { "name": "cnt", "value": { "t": "ref", "id": "o3" } },
+            { "name": "head", "value": { "t": "ptr", "addr": "0x55555556aeb0", "target": "o4", "type": "Node*" } },
+            { "name": "p", "value": { "t": "ptr", "addr": "0x55555556b00c", "target": "o1", "index": 3, "type": "int*" } },
+            { "name": "c", "value": { "t": "char", "v": "a", "code": 97 } },
+            { "name": "x", "value": { "t": "float", "v": "0.5", "type": "double" } },
+            { "name": "ok", "value": { "t": "bool", "v": "true" } },
+            { "name": "s", "value": { "t": "str", "v": "chef", "len": 4, "truncated": false, "type": "std::string" } },
+            { "name": "y", "value": { "t": "uninit" } },
+            { "name": "z", "value": { "t": "unavailable", "reason": "optimized_out" } },
+            { "name": "n", "value": { "t": "none" } },
+            { "name": "__for_range", "value": { "t": "ref", "id": "o2" }, "internal": true }
+          ],
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "kind": "sequence",
+          "type": "int[200005]",
+          "length": 200005,
+          "sparse": {
+            "default": { "t": "int", "v": "0" },
+            "items": { "1": { "t": "int", "v": "1" }, "2": { "t": "int", "v": "1" }, "3": { "t": "int", "v": "2" } }
+          },
+          "window": { "start": 0, "count": 16 },
+          "fixed": true,
+          "truncated": false
+        },
+        "o2": {
+          "kind": "sequence",
+          "type": "vector<int>",
+          "length": 3,
+          "items": [{ "t": "int", "v": "4" }, { "t": "int", "v": "1" }, { "t": "int", "v": "3" }],
+          "meta": { "capacity": 3 }
+        },
+        "o3": {
+          "kind": "mapping",
+          "type": "map<string,int>",
+          "length": 1,
+          "entries": [{ "key": { "t": "str", "v": "ab" }, "value": { "t": "int", "v": "2" } }],
+          "ordered": true
+        },
+        "o4": {
+          "kind": "record",
+          "type": "Node",
+          "fields": [
+            { "name": "val", "value": { "t": "int", "v": "1" } },
+            { "name": "next", "value": { "t": "ptr", "addr": "0x0" } }
+          ]
+        },
+        "o5": {
+          "kind": "set",
+          "type": "set<int>",
+          "length": 2,
+          "items": [{ "t": "int", "v": "1" }, { "t": "int", "v": "2" }],
+          "ordered": true,
+          "truncated": false
+        },
+        "o6": { "kind": "function", "name": "square", "signature": "square(x)" },
+        "o7": { "kind": "class", "name": "Point" },
+        "o8": { "kind": "opaque", "type": "std::priority_queue<int>", "summary": "std::priority_queue with 3 elements" }
+      },
+      "removedObjects": [],
+      "stdout": "",
+      "stderr": "",
+      "error": null,
+      "callId": 1,
+      "parentCallId": 0,
+      "stdinPos": { "bytes": 0, "token": 0, "inferred": true }
+    },
+    {
+      "i": 1,
+      "event": "line",
+      "prevLine": 12,
+      "line": 13,
+      "keyframe": false,
+      "stack": ["f0", "f1"],
+      "frames": {},
+      "heap": {
+        "o1": {
+          "kind": "sequence",
+          "type": "int[200005]",
+          "length": 200005,
+          "patch": { "3": { "t": "int", "v": "7" } },
+          "window": { "start": 0, "count": 16 }
+        }
+      },
+      "removedObjects": ["o8"],
+      "stdout": "4\n",
+      "stderr": "",
+      "error": null,
+      "access": [
+        { "obj": "o1", "path": [3], "mode": "w" },
+        { "obj": "o2", "path": [0], "mode": "r", "inferred": true }
+      ],
+      "stdinPos": { "bytes": 4, "token": 1, "inferred": true }
+    },
+    {
+      "i": 2,
+      "event": "exception",
+      "prevLine": 13,
+      "line": 14,
+      "keyframe": false,
+      "stack": ["f0", "f1"],
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "name": "main",
+          "kind": "function",
+          "line": 14,
+          "locals": [],
+          "returnValue": { "t": "int", "v": "0" }
+        }
+      },
+      "heap": {},
+      "removedObjects": [],
+      "stdout": "",
+      "stderr": "",
+      "error": { "type": "SIGSEGV", "message": "Segmentation fault (invalid memory access)", "line": 14 },
+      "callId": 1
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tu-hm/code-viz/schema/wire.v1.schema.json",
+  "title": "Message",
+  "description": "One NDJSON line an adapter writes on fd 3 (spec §10.1). Unknown fields are allowed.",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": { "enum": ["hello", "step", "out", "exit", "log"] }
+  },
+  "allOf": [
+    { "if": { "properties": { "type": { "const": "hello" } } }, "then": { "$ref": "#/$defs/hello" } },
+    { "if": { "properties": { "type": { "const": "step" } } }, "then": { "$ref": "#/$defs/step" } },
+    { "if": { "properties": { "type": { "const": "out" } } }, "then": { "$ref": "#/$defs/out" } },
+    { "if": { "properties": { "type": { "const": "exit" } } }, "then": { "$ref": "#/$defs/exit" } },
+    { "if": { "properties": { "type": { "const": "log" } } }, "then": { "$ref": "#/$defs/log" } }
+  ],
+  "$defs": {
+    "hello": {
+      "description": "Must be the first message.",
+      "type": "object",
+      "required": ["protocol", "language", "runtime", "adapter"],
+      "properties": {
+        "protocol": { "type": "integer", "const": 1 },
+        "language": { "type": "string", "minLength": 1 },
+        "runtime": { "type": "string", "minLength": 1 },
+        "adapter": { "type": "string", "minLength": 1 }
+      }
+    },
+    "step": {
+      "description": "A full snapshot. Frame and object ids are the adapter's own, e.g. Python id() or C++ address:type.",
+      "type": "object",
+      "required": ["event", "line", "prevLine", "stack", "heap", "error"],
+      "properties": {
+        "event": { "$ref": "trace.v1.schema.json#/$defs/event" },
+        "line": { "type": "integer", "minimum": 1 },
+        "prevLine": { "type": ["integer", "null"], "minimum": 1 },
+        "stack": {
+          "description": "Outermost first. A frame id names one call and is not reused within the run.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "trace.v1.schema.json#/$defs/frame" }
+        },
+        "heap": {
+          "type": "object",
+          "propertyNames": { "minLength": 1 },
+          "additionalProperties": { "$ref": "trace.v1.schema.json#/$defs/heapObject" }
+        },
+        "error": {
+          "type": ["object", "null"],
+          "required": ["type", "message", "line"],
+          "properties": {
+            "type": { "type": "string", "minLength": 1 },
+            "message": { "type": "string" },
+            "line": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "stdinPos": { "$ref": "trace.v1.schema.json#/$defs/stdinPos" },
+        "callId": { "type": "integer", "minimum": 0 },
+        "parentCallId": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "out": {
+      "description": "Program output, only from adapters that capture it themselves instead of on fd 1 and 2.",
+      "type": "object",
+      "required": ["stream", "data"],
+      "properties": {
+        "stream": { "enum": ["stdout", "stderr"] },
+        "data": { "type": "string" }
+      }
+    },
+    "exit": { "description": "Must be the last message.", "$ref": "trace.v1.schema.json#/$defs/exit" },
+    "log": {
+      "description": "Adapter debug output, kept in internal logs and never shown to users.",
+      "type": "object",
+      "required": ["level", "message"],
+      "properties": {
+        "level": { "enum": ["debug", "info", "warn", "error"] },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}

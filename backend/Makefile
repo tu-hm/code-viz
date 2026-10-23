@@ -1,7 +1,17 @@
 .PHONY: gen test golden-update images
 
+SCHEMA_ID := https://github.com/tu-hm/code-viz/schema
+GEN_PKG := github.com/tu-hm/code-viz/backend/internal/gen
+
 gen:
-	@echo "gen: no contracts yet; added with BE-01 §3-§5 (schema/, api/)" >&2; exit 1
+	go tool go-jsonschema --only-models --tags json --capitalization ID --disable-custom-types-for-maps \
+		--schema-package $(SCHEMA_ID)/trace.v1.schema.json=$(GEN_PKG)/trace \
+		--schema-output $(SCHEMA_ID)/trace.v1.schema.json=internal/gen/trace/trace.go \
+		--schema-root-type $(SCHEMA_ID)/trace.v1.schema.json=Trace \
+		--schema-package $(SCHEMA_ID)/wire.v1.schema.json=$(GEN_PKG)/wire \
+		--schema-output $(SCHEMA_ID)/wire.v1.schema.json=internal/gen/wire/wire.go \
+		--schema-root-type $(SCHEMA_ID)/wire.v1.schema.json=Message \
+		schema/trace.v1.schema.json schema/wire.v1.schema.json
 
 test:
 	go test ./...

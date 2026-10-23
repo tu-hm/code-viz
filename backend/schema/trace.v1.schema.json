@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tu-hm/code-viz/schema/trace.v1.schema.json",
+  "title": "Trace",
+  "description": "Trace format v1 (spec §9, v1.1 additions §19.9). Unknown fields are allowed (§9.7).",
+  "type": "object",
+  "required": ["version", "id", "language", "source", "options", "summary", "encoding", "steps"],
+  "properties": {
+    "version": { "type": "string", "pattern": "^1\\.[0-9]+$" },
+    "id": { "type": "string", "pattern": "^trc_[0-9a-f]+$" },
+    "language": { "$ref": "#/$defs/language" },
+    "source": { "$ref": "#/$defs/source" },
+    "options": { "$ref": "#/$defs/options" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "encoding": { "$ref": "#/$defs/encoding" },
+    "steps": { "type": "array", "items": { "$ref": "#/$defs/step" } }
+  },
+  "$defs": {
+    "language": {
+      "type": "object",
+      "required": ["id", "runtime", "adapter"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "runtime": { "type": "string", "minLength": 1 },
+        "adapter": { "type": "string", "minLength": 1 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["file", "lineCount"],
+      "properties": {
+        "file": { "type": "string", "minLength": 1 },
+        "lineCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "options": {
+      "type": "object",
+      "required": ["maxSteps", "startAtLines"],
+      "properties": {
+        "maxSteps": { "type": "integer", "minimum": 1, "maximum": 5000 },
+        "startAtLines": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "captureRanges": {
+          "description": "Variable name to the index ranges to record in full.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "minItems": 2, "maxItems": 2 }
+          }
+        },
+        "showInternals": { "type": "boolean" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["stepCount", "truncated", "truncation", "exit"],
+      "properties": {
+        "stepCount": { "type": "integer", "minimum": 0 },
+        "truncated": { "type": "boolean" },
+        "truncation": {
+          "type": ["object", "null"],
+          "required": ["reason", "atLine"],
+          "properties": {
+            "reason": { "enum": ["step_limit", "time_limit", "size_limit"] },
+            "atLine": { "type": ["integer", "null"], "minimum": 1 }
+          }
+        },
+        "exit": { "$ref": "#/$defs/exit" },
+        "lineHits": {
+          "description": "Line number to times it ran, over the whole run (§19.9.3).",
+          "type": "object",
+          "propertyNames": { "pattern": "^[1-9][0-9]*$" },
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "lineHitsSource": {
+          "description": "gcov and counter cover the whole run; trace counts recorded steps only.",
+          "enum": ["gcov", "counter", "trace"]
+        },
+        "untracedTail": { "$ref": "#/$defs/untracedTail" }
+      }
+    },
+    "exit": {
+      "type": "object",
+      "required": ["kind", "code", "signal", "message"],
+      "properties": {
+        "kind": {
+          "enum": ["normal", "exception", "signal", "timeout", "memory_limit", "step_limit", "output_limit", "internal_error"]
+        },
+        "code": { "type": ["integer", "null"] },
+        "signal": { "description": "Signal name, e.g. SIGSEGV.", "type": ["string", "null"] },
+        "message": { "type": ["string", "null"] }
+      }
+    },
+    "untracedTail": {
+      "description": "What happened after the last recorded step (§19.9.5).",
+      "type": "object",
+      "required": ["completed", "exit", "stdoutBytes"],
+      "properties": {
+        "completed": { "type": "boolean" },
+        "exit": { "$ref": "#/$defs/exit" },
+        "stdoutBytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "encoding": {
+      "type": "object",
+      "required": ["mode", "keyframeInterval"],
+      "properties": {
+        "mode": { "enum": ["delta"] },
+        "keyframeInterval": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["i", "event", "prevLine", "line", "keyframe", "stack", "frames", "heap", "removedObjects", "stdout", "stderr", "error"],
+      "properties": {
+        "i": { "type": "integer", "minimum": 0 },
+        "event": { "$ref": "#/$defs/event" },
+        "prevLine": { "description": "Line just executed; null at i = 0.", "type": ["integer", "null"], "minimum": 1 },
+        "line": { "description": "Next line to execute; for an exception, the line that raised.", "type": "integer", "minimum": 1 },
+        "keyframe": { "type": "boolean" },
+        "stack": {
+          "description": "Frame ids, outermost first.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^f[0-9]+$" }
+        },
+        "frames": {
+          "description": "Keyframe: every frame. Delta: new or changed frames, whole.",
+          "type": "object",
+          "propertyNames": { "pattern": "^f[0-9]+$" },
+          "additionalProperties": { "$ref": "#/$defs/frame" }
+        },
+        "heap": {
+          "description": "Keyframe: every reachable object. Delta: new or changed objects, whole.",
+          "type": "object",
+          "propertyNames": { "pattern": "^o[0-9]+$" },
+          "additionalProperties": { "$ref": "#/$defs/heapObject" }
+        },
+        "removedObjects": { "type": "array", "items": { "type": "string", "pattern": "^o[0-9]+$" } },
+        "stdout": { "description": "Text written during this step only.", "type": "string" },
+        "stderr": { "type": "string" },
+        "error": {
+          "type": ["object", "null"],
+          "required": ["type", "message", "line"],
+          "properties": {
+            "type": { "type": "string", "minLength": 1 },
+            "message": { "type": "string" },
+            "line": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "access": { "type": "array", "items": { "$ref": "#/$defs/access" } },
+        "stdinPos": { "$ref": "#/$defs/stdinPos" },
+        "callId": { "description": "Set on call and return steps (§19.9.6).", "type": "integer", "minimum": 0 },
+        "parentCallId": { "description": "Set on call steps that have a traced caller.", "type": "integer", "minimum": 0 }
+      }
+    },
+    "event": { "enum": ["call", "line", "return", "exception", "exit"] },
+    "access": {
+      "type": "object",
+      "required": ["obj", "path", "mode"],
+      "properties": {
+        "obj": { "type": "string", "pattern": "^o[0-9]+$" },
+        "path": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "minItems": 1 },
+        "mode": { "enum": ["r", "w"] },
+        "inferred": { "type": "boolean" }
+      }
+    },
+    "stdinPos": {
+      "type": "object",
+      "required": ["bytes", "token", "inferred"],
+      "properties": {
+        "bytes": { "type": "integer", "minimum": 0 },
+        "token": { "type": "integer", "minimum": 0 },
+        "inferred": { "type": "boolean" }
+      }
+    },
+    "frame": {
+      "type": "object",
+      "required": ["id", "name", "kind", "line", "locals", "returnValue"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "kind": { "enum": ["global", "function", "method", "lambda"] },
+        "line": { "type": "integer", "minimum": 1 },
+        "locals": { "description": "In declaration order.", "type": "array", "items": { "$ref": "#/$defs/local" } },
+        "returnValue": {
+          "description": "Set on the return step of this frame.",
+          "anyOf": [{ "$ref": "#/$defs/value" }, { "type": "null" }]
+        }
+      }
+    },
+    "local": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "value": { "$ref": "#/$defs/value" },
+        "internal": { "type": "boolean" }
+      }
+    },
+    "value": {
+      "description": "A value; t decides which other fields are set (§9.4).",
+      "type": "object",
+      "required": ["t"],
+      "properties": {
+        "t": { "enum": ["int", "float", "bool", "char", "str", "none", "ref", "ptr", "uninit", "unavailable"] },
+        "type": { "description": "Declared type in the source language.", "type": "string" },
+        "v": { "description": "Always a string, so 64-bit integers keep their precision.", "type": "string" },
+        "code": { "type": "integer" },
+        "len": { "type": "integer", "minimum": 0 },
+        "truncated": { "type": "boolean" },
+        "id": { "type": "string", "minLength": 1 },
+        "addr": { "type": "string", "pattern": "^0x[0-9a-f]+$" },
+        "target": { "description": "Absent when the pointer was not followed.", "type": "string", "minLength": 1 },
+        "index": { "type": "integer", "minimum": 0 },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        { "if": { "properties": { "t": { "enum": ["int", "float", "bool", "str"] } } }, "then": { "required": ["v"] } },
+        { "if": { "properties": { "t": { "const": "char" } } }, "then": { "required": ["v", "code"] } },
+        { "if": { "properties": { "t": { "const": "ref" } } }, "then": { "required": ["id"] } },
+        { "if": { "properties": { "t": { "const": "ptr" } } }, "then": { "required": ["addr"] } },
+        { "if": { "properties": { "t": { "const": "unavailable" } } }, "then": { "required": ["reason"] } }
+      ]
+    },
+    "heapObject": {
+      "description": "A heap object; kind decides which other fields are set (§9.5).",
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["sequence", "set", "mapping", "record", "function", "class", "opaque"] },
+        "type": { "type": "string" },
+        "length": { "description": "Real size, even when items are truncated.", "type": "integer", "minimum": 0 },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/value" } },
+        "window": { "$ref": "#/$defs/window" },
+        "truncated": { "type": "boolean" },
+        "fixed": { "type": "boolean" },
+        "meta": { "description": "Extra facts, e.g. capacity or adapter.", "type": "object" },
+        "ordered": { "type": "boolean" },
+        "entries": { "type": "array", "items": { "$ref": "#/$defs/entry" } },
+        "fields": { "type": "array", "items": { "$ref": "#/$defs/field" } },
+        "name": { "type": "string" },
+        "signature": { "type": "string" },
+        "summary": { "type": "string" },
+        "sparse": { "$ref": "#/$defs/sparse" },
+        "patch": { "description": "Delta only: changed cells of a sparse sequence.", "$ref": "#/$defs/cells" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "sequence" } } },
+          "then": {
+            "required": ["type", "length"],
+            "anyOf": [{ "required": ["items"] }, { "required": ["sparse"] }, { "required": ["patch"] }]
+          }
+        },
+        { "if": { "properties": { "kind": { "const": "set" } } }, "then": { "required": ["type", "length", "items"] } },
+        { "if": { "properties": { "kind": { "const": "mapping" } } }, "then": { "required": ["type", "length", "entries"] } },
+        { "if": { "properties": { "kind": { "const": "record" } } }, "then": { "required": ["type", "fields"] } },
+        { "if": { "properties": { "kind": { "enum": ["function", "class"] } } }, "then": { "required": ["name"] } },
+        { "if": { "properties": { "kind": { "const": "opaque" } } }, "then": { "required": ["type", "summary"] } }
+      ]
+    },
+    "window": {
+      "description": "The recorded slice of a large sequence.",
+      "type": "object",
+      "required": ["start", "count"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "sparse": {
+      "description": "Keyframe form of a large sequence: default plus the cells that differ (§19.9.1).",
+      "type": "object",
+      "required": ["default", "items"],
+      "properties": {
+        "default": { "$ref": "#/$defs/value" },
+        "items": { "$ref": "#/$defs/cells" }
+      }
+    },
+    "cells": {
+      "description": "Index to value.",
+      "type": "object",
+      "propertyNames": { "pattern": "^(0|[1-9][0-9]*)$" },
+      "additionalProperties": { "$ref": "#/$defs/value" }
+    },
+    "entry": {
+      "type": "object",
+      "required": ["key", "value"],
+      "properties": {
+        "key": { "$ref": "#/$defs/value" },
+        "value": { "$ref": "#/$defs/value" }
+      }
+    },
+    "field": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "$ref": "#/$defs/value" }
+      }
+    }
+  }
+}
