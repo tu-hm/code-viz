@@ -3,3 +3,4 @@
 !go.sum
 !cmd/
 !internal/
+!scripts/nsjail-cgroups.sh

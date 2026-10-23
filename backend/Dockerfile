@@ -8,27 +8,33 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -o /out/ ./cmd/vizd ./cmd/viz-shim
 
-FROM --platform=$BUILDPLATFORM busybox:1.37.0-musl@sha256:5cec3fc171c87218698e85a52af7087de727372aae264a787b8112901a5b0092 AS gvisor-amd64
-ADD --checksum=sha256:1298e8ed9c3fee900f00d2ea96ec2d79d80ed93f2175812f29b7e7da718041a3 \
-    https://storage.googleapis.com/gvisor/releases/release/20261019.0/x86_64/gvisor.tar.bz2 /gvisor.tar.bz2
-
-FROM --platform=$BUILDPLATFORM busybox:1.37.0-musl@sha256:5cec3fc171c87218698e85a52af7087de727372aae264a787b8112901a5b0092 AS gvisor-arm64
-ADD --checksum=sha256:5790f89dc94b091b5aa0f0b6596aa4391606b3fe5f069e68f440576f3388abd8 \
-    https://storage.googleapis.com/gvisor/releases/release/20261019.0/aarch64/gvisor.tar.bz2 /gvisor.tar.bz2
-
-# runsc looks for its sidecars in gvisor-bin/ next to itself
-FROM gvisor-${TARGETARCH} AS gvisor
-RUN mkdir /out && tar -xjf /gvisor.tar.bz2 -C /out runsc gvisor-bin
+FROM debian:trixie-slim@sha256:62bd423aeee912639ca8ee681c2b762cb3e25137e0a92b20be455898a9f034ad AS nsjail
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates git make g++ pkg-config bison flex protobuf-compiler libprotobuf-dev libnl-route-3-dev
+RUN git clone --branch 3.6 https://github.com/google/nsjail /nsjail \
+    && test "$(git -C /nsjail rev-parse HEAD)" = f78475530b46d0186111a9096b30725f816b55fe \
+    && make -C /nsjail -j"$(nproc)"
 
 FROM gcr.io/distroless/static-debian13:nonroot@sha256:d62067879de890a1def9da0e7766b7d20810a5e5555cef8506b752437d7a3e88 AS api
 COPY --from=build /out/vizd /usr/local/bin/vizd
 ENTRYPOINT ["/usr/local/bin/vizd"]
 CMD ["--role=api"]
 
-# TODO(tu-hm): revisit sandbox tooling and the nonroot user once G1 picks runsc or nsjail and pod privileges (BE-02 §1)
-FROM gcr.io/distroless/static-debian13:nonroot@sha256:d62067879de890a1def9da0e7766b7d20810a5e5555cef8506b752437d7a3e88 AS worker
-COPY --from=gvisor /out/ /usr/local/bin/
+# runs as root: nsjail needs a privileged pod on the runner node pool (BE-02 §1)
+FROM debian:trixie-slim@sha256:62bd423aeee912639ca8ee681c2b762cb3e25137e0a92b20be455898a9f034ad AS worker
+RUN apt-get update && apt-get install -y --no-install-recommends libprotobuf32t64 libnl-route-3-200 \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=nsjail /nsjail/nsjail /usr/local/bin/nsjail
+COPY scripts/nsjail-cgroups.sh /usr/local/bin/nsjail-cgroups
 COPY --from=build /out/viz-shim /usr/local/bin/viz-shim
 COPY --from=build /out/vizd /usr/local/bin/vizd
 ENTRYPOINT ["/usr/local/bin/vizd"]
 CMD ["--role=worker"]
+
+FROM golang:1.27.3-trixie@sha256:fbb7ae40b62ff8afe31662df570d39b4f5052ac32b90dae8e60d7657a20a74f4 AS nsjail-test
+RUN apt-get update && apt-get install -y --no-install-recommends libprotobuf32t64 libnl-route-3-200 \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=nsjail /nsjail/nsjail /usr/local/bin/nsjail
+COPY --from=busybox:1.37.0-musl@sha256:5cec3fc171c87218698e85a52af7087de727372aae264a787b8112901a5b0092 / /opt/viz/rootfs/sandboxtest/
+RUN cd /opt/viz/rootfs/sandboxtest && mkdir -p work proc opt/viz && touch dev/null dev/zero dev/random dev/urandom
+ENV VIZ_NSJAIL_TEST_ROOTFS=/opt/viz/rootfs/sandboxtest VIZ_NSJAIL_TEST_CGROUP=/sys/fs/cgroup/viz

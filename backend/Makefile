@@ -1,4 +1,4 @@
-.PHONY: gen gen-go test golden-update images dev down reset seed lint fmt vuln check
+.PHONY: gen gen-go test test-nsjail golden-update images dev down reset seed lint fmt vuln check
 
 include .env.example
 -include .env
@@ -25,6 +25,12 @@ gen-go:
 
 test:
 	go test ./...
+
+test-nsjail:
+	docker build --target nsjail-test --tag viz-nsjail-test:dev .
+	docker run --rm --privileged --cgroupns=private -v $(CURDIR):/src -w /src \
+		-v viz-go-mod:/go/pkg/mod -v viz-go-build:/root/.cache/go-build viz-nsjail-test:dev \
+		scripts/nsjail-cgroups.sh sh -c 'CGO_ENABLED=0 go build -o $$VIZ_NSJAIL_TEST_ROOTFS/opt/viz/viz-shim ./cmd/viz-shim && go test ./internal/adapters/nsjail'
 
 golden-update:
 	@echo "golden-update: no golden tests yet; added with the first tracer fixtures (BE-03, BE-04)" >&2; exit 1
@@ -57,7 +63,7 @@ fmt:
 vuln:
 	$(GOVULNCHECK) ./...
 
-check: lint vuln test
+check: lint vuln test test-nsjail
 	go mod tidy -diff
 	@$(MAKE) --no-print-directory gen-go
 	@test -z "$$(git status --porcelain -- internal/gen)" || { git status --short -- internal/gen; echo "check: make gen changed internal/gen; commit the regenerated code" >&2; exit 1; }
