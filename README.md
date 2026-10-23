@@ -13,7 +13,7 @@ backend/        Go: vizd (API and worker roles), vizctl, schemas, OpenAPI contra
   cmd/          vizd and vizctl entrypoints
   internal/     domain, tracecore, app, ports, adapters, transport; gen/ is generated
   fixtures/     golden traces per language
-docs/guides/    how we write code here: comments, tests, migrations
+docs/guides/    how we write code here: comments, tests, migrations, the sandbox
 plans/          spec, work plans, one file per backend and frontend task
 ```
 
@@ -42,6 +42,7 @@ The local stack (MySQL 8.4 and SeaweedFS in Docker), `make dev`, and fixes for c
 | [Comments cheat sheet](docs/guides/comments-cheat-sheet.md) | Default zero comments; the eight kinds that earn one |
 | [Testing cheat sheet](docs/guides/testing-cheat-sheet.md) | 11 rules for tests that catch regressions |
 | [Database migrations](docs/guides/db-migrations.md) | goose on MySQL 8.4: online DDL, expand and contract, safe patterns |
+| [Sandbox](docs/guides/sandbox.md) | The `Sandbox` port, `viz-shim`, the Docker dev sandbox, what a runner image needs |
 
 ## Working rules
 

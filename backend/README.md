@@ -34,7 +34,21 @@ curl -i http://127.0.0.1:8080/readyz    # 200: MySQL is reachable; 503 otherwise
 
 Press Ctrl-C to stop vizd. `make down` stops the containers and keeps their data. `make reset` also deletes the data.
 
-Not built yet: the API endpoints (BE-06), the job worker (BE-05) and the sandbox (BE-02). `make seed` loads nothing until BE-13 §1 adds sample traces.
+Not built yet: the API endpoints (BE-06), the job worker (BE-05), the runner images (BE-03, BE-08) and the production sandbox (BE-02 §3). `make seed` loads nothing until BE-13 §1 adds sample traces.
+
+## Docker dev sandbox
+
+On a laptop, jobs run in Docker containers instead of gVisor or nsjail, which don't run on macOS. `VIZ_SANDBOX=docker` picks it, and it's the default with `VIZ_ENV=dev`. vizd only checks that setting for now; the job worker (BE-05) is what will run jobs through the sandbox.
+
+**It is not a security boundary.** vizd logs a warning on every start with it, and refuses to start with it unless `VIZ_ENV` is `dev` or `test`, so it never runs in staging or production. Each job still gets its own container with no network, a read-only root, a 64 MB `/work`, 32 PIDs, a memory cap, no capabilities and a non-root user.
+
+- **It needs Docker.** The sandbox talks to the daemon at `DOCKER_HOST`, or `/var/run/docker.sock` if that's unset. That works with vizd on the host and with vizd in Compose with the socket mounted. If your Docker uses a context instead (OrbStack, Colima), export `DOCKER_HOST` as shown under Common problems.
+- **It refuses emulated images.** A runner image must match your machine's architecture, because GDB's `ptrace` fails under emulation. Run `make images` once to build them for your machine. The runner images themselves arrive with the tracers (BE-03, BE-08); until then `make images` builds only vizd.
+- **Leftovers are cleaned up.** Sandbox containers carry a `viz.job` label, and the sandbox removes any left from an earlier run when it starts.
+
+`make test` runs the sandbox tests against your Docker, with a small busybox test image it builds itself.
+
+The port contract, `viz-shim` and its frame format, every container setting and what a runner image needs are in the [sandbox guide](../docs/guides/sandbox.md).
 
 ## Ports
 
@@ -58,7 +72,7 @@ Everything listens on 127.0.0.1 only.
 | `make down` | Stops the containers and keeps their data |
 | `make reset` | Stops the containers and deletes their data |
 | `make seed` | Loads sample data (nothing yet) |
-| `make test` | Runs `go test ./...`. Needs Docker, because some tests start MySQL with testcontainers. |
+| `make test` | Runs `go test ./...`. Needs Docker, because some tests start MySQL with testcontainers and the sandbox tests start containers. |
 | `make images` | Builds `vizd-api:dev` and `vizd-worker:dev` for this machine's architecture |
 | `make gen` | Regenerates Go types from `api/` and `schema/` |
 | `make lint` | Runs golangci-lint v2.15.0 with `.golangci.yml`. The first run builds the linter, which takes about a minute |
@@ -76,7 +90,7 @@ Everything listens on 127.0.0.1 only.
 
 **Architecture mismatch.** Images you run locally must match your machine: `arm64` on Apple silicon, `amd64` on most Linux PCs. Under emulation GDB's `ptrace` fails, and the Docker sandbox (BE-02) refuses emulated runner images. `make images` builds for your machine. To check an image, compare `docker image inspect --format '{{.Architecture}}' vizd-worker:dev` with `uname -m` (`arm64`/`aarch64` means arm64, `x86_64` means amd64). Don't pass `--platform linux/amd64` for local images on an arm64 Mac. The MySQL and SeaweedFS images are multi-arch, so Docker pulls the native one.
 
-**Tests fail with `rootless Docker not found`.** testcontainers ignores Docker contexts, so it can't find OrbStack, Colima or some Docker Desktop setups. Point it at the active context's socket:
+**Tests fail with `rootless Docker not found`, or the sandbox can't reach `/var/run/docker.sock`.** testcontainers and the Docker sandbox ignore Docker contexts, so they can't find OrbStack, Colima or some Docker Desktop setups. Point them at the active context's socket:
 
 ```sh
 export DOCKER_HOST=$(docker context inspect --format '{{.Endpoints.docker.Host}}')
