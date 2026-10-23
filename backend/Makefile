@@ -1,4 +1,8 @@
-.PHONY: gen test golden-update images
+.PHONY: gen test golden-update images dev down reset seed
+
+include .env.example
+-include .env
+export
 
 SCHEMA_ID := https://github.com/tu-hm/code-viz/schema
 GEN_PKG := github.com/tu-hm/code-viz/backend/internal/gen
@@ -21,4 +25,20 @@ golden-update:
 	@echo "golden-update: no golden tests yet; added with the first tracer fixtures (BE-03, BE-04)" >&2; exit 1
 
 images:
-	@echo "images: no Dockerfile yet; added with BE-01 §6" >&2; exit 1
+	docker build --target api --tag vizd-api:dev .
+	docker build --target worker --tag vizd-worker:dev .
+
+dev:
+	docker compose up --detach --wait
+	go run ./cmd/vizd migrate up
+	@$(MAKE) --no-print-directory seed
+	go tool air
+
+down:
+	docker compose down
+
+reset:
+	docker compose down --volumes
+
+seed:
+	@echo "seed: nothing to seed yet; sample traces come with BE-13 §1" >&2

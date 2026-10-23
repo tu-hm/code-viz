@@ -1,0 +1,6 @@
+[build]
+cmd = "go build -o ./tmp/vizd ./cmd/vizd"
+entrypoint = ["./tmp/vizd", "--role=all"]
+include_ext = ["go", "sql"]
+send_interrupt = true
+kill_delay = "26s" # vizd drains for up to 25 s (§13)
