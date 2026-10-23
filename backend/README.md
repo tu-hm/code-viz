@@ -88,7 +88,7 @@ Everything listens on 127.0.0.1 only.
 | `make runner-images` | Builds only the runner images, tagged with each manifest's `image` |
 | `make golden-update` | Rewrites the tracecore goldens and every `fixtures/*/*/expected.trace.json` from real runs. Read the diff before committing |
 | `go run ./cmd/vizctl trace\|validate` | Traces a program in the Docker dev sandbox, or checks a trace file (see Trace a program locally) |
-| `make gen` | Regenerates Go types from `api/` and `schema/` |
+| `make gen` | Regenerates Go types from `api/` and `schema/`, and the sqlc query code from `internal/adapters/mysql` |
 | `make lint` | Runs golangci-lint v2.15.0 with `.golangci.yml`. The first run builds the linter, which takes about a minute |
 | `make fmt` | Formats Go code with goimports, then gofmt |
 | `make vuln` | Runs govulncheck v1.9.0 |

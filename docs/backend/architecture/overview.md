@@ -31,18 +31,18 @@ Dependencies point one way: `transport → app → domain`. `domain` and `tracec
 
 | Package | What it holds | Status |
 |---|---|---|
-| `internal/domain` | Sentinel errors (`ErrInfra`), the language `Manifest` and `ChunkKey`; later the job states, limits and IDs | Started |
+| `internal/domain` | Sentinel errors (`ErrInfra`, `ErrNoJob`, `ErrLeaseLost`), the language `Manifest` and `ChunkKey`; later the job states, limits and IDs | Started |
 | `internal/tracecore` | Wire stream in, trace out: stable IDs, keyframes and deltas, limits, chunks | Done (BE-04 §2). See [tracing](tracing.md) |
 | `internal/app` | Use cases: create, get and wait, run a trace job | Empty (BE-05, BE-06) |
-| `internal/ports` | `Sandbox` and its shared test suite `sandboxtest`, `BlobStore` and `Adapters`. Later `MetaStore`, `JobQueue`, `Events` | `Sandbox` and `Adapters` done; `BlobStore` puts only. See [sandbox](sandbox.md) |
+| `internal/ports` | `Sandbox` and its shared test suite `sandboxtest`, `JobQueue`, `BlobStore` and `Adapters`. Later `MetaStore`, `Events` | `Sandbox`, `JobQueue` and `Adapters` done; `BlobStore` puts only. See [sandbox](sandbox.md) |
 | `internal/adapters/nsjail` | The production sandbox (D10, G1) | Done |
 | `internal/adapters/dockersandbox` | The dev sandbox for laptops; not a security boundary | Done |
-| `internal/adapters/mysql` | The connection pool and goose migrations | Open and migrate only; no tables yet (BE-06) |
+| `internal/adapters/mysql` | The connection pool, goose migrations, sqlc query files, the transaction retry helper `InTx`, and the `JobQueue` adapter on the `jobs` table | Tables and queue done (BE-06 §2, BE-05 §1); `vizd` doesn't run the queue yet (BE-05 §2) |
 | `internal/adapters/blobstore` | `BlobStore` on any S3 API (aws-sdk-go-v2); SeaweedFS in dev | Put with 3 retries; presign and copy come with BE-06 |
 | `internal/adapters/manifest` | `Adapters`: every `*/manifest.yaml` in a directory, checked once at load | Done; `vizctl` uses it, the worker and `GET /languages` will |
 | `internal/shim` | The `viz-shim` frame codec, shared by both sandboxes | Done |
 | `internal/transport/http` | HTTP handlers | Health probes only (BE-06) |
-| `internal/gen/{api,trace,wire}` | Types generated from the contracts by `make gen`. Never edited | Generated |
+| `internal/gen/{api,trace,wire,sqlc}` | Types generated from the contracts, and query code generated from the SQL, by `make gen`. Never edited | Generated |
 | `schema/` | `trace.v1` and `wire.v1` JSON Schemas, and the Go package that validates against them | Done |
 | `api/` | `openapi.yaml`, the HTTP contract | Done (BE-01) |
 | `adapters/<language>/` | Each language's manifest, runner image and tracer | Python done (BE-03); C++ is a GDB prototype (BE-08 §1) |
@@ -71,7 +71,7 @@ sequenceDiagram
   B->>O: fetch chunks
 ```
 
-Built today: the sandbox, the Python tracer and `tracecore`, which `vizctl trace` runs in that order. The API (BE-06), the MySQL queue and the worker (BE-05), and object storage are the next tasks. The lifecycle is spec §7.6, the job states §7.7 and the queue §7.13.2.
+Built today: the sandbox, the Python tracer and `tracecore`, which `vizctl trace` runs in that order, plus the MySQL tables and the job queue adapter, which nothing calls yet. The API (BE-06), the worker (BE-05) and object storage are the next tasks. The lifecycle is spec §7.6, the job states §7.7 and the queue §7.13.2.
 
 ## Shape of the code
 

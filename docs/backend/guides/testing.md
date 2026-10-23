@@ -26,6 +26,7 @@ What each test package covers, what it needs, and how to update goldens. How to 
 | `go test ./cmd/vizctl` | `TestGoldenTraces` runs every `fixtures/<language>/<case>/` through `vizctl trace` in the Docker dev sandbox and compares it with `expected.trace.json`. `TestTraceNamesBuildFailure` covers `compile_error` and `unsupported_module` | Docker, the runner images |
 | `go test ./cmd/vizd` | The `VIZ_ENV` and `VIZ_SANDBOX` rules | — |
 | `go test ./internal/transport/http` | `/readyz` fails while stopping and when MySQL is down | Docker (testcontainers MySQL) |
+| `go test ./internal/adapters/mysql` | Migrations go up, down and up again. Sessions are READ COMMITTED and UTC whatever the DSN says. `InTx` retries the victim of a real deadlock and stops after 3 tries. The `JobQueue` adapter: claim order, `run_after`, SKIP LOCKED, concurrent claimers, every write under a lost lease, the rescuer on both sides of the lease expiry, requeue, cancel and the cleanup batches. `TestNoJobIsLostOrCompletedTwiceWhenWorkersDieAtRandom` kills workers at random and logs its seed. One MySQL container per run and a fresh database per test; about 15 s | Docker (testcontainers MySQL) |
 
 ## The shared sandbox suite
 
