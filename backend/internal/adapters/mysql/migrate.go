@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"embed"
-	"errors"
 	"fmt"
 	"io/fs"
 	"log/slog"
@@ -12,9 +11,7 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-// TODO(tu-hm): embed migrations/*.sql, drop .gitkeep and the ErrNoMigrations case once BE-06 adds the first migration
-//
-//go:embed all:migrations
+//go:embed migrations/*.sql
 var migrations embed.FS
 
 // Migrate runs the goose command up, down or status with the embedded migrations.
@@ -28,10 +25,6 @@ func Migrate(ctx context.Context, db *sql.DB, command string) error {
 		return fmt.Errorf("open migrations: %w", err)
 	}
 	p, err := goose.NewProvider(goose.DialectMySQL, db, fsys)
-	if errors.Is(err, goose.ErrNoMigrations) {
-		slog.InfoContext(ctx, "no migrations")
-		return nil
-	}
 	if err != nil {
 		return fmt.Errorf("load migrations: %w", err)
 	}
