@@ -4,8 +4,6 @@
 
 A comment matches one of the eight exceptions below or it is deleted. The one close call is E8 vs N1: when a short label could be either, keep it. Cite rules by ID in review: `E4` for an exception, `N2` for a never, `T` for wording.
 
-Adapted from the Nova comments cheat sheet.
-
 ## Earns a comment (E1–E8)
 
 | # | Earns it | Example |
