@@ -95,6 +95,7 @@
 | v1.3 | 2026-10-23 | **Frontend trimmed to the IDE.** The web app is there to show the backend's traces, not to be a production UI: no i18n files (strings written inline), no Playwright end-to-end or visual-snapshot tests. D20 changed; §13, §15 and §18 updated. |
 | v1.4 | 2026-10-23 | C++ locals are `uninit` on their declaration line until it runs (§7.11.2), instead of showing garbage. |
 | v1.5 | 2026-10-23 | **G1: the production sandbox is nsjail (D10), not gVisor (D9).** Spike S1b: gVisor runs GDB, but a 1,000-step trace takes 7–9 s on its default platform (target 3 s) and `personality(ADDR_NO_RANDOMIZE)` fails, so traces aren't deterministic (§7.12). nsjail: 1.5 s, 4–8 ms starts, ASLR off. Worker pods run privileged on the runner node pool. Report: `plans/spikes/s1b-sandbox.md`. |
+| v1.6 | 2026-10-24 | **Python tracer contract (BE-03).** The Python build step is a check (`tracer.py --check`): syntax errors become `compile_error` with diagnostics, blocked imports `unsupported_module` (§7.11.1, §10.2). The trace runs with `python3 -s -P` and `PYTHONHASHSEED=0` instead of `-I`, which ignored the seed, so set order changed between runs (§7.12). Wire `exit` carries the tracer's `lineHits`. A tracer sends one step past `maxSteps` to mark that the program went on, and the core keeps reading for the untraced tail instead of killing (§10.1, D25). §11 says what the heap-object and size limits do to a Python trace. |
 
 ---
 
@@ -806,13 +807,15 @@ Database load stays small. Each job costs about 4 row writes, 3 queue writes (in
 
 #### 7.11.1 Python 3.12
 
-- **Runtime:** CPython 3.12. The tracer starts with `python3 -I /opt/viz/tracer.py main.py`.
+- **Runtime:** CPython 3.12. The tracer starts with `python3 -s -P /opt/viz/tracer.py main.py` and `PYTHONHASHSEED=0` in its environment. `-I` would ignore `PYTHONHASHSEED`, so string hashes, and with them set order and `print(some_set)`, would change on every run (§7.12). `-s -P` keeps the user site and the script directory off `sys.path`, and the sandbox sets the rest of the environment.
 - **Hook:** `sys.settrace` in v1. We may switch to `sys.monitoring` (PEP 669) to cut overhead (open question Q4).
 - **Running the code:** `exec(compile(src, "main.py", "exec"), {"__name__": "__main__"})`. Only frames whose `co_filename == "main.py"` produce steps; tracer and library frames are skipped. This prevents the CodeChef bug where a step pointed at line 328 of the wrapper.
 - **Events:** `call`, `line`, `return` (with the return value) and `exception`. A `call` step reports the function's first **body** line, so the `def` line isn't a separate step.
 - **Stdin and stdout:** `sys.stdin` is replaced by a `StringIO` holding the input. `sys.stdout` and `sys.stderr` are replaced by writers that tag each chunk with the current step number.
 - **What gets recorded:** each object is identified by `id(obj)` and becomes a native ID. `int`, `float`, `bool`, `str` and `None` are shown inline. Module-level names starting with `__`, imported modules, and imported functions are flagged `internal`.
 - **Blocked modules:** numpy, pandas, matplotlib and any other non-stdlib import fail before the run with `unsupported_module`. The allowlist lives in the adapter manifest.
+- **Build step:** Python has no compiler, so its build step is a check: `python3 -I /opt/viz/tracer.py --check main.py`. A syntax error exits 1 with `main.py:L:C: error: …` diagnostics (`compile_error`); an import that isn't in `modules.allow` exits 3 with the same format (`unsupported_module`). The worker treats it like any other build (§7.7).
+- **Threads:** a thread started from `main.py` runs to the end before `start()` returns, so its steps form one call stack with the caller's. This traces the common `threading.Thread(target=main)` trick for a bigger stack. A program whose thread waits on the thread that started it hangs until the time limit.
 
 #### 7.11.2 C++17 (GCC 13)
 
@@ -1275,14 +1278,17 @@ The tracer writes NDJSON (one JSON message per line) to **file descriptor 3**. T
 | `hello` | `protocol: 1`, `language`, `runtime`, `adapter` | Must be the first message |
 | `step` | `event`, `line`, `prevLine`, `stack: [Frame]`, `heap: {nativeId: Object}`, `error?` | Always a **full** snapshot. Object IDs are the adapter's own (Python `id()`, C++ `address:type`). |
 | `out` | `stream: "stdout" \| "stderr"`, `data` | Optional. Only needed if the adapter captures output itself instead of through fd 1/2. |
-| `exit` | `kind`, `code`, `signal`, `message` | Must be the last message |
+| `exit` | `kind`, `code`, `signal`, `message`, `lineHits?` | Must be the last message. `lineHits` (`{"<line>": count}`, the tracer's own counter over the whole run) is copied to `summary.lineHits` with `lineHitsSource: "counter"` (§19.9.3). |
 | `log` | `level`, `message` | Adapter debug output. Kept in internal logs, never shown to users. |
+
+- **Output belongs to the next step.** Output that arrives between step k−1 and step k, in `out` messages or on fd 1/2 by arrival order, was printed while step k's `prevLine` ran, so it goes to step k. Output after the last step goes to the last step, or to the untraced tail when the trace stopped at the step limit.
+- **Step limit (D25).** The core passes `VIZ_MAX_STEPS` in the tracer's environment. A tracer sends at most `maxSteps + 1` steps; the extra one only marks that the program went on. The core drops it and any later step, records `truncation.step_limit`, and keeps reading `out` and `exit` to fill `summary.untracedTail` (§19.9.5). This is not a kill.
 
 Adapters always send full snapshots. The core then:
 
 1. maps native IDs to stable `o1, o2…` in order of first appearance;
 2. computes deltas and keyframes;
-3. enforces `maxSteps`, the size budget and the time budget. On a limit it kills the sandbox and ends the trace with the right `truncation`;
+3. enforces `maxSteps`, the size budget and the time budget. On the size or time limit it kills the sandbox; at the step limit it stops recording (above). Either way the trace ends with the right `truncation`;
 4. drops `internal` variables unless `showInternals` is on;
 5. checks every message against the JSON Schema and rejects malformed ones.
 
@@ -1316,7 +1322,7 @@ enabled: true
 rollout: { percent: 100 }
 ```
 
-The Python manifest is the same apart from `build: null` (a syntax check runs instead), `trace.cmd: ["python3", "-I", "/opt/viz/tracer.py", "main.py"]`, `capabilities.pointers: false`, and a `modules.allow` list.
+The Python manifest is the same apart from the build, a check instead of a compiler (`build.cmd: ["python3", "-I", "/opt/viz/tracer.py", "--check", "main.py"]`, with `build.unsupportedModuleExit: 3` naming the exit code that means `unsupported_module`), `trace.cmd: ["python3", "-s", "-P", "/opt/viz/tracer.py", "main.py"]` with `PYTHONHASHSEED: "0"` in `trace.env` (§7.11.1), `capabilities.pointers: false`, and a `modules.allow` list. The worker passes `modules.allow` to the build as `VIZ_MODULES_ALLOW` (comma-separated) and `options.maxSteps` to the trace as `VIZ_MAX_STEPS`.
 
 ### 10.3 Type mapping (v1)
 
@@ -1394,13 +1400,13 @@ All of these are configurable per language in the manifest, with global ceilings
 | Build time (C++) | 10 s | 10 s | `compile_error` "Build timed out" |
 | Items recorded per container | 1,000 | 10,000 | `truncated: true`, `length` = real size |
 | Items drawn before "show more" | 100 | — | UI only |
-| Heap objects per step | 500 | 2,000 | Pointers aren't followed further; `target: null` |
+| Heap objects per step | 500 | 2,000 | Pointers aren't followed further; `target: null`. A Python reference past the budget becomes `unavailable` with reason `object_limit` |
 | Pointer-follow depth (C++) | 32 | 128 | Same as above |
 | String length recorded | 1,000 chars | 10,000 | `truncated: true` |
 | Stack frames recorded | 100 innermost (+ the Globals frame) | 500 | The UI shows "N more frames" |
 | Stack size (rlimit) | 256 MB | 512 MB | Deep recursion behaves as on a typical judge. Stack use counts toward the memory limit. |
 | Output recorded | 64 KB | 1 MB | `exit.kind = output_limit` if the program keeps writing |
-| Trace size, uncompressed | 20 MB | 50 MB | `truncation.reason = size_limit` |
+| Trace size, uncompressed | 20 MB | 50 MB | `truncation.reason = size_limit`, `exit.kind = step_limit` (there is no size exit kind) |
 | Create rate per IP (ingress) | 30/min | — | `429` with `Retry-After` |
 | Daily quota (MySQL) | Anonymous 100, signed in 1,000 | — | `429` with `Retry-After` (next UTC midnight) |
 | Active visualizations per user | 2 | — | A third request detaches the oldest queued one (§8.5 rules) |
@@ -2101,6 +2107,7 @@ All additions are optional and backward compatible (§9.7). Older players ignore
 
 - **C++:** after the step limit, the tracer deletes its breakpoints and lets the program continue at full speed.
 - **Python:** after the limit, the trace hook is replaced by the line counter only.
+- **Exit:** `summary.exit.kind` is `step_limit` (FR-14). The program's own exit is `untracedTail.exit`; `completed` is false when the tail ended at a limit (time, memory, output) instead of by itself.
 - **Storage:** output printed after the last traced step goes into a final object, `tail.txt.gz`, listed in the trace manifest.
 
 #### 19.9.6 Call identity
