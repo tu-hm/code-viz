@@ -16,13 +16,15 @@ Run untrusted code with CPU, memory, time and output limits and no network.
 
 Input: the GDB prototype from M0-09 (loop, recursion, STL programs).
 
-- [ ] Run the prototype under **gVisor `runsc`**
-- [ ] Run it under **nsjail** with the C.9 config sketch
-- [ ] For each: does `ptrace` work? Sandbox start time (target ≤ 300 ms)? 1,000-step C++ trace time (target ≤ 3 s)?
-- [ ] Check ASLR is off (`persona_addr_no_randomize` for nsjail)
-- [ ] Decide how a worker **pod** starts one sandbox per job on Kubernetes (privileged pod calling `runsc`/nsjail, containerd on the node, or one pod per job) and what privileges and mounts that needs
-- [ ] Write a 1-page report with numbers + recommendation
-- [ ] Present at **G1**; record the result in spec §0.3
+- [x] Run the prototype under **gVisor `runsc`**
+- [x] Run it under **nsjail** with the C.9 config sketch
+- [x] For each: does `ptrace` work? Sandbox start time (target ≤ 300 ms)? 1,000-step C++ trace time (target ≤ 3 s)?
+- [x] Check ASLR is off (`persona_addr_no_randomize` for nsjail)
+- [x] Decide how a worker **pod** starts one sandbox per job on Kubernetes (privileged pod calling `runsc`/nsjail, containerd on the node, or one pod per job) and what privileges and mounts that needs
+- [x] Write a 1-page report with numbers + recommendation
+- [x] Present at **G1**; record the result in spec §0.3
+
+**Result (23 Oct, ahead of G1):** nsjail. gVisor runs GDB but takes 6.9–9.0 s per 1,000 steps on its default platform and can't turn ASLR off; nsjail takes 1.5 s, starts in 4–8 ms and turns ASLR off. Worker pods run privileged on the runner node pool. Report: [plans/spikes/s1b-sandbox.md](../../spikes/s1b-sandbox.md); spec v1.5 records it (D9, D10, Q9).
 
 ## 2. `Sandbox` port + Docker dev adapter (new · 1.5 d · M1 week 4–5)
 
@@ -35,7 +37,7 @@ Local dev runs on macOS (arm64), where gVisor and nsjail don't run. This adapter
 **fd 3 transport**
 - [x] `docker run` can't hand fd 3 to the host, and FIFOs don't cross the Docker Desktop VM boundary. Add a small static Go binary, `viz-shim`, as the runner images' entrypoint. It starts the tracer with pipes on fd 1/2/3 and writes one framed stream (`stream id + length + bytes`) to its own stdout
 - [x] The adapter reads that stream over the Docker attach API and splits it back into stdout, stderr and wire messages
-- [ ] Decide at G1 whether the production adapter uses the shim too (one code path) or passes fd 3 directly
+- [x] Decide at G1 whether the production adapter uses the shim too (one code path) or passes fd 3 directly
 
 **Adapter: `internal/adapters/dockersandbox`**
 - [x] Use the Docker Engine API (Go client) instead of shelling out to `docker`
@@ -56,49 +58,56 @@ Local dev runs on macOS (arm64), where gVisor and nsjail don't run. This adapter
 
 **Done:** `vizctl trace --lang python3 main.py` and `vizd --role=all` complete a real job on a Mac, and the port test suite passes against this adapter.
 
-Left open in §2: the shim decision waits on G1. The Compose item waits on vizd running in Compose (BE-13 §1); the client reads `DOCKER_HOST` or the default socket, but only the host path is tested. The Done line waits on `vizctl trace` (BE-03, BE-04) and the worker (BE-05); `sandboxtest` already passes against this adapter.
+G1 kept `viz-shim` for nsjail too, so both adapters share one stream decoder (`shim.Demux`). The Compose item waits on vizd running in Compose (BE-13 §1); the client reads `DOCKER_HOST` or the default socket, but only the host path is tested. The Done line waits on `vizctl trace` (BE-03, BE-04) and the worker (BE-05); `sandboxtest` already passes against this adapter.
 
 ## 3. Production adapter (M1-07 · 2 d)
 
-- [ ] Implement the adapter picked at G1 (`internal/adapters/runsc` or `nsjail`) behind the same port; pass `sandboxtest`
-- [ ] One fresh sandbox per job, destroyed after; no state reused
-- [ ] Mount the runner image read-only; writable `tmpfs` at `/work` ≤ 64 MB
-- [ ] No network namespace, no DNS
-- [ ] Non-root UID, no capabilities
-- [ ] cgroup limits: CPU, memory (256 MB default / 512 MB ceiling), PIDs ≤ 32
-- [ ] Stack rlimit 256 MB (counts toward memory)
-- [ ] Output file-size limit
+- [x] Implement the adapter picked at G1 (`internal/adapters/runsc` or `nsjail`) behind the same port; pass `sandboxtest`
+- [x] One fresh sandbox per job, destroyed after; no state reused
+- [x] Mount the runner image read-only; writable `tmpfs` at `/work` ≤ 64 MB
+- [x] No network namespace, no DNS
+- [x] Non-root UID, no capabilities
+- [x] cgroup limits: CPU, memory (256 MB default / 512 MB ceiling), PIDs ≤ 32
+- [x] Stack rlimit 256 MB (counts toward memory)
+- [x] Output file-size limit
 - [ ] Seccomp policy per image (C.9 denylist to start; allowlist before GA)
-- [ ] Pass fd 3 (or use `viz-shim`) for the NDJSON wire channel
-- [ ] Label sandboxes (job ID + start time) so the node janitor can kill orphans (§7.8)
-- [ ] Map sandbox start failures to an **infra error** (retryable), not a user error
+- [x] Pass fd 3 (or use `viz-shim`) for the NDJSON wire channel
+- [x] Label sandboxes (job ID + start time) so the node janitor can kill orphans (§7.8)
+- [x] Map sandbox start failures to an **infra error** (retryable), not a user error
+
+The adapter is `internal/adapters/nsjail`; `make test-nsjail` runs `sandboxtest` and the adapter tests in a privileged container. One box per job is a 64 MiB tmpfs `/work` plus a cgroup; each `Run` is a fresh jail over it. The seccomp item stays open: one C.9 denylist covers every image for now, and the per-image allowlist is due before GA. `SandboxSpec.Image` is the path of an unpacked runner image; BE-05 maps manifests to it.
 
 ## 4. Basic containment tests (part of M1-07)
 
 - [x] Fork bomb is stopped by the PID limit
 - [x] Network attempt (socket, DNS) fails
 - [x] Write outside `/work` fails
-- [ ] Run against **both** adapters (the Docker one locally, the production one in CI on Linux runners)
+- [x] Run against **both** adapters (the Docker one locally, the production one in CI on Linux runners)
 - [ ] **Done:** these three run in CI
 
-The three tests are cases in `sandboxtest`, so `make check` runs them against the Docker adapter on every CI run. The two open items wait on the production adapter (§3).
+The three tests are cases in `sandboxtest`, and `make check` now runs the suite against both adapters (`make test-nsjail` for nsjail). Both pass locally; the Done item waits on the first CI run with `test-nsjail`.
 
 ## 5. Security test suite (M3-B08 · 2 d)
 
 Every §15 attack case as an automated test, run in CI against the **production** adapter:
 
-- [ ] Fork bomb
-- [ ] Network attempts (TCP, UDP, DNS)
-- [ ] Writing outside `/work`; filling `/work` past 64 MB
-- [ ] Huge output (→ `output_limit`)
-- [ ] 50 MB single-line stdout
-- [ ] Infinite loop (→ `time_limit`)
-- [ ] Deep recursion (→ stack / memory limit)
-- [ ] Memory bomb (→ `memory_limit`)
+- [x] Fork bomb
+- [x] Network attempts (TCP, UDP, DNS)
+- [x] Writing outside `/work`; filling `/work` past 64 MB
+- [x] Huge output (→ `output_limit`)
+- [x] 50 MB single-line stdout
+- [x] Infinite loop (→ `time_limit`)
+- [x] Deep recursion (→ stack / memory limit)
+- [x] Memory bomb (→ `memory_limit`)
 - [ ] Fake fd-3 messages from Python user code (core must reject or contain)
 - [ ] `ptrace` of a process outside the sandbox PID namespace fails
 - [ ] Runner image check: no setuid binaries, no network tools (§10.4 item 6)
-- [ ] A staging/production build with `VIZ_SANDBOX=docker` fails to start
+- [x] A staging/production build with `VIZ_SANDBOX=docker` fails to start
+
+The sandbox-level attacks are cases in `sandboxtest`, run against nsjail by `make check`. Huge output is the failing-writer case: the core's output limit is a writer that returns an error, and the box dies. `TestPickSandbox` in `cmd/vizd` covers the docker refusal. Still open:
+- fake fd-3 messages need the Python tracer and the core's wire validation (BE-03, BE-04);
+- the `ptrace` item is only partly covered. The suite shows that a host PID can't even be signaled from inside the box, but a real `ptrace` attempt needs a runner image with GDB (BE-07);
+- the runner image check needs the runner images (BE-03, BE-07).
 
 ## Done when
 

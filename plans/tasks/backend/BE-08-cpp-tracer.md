@@ -18,9 +18,9 @@ Step through C++ with GDB's Python API (`adapters/cpp/trace.py`). The step loop 
 - [x] GDB Python script that writes wire NDJSON on fd 3
 - [x] Programs: a loop, a recursion, an STL example
 - [x] Output validates against `wire.v1.schema.json`
-- [ ] Hand to BE-02 for the gVisor/nsjail measurements
+- [x] Hand to BE-02 for the gVisor/nsjail measurements
 
-The script is `adapters/cpp/trace.py`. The programs are in `fixtures/cpp/{loop,recursion,stl}`. The three sessions are in `schema/testdata/wire/` (`cpp-loop`, `cpp-recursion`, `cpp-stl`), so the schema tests validate them in CI. The handoff waits on a box with GCC and GDB to run it in: the BE-07 §2 runner image, or a throwaway image for the spike.
+The script is `adapters/cpp/trace.py`. The programs are in `fixtures/cpp/{loop,recursion,stl}`. The three sessions are in `schema/testdata/wire/` (`cpp-loop`, `cpp-recursion`, `cpp-stl`), so the schema tests validate them in CI. BE-02 ran it in a throwaway Debian trixie image (GCC 14.2, GDB 16.3) for S1b: 1,003 steps in 1.45 s under nsjail through the adapter ([report](../../spikes/s1b-sandbox.md)).
 
 Findings, on GDB 17.1 and GCC 15.2 (x86_64):
 

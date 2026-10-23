@@ -70,7 +70,7 @@ The Go repo, CI, and the three contracts everything else is built on.
 **`vizd` image**
 - [x] One multi-stage `Dockerfile` for `vizd`: Go build stage, then two targets
   - `api`: distroless/static, non-root, only the `vizd` binary
-  - `worker`: `vizd` + the sandbox tooling chosen at G1 (`runsc` or nsjail) + `viz-shim`
+  - `worker`: `vizd` + nsjail (chosen at G1) + `viz-shim`
 - [x] `vizd migrate up|down|status` subcommand (goose embedded), used by `make dev` and the Kubernetes migration Job (BE-13 §3)
 - [x] `/healthz` and `/readyz` endpoints on both roles (contents defined in BE-13 §3)
 
