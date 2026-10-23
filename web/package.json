@@ -11,7 +11,7 @@
     "build": "pnpm --filter @viz/ide build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit && pnpm --recursive typecheck",
-    "lint": "eslint . && prettier --check .",
+    "lint": "eslint --max-warnings=0 . && prettier --check .",
     "fmt": "prettier --write . && eslint --fix .",
     "gen": "pnpm gen:trace && pnpm gen:api",
     "gen:trace": "node scripts/gen-trace.ts",

@@ -15,8 +15,12 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*.{ts,tsx}'],
+    extends: [reactHooks.configs.flat.recommended],
+  },
+  {
     files: ['**/*.tsx'],
-    extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
+    extends: [reactRefresh.configs.vite],
   },
   {
     files: ['**/*.js'],
