@@ -1,7 +1,7 @@
 //go:build linux
 
 // Package nsjail runs jobs under nsjail (D10, chosen at G1). Each Run is a fresh jail over the box's /work, a 64 MiB tmpfs on the host.
-// SandboxSpec.Image is the path of an unpacked runner image. It needs viz-shim at /opt/viz/viz-shim, empty /work and /proc directories,
+// SandboxSpec.Image names a runner image unpacked at <images>/<Image>. It needs viz-shim at /opt/viz/viz-shim, empty /work and /proc directories,
 // and empty files at /dev/null, /dev/zero, /dev/random and /dev/urandom to mount the host devices on.
 package nsjail
 
@@ -58,12 +58,14 @@ type Sandbox struct {
 	bin    string
 	cgroup string
 	boxes  string
+	images string
 }
 
 // New finds nsjail on PATH and removes every box left over from earlier runs: it assumes one worker per cgroup and boxes directory.
 // cgroup is a cgroup v2 directory that enables the cpu, memory and pids controllers for its children.
 // boxes holds each box's /work; uid 65534 must be able to reach it, so it and its parents are mode 0755.
-func New(ctx context.Context, cgroup, boxes string) (*Sandbox, error) {
+// images holds the unpacked runner images.
+func New(ctx context.Context, cgroup, boxes, images string) (*Sandbox, error) {
 	bin, err := exec.LookPath("nsjail")
 	if err != nil {
 		return nil, infra("find nsjail", err)
@@ -81,7 +83,7 @@ func New(ctx context.Context, cgroup, boxes string) (*Sandbox, error) {
 		return nil, infra("create boxes dir", err)
 	}
 
-	s := &Sandbox{bin: bin, cgroup: cgroup, boxes: boxes}
+	s := &Sandbox{bin: bin, cgroup: cgroup, boxes: boxes, images: images}
 	if err := s.sweep(ctx, func(string) bool { return true }); err != nil {
 		return nil, err
 	}
@@ -132,8 +134,9 @@ func startedBy(name string, t time.Time) bool {
 }
 
 func (s *Sandbox) Start(ctx context.Context, spec ports.SandboxSpec) (ports.Box, error) {
-	if info, err := os.Stat(spec.Image); err != nil || !info.IsDir() {
-		return nil, fmt.Errorf("runner image %s is not unpacked on this node: %w", spec.Image, domain.ErrInfra)
+	rootfs := filepath.Join(s.images, spec.Image)
+	if info, err := os.Stat(rootfs); err != nil || !info.IsDir() {
+		return nil, fmt.Errorf("runner image %s is not unpacked in %s: %w", spec.Image, s.images, domain.ErrInfra)
 	}
 	var suffix [4]byte
 	if _, err := rand.Read(suffix[:]); err != nil {
@@ -143,7 +146,7 @@ func (s *Sandbox) Start(ctx context.Context, spec ports.SandboxSpec) (ports.Box,
 	name := fmt.Sprintf("%s.%d.%s", spec.JobID, time.Now().Unix(), hex.EncodeToString(suffix[:]))
 	b := &box{
 		bin:    s.bin,
-		rootfs: spec.Image,
+		rootfs: rootfs,
 		work:   filepath.Join(s.boxes, name),
 		cgroup: filepath.Join(s.cgroup, name),
 		memory: spec.Memory,

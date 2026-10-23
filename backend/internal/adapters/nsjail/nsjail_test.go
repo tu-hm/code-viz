@@ -21,12 +21,13 @@ import (
 
 func TestSandbox(t *testing.T) {
 	sb, _, _ := newSandbox(t)
-	sandboxtest.Run(t, sb, rootfs(t))
+	_, image := rootfs(t)
+	sandboxtest.Run(t, sb, image)
 }
 
 func TestStartMissingImageIsInfraError(t *testing.T) {
 	sb, _, _ := newSandbox(t)
-	_, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "missing", Image: filepath.Join(t.TempDir(), "absent"), Memory: 64 << 20})
+	_, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "missing", Image: "absent", Memory: 64 << 20})
 	if !errors.Is(err, domain.ErrInfra) {
 		t.Fatalf("err = %v, want ErrInfra", err)
 	}
@@ -34,7 +35,17 @@ func TestStartMissingImageIsInfraError(t *testing.T) {
 
 func TestJailSetupFailureIsInfraError(t *testing.T) {
 	sb, _, _ := newSandbox(t)
-	box, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "no-work", Image: t.TempDir(), Memory: 64 << 20})
+	images, _ := rootfs(t)
+	empty, err := os.MkdirTemp(images, "empty")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := os.Remove(empty); err != nil {
+			t.Error(err)
+		}
+	})
+	box, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "no-work", Image: filepath.Base(empty), Memory: 64 << 20})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +62,8 @@ func TestJailSetupFailureIsInfraError(t *testing.T) {
 
 func TestCloseRemovesBox(t *testing.T) {
 	sb, cgroup, boxes := newSandbox(t)
-	box, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "close", Image: rootfs(t), Files: map[string][]byte{"main.py": []byte("x")}, Memory: 64 << 20})
+	_, image := rootfs(t)
+	box, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "close", Image: image, Files: map[string][]byte{"main.py": []byte("x")}, Memory: 64 << 20})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +86,8 @@ func TestCloseRemovesBox(t *testing.T) {
 
 func TestSweepRemovesBoxesStartedTwoMinutesBeforeNow(t *testing.T) {
 	sb, cgroup, boxes := newSandbox(t)
-	box, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "sweep", Image: rootfs(t), Memory: 64 << 20})
+	_, image := rootfs(t)
+	box, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "sweep", Image: image, Memory: 64 << 20})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,7 +150,8 @@ func TestNewRemovesLeftoverBoxes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err := nsjail.New(t.Context(), cgroup, boxes); err != nil {
+	images, _ := rootfs(t)
+	if _, err := nsjail.New(t.Context(), cgroup, boxes, images); err != nil {
 		t.Fatal(err)
 	}
 	if err := sleep.Wait(); err == nil {
@@ -161,7 +175,7 @@ func TestNewRefusesCgroupWithoutControllers(t *testing.T) {
 			t.Error(err)
 		}
 	})
-	_, err := nsjail.New(t.Context(), cgroup, boxesDir(t))
+	_, err := nsjail.New(t.Context(), cgroup, boxesDir(t), t.TempDir())
 	if !errors.Is(err, domain.ErrInfra) || !strings.Contains(err.Error(), "does not enable") {
 		t.Fatalf("err = %v, want ErrInfra naming the missing controller", err)
 	}
@@ -182,7 +196,8 @@ func newSandbox(t *testing.T) (sb *nsjail.Sandbox, cgroup, boxes string) {
 		t.Fatal(err)
 	}
 	boxes = boxesDir(t)
-	sb, err := nsjail.New(t.Context(), cgroup, boxes)
+	images, _ := rootfs(t)
+	sb, err := nsjail.New(t.Context(), cgroup, boxes, images)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -215,13 +230,13 @@ func parentCgroup(t *testing.T) string {
 	return cgroup
 }
 
-func rootfs(t *testing.T) string {
+func rootfs(t *testing.T) (images, image string) {
 	t.Helper()
 	dir := os.Getenv("VIZ_NSJAIL_TEST_ROOTFS")
 	if dir == "" {
 		t.Skip("needs a runner rootfs; run make test-nsjail")
 	}
-	return dir
+	return filepath.Dir(dir), filepath.Base(dir)
 }
 
 func boxDirs(t *testing.T, dir, job string) []string {
