@@ -2,11 +2,13 @@ package mysql_test
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
 	"fmt"
 	"os"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	gomysql "github.com/go-sql-driver/mysql"
 	"github.com/testcontainers/testcontainers-go"
@@ -93,4 +95,13 @@ func closeDB(t *testing.T, db *sql.DB) {
 	if err := db.Close(); err != nil {
 		t.Error(err)
 	}
+}
+
+func insertTrace(ctx context.Context, tx *sql.Tx, id string, now time.Time) error {
+	key := sha256.Sum256([]byte(id))
+	_, err := tx.ExecContext(ctx,
+		`INSERT INTO traces (id, cache_key, language, source, stdin, options, updated_at, expires_at)
+		VALUES (?, ?, 'python3', 'print(input())', 'hi', '{"maxSteps":1000,"startAtLines":[]}', ?, ?)`,
+		id, key[:], now, now.Add(7*24*time.Hour))
+	return err
 }
