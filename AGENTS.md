@@ -140,6 +140,7 @@ These look like holes in review and are decisions:
 - Standard library only. The tracer runs inside the user's interpreter, or inside GDB.
 - stdout and stderr belong to the user's program. The protocol goes to fd 3 and nowhere else.
 - The style rules above apply: flat functions, no class for a single use, zero comments by default.
+- How a run flows from manifest to trace, and the tracer ↔ core wire contract: [tracing guide](docs/guides/tracing.md).
 
 ## Comments: default zero
 

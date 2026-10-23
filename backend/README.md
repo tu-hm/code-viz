@@ -45,7 +45,7 @@ go run ./cmd/vizctl trace --lang python3 fixtures/python/aliasing/main.py < fixt
 go run ./cmd/vizctl validate trace.json   # silent when the trace matches schema/trace.v1.schema.json
 ```
 
-`--lang` is a manifest `id` from `adapters/*/manifest.yaml`. A program that fails its build step (a syntax error, or an import outside `modules.allow`) prints `compile_error` or `unsupported_module` with the diagnostics and exits 1. The Python tracer's contract with the core is in spec §7.11.1 and §10.1.
+`--lang` is a manifest `id` from `adapters/*/manifest.yaml`. A program that fails its build step (a syntax error, or an import outside `modules.allow`) prints `compile_error` or `unsupported_module` with the diagnostics and exits 1. How the tracer, the wire protocol and the trace core fit together is in the [tracing guide](../docs/guides/tracing.md).
 
 ## Docker dev sandbox
 

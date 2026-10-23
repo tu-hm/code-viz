@@ -17,7 +17,7 @@ web/            TypeScript: pnpm workspace for the browser app
   apps/ide/     IDE app (Vite, React)
   packages/     @viz/player, @viz/ui (design system)
   fixtures/     traces every view is built against
-docs/guides/    how we write code here: comments, tests, migrations, the sandbox, the design system
+docs/guides/    how we write code here: comments, tests, migrations, the sandbox, tracing, the design system
 plans/          spec, work plans, one file per backend and frontend task
 ```
 
@@ -61,6 +61,7 @@ The mock API, fixtures and configuration are in [web/README.md](web/README.md).
 | [Testing cheat sheet](docs/guides/testing-cheat-sheet.md) | 11 rules for tests that catch regressions |
 | [Database migrations](docs/guides/db-migrations.md) | goose on MySQL 8.4: online DDL, expand and contract, safe patterns |
 | [Sandbox](docs/guides/sandbox.md) | The `Sandbox` port, `viz-shim`, the Docker dev sandbox, what a runner image needs |
+| [Tracing](docs/guides/tracing.md) | Program to trace: the Python tracer, the wire contract, `tracecore`, `vizctl`, the golden fixtures |
 
 ## Working rules
 
