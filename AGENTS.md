@@ -14,11 +14,12 @@ make dev              # MySQL + SeaweedFS, migrate, seed, vizd --role=all with h
 make down             # stop; make reset also drops volumes
 make gen              # Go + TS types from api/openapi.yaml and schema/*.json
 make test             # needs Docker: testcontainers starts MySQL
+make test-nsjail      # needs Docker: nsjail sandbox tests in a privileged container
 make golden-update    # rewrites expected.trace.json; read the diff before committing
 make lint             # golangci-lint v2.15.0, pinned through go run
 make fmt              # goimports, then gofmt
 make vuln             # govulncheck v1.9.0, pinned
-make check            # lint, vuln, test, go mod tidy and Go codegen drift; run before pushing
+make check            # lint, vuln, test, test-nsjail, go mod tidy and Go codegen drift; run before pushing
 go test ./internal/tracecore -run TestName
 ```
 

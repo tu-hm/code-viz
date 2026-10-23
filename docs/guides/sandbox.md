@@ -1,6 +1,11 @@
 # Sandbox
 
-Every job runs the user's program in a sandbox (§12). The worker talks to it through the `Sandbox` port in `backend/internal/ports/sandbox.go`. Today there is one adapter, the Docker dev sandbox in `internal/adapters/dockersandbox`. The production adapter (gVisor `runsc` or nsjail) is decided at gate G1 on Fri 6 Nov and built in BE-02 §3. Every adapter has to pass the shared suite in `internal/ports/sandboxtest`.
+Every job runs the user's program in a sandbox (§12). The worker talks to it through the `Sandbox` port in `backend/internal/ports/sandbox.go`. There are two adapters:
+
+- **nsjail** (`internal/adapters/nsjail`) is the production sandbox. It was chosen at G1 (D10, spec v1.5); the numbers are in [the S1b report](../../plans/spikes/s1b-sandbox.md).
+- **Docker** (`internal/adapters/dockersandbox`) is the dev sandbox, for macOS and any machine with Docker. It is not a security boundary.
+
+Both adapters pass the shared suite in `internal/ports/sandboxtest`.
 
 Read this before you wire the worker to the sandbox (BE-05), build a runner image or tracer (BE-03, BE-07, BE-08), or write the production adapter.
 
@@ -40,7 +45,7 @@ This is a sketch; the real flow belongs to BE-05. `Files` are written into `/wor
 | `ctx` was canceled | `ctx.Err()` | Dead |
 | One of the writers returned an error | That error, wrapped | Dead |
 | The shim's stream was broken or forged | A plain error | Dead |
-| Docker failed (daemon down, image missing or built for another architecture, create or exec failed) | An error wrapping `domain.ErrInfra` | — |
+| The sandbox failed (Docker daemon down, image missing or built for another architecture; nsjail missing, its cgroup not set up, or the jail failed to start) | An error wrapping `domain.ErrInfra` | — |
 
 Turning these into `exit.kind` and `truncation` is the worker's job (§7.7). Only `domain.ErrInfra` is retried, once. A broken stream is a plain error on purpose, so it ends as `internal_error` instead of a retry: the user's program can corrupt its own stream (see below).
 
@@ -50,7 +55,7 @@ Turning these into `exit.kind` and `truncation` is the worker's job (§7.7). Onl
 - **Enforce the core's limits through the writers.** Output, step and trace-size limits (§11) are counted outside the sandbox. When one is hit, return an error from the writer. `Run` kills the box and returns that error.
 - **Enforce wall time with the context deadline.** The adapter's watchdog kills the box when the deadline passes. Use the deadline, not a timer of your own.
 - **Close with a context that isn't canceled.** The job's context may already be done when you clean up.
-- **One `Run` at a time.** Never `Run` again on a dead box. In the Docker adapter that fails with `ErrInfra`, which would requeue a job that should have ended.
+- **One `Run` at a time.** Never `Run` again on a dead box. In the Docker adapter that fails with `ErrInfra`, which would requeue a job that should have ended. In the nsjail adapter it fails with a plain error.
 - **Stdin is a file.** The program's fd 0 is `/dev/null`. Put the input in `Files` as `stdin`; the tracers read `/work/stdin` themselves (§7.11).
 
 ## viz-shim and the frame stream
@@ -59,6 +64,11 @@ The tracer writes the wire protocol to fd 3 (§10.1), but `docker run` can't han
 
 - `viz-shim` with no arguments waits for SIGTERM. The Docker adapter uses it as the container's main process.
 - `viz-shim -- cmd args...` starts `cmd` with stdin on `/dev/null` and pipes on fd 1, 2 and 3. It writes everything it reads as frames to its own stdout. When `cmd` exits, it kills `cmd`'s process group, waits for every pipe to reach EOF, and then writes one exit frame.
+
+The shim protects itself in two ways, because a killed shim loses the exit frame and the run ends as a broken stream:
+
+- **The program is the out-of-memory killer's first choice.** The shim starts `cmd` with `oom_score_adj` 1000 and keeps its own at 0. Without this, the kernel sometimes picked the shim for a second kill while the first victim's memory was still charged.
+- **It runs with `GOMAXPROCS=1`.** Its threads count toward the box's 32 PIDs. Under nsjail the Go runtime can't see the CPU limit, so it started one thread per host CPU, and a fork bomb could take the PID it needed for the next one.
 
 Each frame is one byte of stream id, then the payload length as a 4-byte big-endian integer, then the payload:
 
@@ -75,11 +85,56 @@ A payload is at most 64 KiB. The codec is `backend/internal/shim`.
 
 A background process that calls `setsid` escapes the process-group kill and keeps the pipes open. The shim then never writes its exit frame, and the run ends at the deadline with `LimitTime`.
 
+## The nsjail sandbox
+
+The production adapter. vizd runs as root in a privileged worker pod on the runner node pool, and starts nsjail once per `Run`.
+
+`nsjail.New(ctx, cgroup, boxes)` takes two directories:
+
+- `cgroup` is a cgroup v2 directory that turns on the `cpu`, `memory` and `pids` controllers for its children. `New` refuses one that doesn't. `scripts/nsjail-cgroups.sh` sets up `/sys/fs/cgroup/viz` in a privileged container and then runs its arguments: `nsjail-cgroups.sh vizd --role=worker`. It first moves every process out of the root cgroup, because cgroup v2 doesn't let a cgroup hold processes while it gives controllers to its children.
+- `boxes` holds each box's `/work`. The jail's user (UID 65534) must be able to reach it, so it and every parent directory need mode 0755. Don't put it under a `t.TempDir()`, which is 0700.
+
+`SandboxSpec.Image` is the **path of an unpacked runner image** on the node, not an image name. How a manifest's image maps to that path is decided in BE-05.
+
+### What a box is
+
+`Start` creates `<boxes>/<job>.<unix start>.<random>`, mounts a 64 MiB tmpfs on it (mode 1777, `nosuid`, `nodev`), writes `Files` owned by UID 65534, and creates a cgroup with the same name under `cgroup`. The name carries the job ID and the start time, so the janitor can find leftovers (§7.8).
+
+Each `Run` starts a new jail over that `/work`:
+
+| Setting | Value | Why |
+|---|---|---|
+| Root | the unpacked image, bind mounted read-only (`--chroot`) | Only `/work` is writable |
+| `/work` | the box's tmpfs, bind mounted read-write | Survives between runs; 64 MiB (§12) |
+| Devices | host `/dev/null`, `/dev/zero`, `/dev/random`, `/dev/urandom` bind mounted | The image's `/dev` is empty |
+| `/proc` | mounted read-write | viz-shim writes `/proc/self/oom_score_adj`. The user namespace keeps `/proc/sys` read-only |
+| Namespaces | user, mount, PID, network, IPC, UTS, cgroup | No network, no DNS; host processes can't be named |
+| User | `65534:65534`, mapped to 65534 outside | Never root on the host, even after an escape |
+| Capabilities | none, `no_new_privs` | §12 |
+| Seccomp | the C.9 Kafel denylist (`mount`, `unshare`, `setns`, `bpf`, `keyctl`, module and reboot calls fail with EPERM) | `ptrace` stays allowed for GDB. Allowlist before GA |
+| ASLR | off for the whole jail (`persona_addr_no_randomize`) | §7.12; GDB needs no `personality` call |
+| Memory | `SandboxSpec.Memory`, swap 0 | §11 |
+| PIDs | 32 | §11 |
+| CPU | 1,000 ms per second | One slot is one vCPU (§7.9) |
+| rlimits | stack 256 MiB, file size 64 MiB, 1,024 open files, no address-space limit | §11; memory is limited by the cgroup |
+
+nsjail stays in vizd's cgroup and puts the jail in a `NSJAIL.<pid>` child of the box's cgroup, which it removes when the jail ends. A kill is SIGTERM to nsjail, which kills and reaps the whole jail. Out-of-memory kills come from the box cgroup's `memory.events`, which still counts kills from the removed children.
+
+Unlike Docker, a box has no long-running process between runs. A box that hit the deadline or was canceled is still marked dead, so both adapters behave the same.
+
+### Infra errors
+
+`domain.ErrInfra` covers: `nsjail` not on `PATH`, a cgroup without the controllers, a runner image that isn't unpacked on the node, a failed mount or cgroup write, and a jail that never started. nsjail exits 255 when it can't set up the jail. The adapter maps that to `ErrInfra` with nsjail's own log, which names the mount or cgroup that failed.
+
+### Janitor
+
+`New` kills every process in each child of `cgroup` (`cgroup.kill`), waits until the cgroup is empty, and removes it. Then it unmounts and deletes every directory in `boxes`. Like the Docker janitor, it assumes one worker per `cgroup` and `boxes`.
+
 ## The Docker dev sandbox
 
 **It is not a security boundary.** It exists because gVisor and nsjail don't run on macOS. vizd enforces that:
 
-| `VIZ_ENV` | `VIZ_SANDBOX` unset | `VIZ_SANDBOX=docker` | `runsc` or `nsjail` |
+| `VIZ_ENV` | `VIZ_SANDBOX` unset | `VIZ_SANDBOX=docker` | `VIZ_SANDBOX=nsjail` |
 |---|---|---|---|
 | `dev` | docker | allowed, with a warning on every start | allowed |
 | `test` | refused | allowed, with a warning on every start | allowed |
@@ -124,33 +179,41 @@ One container per box:
 
 ## Runner image requirements
 
-A runner image (BE-03, BE-07, BE-08) works with the Docker sandbox when:
+A runner image (BE-03, BE-07, BE-08) works with both sandboxes when:
 
 - **`viz-shim` is at `/opt/viz/viz-shim`,** built static for the image's architecture: `CGO_ENABLED=0 GOOS=linux go build ./cmd/viz-shim`. The `build` stage of `backend/Dockerfile` already builds it, for the worker image.
 - **`tar` and `cat` are on `PATH`.** The adapter uses them to write `Files` and to read `memory.events`.
 - **The toolchain runs as UID 65534 with only `/work` writable.** `/tmp` is read-only, so anything that writes temp files needs `TMPDIR=/work` in the command's `Env`. g++ is one of them.
-- **It fits in the PID budget.** `docker-init` and the idle shim take about 8 of the 32 PIDs, and each running `viz-shim -- …` takes about 6 more, because Go threads count toward the limit. That leaves about 18 for the tracer and the user's program. Recent GDB versions can start worker threads, so check a traced C++ program against this budget early.
+- **It fits in the PID budget.** Go threads count toward the limit. Under Docker, `docker-init` and the idle shim take about 8 of the 32 PIDs, and each running `viz-shim -- …` takes a few more. Under nsjail only the running shim counts. GDB 16 tracing a 1,003-step program and g++ building it both fit.
 - **It is built for your machine's architecture.** `make images` builds for the host.
+
+For nsjail, the image is unpacked into a directory on the node (for example `docker export`, or `COPY --from` in the worker image). That directory also needs:
+
+- **empty `/work` and `/proc` directories, and empty files at `/dev/null`, `/dev/zero`, `/dev/random` and `/dev/urandom`.** The root is read-only, so nsjail can't create its mount points. `docker build` doesn't keep files written to `/dev`, so add them after unpacking.
+- **a mount without `nosuid`, `nodev` or `noexec`.** nsjail can't remount such a bind read-only inside a user namespace and fails with EPERM. The image layer of the worker container is fine. A directory under a host `/tmp` that is bind mounted into the container is not.
 
 ## Tests
 
 | Run | What it covers |
 |---|---|
-| `go test ./internal/adapters/dockersandbox/` | The shared suite against the Docker adapter, plus adapter-only cases: missing image, emulated image, unreachable daemon, the janitor, `Close`. About 6 s once images are cached |
+| `go test ./internal/adapters/dockersandbox/` | The shared suite against the Docker adapter, plus adapter-only cases: missing image, emulated image, unreachable daemon, the janitor, `Close`. About 10 s once images are cached |
+| `make test-nsjail` | The shared suite against the nsjail adapter, plus adapter-only cases: missing image, failed jail setup, a cgroup without controllers, the janitor, `Close`. Builds `viz-nsjail-test:dev` and runs it privileged with `scripts/nsjail-cgroups.sh`. `go test ./...` skips these tests outside that container. `make check` runs it, so CI covers both adapters |
 | `go test ./internal/shim -fuzz=FuzzReader -fuzztime=30s` | Fuzzes the frame reader. Commit any failing input it finds (test 9) |
 | `go test ./cmd/vizd` | The `VIZ_ENV` and `VIZ_SANDBOX` rules |
 
 The dockersandbox tests build `viz-sandboxtest:dev` themselves: busybox (pinned by digest) plus a `viz-shim` compiled for the daemon's architecture. On OrbStack or Colima, export `DOCKER_HOST` first (see the backend README, Common problems).
 
-`sandboxtest.Run(t, sandbox, image)` is the contract every adapter passes. It covers exit codes and signals, the three streams (including a 5 MB single-line write), files and `/work` surviving between runs, deadline and cancel, a failing writer, the memory limit, the PID limit, network, read-only paths, the size of `/work`, non-root without capabilities, the stack rlimit, and turning ASLR off. To add a case, add a table entry whose `name` states the behavior and give it one or more steps. Each case gets its own box and runs in parallel.
+`sandboxtest.Run(t, sandbox, image)` is the contract every adapter passes. It covers exit codes and signals, the three streams (including a 50 MB single-line write), files and `/work` surviving between runs, deadline (on a busy loop) and cancel, a failing writer, the memory limit, deep recursion, the PID limit and a fork bomb, TCP, UDP and DNS, host processes out of reach, new namespaces refused by seccomp, read-only paths, the size of `/work`, non-root without capabilities, the stack rlimit, and turning ASLR off. To add a case, add a table entry whose `name` states the behavior and give it one or more steps. Each case gets its own box and runs in parallel.
 
 ## Not built yet
 
 | What | Where |
 |---|---|
-| Production adapter (`runsc` or nsjail), passing `sandboxtest` | BE-02 §3, after G1 |
-| Whether the production adapter uses `viz-shim` or passes fd 3 directly | G1 |
-| Security suite (§15 attacks) against the production adapter | BE-02 §5, M3 |
+| A seccomp allowlist per runner image, tuned against g++, GDB and Python | BE-02 §5, before GA |
+| Fake fd-3 messages from Python user code, rejected by the core | BE-03, BE-04 |
+| Runner image check: no setuid binaries, no network tools | BE-02 §5, with the runner images (BE-03, BE-07) |
+| Mapping a manifest's image to an unpacked rootfs path on the node | BE-05 |
+| The worker pod spec on the runner node pool (privileged, `nsjail-cgroups.sh`), tested on staging | BE-13 §3 |
 | The worker opening the sandbox and running jobs | BE-05 |
 | A sandbox self-check in `/readyz` | BE-13 §3 |
 | `vizd` in Compose with the Docker socket mounted, tested | BE-13 §1 |

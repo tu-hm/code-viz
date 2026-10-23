@@ -34,11 +34,11 @@ curl -i http://127.0.0.1:8080/readyz    # 200: MySQL is reachable; 503 otherwise
 
 Press Ctrl-C to stop vizd. `make down` stops the containers and keeps their data. `make reset` also deletes the data.
 
-Not built yet: the API endpoints (BE-06), the job worker (BE-05), the runner images (BE-03, BE-08) and the production sandbox (BE-02 §3). `make seed` loads nothing until BE-13 §1 adds sample traces.
+Not built yet: the API endpoints (BE-06), the job worker (BE-05) and the runner images (BE-03, BE-08). `make seed` loads nothing until BE-13 §1 adds sample traces.
 
 ## Docker dev sandbox
 
-On a laptop, jobs run in Docker containers instead of gVisor or nsjail, which don't run on macOS. `VIZ_SANDBOX=docker` picks it, and it's the default with `VIZ_ENV=dev`. vizd only checks that setting for now; the job worker (BE-05) is what will run jobs through the sandbox.
+On a laptop, jobs run in Docker containers instead of nsjail, the production sandbox, which doesn't run on macOS. `VIZ_SANDBOX=docker` picks it, and it's the default with `VIZ_ENV=dev`. vizd only checks that setting for now; the job worker (BE-05) is what will run jobs through the sandbox.
 
 **It is not a security boundary.** vizd logs a warning on every start with it, and refuses to start with it unless `VIZ_ENV` is `dev` or `test`, so it never runs in staging or production. Each job still gets its own container with no network, a read-only root, a 64 MB `/work`, 32 PIDs, a memory cap, no capabilities and a non-root user.
 
@@ -78,7 +78,8 @@ Everything listens on 127.0.0.1 only.
 | `make lint` | Runs golangci-lint v2.15.0 with `.golangci.yml`. The first run builds the linter, which takes about a minute |
 | `make fmt` | Formats Go code with goimports, then gofmt |
 | `make vuln` | Runs govulncheck v1.9.0 |
-| `make check` | Runs lint, vuln and test, then fails if `go mod tidy` or `make gen` would change anything. Run it before pushing |
+| `make test-nsjail` | Runs the nsjail sandbox tests in a privileged container. Needs Docker with cgroup v2 that can run privileged containers |
+| `make check` | Runs lint, vuln, test and test-nsjail, then fails if `go mod tidy` or `make gen` would change anything. Run it before pushing |
 | `scripts/setup.sh` | Checks the prerequisites and prints the install command for anything missing |
 | `go run ./cmd/vizd migrate up\|down\|status` | Runs database migrations. Needs `MYSQL_DSN` |
 
