@@ -29,14 +29,17 @@
 
 ## 3. Object storage — `BlobStore` (M1-10 · 1.5 d)
 
-- [ ] Port + S3 adapter (`aws-sdk-go-v2`): put, presign GET (15 min), server-side copy
+- [x] Port + S3 adapter (`aws-sdk-go-v2`): put, with 3 retries (§7.8)
+- [ ] Presign GET (15 min), server-side copy
 - [ ] Two endpoints: `S3_ENDPOINT` (used by vizd to put/copy) and `S3_PUBLIC_ENDPOINT` (used only to presign). The signature covers the host, so a URL signed for `seaweedfs:8333` can't be rewritten for the browser later
-- [ ] Path-style addressing option (needed for SeaweedFS locally)
-- [ ] Keys: `{t7|t90}/{traceId}/chunk-0000.json.gz`
-- [ ] Upload with `Content-Encoding: gzip`, `Cache-Control: private, max-age=86400, immutable`
+- [x] Path-style addressing option (needed for SeaweedFS locally)
+- [x] Keys: `{t7|t90}/{traceId}/chunk-0000.json.gz`
+- [x] Upload with `Content-Encoding: gzip`, `Cache-Control: private, max-age=86400, immutable`
 - [ ] Bucket CORS: allow `GET` from the IDE origins (`CORS_ORIGINS`), expose `Content-Length`, `ETag`; set up in Compose and OpenTofu
 - [ ] Lifecycle rules: `t7/` 7 days, `t90/` 90 days
 - [ ] **Done:** the browser downloads a chunk from a presigned URL locally and on staging; objects expire on staging
+
+**Status (24 Oct):** `ports.BlobStore` puts gzipped chunks through `internal/adapters/blobstore` (tested against SeaweedFS), `domain.ChunkKey` builds the keys, and `make seed` creates the dev bucket. Left: presign with `S3_PUBLIC_ENDPOINT`, server-side copy, bucket CORS, lifecycle rules and OpenTofu.
 
 ## 4. Endpoints (M1-09 · 3 d)
 
