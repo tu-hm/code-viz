@@ -115,6 +115,8 @@ The display options (§19.3) are data attributes on `<html>`, and the component 
 
 FE-02 §4 owns the settings that set these attributes, including the system theme option.
 
+The app shell takes its height from `dvh` (`h-dvh`, `min-h-dvh`), never `vh` or `h-screen`. On a phone, `100vh` includes the strip under the browser's address bar, so anything pinned to the bottom, such as the step controls, sits behind it.
+
 ## 6. Shape and elevation
 
 | Radius | Utility | Where |
@@ -156,6 +158,8 @@ Shadows only for things that lift: `shadow-raised` for a card on hover, `shadow-
 
 Use the tokens (`duration-(--duration-fade)`), not literals. Under `prefers-reduced-motion: reduce` both are 0 ms, so a component that uses them needs no extra rule. Nothing changes width or position between steps.
 
+Transition colour and opacity only, and name the property: `transition-colors`, `transition-opacity`. Never `transition-all`: it also animates width, height and position, and a cell easing to its new width is the movement this section rules out. Students step, scrub and press shortcuts hundreds of times a session, so those actions get the 150 ms fade and nothing else.
+
 ## 9. Dark mode
 
 - `semantic.css` defines light values on `:root` and `[data-theme='light']`, and dark values on `[data-theme='dark']`. The app sets the attribute on `<html>`; any element can set it to force a theme for its subtree, as a Storybook side-by-side does.
@@ -169,6 +173,8 @@ Use the tokens (`duration-(--duration-fade)`), not literals. Under `prefers-redu
 - Every control is reachable by keyboard. Focus shows as a 2px `--border-focus` outline with a 2px offset, from the base layer.
 - Every trace colour has its mark (§19.10). Every icon-only control has a label.
 - Motion follows `prefers-reduced-motion` through the duration tokens.
+- Touch screens can't hover, and Tailwind v4 applies `hover:` only on devices that can. Anything revealed on hover, such as a pointer's address (§5.4) or a line's share of all hits (§19.3), also opens on focus and on tap.
+- Zoom stays on: the viewport tag never sets `maximum-scale` or `user-scalable=no`. Text inputs on touch screens use 16px text or larger, or iOS Safari zooms in when they take focus.
 
 ## 11. Checklist for a UI change
 
@@ -176,5 +182,7 @@ Use the tokens (`duration-(--duration-fade)`), not literals. Under `prefers-redu
 - [ ] Any new colour pair is in `tokens.test.ts`, and `pnpm test` passes.
 - [ ] Every trace state shows its mark as well as its colour.
 - [ ] Checked in light and dark, compact and comfortable, font sizes S and L.
-- [ ] Nothing moves between steps; any animation uses the duration tokens.
+- [ ] Nothing moves between steps; any animation uses the duration tokens and names its property (no `transition-all`).
 - [ ] Focus is visible on every new control; icon-only controls have an `aria-label`.
+- [ ] Anything shown on hover also shows on focus and on tap.
+- [ ] At phone width: the shell uses `dvh`, text inputs are 16px or larger, and zoom still works.
