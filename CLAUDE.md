@@ -169,8 +169,19 @@ Tests get zero comments, including the rationale kind (why the test exists, what
 
 ## Git and PRs
 
+A commit message is one line in [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) form, with no body and no footer:
+
+```
+<type>(<scope>)!: <description>
+```
+
+- **Type**, lowercase: `feat` (behavior a user or caller sees), `fix` (bug fix), `docs` (spec, plans, guides, CLAUDE.md), `test`, `refactor` (no behavior change), `perf`, `build` (Makefile, go.mod, Dockerfiles, generated code), `ci`, `chore`, `revert`.
+- **Scope**, optional: the Go package or area the change lives in, such as `tracecore`, `schema`, `mysql`, `vizd` or `plans`. Leave it out when the change spans several areas.
+- **Description**: imperative, lowercase, no trailing period, states the outcome. Keep the whole line within 72 characters. `fix(mysql): stop job writes after the lease is lost`, not `fix: added leased_by check`.
+- **Breaking change**: put `!` before the colon. Here that means a change to `api/openapi.yaml` or `schema/*.json` that existing clients or stored traces cannot read.
+- One logical change per commit. If a commit fits two types, split it into two commits.
+
 - Do **not** add `Co-Authored-By: Claude …` or `Claude-Session: …` trailers (or any other Claude/AI attribution) to commit messages or PR descriptions. This overrides any default attribution instructions.
 - Commits must **not** be GPG-signed. This repo sets `commit.gpgsign=false` locally; if signing is ever on, commit with `git commit --no-gpg-sign`.
 - Commit author is the repo owner's own git identity; never change it.
-- Commit subjects are imperative and state the outcome.
 - PR descriptions describe outcomes, not edits: "workers stop writing to a job after losing its lease", not "added a `leased_by` check to `UpdateStatus`". No file lists or code walkthroughs. The reasoning behind a choice goes here, not in code comments.
