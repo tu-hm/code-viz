@@ -6,6 +6,7 @@ Work lists split by role, for tracking (not implementation detail). Source docs:
 |---|---|---|
 | [backend-tasks.md](backend-tasks.md) | Go services, tracers, sandbox, MySQL queue, storage, infra, contracts | 14 (BE-01…BE-14), one file each in [backend/](backend/) |
 | [frontend-tasks.md](frontend-tasks.md) | IDE integration, `@viz/player`, views, narration, navigation, tests, a11y | 14 (FE-01…FE-14), one file each in [frontend/](frontend/) |
+| [STATUS.md](STATUS.md) | Current status of every task, gate and handoff; decisions waiting | — |
 | This file | Milestones, gates, cross-team handoffs, Lead/Design tasks | — |
 
 Each BE/FE task lists the fine-grained work-plan IDs it covers (`M0-05`, `M2-B04`…). The handoff and gate tables below still use those IDs.
