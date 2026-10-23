@@ -45,6 +45,7 @@ const (
 
 	killTimeout = 10 * time.Second
 	outputMax   = 4 << 10
+	boxLifetime = 2 * time.Minute // one job: 30 s deadline (§7.7) plus build and cleanup; older boxes are leftovers
 )
 
 type Sandbox struct {
@@ -52,7 +53,7 @@ type Sandbox struct {
 	arch   string
 }
 
-// New connects to the Docker daemon named by DOCKER_HOST, or the default socket, and removes containers left over from earlier runs.
+// New connects to the Docker daemon named by DOCKER_HOST, or the default socket, and removes boxes left over from earlier runs: those started more than boxLifetime ago.
 func New(ctx context.Context) (*Sandbox, error) {
 	docker, err := client.New(client.FromEnv)
 	if err != nil {
@@ -70,8 +71,15 @@ func New(ctx context.Context) (*Sandbox, error) {
 	if err != nil {
 		return nil, errors.Join(infra("list leftover containers", err), docker.Close())
 	}
+	now := time.Now()
 	for _, c := range leftovers.Items {
-		if _, err := docker.ContainerRemove(ctx, c.ID, client.ContainerRemoveOptions{Force: true}); err != nil {
+		started, err := time.Parse(time.RFC3339, c.Labels[startedLabel])
+		if err == nil && now.Sub(started) < boxLifetime {
+			continue
+		}
+		_, err = docker.ContainerRemove(ctx, c.ID, client.ContainerRemoveOptions{Force: true})
+		// another sandbox's janitor may be removing it too: not found or conflict means it's going
+		if err != nil && !cerrdefs.IsNotFound(err) && !cerrdefs.IsConflict(err) {
 			return nil, errors.Join(infra("remove leftover container "+c.ID, err), docker.Close())
 		}
 	}

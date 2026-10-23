@@ -93,24 +93,40 @@ func TestNewRemovesLeftoverJobContainers(t *testing.T) {
 	testImage(t)
 	created, err := docker.ContainerCreate(ctx, client.ContainerCreateOptions{
 		Image:  busybox,
-		Config: &container.Config{Cmd: []string{"sleep", "60"}, Labels: map[string]string{"viz.job": "leftover"}},
+		Config: &container.Config{Cmd: []string{"sleep", "60"}, Labels: map[string]string{"viz.job": "leftover", "viz.started": "2026-01-01T00:00:00Z"}},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
 		_, err := docker.ContainerRemove(context.WithoutCancel(ctx), created.ID, client.ContainerRemoveOptions{Force: true})
-		if err != nil && !cerrdefs.IsNotFound(err) {
+		if err != nil && !cerrdefs.IsNotFound(err) && !cerrdefs.IsConflict(err) {
 			t.Error(err)
 		}
 	})
-	if _, err := docker.ContainerStart(ctx, created.ID, client.ContainerStartOptions{}); err != nil {
-		t.Fatal(err)
-	}
 
 	newSandbox(t)
-	if _, err := docker.ContainerInspect(ctx, created.ID, client.ContainerInspectOptions{}); !cerrdefs.IsNotFound(err) {
-		t.Fatalf("inspect leftover: err = %v, want not found", err)
+	got, err := docker.ContainerInspect(ctx, created.ID, client.ContainerInspectOptions{})
+	if !cerrdefs.IsNotFound(err) && (err != nil || got.Container.State.Status != container.StateRemoving) {
+		t.Fatalf("inspect leftover: err = %v, want not found or removing", err)
+	}
+}
+
+func TestNewKeepsBoxesOfOtherRunningSandboxes(t *testing.T) {
+	docker := newClient(t)
+	box, err := newSandbox(t).Start(t.Context(), ports.SandboxSpec{JobID: "running", Image: testImage(t), Memory: 64 << 20})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := box.Close(context.WithoutCancel(t.Context())); err != nil {
+			t.Error(err)
+		}
+	})
+
+	newSandbox(t)
+	if got := jobContainers(t, docker, "running"); len(got) != 1 {
+		t.Errorf("containers of the running box: %v, want one", got)
 	}
 }
 
