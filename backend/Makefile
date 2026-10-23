@@ -54,8 +54,13 @@ down:
 reset:
 	docker compose down --volumes
 
+# 409: bucket exists from an earlier seed
 seed:
-	@echo "seed: nothing to seed yet; sample traces come with BE-13 §1" >&2
+	@code=$$(curl -sS -o /dev/null -w '%{http_code}' -X PUT "$(S3_ENDPOINT)/$(S3_BUCKET)") && \
+	case $$code in \
+	200|409) ;; \
+	*) echo "seed: create bucket $(S3_BUCKET): HTTP $$code" >&2; exit 1 ;; \
+	esac
 
 lint:
 	$(GOLANGCI_LINT) run ./...

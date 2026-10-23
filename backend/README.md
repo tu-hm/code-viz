@@ -22,7 +22,7 @@ make dev
 
 1. Starts MySQL 8.4 and SeaweedFS (S3 API) with Docker Compose and waits until both are healthy.
 2. Runs `vizd migrate up`.
-3. Runs `make seed`.
+3. Runs `make seed`, which creates the `viz-traces` bucket in SeaweedFS.
 4. Starts `vizd --role=all` under [air](https://github.com/air-verse/air), which rebuilds and restarts it when a `.go` or `.sql` file changes.
 
 The first run pulls images and downloads modules, which takes a few minutes. Then check vizd from another terminal:
@@ -34,7 +34,7 @@ curl -i http://127.0.0.1:8080/readyz    # 200: MySQL is reachable; 503 otherwise
 
 Press Ctrl-C to stop vizd. `make down` stops the containers and keeps their data. `make reset` also deletes the data.
 
-Not built yet: the API endpoints (BE-06), the job worker (BE-05) and the C++ runner image (BE-07, BE-08). `make seed` loads nothing until BE-13 §1 adds sample traces.
+Not built yet: the API endpoints (BE-06), the job worker (BE-05) and the C++ runner image (BE-07, BE-08). `make seed` loads no sample traces until BE-13 §1.
 
 ## Trace a program locally
 
@@ -82,7 +82,7 @@ Everything listens on 127.0.0.1 only.
 | `make dev` | Starts the stack and runs vizd with hot reload |
 | `make down` | Stops the containers and keeps their data |
 | `make reset` | Stops the containers and deletes their data |
-| `make seed` | Loads sample data (nothing yet) |
+| `make seed` | Creates the trace bucket (`S3_BUCKET`) if it doesn't exist. Sample traces come with BE-13 §1 |
 | `make test` | Builds the runner images, then runs `go test ./...`. Needs Docker, because some tests start MySQL with testcontainers, and the sandbox and fixture tests start containers. |
 | `make images` | Builds `vizd-api:dev`, `vizd-worker:dev` and the runner images for this machine's architecture |
 | `make runner-images` | Builds only the runner images, tagged with each manifest's `image` |
