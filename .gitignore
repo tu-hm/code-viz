@@ -31,6 +31,12 @@ go.work.sum
 # env file
 .env
 
+# Web (pnpm workspace in web/)
+node_modules/
+dist/
+.env.local
+.env.*.local
+
 # Editor/IDE
 # .idea/
 # .vscode/
