@@ -6,7 +6,10 @@ The spec is [plans/code-visualizer-spec_2.md](plans/code-visualizer-spec_2.md); 
 
 ## Commands
 
+Run from `backend/`. Works on macOS and Linux; the prerequisites are Go, Docker with Compose v2, make and git.
+
 ```bash
+scripts/setup.sh      # checks prerequisites, prints the install command for this OS
 make dev              # MySQL + SeaweedFS, migrate, seed, vizd --role=all with hot reload
 make down             # stop; make reset also drops volumes
 make gen              # Go + TS types from api/openapi.yaml and schema/*.json
@@ -17,7 +20,7 @@ golangci-lint run ./...
 govulncheck ./...
 ```
 
-Format with `goimports -w`, then `gofmt`. Fix lint findings in the code. A `//nolint` names the linter and gives a reason.
+Format with `goimports -w`, then `gofmt`. Fix lint findings in the code. A `//nolint` names the linter and gives a reason. `backend/.golangci.yml` (golangci-lint v2) enforces part of this file: `_ = f()` (S3), the slog rules, a reason on every `//nolint`, and no `time.Sleep`, `log.Print*` or `fmt.Print*`.
 
 ## How to work
 
@@ -90,6 +93,7 @@ Also:
 - `internal/gen/` is generated; never edit it. Change `api/openapi.yaml` or `schema/*.json`, run `make gen`, and commit the contract, the generated code and the callers together (D14). CI fails on drift.
 - Languages are data (§7.2 #5): a runner image and a manifest. Go code that branches on a language name is a design problem; ask first.
 - Domain errors map to the §8.7 envelope in `transport/http` only. `app` and `domain` never see HTTP status codes.
+- A new endpoint or table starts as a spec change (§8, §7.5). Routes name the resource, never the caller: anonymous vs signed in is a branch in the handler and a metric label, not a separate path (D16).
 - A new limit or failure path is added to §11 or §7.8 in the same PR.
 
 ## Trust boundary (§12)
@@ -99,15 +103,26 @@ Also:
 - IDs come from `crypto/rand` (128-bit `trc_…`). `cache_key` never leaves the database.
 - Never log user source, stdin or trace contents. Broken tracer output logs a redacted sample only (§7.8).
 
+### Intentional, do not flag
+
+These look like holes in review and are decisions:
+
+- **User code can write fake fd-3 messages.** The Python tracer shares a process with the user's program. A user can only fake their own trace, so this is accepted (§12). The defense is validating every message in the core, not hiding fd 3.
+- **GDB gets `ptrace`, and ASLR is off, inside the sandbox** (D10, C.9). The tracer needs both; neither reaches outside the sandbox's PID namespace.
+- **`POST /visualizations` accepts anonymous callers** (D16). Abuse control is the per-IP ingress limit plus the daily quota in MySQL (§11), not sign-in.
+- **A signed chunk URL works for whoever holds it, for 15 minutes** (§8.4, §12). Buckets are private and object keys carry random `trc_` IDs.
+- **Credentials in the local compose file and `.env.example`.** Dev-only values for containers bound to localhost.
+
 ## MySQL (§7.13)
 
 - SQL lives in sqlc query files under `internal/adapters/mysql`. No ORM, no query builder, no SQL assembled from strings.
-- Migrations use goose. An applied migration is immutable; ship a new one.
+- Migrations use goose. An applied migration is immutable; ship a new one. Expand, backfill, contract: old and new pods run against the same schema during a rollout. Every `ALTER TABLE` on an existing table names `ALGORITHM=INSTANT` or `ALGORITHM=INPLACE, LOCK=NONE`. Rules and patterns: [db migrations guide](docs/guides/db-migrations.md).
 - Every transaction locks in this order: `usage_daily → traces → visualizations → jobs`.
 - Deadlock (1213) and lock-wait timeout (1205) retries go through the one retry helper. No ad-hoc retry loops.
 - No network call (object storage, sandbox, HTTP) while a transaction is open.
 - Every worker write to `jobs` or `traces` checks `leased_by = ?`. Zero rows affected means the lease is lost: stop the job, do not retry the write.
 - Never filter on the JSON columns (`options`, `header`).
+- **Never run `INSERT`, `UPDATE`, `DELETE` or DDL against a shared database (staging, prod) without showing the exact SQL and getting confirmation.**
 
 ## Errors, logs, metrics
 
@@ -147,18 +162,21 @@ Tests get zero comments, including the rationale kind (why the test exists, what
 
 ## Tests (§15)
 
-`go test` with `go-cmp` for diffs, golden files for traces, `testcontainers-go` for MySQL and SeaweedFS.
+`go test` with `go-cmp` for diffs, golden files for traces, `testcontainers-go` for MySQL and SeaweedFS. No testify. Cite rules by number (`test 7`); BAD/GOOD examples and the pre-merge checklist: [testing cheat sheet](docs/guides/testing-cheat-sheet.md).
 
 1. **Skip trivial code.** No branch, transformation or invariant means no test. Ask before writing a trivial input-validation test.
-2. **A plausible regression must fail the test.** Delete the line under test; if the test still passes, it is useless. Assert the side effect, not just `err == nil`.
-3. **Deterministic.** Inject the clock, randomness and env. No `time.Sleep` to wait for an event.
+2. **A plausible regression must fail the test.** Delete the line under test, or flip `<=` to `<`; if the test still passes, it is useless. Assert the side effect and both sides of a boundary, not just `err == nil`.
+3. **Deterministic.** Inject the clock, randomness, IDs and env. No `time.Sleep` to wait for an event.
 4. **Real dependencies over mocks.** MySQL and object storage run in containers. Mock only what cannot run locally, and assert on outcomes, never on "the mock was called".
 5. **Test the rule, not the wrapper.** Domain rules are tested below `transport`; handler tests cover only the HTTP mapping.
 6. **Test at the seam.** Exported behavior, not unexported helpers.
-7. **Golden traces** for anything that changes trace output. Mask addresses and timings. `make golden-update`, then read the diff.
-8. **Fuzz byte parsers.** The wire NDJSON decoder and every trace decoder have a `FuzzX`.
-9. **Property tests for invariants.** No job is lost or run twice when workers die at random (§7.13.2). Replaying deltas from a keyframe gives the full step.
-10. **Table cases** carry a `name` that states the behavior.
+7. **Derive lists from the source of truth.** Iterate the schema enum, the OpenAPI error codes or the manifests, never a hand-written list that must grow with them.
+8. **Golden traces** for anything that changes trace output. Mask addresses, timings and values that differ between amd64 and arm64. `make golden-update`, then read the diff.
+9. **Fuzz byte parsers.** The wire NDJSON decoder and every trace decoder have a `FuzzX`. Commit the failing inputs it finds.
+10. **Property tests for invariants.** No job is lost or run twice when workers die at random (§7.13.2). Replaying deltas from a keyframe gives the full step. Log the seed; a failure it finds becomes a plain named test.
+11. **Table cases** carry a `name` that states the behavior.
+
+Use `t.Context()`, not `context.Background()`. Use `t.Fatalf` when the next line depends on the check.
 
 ## Before you hand back
 
