@@ -1,0 +1,37 @@
+:root {
+  --frame-rule: var(--border-subtle);
+  --frame-gap: 6px;
+  --frame-mark: 3px;
+
+  --code-font-size: 14px;
+  --code-line-height: 22px;
+  --row-height: 24px;
+  --cell-size: 32px;
+  --pane-padding: 12px;
+
+  --duration-fade: 150ms; /* the only step animation (§19.10) */
+  --duration-control: 200ms;
+}
+
+[data-font-size='s'] {
+  --code-font-size: 13px;
+  --code-line-height: 20px;
+}
+
+[data-font-size='l'] {
+  --code-font-size: 16px;
+  --code-line-height: 24px;
+}
+
+[data-density='comfortable'] {
+  --row-height: 30px;
+  --cell-size: 40px;
+  --pane-padding: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fade: 0ms;
+    --duration-control: 0ms;
+  }
+}

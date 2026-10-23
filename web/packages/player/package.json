@@ -1,0 +1,21 @@
+{
+  "name": "@viz/player",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zustand": "5.0.16"
+  },
+  "devDependencies": {
+    "react": "19.3.1"
+  },
+  "peerDependencies": {
+    "react": "^19.3.0"
+  }
+}

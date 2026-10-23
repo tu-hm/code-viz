@@ -1,0 +1,92 @@
+/* shadcn/ui names, so generated primitives render on-system without edits; extras below them */
+@theme inline {
+  --color-*: initial;
+  --shadow-*: initial;
+
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
+
+  --color-background: var(--bg-canvas);
+  --color-foreground: var(--content-primary);
+  --color-card: var(--bg-surface);
+  --color-card-foreground: var(--content-primary);
+  --color-popover: var(--bg-raised);
+  --color-popover-foreground: var(--content-primary);
+  --color-primary: var(--bg-fill-brand);
+  --color-primary-hover: var(--bg-fill-brand-hover);
+  --color-primary-press: var(--bg-fill-brand-press);
+  --color-primary-foreground: var(--content-on-fill);
+  --color-secondary: var(--bg-fill-subtle);
+  --color-secondary-hover: var(--bg-fill-subtle-hover);
+  --color-secondary-press: var(--bg-fill-subtle-press);
+  --color-secondary-foreground: var(--content-primary);
+  --color-muted: var(--bg-surface);
+  --color-muted-foreground: var(--content-secondary);
+  --color-accent: var(--bg-surface-alt);
+  --color-accent-foreground: var(--content-primary);
+  --color-destructive: var(--bg-fill-danger);
+  --color-destructive-hover: var(--bg-fill-danger-hover);
+  --color-destructive-press: var(--bg-fill-danger-press);
+  --color-destructive-foreground: var(--content-on-fill);
+  --color-border: var(--border-subtle);
+  --color-border-strong: var(--border-default);
+  --color-input: var(--border-control);
+  --color-ring: var(--border-focus);
+  --color-overlay: var(--bg-overlay);
+
+  --color-faint: var(--content-tertiary);
+  --color-brand: var(--content-brand);
+  --color-brand-subtle: var(--bg-brand-subtle);
+  --color-danger: var(--content-danger);
+  --color-danger-subtle: var(--bg-danger-subtle);
+  --color-warning: var(--content-warning);
+  --color-warning-subtle: var(--bg-warning-subtle);
+  --color-success: var(--content-success);
+  --color-success-subtle: var(--bg-success-subtle);
+
+  --color-trace-executed: var(--trace-executed-bg);
+  --color-trace-executed-mark: var(--trace-executed-mark);
+  --color-trace-next: var(--trace-next-mark);
+  --color-trace-write: var(--trace-write-bg);
+  --color-trace-write-mark: var(--trace-write-mark);
+  --color-trace-read: var(--trace-read-mark);
+  --color-trace-changed: var(--trace-changed-bg);
+  --color-trace-error: var(--trace-error-bg);
+  --color-trace-error-mark: var(--trace-error-mark);
+  --color-trace-index: var(--trace-index);
+  --color-trace-unset: var(--trace-unset);
+  --color-trace-arrow: var(--trace-arrow);
+  --color-trace-arrow-active: var(--trace-arrow-active);
+  --color-trace-heat: var(--trace-heat);
+
+  --shadow-raised: var(--elevation-raised);
+  --shadow-popover: var(--elevation-popover);
+}
+
+@layer base {
+  body {
+    background: var(--bg-canvas);
+    color: var(--content-primary);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--bg-brand-subtle);
+  }
+}
+
+@utility mono-label {
+  font-family: var(--font-family-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,112 @@
+/* contrast pairs are asserted in ../tokens.test.ts; run it after changing a value */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-canvas: var(--white);
+  --bg-surface: var(--slate-2);
+  --bg-surface-alt: var(--slate-3);
+  --bg-raised: var(--white);
+  --bg-fill-subtle: var(--slate-3);
+  --bg-fill-subtle-hover: var(--slate-4);
+  --bg-fill-subtle-press: var(--slate-5);
+  --bg-fill-brand: var(--blue-light-fill);
+  --bg-fill-brand-hover: var(--blue-light-fill-hover);
+  --bg-fill-brand-press: var(--blue-light-fill-press);
+  --bg-brand-subtle: var(--blue-light-tint);
+  --bg-fill-danger: var(--red-light-fill);
+  --bg-fill-danger-hover: var(--red-light-fill-hover);
+  --bg-fill-danger-press: var(--red-light-fill-press);
+  --bg-danger-subtle: var(--red-light-tint);
+  --bg-warning-subtle: var(--amber-light-tint);
+  --bg-success-subtle: var(--green-light-tint);
+  --bg-overlay: rgb(28 32 36 / 0.4);
+
+  --content-primary: var(--slate-12);
+  --content-secondary: var(--slate-11);
+  --content-tertiary: var(--slate-9);
+  --content-on-fill: var(--white);
+  --content-brand: var(--blue-light-ink);
+  --content-danger: var(--red-light-ink);
+  --content-warning: var(--amber-light-ink);
+  --content-success: var(--green-light-ink);
+
+  --border-subtle: var(--slate-4);
+  --border-default: var(--slate-6);
+  --border-control: var(--slate-9);
+  --border-focus: var(--blue-light-ink);
+
+  --trace-executed-bg: var(--blue-light-tint);
+  --trace-executed-mark: var(--blue-light-ink);
+  --trace-next-mark: var(--amber-light-mark);
+  --trace-write-bg: var(--vermillion-light-tint);
+  --trace-write-mark: var(--vermillion-light-mark);
+  --trace-read-mark: var(--green-light-mark);
+  --trace-changed-bg: var(--blue-light-tint);
+  --trace-error-bg: var(--red-light-tint);
+  --trace-error-mark: var(--red-light-ink);
+  --trace-index: var(--purple-light-ink);
+  --trace-unset: var(--slate-9);
+  --trace-arrow: var(--slate-9);
+  --trace-arrow-active: var(--blue-light-ink);
+  --trace-heat: var(--amber-light-mark);
+
+  --elevation-raised: 0 1px 2px rgb(12 14 18 / 0.05);
+  --elevation-popover: 0 18px 36px -12px rgb(12 14 18 / 0.18);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-canvas: var(--black);
+  --bg-surface: var(--slate-dark-2);
+  --bg-surface-alt: var(--slate-dark-3);
+  --bg-raised: var(--slate-dark-3);
+  --bg-fill-subtle: var(--slate-dark-3);
+  --bg-fill-subtle-hover: var(--slate-dark-4);
+  --bg-fill-subtle-press: var(--slate-dark-5);
+  --bg-fill-brand: var(--blue-dark-fill);
+  --bg-fill-brand-hover: var(--blue-dark-fill-hover);
+  --bg-fill-brand-press: var(--blue-dark-fill-press);
+  --bg-brand-subtle: var(--blue-dark-tint);
+  --bg-fill-danger: var(--red-dark-fill);
+  --bg-fill-danger-hover: var(--red-dark-fill-hover);
+  --bg-fill-danger-press: var(--red-dark-fill-press);
+  --bg-danger-subtle: var(--red-dark-tint);
+  --bg-warning-subtle: var(--amber-dark-tint);
+  --bg-success-subtle: var(--green-dark-tint);
+  --bg-overlay: rgb(0 0 0 / 0.6);
+
+  --content-primary: var(--slate-dark-12);
+  --content-secondary: var(--slate-dark-11);
+  --content-tertiary: var(--slate-dark-9);
+  --content-on-fill: var(--white);
+  --content-brand: var(--blue-dark-ink);
+  --content-danger: var(--red-dark-ink);
+  --content-warning: var(--amber-dark-ink);
+  --content-success: var(--green-dark-ink);
+
+  --border-subtle: var(--slate-dark-4);
+  --border-default: var(--slate-dark-6);
+  --border-control: var(--slate-dark-9);
+  --border-focus: var(--blue-dark-ink);
+
+  --trace-executed-bg: var(--blue-dark-tint);
+  --trace-executed-mark: var(--blue-dark-ink);
+  --trace-next-mark: var(--amber-dark-ink);
+  --trace-write-bg: var(--vermillion-dark-tint);
+  --trace-write-mark: var(--vermillion-dark-mark);
+  --trace-read-mark: var(--green-dark-mark);
+  --trace-changed-bg: var(--blue-dark-tint);
+  --trace-error-bg: var(--red-dark-tint);
+  --trace-error-mark: var(--red-dark-ink);
+  --trace-index: var(--purple-dark-ink);
+  --trace-unset: var(--slate-dark-9);
+  --trace-arrow: var(--slate-dark-9);
+  --trace-arrow-active: var(--blue-dark-ink);
+  --trace-heat: var(--amber-dark-ink);
+
+  /* near-black shadow vanishes on the black canvas => ring instead */
+  --elevation-raised: 0 0 0 1px var(--slate-dark-4);
+  --elevation-popover: 0 0 0 1px var(--slate-dark-5), 0 18px 36px -12px rgb(0 0 0 / 0.7);
+}

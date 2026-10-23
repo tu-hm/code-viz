@@ -1,0 +1,1871 @@
+[
+  {
+    "i": 0,
+    "event": "call",
+    "prevLine": null,
+    "line": 5,
+    "keyframe": true,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 5,
+        "locals": [],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "callId": 0
+  },
+  {
+    "i": 1,
+    "event": "line",
+    "prevLine": 5,
+    "line": 6,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 2,
+    "event": "line",
+    "prevLine": 6,
+    "line": 7,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "kind": "sequence",
+        "type": "vector<vector<long long>>",
+        "length": 4,
+        "items": [
+          { "t": "ref", "id": "o2" },
+          { "t": "ref", "id": "o3" },
+          { "t": "ref", "id": "o4" },
+          { "t": "ref", "id": "o5" }
+        ],
+        "meta": { "capacity": 4 }
+      },
+      "o2": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      },
+      "o3": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      },
+      "o4": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      },
+      "o5": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 3,
+    "event": "line",
+    "prevLine": 7,
+    "line": 8,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o2": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      },
+      "o3": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      },
+      "o4": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      },
+      "o5": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 4,
+    "event": "line",
+    "prevLine": 8,
+    "line": 9,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o2": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "1" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 5,
+    "event": "line",
+    "prevLine": 9,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 6,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 7,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "2" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 8,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 9,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "2" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 10,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 11,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "2" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "4" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 12,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 13,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "2" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "4" },
+          { "t": "int", "v": "5" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 14,
+    "event": "line",
+    "prevLine": 10,
+    "line": 9,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 15,
+    "event": "line",
+    "prevLine": 9,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 16,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 17,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 18,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 19,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "6" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 20,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 21,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "6" },
+          { "t": "int", "v": "10" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 22,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 23,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "6" },
+          { "t": "int", "v": "10" },
+          { "t": "int", "v": "15" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 24,
+    "event": "line",
+    "prevLine": 10,
+    "line": 9,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 25,
+    "event": "line",
+    "prevLine": 9,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 26,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 27,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o5": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "4" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 28,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 29,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "2", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o5": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "4" },
+          { "t": "int", "v": "10" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 30,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 31,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o5": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "4" },
+          { "t": "int", "v": "10" },
+          { "t": "int", "v": "20" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 32,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 33,
+    "event": "line",
+    "prevLine": 11,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          },
+          {
+            "name": "j",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o5": {
+        "kind": "sequence",
+        "type": "vector<long long>",
+        "length": 5,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "4" },
+          { "t": "int", "v": "10" },
+          { "t": "int", "v": "20" },
+          { "t": "int", "v": "35" }
+        ],
+        "meta": { "capacity": 5 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 34,
+    "event": "line",
+    "prevLine": 10,
+    "line": 9,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 35,
+    "event": "line",
+    "prevLine": 9,
+    "line": 12,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 12,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 36,
+    "event": "line",
+    "prevLine": 12,
+    "line": 13,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 13,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "35\n",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 37,
+    "event": "return",
+    "prevLine": 13,
+    "line": 13,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 13,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "m",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "dp",
+            "value": { "t": "ref", "id": "o1", "type": "vector<vector<long long>>" }
+          }
+        ],
+        "returnValue": { "t": "int", "v": "0", "type": "int" }
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "callId": 0
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "name": "viz-web",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.9.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @viz/ide dev",
+    "build": "pnpm --filter @viz/ide build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit && pnpm --recursive typecheck",
+    "lint": "eslint . && prettier --check .",
+    "fmt": "prettier --write . && eslint --fix .",
+    "gen": "pnpm gen:trace && pnpm gen:api",
+    "gen:trace": "node scripts/gen-trace.ts",
+    "gen:api": "openapi-typescript ../backend/api/openapi.yaml --output apps/ide/src/gen/api.ts",
+    "check": "pnpm gen && pnpm check:gen && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "check:gen": "test -z \"$(git status --porcelain -- packages/player/src/gen apps/ide/src/gen)\" || { git status --short -- packages/player/src/gen apps/ide/src/gen; echo 'check: pnpm gen changed generated code; commit it' >&2; exit 1; }"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.6.5",
+    "eslint": "10.13.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "globals": "17.13.0",
+    "json-schema-to-typescript": "16.0.0",
+    "openapi-typescript": "7.13.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
+    "vitest": "5.0.5"
+  }
+}

@@ -1,0 +1,77 @@
+/* neutrals: Radix Colors slate (MIT); hues: Okabe–Ito anchors, tinted and darkened per theme (§19.10) */
+:root {
+  --font-family-sans: 'Albert Sans Variable', 'Albert Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --white: #ffffff;
+  --black: #000000;
+
+  --slate-1: #fcfcfd;
+  --slate-2: #f9f9fb;
+  --slate-3: #f0f0f3;
+  --slate-4: #e8e8ec;
+  --slate-5: #e0e1e6;
+  --slate-6: #d9d9e0;
+  --slate-7: #cdced6;
+  --slate-8: #b9bbc6;
+  --slate-9: #8b8d98;
+  --slate-10: #80838d;
+  --slate-11: #60646c;
+  --slate-12: #1c2024;
+
+  --slate-dark-1: #111113;
+  --slate-dark-2: #18191b;
+  --slate-dark-3: #212225;
+  --slate-dark-4: #272a2d;
+  --slate-dark-5: #2e3135;
+  --slate-dark-6: #363a3f;
+  --slate-dark-7: #43484e;
+  --slate-dark-8: #5a6169;
+  --slate-dark-9: #696e77;
+  --slate-dark-10: #777b84;
+  --slate-dark-11: #b0b4ba;
+  --slate-dark-12: #edeef0;
+
+  --blue-light-tint: #e1ebff;
+  --blue-light-fill: #1f3dff;
+  --blue-light-fill-hover: #2e5aff;
+  --blue-light-fill-press: #172fce;
+  --blue-light-ink: #1f3dff;
+  --blue-dark-tint: #050f42;
+  --blue-dark-fill: #2f52ff;
+  --blue-dark-fill-hover: #3c64ff;
+  --blue-dark-fill-press: #2440ce;
+  --blue-dark-ink: #7090ff;
+
+  --red-light-tint: #ffe8e6;
+  --red-light-fill: #cb2936;
+  --red-light-fill-hover: #b6242f;
+  --red-light-fill-press: #9b1d27;
+  --red-light-ink: #cb2936;
+  --red-dark-tint: #370508;
+  --red-dark-fill: #d92d3a;
+  --red-dark-fill-hover: #c22733;
+  --red-dark-fill-press: #a6202a;
+  --red-dark-ink: #e95a5b;
+
+  --amber-light-tint: #fdf4e8;
+  --amber-light-mark: #c28500;
+  --amber-light-ink: #976700;
+  --amber-dark-tint: #3b2600;
+  --amber-dark-ink: #e69f00;
+
+  --vermillion-light-tint: #fae0d3;
+  --vermillion-light-mark: #d55e00;
+  --vermillion-dark-tint: #361200;
+  --vermillion-dark-mark: #e0691c;
+
+  --green-light-tint: #e7f3ed;
+  --green-light-mark: #009e73;
+  --green-light-ink: #007c5a;
+  --green-dark-tint: #002518;
+  --green-dark-mark: #14a97e;
+  --green-dark-ink: #1fae84;
+
+  --purple-light-ink: #9f5d81;
+  --purple-dark-ink: #cc79a7;
+}
