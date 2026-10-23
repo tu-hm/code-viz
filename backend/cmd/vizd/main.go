@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"database/sql"
 	"errors"
 	"flag"
 	"fmt"
@@ -15,8 +17,14 @@ import (
 
 	"github.com/caarlos0/env/v11"
 
+	"github.com/tu-hm/code-viz/backend/internal/adapters/blobstore"
+	"github.com/tu-hm/code-viz/backend/internal/adapters/dockersandbox"
+	"github.com/tu-hm/code-viz/backend/internal/adapters/manifest"
 	"github.com/tu-hm/code-viz/backend/internal/adapters/mysql"
+	"github.com/tu-hm/code-viz/backend/internal/app"
+	"github.com/tu-hm/code-viz/backend/internal/ports"
 	httptransport "github.com/tu-hm/code-viz/backend/internal/transport/http"
+	"github.com/tu-hm/code-viz/backend/schema"
 )
 
 const drainTimeout = 25 * time.Second // §13
@@ -76,8 +84,98 @@ func run() (err error) {
 	mux := http.NewServeMux()
 	// TODO(tu-hm): add the sandbox self-check to readyz for worker and all once BE-02 lands
 	httptransport.HandleProbes(mux, ctx.Done(), db.PingContext)
-	// TODO(tu-hm): claim and run jobs under worker and all once BE-05 lands; drain them before http shutdown
-	return serve(ctx, cfg.HTTPAddr, mux)
+
+	worked := make(chan struct{})
+	if *role == "api" {
+		close(worked)
+	} else {
+		w, closeSandbox, err := newWorker(ctx, sandbox, db)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if cerr := closeSandbox(); cerr != nil {
+				err = errors.Join(err, fmt.Errorf("close sandbox: %w", cerr))
+			}
+		}()
+		go func() {
+			defer close(worked)
+			w.Run(ctx)
+		}()
+	}
+	err = serve(ctx, cfg.HTTPAddr, mux, worked)
+	stop()
+	<-worked
+	return err
+}
+
+type workerConfig struct {
+	AdaptersDir string `env:"VIZ_ADAPTERS_DIR" envDefault:"adapters"`
+	S3Endpoint  string `env:"S3_ENDPOINT"`
+	S3Bucket    string `env:"S3_BUCKET,required"`
+	S3PathStyle bool   `env:"S3_PATH_STYLE"`
+}
+
+func newWorker(ctx context.Context, sandbox string, db *sql.DB) (*app.Worker, func() error, error) {
+	var cfg workerConfig
+	if err := env.Parse(&cfg); err != nil {
+		return nil, nil, fmt.Errorf("load worker config: %w", err)
+	}
+	adapters, err := manifest.Load(cfg.AdaptersDir)
+	if err != nil {
+		return nil, nil, fmt.Errorf("load manifests: %w", err)
+	}
+	val, err := schema.New()
+	if err != nil {
+		return nil, nil, fmt.Errorf("compile schemas: %w", err)
+	}
+	blobs, err := blobstore.New(ctx, blobstore.Config{Endpoint: cfg.S3Endpoint, Bucket: cfg.S3Bucket, PathStyle: cfg.S3PathStyle})
+	if err != nil {
+		return nil, nil, fmt.Errorf("open blob store: %w", err)
+	}
+
+	name, err := workerName()
+	if err != nil {
+		return nil, nil, err
+	}
+	sb, closeSandbox, err := openSandbox(ctx, sandbox)
+	if err != nil {
+		return nil, nil, fmt.Errorf("open %s sandbox: %w", sandbox, err)
+	}
+
+	return &app.Worker{
+		Name:     name,
+		Queue:    mysql.NewQueue(db),
+		Adapters: adapters,
+		Sandbox:  sb,
+		Blobs:    blobs,
+		Validate: val.Wire,
+		Now:      time.Now,
+		After:    time.After,
+	}, closeSandbox, nil
+}
+
+func openSandbox(ctx context.Context, sandbox string) (ports.Sandbox, func() error, error) {
+	if sandbox == "nsjail" {
+		sb, err := openNsjail(ctx)
+		return sb, func() error { return nil }, err
+	}
+	sb, err := dockersandbox.New(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return sb, sb.Close, nil
+}
+
+// workerName is the hostname plus a random suffix: two processes on one host, or one restarted, never share a lease.
+func workerName() (string, error) {
+	host, err := os.Hostname()
+	if err != nil {
+		return "", fmt.Errorf("hostname: %w", err)
+	}
+	suffix := make([]byte, 4)
+	rand.Read(suffix)
+	return fmt.Sprintf("%.55s-%x", host, suffix), nil // leased_by is VARCHAR(64)
 }
 
 func pickSandbox(vizEnv, sandbox string) (string, error) {
@@ -101,7 +199,8 @@ func pickSandbox(vizEnv, sandbox string) (string, error) {
 	return "", fmt.Errorf("VIZ_SANDBOX must be docker or nsjail, got %q", sandbox)
 }
 
-func serve(ctx context.Context, addr string, h http.Handler) error {
+// serve answers HTTP until ctx is done, and shuts down once worked is closed: probes keep answering while the worker drains.
+func serve(ctx context.Context, addr string, h http.Handler, worked <-chan struct{}) error {
 	var lc net.ListenConfig
 	ln, err := lc.Listen(ctx, "tcp", addr)
 	if err != nil {
@@ -121,6 +220,7 @@ func serve(ctx context.Context, addr string, h http.Handler) error {
 		return fmt.Errorf("serve http: %w", err)
 	case <-ctx.Done():
 	}
+	<-worked
 
 	shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), drainTimeout)
 	defer cancel()
