@@ -53,7 +53,7 @@ type Sandbox struct {
 	arch   string
 }
 
-// New connects to the Docker daemon named by DOCKER_HOST, or the default socket, and removes boxes left over from earlier runs: those started more than boxLifetime ago.
+// New connects to the Docker daemon named by DOCKER_HOST, or the default socket, and sweeps boxes left over from earlier runs.
 func New(ctx context.Context) (*Sandbox, error) {
 	docker, err := client.New(client.FromEnv)
 	if err != nil {
@@ -63,31 +63,38 @@ func New(ctx context.Context) (*Sandbox, error) {
 	if err != nil {
 		return nil, errors.Join(infra("docker info", err), docker.Close())
 	}
+	s := &Sandbox{docker: docker, arch: goArch(info.Info.Architecture)}
+	if err := s.Sweep(ctx, time.Now()); err != nil {
+		return nil, errors.Join(err, docker.Close())
+	}
+	return s, nil
+}
 
-	leftovers, err := docker.ContainerList(ctx, client.ContainerListOptions{
+func (s *Sandbox) Close() error {
+	return s.docker.Close()
+}
+
+// Sweep removes boxes started more than boxLifetime before now, or with no start label, whichever process started them.
+func (s *Sandbox) Sweep(ctx context.Context, now time.Time) error {
+	leftovers, err := s.docker.ContainerList(ctx, client.ContainerListOptions{
 		All:     true,
 		Filters: make(client.Filters).Add("label", jobLabel),
 	})
 	if err != nil {
-		return nil, errors.Join(infra("list leftover containers", err), docker.Close())
+		return infra("list leftover containers", err)
 	}
-	now := time.Now()
 	for _, c := range leftovers.Items {
 		started, err := time.Parse(time.RFC3339, c.Labels[startedLabel])
 		if err == nil && now.Sub(started) < boxLifetime {
 			continue
 		}
-		_, err = docker.ContainerRemove(ctx, c.ID, client.ContainerRemoveOptions{Force: true})
+		_, err = s.docker.ContainerRemove(ctx, c.ID, client.ContainerRemoveOptions{Force: true})
 		// another sandbox's janitor may be removing it too: not found or conflict means it's going
 		if err != nil && !cerrdefs.IsNotFound(err) && !cerrdefs.IsConflict(err) {
-			return nil, errors.Join(infra("remove leftover container "+c.ID, err), docker.Close())
+			return infra("remove leftover container "+c.ID, err)
 		}
 	}
-	return &Sandbox{docker: docker, arch: goArch(info.Info.Architecture)}, nil
-}
-
-func (s *Sandbox) Close() error {
-	return s.docker.Close()
+	return nil
 }
 
 func (s *Sandbox) Start(ctx context.Context, spec ports.SandboxSpec) (ports.Box, error) {

@@ -3,12 +3,15 @@ package ports
 import (
 	"context"
 	"io"
+	"time"
 )
 
 // Sandbox starts one fresh Box per job (§12).
 type Sandbox interface {
 	// Start creates a box with spec.Files in /work. Infrastructure failures wrap domain.ErrInfra.
 	Start(ctx context.Context, spec SandboxSpec) (Box, error)
+	// Sweep removes boxes started longer before now than any job runs: leftovers of a crash or a failed Close (§7.8).
+	Sweep(ctx context.Context, now time.Time) error
 }
 
 type SandboxSpec struct {

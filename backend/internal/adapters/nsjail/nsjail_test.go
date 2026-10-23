@@ -7,9 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 	"testing"
+	"time"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/nsjail"
 	"github.com/tu-hm/code-viz/backend/internal/domain"
@@ -53,20 +55,61 @@ func TestCloseRemovesBox(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := closeDirs(t, cgroup); len(got) != 1 {
+	if got := boxDirs(t, cgroup, "close"); len(got) != 1 {
 		t.Fatalf("cgroups before close: %v, want one", got)
 	}
-	if got := closeDirs(t, boxes); len(got) != 1 {
+	if got := boxDirs(t, boxes, "close"); len(got) != 1 {
 		t.Fatalf("boxes before close: %v, want one", got)
 	}
 	if err := box.Close(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if got := closeDirs(t, cgroup); len(got) != 0 {
+	if got := boxDirs(t, cgroup, "close"); len(got) != 0 {
 		t.Errorf("cgroups after close: %v, want none", got)
 	}
-	if got := closeDirs(t, boxes); len(got) != 0 {
+	if got := boxDirs(t, boxes, "close"); len(got) != 0 {
 		t.Errorf("boxes after close: %v, want none", got)
+	}
+}
+
+func TestSweepRemovesBoxesStartedTwoMinutesBeforeNow(t *testing.T) {
+	sb, cgroup, boxes := newSandbox(t)
+	box, err := sb.Start(t.Context(), ports.SandboxSpec{JobID: "sweep", Image: rootfs(t), Memory: 64 << 20})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := box.Close(t.Context()); err != nil {
+			t.Error(err)
+		}
+	})
+	dirs := boxDirs(t, boxes, "sweep")
+	if len(dirs) != 1 {
+		t.Fatalf("boxes after start: %v, want one", dirs)
+	}
+	sec, err := strconv.ParseInt(strings.Split(filepath.Base(dirs[0]), ".")[1], 10, 64)
+	if err != nil {
+		t.Fatal(err)
+	}
+	started := time.Unix(sec, 0)
+
+	if err := sb.Sweep(t.Context(), started.Add(2*time.Minute-time.Nanosecond)); err != nil {
+		t.Fatal(err)
+	}
+	if got := boxDirs(t, cgroup, "sweep"); len(got) != 1 {
+		t.Fatalf("cgroups just before 2 minutes: %v, want one", got)
+	}
+	if got := boxDirs(t, boxes, "sweep"); len(got) != 1 {
+		t.Fatalf("boxes just before 2 minutes: %v, want one", got)
+	}
+	if err := sb.Sweep(t.Context(), started.Add(2*time.Minute)); err != nil {
+		t.Fatal(err)
+	}
+	if got := boxDirs(t, cgroup, "sweep"); len(got) != 0 {
+		t.Errorf("cgroups at 2 minutes: %v, want none", got)
+	}
+	if got := boxDirs(t, boxes, "sweep"); len(got) != 0 {
+		t.Errorf("boxes at 2 minutes: %v, want none", got)
 	}
 }
 
@@ -181,9 +224,9 @@ func rootfs(t *testing.T) string {
 	return dir
 }
 
-func closeDirs(t *testing.T, dir string) []string {
+func boxDirs(t *testing.T, dir, job string) []string {
 	t.Helper()
-	matches, err := filepath.Glob(filepath.Join(dir, "close.*"))
+	matches, err := filepath.Glob(filepath.Join(dir, job+".*"))
 	if err != nil {
 		t.Fatal(err)
 	}

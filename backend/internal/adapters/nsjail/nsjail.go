@@ -49,6 +49,7 @@ const (
 	setupFailed = 255
 	killTimeout = 10 * time.Second
 	outputMax   = 4 << 10
+	boxLifetime = 2 * time.Minute // one job: 30 s deadline (§7.7) plus build and cleanup; older boxes are leftovers
 )
 
 var devices = []string{"/dev/null", "/dev/zero", "/dev/random", "/dev/urandom"}
@@ -59,7 +60,7 @@ type Sandbox struct {
 	boxes  string
 }
 
-// New finds nsjail on PATH and removes boxes left over from earlier runs.
+// New finds nsjail on PATH and removes every box left over from earlier runs: it assumes one worker per cgroup and boxes directory.
 // cgroup is a cgroup v2 directory that enables the cpu, memory and pids controllers for its children.
 // boxes holds each box's /work; uid 65534 must be able to reach it, so it and its parents are mode 0755.
 func New(ctx context.Context, cgroup, boxes string) (*Sandbox, error) {
@@ -81,28 +82,53 @@ func New(ctx context.Context, cgroup, boxes string) (*Sandbox, error) {
 	}
 
 	s := &Sandbox{bin: bin, cgroup: cgroup, boxes: boxes}
-	leftovers, err := os.ReadDir(cgroup)
-	if err != nil {
-		return nil, infra("list leftover cgroups", err)
-	}
-	for _, e := range leftovers {
-		if !e.IsDir() {
-			continue
-		}
-		if err := drain(ctx, filepath.Join(cgroup, e.Name())); err != nil {
-			return nil, infra("remove leftover cgroup", err)
-		}
-	}
-	leftovers, err = os.ReadDir(boxes)
-	if err != nil {
-		return nil, infra("list leftover boxes", err)
-	}
-	for _, e := range leftovers {
-		if err := removeWork(filepath.Join(boxes, e.Name())); err != nil {
-			return nil, infra("remove leftover box", err)
-		}
+	if err := s.sweep(ctx, func(string) bool { return true }); err != nil {
+		return nil, err
 	}
 	return s, nil
+}
+
+// Sweep removes boxes started more than boxLifetime before now.
+func (s *Sandbox) Sweep(ctx context.Context, now time.Time) error {
+	return s.sweep(ctx, func(name string) bool { return startedBy(name, now.Add(-boxLifetime)) })
+}
+
+func (s *Sandbox) sweep(ctx context.Context, leftover func(name string) bool) error {
+	cgroups, err := os.ReadDir(s.cgroup)
+	if err != nil {
+		return infra("list leftover cgroups", err)
+	}
+	for _, e := range cgroups {
+		if !e.IsDir() || !leftover(e.Name()) {
+			continue
+		}
+		if err := drain(ctx, filepath.Join(s.cgroup, e.Name())); err != nil {
+			return infra("remove leftover cgroup", err)
+		}
+	}
+	boxes, err := os.ReadDir(s.boxes)
+	if err != nil {
+		return infra("list leftover boxes", err)
+	}
+	for _, e := range boxes {
+		if !leftover(e.Name()) {
+			continue
+		}
+		if err := removeWork(filepath.Join(s.boxes, e.Name())); err != nil {
+			return infra("remove leftover box", err)
+		}
+	}
+	return nil
+}
+
+// startedBy reads the start time from a box name, <job>.<unix start>.<random>. A name without one counts as a leftover.
+func startedBy(name string, t time.Time) bool {
+	parts := strings.Split(name, ".")
+	if len(parts) < 3 {
+		return true
+	}
+	sec, err := strconv.ParseInt(parts[len(parts)-2], 10, 64)
+	return err != nil || !time.Unix(sec, 0).After(t)
 }
 
 func (s *Sandbox) Start(ctx context.Context, spec ports.SandboxSpec) (ports.Box, error) {
