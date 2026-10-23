@@ -20,7 +20,7 @@ Step through C++ with GDB's Python API (`adapters/cpp/trace.py`). The step loop 
 - [x] Output validates against `wire.v1.schema.json`
 - [ ] Hand to BE-02 for the gVisor/nsjail measurements
 
-The script is `adapters/cpp/trace.py`. The programs are in `fixtures/cpp/{loop,recursion,stl}`. The loop and recursion sessions are in `schema/testdata/wire/`, so the schema tests validate them in CI. The STL session validates too, but it isn't committed: the generated Go types drop an empty `entries` (and `items`, `fields`) through `omitempty`, so the round-trip test fails on a freshly constructed `std::map`. That needs a contract fix first. The handoff waits on a box with GCC and GDB to run it in: the BE-07 §2 runner image, or a throwaway image for the spike.
+The script is `adapters/cpp/trace.py`. The programs are in `fixtures/cpp/{loop,recursion,stl}`. The three sessions are in `schema/testdata/wire/` (`cpp-loop`, `cpp-recursion`, `cpp-stl`), so the schema tests validate them in CI. The handoff waits on a box with GCC and GDB to run it in: the BE-07 §2 runner image, or a throwaway image for the spike.
 
 Findings, on GDB 17.1 and GCC 15.2 (x86_64):
 

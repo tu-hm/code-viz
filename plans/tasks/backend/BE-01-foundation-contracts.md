@@ -52,7 +52,7 @@ The Go repo, CI, and the three contracts everything else is built on.
 - [x] `step.heap` keyed by native IDs (Python `id()`, C++ `address:type`)
 - [x] Reuse frame/value/kind definitions from the trace schema (`$ref`)
 - [x] Generate Go structs
-- [x] **Done:** validates the S1 prototype output (BE-08 spike): `cpp-loop` and `cpp-recursion` in `schema/testdata/wire/`
+- [x] **Done:** validates the S1 prototype output (BE-08 spike): `cpp-loop`, `cpp-recursion` and `cpp-stl` in `schema/testdata/wire/`
 
 ## 5. OpenAPI — `api/openapi.yaml` (M1-01 · 1.5 d)
 
