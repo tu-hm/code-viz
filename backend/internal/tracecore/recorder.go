@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync/atomic"
 
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
 	"github.com/tu-hm/code-viz/backend/internal/gen/wire"
@@ -66,6 +67,7 @@ type Recorder struct {
 	objectIDs map[string]string // native object id => oN
 	prev      snapshotJSON
 	steps     []trace.Step
+	stepCount atomic.Int64 // len(steps), for StepCount on other goroutines
 	size      int
 
 	stdout, stderr []byte // output since the last recorded step
@@ -94,6 +96,9 @@ func (r *Recorder) Stderr() io.Writer { return writer{r, 2} }
 
 // Wire takes the tracer's fd 3 (NDJSON).
 func (r *Recorder) Wire() io.Writer { return writer{r, 3} }
+
+// StepCount returns how many steps are recorded so far. Unlike the rest of Recorder, it is safe to call while Box.Run writes.
+func (r *Recorder) StepCount() int { return int(r.stepCount.Load()) }
 
 type writer struct {
 	r  *Recorder

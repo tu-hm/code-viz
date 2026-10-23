@@ -191,6 +191,24 @@ func TestStepLimit(t *testing.T) {
 	}
 }
 
+func TestStepCountCountsRecordedStepsOnly(t *testing.T) {
+	rec := tracecore.NewRecorder(config(t, 2, tracecore.DefaultLimits))
+	var got []int
+	for line := range 4 {
+		msg := helloLine
+		if line > 0 {
+			msg = stepLine(line, []trace.Frame{frame("m", "<module>", line)}, nil)
+		}
+		if _, err := rec.Wire().Write([]byte(msg + "\n")); err != nil {
+			t.Fatal(err)
+		}
+		got = append(got, rec.StepCount())
+	}
+	if diff := cmp.Diff([]int{0, 1, 2, 2}, got); diff != "" {
+		t.Errorf("step count after each message (-want +got):\n%s", diff)
+	}
+}
+
 func TestTraceSizeLimit(t *testing.T) {
 	writes := wireLines(
 		helloLine,

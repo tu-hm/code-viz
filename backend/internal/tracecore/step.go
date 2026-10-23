@@ -106,6 +106,7 @@ func (r *Recorder) step(s wire.Step) error {
 	}
 	r.size += len(b)
 	r.steps = append(r.steps, st)
+	r.stepCount.Store(int64(len(r.steps)))
 	r.prev = next
 	r.stdout, r.stderr = nil, nil
 	return nil
