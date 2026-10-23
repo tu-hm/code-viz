@@ -1,6 +1,6 @@
 # AGENTS.md (web)
 
-The browser half of the code visualizer: `apps/ide`, `@viz/player`, `@viz/ui` and `@viz/fixtures`. Running it, the mock API and the fixtures: [README.md](README.md). Visual rules: [design system](../docs/guides/design-system.md). Tasks: [plans/tasks/frontend/](../plans/tasks/frontend/).
+The browser half of the code visualizer: `apps/ide`, `@viz/player`, `@viz/ui` and `@viz/fixtures`. Running it, the mock API and the fixtures: [README.md](README.md). Visual rules: [design system](../docs/frontend/design-system.md). Tasks: [plans/tasks/frontend/](../plans/tasks/frontend/).
 
 The root [AGENTS.md](../AGENTS.md) applies here too: how to work, the S rules (none of them is Go-specific), comments default to zero, git. This file adds what is specific to TypeScript, React and the browser. Cite rules by ID in review (`R4`).
 
@@ -54,7 +54,7 @@ React Compiler is on (§18.1) and Strict Mode wraps the app.
 
 ## Tests
 
-The [testing cheat sheet](../docs/guides/testing-cheat-sheet.md) applies. Rules 1–3, 6, 7, 10 and 11 carry over as written; rule 11 is `test.each([{ name: '…' }])('$name', …)` here.
+The [testing cheat sheet](../docs/backend/conventions/testing-cheat-sheet.md) applies. Rules 1–3, 6, 7, 10 and 11 carry over as written; rule 11 is `test.each([{ name: '…' }])('$name', …)` here.
 
 - Vitest everywhere, `jsdom` in `apps/ide`. A package gets a DOM environment with its first component test: copy the `test` block of `apps/ide/vite.config.ts`, setup file included.
 - After every test, Testing Library unmounts what it rendered and spies are restored (`src/test-setup.ts`, `restoreMocks`). Vitest globals are off, so Testing Library's built-in cleanup never registers. Without the setup file the second test in a file sees the first test's DOM.
@@ -86,5 +86,5 @@ Code that looks right and isn't. When you hit a new one, add it here in the same
 1. `pnpm check` passed. Say so.
 2. Contract touched => `make gen` ran and the generated code is in the diff.
 3. A new view or state renders from a fixture in a test or a story.
-4. A UI change went through the design system's [checklist](../docs/guides/design-system.md#11-checklist-for-a-ui-change).
+4. A UI change went through the design system's [checklist](../docs/frontend/design-system.md#11-checklist-for-a-ui-change).
 5. Re-read the diff as its reviewer: no memo hook without its reason (R1), no export nobody imports (T7), every comment has an E number.

@@ -18,7 +18,7 @@ The web workspace, generated types, fixture traces, and the test harness every v
 - [x] pnpm workspace with `apps/ide` and `packages/player` (`@viz/player`, no IDE dependency) — in `web/`, plus `packages/ui` (design system) and `fixtures`
 - [x] Vite 8 + `@vitejs/plugin-react` v6, React 19.3 + React Compiler 1.0 — the compiler runs through `@rolldown/plugin-babel`; the plugin's Rust compiler is still experimental
 - [x] Strict TypeScript (`strict`, `noUncheckedIndexedAccess`), shared `tsconfig` base — TypeScript 6.0: typescript-eslint and openapi-typescript don't support 7 yet
-- [x] Tailwind v4 + Radix UI / shadcn/ui primitives; design tokens as CSS variables (light/dark), placeholders until DS tokens land (Fri 30 Oct) — `@viz/ui`: three-layer tokens with a contrast test, shadcn-compatible theme, `Button`; guide in `docs/guides/design-system.md`
+- [x] Tailwind v4 + Radix UI / shadcn/ui primitives; design tokens as CSS variables (light/dark), placeholders until DS tokens land (Fri 30 Oct) — `@viz/ui`: three-layer tokens with a contrast test, shadcn-compatible theme, `Button`; guide in `docs/frontend/design-system.md`
 - [x] Zustand store skeleton (current step, settings, panel sizes) — `usePlayer` in `@viz/player`
 - [x] Vitest + Testing Library; ESLint + Prettier
 - [x] Fill the web checks job in CI (BE-01 §2): lint, typecheck, test, build — `web` job runs `pnpm check`, which also checks codegen drift

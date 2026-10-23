@@ -2,7 +2,7 @@
 
 How a program becomes a trace: the Python tracer, the wire protocol, the trace core and `vizctl`. The spec sections are §7.11.1 (Python tracer), §9 (trace format), §10 (adapters and wire protocol), §11 (limits) and §19.9 (v1.1 additions). The sandbox the tracer runs in has [its own guide](sandbox.md).
 
-Read this before you wire the worker to the core (BE-05), add a language (BE-07, BE-08, BE-14), change the wire protocol, or move the Python tracer to `sys.monitoring` (G2).
+Read this before you wire the worker to the core (BE-05), add a language (BE-07, BE-08, BE-14), change the wire protocol, or move the Python tracer to `sys.monitoring` (G2). The steps for those changes are in [adding or changing a language adapter](../guides/language-adapter.md). The tests and golden fixtures are in [testing](../guides/testing.md).
 
 ## The pipeline
 
@@ -154,7 +154,7 @@ sequenceDiagram
 
 When the step past the limit is sent, the tracer swaps both hooks for `count_call` and `count_line`. These only count `line` events in `main.py`, with no snapshots, and the program runs to the end. Output still goes out as `out` messages, and the core files it under the untraced tail.
 
-Spike S2 measured this counter at 3–19× the untraced run time under settrace, and 1–9× under `sys.monitoring` ([S2 report](../../plans/spikes/s2-python-hook.md)). How much of a long program finishes inside the 10 s CPU limit depends on that number. G2 decides whether to switch.
+Spike S2 measured this counter at 3–19× the untraced run time under settrace, and 1–9× under `sys.monitoring` ([S2 report](../../../plans/spikes/s2-python-hook.md)). How much of a long program finishes inside the 10 s CPU limit depends on that number. G2 decides whether to switch.
 
 ### The recursion limit
 
@@ -232,36 +232,6 @@ The user's program runs in the tracer's process, so it can write anything to fd 
 - errors and logs never quote tracer output.
 
 One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID": null` can change a field after the line passed validation. The core checks the required pointers again before using them, so the most this does is bend the user's own trace.
-
-## Tests
-
-| Run | What it covers |
-|---|---|
-| `go test ./internal/tracecore` | Unit tests at the seam: ID order, deltas, internals, each limit on both sides of its boundary, the step-limit marker and tail, output attribution, malformed and out-of-order input, lines split across writes, chunks. `TestGolden` turns the wire inputs in `testdata/wire/` and `schema/testdata/wire/` into `testdata/golden/*.trace.json`. `TestDeltasReplayToFullSteps` rebuilds every step from its keyframe and deltas |
-| `go test ./internal/tracecore -fuzz=FuzzWire` | Fuzzes the fd-3 reader. Commit any failing input it finds (test 9) |
-| `go test ./schema` | The schemas accept the examples and reject each broken field; validator errors never quote their input |
-| `go test ./cmd/vizctl` | `TestGoldenTraces` runs every `fixtures/<language>/<case>/` through `vizctl trace` in the Docker dev sandbox and compares it with `expected.trace.json` (trace ID and `0x…` addresses masked). The language list comes from `adapters/*/manifest.yaml`, the cases from the directories. `TestTraceNamesBuildFailure` covers `compile_error` and `unsupported_module`. Needs the runner images |
-| `make golden-update` | Rewrites both sets of goldens from real runs. Read the diff before committing |
-
-`make test` builds the runner images first. `go test` caches the `vizctl` result and can't see changes to `tracer.py`, which lives in the image. After editing the tracer, run `make runner-images` and then `go test -count=1 ./cmd/vizctl`.
-
-| Fixture | What it pins |
-|---|---|
-| `aliasing` | The §5.3 program: `a` and `b` share one object, `c` is a copy, a call with its return value |
-| `binary-search` | Loops, a function returning found and not-found |
-| `fib` | Recursion: 15 calls with the right `parentCallId` |
-| `exception` | A caught `IndexError`, then an uncaught one: two exception steps and `exit.kind = exception` |
-| `input` | Several `input()` calls: no step outside `main.py`, `stdinPos` advancing |
-| `long` | Over 1,000 steps: `step_limit`, the untraced tail with the full output, `lineHits` for the whole run |
-| `recursion-limit` | A `RecursionError` step, then the program catches it and finishes |
-| `thread-main` | The CP thread trick: the thread's frames on top of the module frame |
-
-## Changing things
-
-- **Switching to `sys.monitoring` (G2).** Only the hook half of `tracer.py` changes: the event plumbing, the counter and the recursion recovery. Value encoding, output, stdin, `--check` and the wire contract stay as they are. Spike S2 found identical step streams and line hits between the hooks, so the goldens should not move; if they do, read why before updating. Handle the JUMP event too, or one-line loops lose their per-iteration steps (S2 report). Bump `ADAPTER` (`py-settrace/0.1.0`).
-- **Adding a fixture.** Add `fixtures/python/<case>/main.py` (and `stdin`), run `make golden-update`, and read the new `expected.trace.json` step by step against the source.
-- **Adding a language.** Write a manifest and a runner image that meet the sandbox guide's requirements, and a tracer that speaks the wire contract above. `vizctl`, the core and the fixture test need no change. Fixtures go in `fixtures/<adapters dir>/<case>/`.
-- **Changing the wire contract.** Change `schema/wire.v1.schema.json`, run `make gen`, update spec §10.1, and add accept and reject cases to `schema/wire_test.go`. The tracer, the core and the generated code go in together (D14).
 
 ## Not built yet
 

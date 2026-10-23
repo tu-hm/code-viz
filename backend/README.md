@@ -45,7 +45,7 @@ go run ./cmd/vizctl trace --lang python3 fixtures/python/aliasing/main.py < fixt
 go run ./cmd/vizctl validate trace.json   # silent when the trace matches schema/trace.v1.schema.json
 ```
 
-`--lang` is a manifest `id` from `adapters/*/manifest.yaml`. A program that fails its build step (a syntax error, or an import outside `modules.allow`) prints `compile_error` or `unsupported_module` with the diagnostics and exits 1. How the tracer, the wire protocol and the trace core fit together is in the [tracing guide](../docs/guides/tracing.md).
+`--lang` is a manifest `id` from `adapters/*/manifest.yaml`. A program that fails its build step (a syntax error, or an import outside `modules.allow`) prints `compile_error` or `unsupported_module` with the diagnostics and exits 1. How the tracer, the wire protocol and the trace core fit together is in the [tracing architecture doc](../docs/backend/architecture/tracing.md).
 
 ## Docker dev sandbox
 
@@ -59,7 +59,7 @@ On a laptop, jobs run in Docker containers instead of nsjail, the production san
 
 `make test` runs the sandbox tests against your Docker, with a small busybox test image it builds itself. It also builds the runner images first, because the golden fixture test runs every `fixtures/<language>/<case>/` through `vizctl trace`.
 
-The port contract, `viz-shim` and its frame format, every container setting and what a runner image needs are in the [sandbox guide](../docs/guides/sandbox.md).
+The port contract, `viz-shim` and its frame format and every container setting are in the [sandbox architecture doc](../docs/backend/architecture/sandbox.md). What a runner image needs is in the [language adapter guide](../docs/backend/guides/language-adapter.md#runner-image-requirements). What each test covers and needs is in the [testing guide](../docs/backend/guides/testing.md).
 
 ## Ports
 

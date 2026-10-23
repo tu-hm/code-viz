@@ -2,12 +2,12 @@
 
 Every job runs the user's program in a sandbox (§12). The worker talks to it through the `Sandbox` port in `backend/internal/ports/sandbox.go`. There are two adapters:
 
-- **nsjail** (`internal/adapters/nsjail`) is the production sandbox. It was chosen at G1 (D10, spec v1.5); the numbers are in [the S1b report](../../plans/spikes/s1b-sandbox.md).
+- **nsjail** (`internal/adapters/nsjail`) is the production sandbox. It was chosen at G1 (D10, spec v1.5); the numbers are in [the S1b report](../../../plans/spikes/s1b-sandbox.md).
 - **Docker** (`internal/adapters/dockersandbox`) is the dev sandbox, for macOS and any machine with Docker. It is not a security boundary.
 
 Both adapters pass the shared suite in `internal/ports/sandboxtest`.
 
-Read this before you wire the worker to the sandbox (BE-05), build a runner image or tracer (BE-03, BE-07, BE-08), or write the production adapter.
+Read this before you wire the worker to the sandbox (BE-05), build a runner image or tracer (BE-03, BE-07, BE-08), or write a sandbox adapter. What a runner image needs is in [adding a language adapter](../guides/language-adapter.md#runner-image-requirements); how to run the sandbox tests is in [testing](../guides/testing.md).
 
 ## The port: one box per job
 
@@ -176,35 +176,6 @@ One container per box:
 
 - `Start` refuses an image whose architecture doesn't match the daemon's: GDB's `ptrace` fails under emulation. The error says to run `make images`.
 - `dockersandbox.New` force-removes containers labelled `viz.job` whose `viz.started` is more than 2 minutes old, or missing: boxes left over from a crash. A box lives for one job, and a job's hard deadline is 30 s (§7.7), so a younger box belongs to a process that is still running. A dev worker, `vizctl` and the test packages can therefore share one Docker daemon. When two janitors race for the same leftover, the loser's "not found" or "removal in progress" counts as removed.
-
-## Runner image requirements
-
-A runner image (BE-03, BE-07, BE-08) works with both sandboxes when:
-
-- **`viz-shim` is at `/opt/viz/viz-shim`,** built static for the image's architecture: `CGO_ENABLED=0 GOOS=linux go build ./cmd/viz-shim`. The `build` stage of `backend/Dockerfile` already builds it, for the worker image.
-- **`tar` and `cat` are on `PATH`.** The adapter uses them to write `Files` and to read `memory.events`.
-- **The toolchain runs as UID 65534 with only `/work` writable.** `/tmp` is read-only, so anything that writes temp files needs `TMPDIR=/work` in the command's `Env`. g++ is one of them.
-- **It fits in the PID budget.** Go threads count toward the limit. Under Docker, `docker-init` and the idle shim take about 8 of the 32 PIDs, and each running `viz-shim -- …` takes a few more. Under nsjail only the running shim counts. GDB 16 tracing a 1,003-step program and g++ building it both fit.
-- **It is built for your machine's architecture.** `make images` builds for the host.
-
-For nsjail, the image is unpacked into a directory on the node (for example `docker export`, or `COPY --from` in the worker image). That directory also needs:
-
-- **empty `/work` and `/proc` directories, and empty files at `/dev/null`, `/dev/zero`, `/dev/random` and `/dev/urandom`.** The root is read-only, so nsjail can't create its mount points. `docker build` doesn't keep files written to `/dev`, so add them after unpacking.
-- **a mount without `nosuid`, `nodev` or `noexec`.** nsjail can't remount such a bind read-only inside a user namespace and fails with EPERM. The image layer of the worker container is fine. A directory under a host `/tmp` that is bind mounted into the container is not.
-
-## Tests
-
-| Run | What it covers |
-|---|---|
-| `go test ./internal/adapters/dockersandbox/` | The shared suite against the Docker adapter, plus adapter-only cases: missing image, emulated image, unreachable daemon, the janitor (old leftovers go, running boxes stay), `Close`. About 10 s once images are cached |
-| `go test ./cmd/vizctl` | Every `fixtures/<language>/<case>/` through `vizctl trace` in the Docker sandbox, against its `expected.trace.json`, plus the build-step failures. Needs the runner images (`make runner-images`; `make test` builds them) |
-| `make test-nsjail` | The shared suite against the nsjail adapter, plus adapter-only cases: missing image, failed jail setup, a cgroup without controllers, the janitor, `Close`. Builds `viz-nsjail-test:dev` and runs it privileged with `scripts/nsjail-cgroups.sh`. `go test ./...` skips these tests outside that container. `make check` runs it, so CI covers both adapters |
-| `go test ./internal/shim -fuzz=FuzzReader -fuzztime=30s` | Fuzzes the frame reader. Commit any failing input it finds (test 9) |
-| `go test ./cmd/vizd` | The `VIZ_ENV` and `VIZ_SANDBOX` rules |
-
-The dockersandbox tests build `viz-sandboxtest:dev` themselves: busybox (pinned by digest) plus a `viz-shim` compiled for the daemon's architecture. On OrbStack or Colima, export `DOCKER_HOST` first (see the backend README, Common problems).
-
-`sandboxtest.Run(t, sandbox, image)` is the contract every adapter passes. It covers exit codes and signals, the three streams (including a 50 MB single-line write), files and `/work` surviving between runs, deadline (on a busy loop) and cancel, a failing writer, the memory limit, deep recursion, the PID limit and a fork bomb, TCP, UDP and DNS, host processes out of reach, new namespaces refused by seccomp, read-only paths, the size of `/work`, non-root without capabilities, the stack rlimit, and turning ASLR off. To add a case, add a table entry whose `name` states the behavior and give it one or more steps. Each case gets its own box and runs in parallel.
 
 ## Not built yet
 

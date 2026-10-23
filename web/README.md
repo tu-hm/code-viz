@@ -1,6 +1,6 @@
 # Web
 
-The browser half of the code visualizer: the IDE app, the `@viz/player` package it embeds, the design system, and the trace fixtures every view is built against. Tasks: [plans/tasks/frontend/](../plans/tasks/frontend/). Visual rules: [docs/guides/design-system.md](../docs/guides/design-system.md). Rules for the code, tests and dependencies: [AGENTS.md](AGENTS.md).
+The browser half of the code visualizer: the IDE app, the `@viz/player` package it embeds, the design system, and the trace fixtures every view is built against. Tasks: [plans/tasks/frontend/](../plans/tasks/frontend/). Visual rules: [docs/frontend/design-system.md](../docs/frontend/design-system.md). Rules for the code, tests and dependencies: [AGENTS.md](AGENTS.md).
 
 ## Layout
 

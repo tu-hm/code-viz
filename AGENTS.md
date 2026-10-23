@@ -2,7 +2,7 @@
 
 Code visualizer: run a user's Python or C++ program once in a sandbox, record each step as a trace, replay it in the browser. This file covers the backend: Go (`cmd/`, `internal/`), tracers (`adapters/`), contracts (`api/`, `schema/`) and SQL. The frontend rules are in [web/AGENTS.md](web/AGENTS.md).
 
-The spec is [plans/code-visualizer-spec_2.md](plans/code-visualizer-spec_2.md); every `§` and `D` number below points into it. Backend tasks: [plans/tasks/backend/](plans/tasks/backend/).
+The spec is [plans/code-visualizer-spec_2.md](plans/code-visualizer-spec_2.md); every `§` and `D` number below points into it. Backend tasks: [plans/tasks/backend/](plans/tasks/backend/). Architecture, guides and conventions: [docs/](docs/README.md).
 
 ## Commands
 
@@ -120,7 +120,7 @@ These look like holes in review and are decisions:
 ## MySQL (§7.13)
 
 - SQL lives in sqlc query files under `internal/adapters/mysql`. No ORM, no query builder, no SQL assembled from strings.
-- Migrations use goose. An applied migration is immutable; ship a new one. Expand, backfill, contract: old and new pods run against the same schema during a rollout. Every `ALTER TABLE` on an existing table names `ALGORITHM=INSTANT` or `ALGORITHM=INPLACE, LOCK=NONE`. Rules and patterns: [db migrations guide](docs/guides/db-migrations.md).
+- Migrations use goose. An applied migration is immutable; ship a new one. Expand, backfill, contract: old and new pods run against the same schema during a rollout. Every `ALTER TABLE` on an existing table names `ALGORITHM=INSTANT` or `ALGORITHM=INPLACE, LOCK=NONE`. Rules and patterns: [db migrations guide](docs/backend/guides/db-migrations.md).
 - Every transaction locks in this order: `usage_daily → traces → visualizations → jobs`.
 - Deadlock (1213) and lock-wait timeout (1205) retries go through the one retry helper. No ad-hoc retry loops.
 - No network call (object storage, sandbox, HTTP) while a transaction is open.
@@ -140,11 +140,11 @@ These look like holes in review and are decisions:
 - Standard library only. The tracer runs inside the user's interpreter, or inside GDB.
 - stdout and stderr belong to the user's program. The protocol goes to fd 3 and nowhere else.
 - The style rules above apply: flat functions, no class for a single use, zero comments by default.
-- How a run flows from manifest to trace, and the tracer ↔ core wire contract: [tracing guide](docs/guides/tracing.md).
+- How a run flows from manifest to trace, and the tracer ↔ core wire contract: [tracing](docs/backend/architecture/tracing.md).
 
 ## Comments: default zero
 
-Full canon with BAD/GOOD examples: [docs/guides/comments-cheat-sheet.md](docs/guides/comments-cheat-sheet.md).
+Full canon with BAD/GOOD examples: [docs/backend/conventions/comments-cheat-sheet.md](docs/backend/conventions/comments-cheat-sheet.md).
 
 The code carries the meaning. A file or diff with no comments is the normal result. A comment survives only if it matches one of these:
 
@@ -167,7 +167,7 @@ Tests get zero comments, including the rationale kind (why the test exists, what
 
 ## Tests (§15)
 
-`go test` with `go-cmp` for diffs, golden files for traces, `testcontainers-go` for MySQL and SeaweedFS. No testify. Cite rules by number (`test 7`); BAD/GOOD examples and the pre-merge checklist: [testing cheat sheet](docs/guides/testing-cheat-sheet.md).
+`go test` with `go-cmp` for diffs, golden files for traces, `testcontainers-go` for MySQL and SeaweedFS. No testify. Cite rules by number (`test 7`); BAD/GOOD examples and the pre-merge checklist: [testing cheat sheet](docs/backend/conventions/testing-cheat-sheet.md).
 
 1. **Skip trivial code.** No branch, transformation or invariant means no test. Ask before writing a trivial input-validation test.
 2. **A plausible regression must fail the test.** Delete the line under test, or flip `<=` to `<`; if the test still passes, it is useless. Assert the side effect and both sides of a boundary, not just `err == nil`.

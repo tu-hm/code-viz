@@ -17,7 +17,7 @@ web/            TypeScript: pnpm workspace for the browser app
   apps/ide/     IDE app (Vite, React)
   packages/     @viz/player, @viz/ui (design system)
   fixtures/     traces every view is built against
-docs/guides/    how we write code here: comments, tests, migrations, the sandbox, tracing, the design system
+docs/           backend architecture, guides and conventions; the frontend design system
 plans/          spec, work plans, one file per backend and frontend task
 ```
 
@@ -53,15 +53,16 @@ The mock API, fixtures and configuration are in [web/README.md](web/README.md).
 | [Backend tasks](plans/tasks/backend/) | What to build, BE-01 to BE-14, each with its spec sections and done criteria |
 | [Frontend tasks](plans/tasks/frontend/) | FE-01 to FE-14, the same shape |
 | [Web README](web/README.md) | Running the web app, the mock API, fixtures, generated types |
-| [Design system](docs/guides/design-system.md) | Tokens, the trace palette, type, frame, components, contrast rules |
+| [Design system](docs/frontend/design-system.md) | Tokens, the trace palette, type, frame, components, contrast rules |
 | [Task tracking](plans/tasks/README.md) | Milestones, decision gates, handoffs between backend and frontend |
 | [AGENTS.md](AGENTS.md) | Backend rules: plain Go (S1 to S12), architecture, trust boundary, MySQL, errors and logs, git |
 | [web/AGENTS.md](web/AGENTS.md) | Frontend rules: plain TypeScript (T1 to T7), React with the compiler (R1 to R8), tests, dependencies, known traps |
-| [Comments cheat sheet](docs/guides/comments-cheat-sheet.md) | Default zero comments; the eight kinds that earn one |
-| [Testing cheat sheet](docs/guides/testing-cheat-sheet.md) | 11 rules for tests that catch regressions |
-| [Database migrations](docs/guides/db-migrations.md) | goose on MySQL 8.4: online DDL, expand and contract, safe patterns |
-| [Sandbox](docs/guides/sandbox.md) | The `Sandbox` port, `viz-shim`, the Docker dev sandbox, what a runner image needs |
-| [Tracing](docs/guides/tracing.md) | Program to trace: the Python tracer, the wire contract, `tracecore`, `vizctl`, the golden fixtures |
+| [Docs](docs/README.md) | Index: backend architecture, guides and conventions, and the design system |
+| [Comments cheat sheet](docs/backend/conventions/comments-cheat-sheet.md) | Default zero comments; the eight kinds that earn one |
+| [Testing cheat sheet](docs/backend/conventions/testing-cheat-sheet.md) | 11 rules for tests that catch regressions |
+| [Database migrations](docs/backend/guides/db-migrations.md) | goose on MySQL 8.4: online DDL, expand and contract, safe patterns |
+| [Sandbox](docs/backend/architecture/sandbox.md) | The `Sandbox` port, `viz-shim`, the Docker dev sandbox, what a runner image needs |
+| [Tracing](docs/backend/architecture/tracing.md) | Program to trace: the Python tracer, the wire contract, `tracecore`, `vizctl`, the golden fixtures |
 
 ## Working rules
 
