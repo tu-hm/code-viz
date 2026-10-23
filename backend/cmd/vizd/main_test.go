@@ -14,12 +14,13 @@ func TestPickSandbox(t *testing.T) {
 		{"test allows docker", "test", "docker", "docker"},
 		{"staging refuses docker", "staging", "docker", ""},
 		{"prod refuses docker", "prod", "docker", ""},
-		{"prod allows runsc", "prod", "runsc", "runsc"},
+		{"prod allows nsjail", "prod", "nsjail", "nsjail"},
+		{"runsc is refused", "prod", "runsc", ""},
 		{"staging allows nsjail", "staging", "nsjail", "nsjail"},
 		{"test requires a sandbox", "test", "", ""},
 		{"prod requires a sandbox", "prod", "", ""},
 		{"unknown sandbox is refused", "dev", "firecracker", ""},
-		{"unknown env is refused", "production", "runsc", ""},
+		{"unknown env is refused", "production", "nsjail", ""},
 		{"missing env is refused", "", "docker", ""},
 	}
 	for _, tc := range tests {

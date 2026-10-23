@@ -90,7 +90,7 @@ func pickSandbox(vizEnv, sandbox string) (string, error) {
 		return "docker", nil
 	}
 	switch sandbox {
-	case "runsc", "nsjail":
+	case "nsjail":
 		return sandbox, nil
 	case "docker":
 		if vizEnv != "dev" && vizEnv != "test" {
@@ -98,7 +98,7 @@ func pickSandbox(vizEnv, sandbox string) (string, error) {
 		}
 		return sandbox, nil
 	}
-	return "", fmt.Errorf("VIZ_SANDBOX must be docker, runsc or nsjail, got %q", sandbox)
+	return "", fmt.Errorf("VIZ_SANDBOX must be docker or nsjail, got %q", sandbox)
 }
 
 func serve(ctx context.Context, addr string, h http.Handler) error {
