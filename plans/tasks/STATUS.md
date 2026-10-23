@@ -1,6 +1,6 @@
 # Task status
 
-**Updated Fri 23 Oct 2026.** One row per task. The checklist in each task file is the source of truth; when you tick items there, update the row here. The recount command is at the bottom.
+**Updated Sat 24 Oct 2026.** One row per task. The checklist in each task file is the source of truth; when you tick items there, update the row here. The recount command is at the bottom.
 
 ✅ done · 🟡 in progress · 🟢 ready to start · ⏳ waiting on another task
 
@@ -10,11 +10,14 @@
 - **In progress:** FE-01 (26/37). The web workspace, design system, codegen, fixtures and mock API are in `web/`. Storybook (§4) is planned for week 6. The frontend is trimmed to the IDE: no i18n, no Playwright end-to-end tests (spec v1.3).
 - **Done:** BE-08 §1 (4/4). The GDB prototype traces the loop, recursion and STL programs, its output validates against the wire schema, and it ran under both sandboxes for S1b.
 - **In progress:** BE-02 (48/54). G1 is decided: nsjail (spec v1.5, [S1b report](../spikes/s1b-sandbox.md)). The nsjail adapter passes `sandboxtest`, and `make check` runs the suite against both adapters. What's left waits on other tasks; see the task file.
-- **Next, by the suggested order:** BE-03 §1 (spike S2, decides G2). On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
+- **Done except signing:** BE-03 (34/35). The Python tracer, its runner image and manifest, `vizctl trace`/`validate`, and eight golden fixtures traced from real code. Signing the image waits on a registry (BE-13). Spike S2 recommends `sys.monitoring` for G2 ([S2 report](../spikes/s2-python-hook.md)); the tracer uses `settrace` until G2 decides.
+- **In progress:** BE-04 (21/31). `tracecore` (§2) was built early, inside BE-03, so `vizctl` prints real traces. The S4 spike (§1), sparse arrays (§3) and running the goldens on both architectures in CI are open.
+- **Next, by the suggested order:** BE-04 §1 (spike S4, input to G3). On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
 ## Decisions waiting on you
 
+- [ ] G2 (Fri 13 Nov): keep `sys.settrace` (D12) or switch to `sys.monitoring`? S2 recommends `sys.monitoring`: tied on a 1,000-step trace, 1.5–3.4× faster after the step limit ([S2 report](../spikes/s2-python-hook.md)).
 - [ ] Mark the CI checks as required on `main` (BE-01 §2)? This blocks direct pushes to `main`, so every change would go through a PR.
 - [ ] API: what does `wait` do when `since` is missing?
 - [ ] API: what does `POST /visualizations/{id}/share` return before the visualization is completed?
@@ -28,8 +31,8 @@
 |---|---|---|---|---|
 | [BE-01](backend/BE-01-foundation-contracts.md) Foundation & contracts | M0–M1 | 🟡 | 41/46 | CI runs `make check`. Open items: see [BE-01 open items](#be-01-open-items) |
 | [BE-02](backend/BE-02-sandbox.md) Sandbox ⚠ | M0–M1, M3 | 🟡 | 48/54 | G1: nsjail. Docker and nsjail adapters pass `sandboxtest`. Open: Compose socket (BE-13 §1), per-image seccomp allowlist (before GA), first CI run with `test-nsjail`, fake fd-3 (BE-03/04), `ptrace` and runner image checks (BE-07) |
-| [BE-03](backend/BE-03-python-tracer.md) Python tracer | M0–M1 | ⏳ | 0/35 | §1 spike S2 comes after BE-02 §1 in the M0 order; decides G2 (Fri 13 Nov). §2+ need BE-02 §2, BE-04 |
-| [BE-04](backend/BE-04-trace-processing.md) Trace processing | M0–M2 | 🟢 | 0/31 | §1 spike S4 (input to G3, Fri 13 Nov); needs only BE-01 |
+| [BE-03](backend/BE-03-python-tracer.md) Python tracer | M0–M1 | 🟡 | 34/35 | Done except cosign signing (needs a registry, BE-13). S2 report in; G2 (Fri 13 Nov) open |
+| [BE-04](backend/BE-04-trace-processing.md) Trace processing | M0–M2 | 🟡 | 21/31 | §2 done in the BE-03 run. Open: §1 spike S4 (input to G3, Fri 13 Nov), goldens on both architectures in CI, §3 after BE-09 |
 | [BE-05](backend/BE-05-job-queue-worker.md) Job queue & worker | M1 | ⏳ | 0/30 | BE-02, BE-04, BE-06 §2 |
 | [BE-06](backend/BE-06-visualization-api.md) Visualization API | M0–M1 | 🟢 | 0/50 | §1 spike S5 (stretch) can start; §2+ need BE-13 §1 |
 | [BE-07](backend/BE-07-cpp-build.md) C++ build | M2 | ⏳ | 0/20 | BE-02, BE-05 |
@@ -40,7 +43,7 @@
 | [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/10 | BE-06 |
 | [BE-13](backend/BE-13-environments-launch.md) Environments & launch | M1–M5 | 🟢 | 0/48 | §1 can start. BE-01 §6 already covers part of it (Compose with MySQL + SeaweedFS, `migrate up` on start); not ticked yet |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | ⏳ | 0/10 | BE-07–09 |
-| **Total** | | | **93/427** | |
+| **Total** | | | **148/427** | |
 
 ### BE-01 open items
 
@@ -77,7 +80,7 @@
 | Gate | Date | Decides | Input | Status |
 |---|---|---|---|---|
 | G1 | Fri 6 Nov | gVisor or nsjail | BE-02 §1 | ✅ 23 Oct: nsjail (spec v1.5) |
-| G2 | Fri 13 Nov | `settrace` or `sys.monitoring` | BE-03 §1 | Open |
+| G2 | Fri 13 Nov | `settrace` or `sys.monitoring` | BE-03 §1 | Open; S2 recommends `sys.monitoring` |
 | G3 | Fri 13 Nov | Freeze trace format | BE-04 §1, fixtures | Open |
 | G4 | Fri 25 Dec | Python beta go/no-go, team size | M1 | Open |
 | G5 | Fri 19 Feb | Safety checks, tree-sitter, big arrays | BE-07 §3, BE-09 §3, FE-08 §1 | Open |
@@ -91,7 +94,7 @@
 | Format frozen | Fri 13 Nov | G3 |
 | OpenAPI | Tue 17 Nov | ✅ 23 Oct (`3ebd66b`) |
 | Local stack | Wed 18 Nov | 🟡 MySQL, SeaweedFS and migrations run; buckets, seed data and sandbox missing |
-| Real Python traces | Fri 4 Dec | Not started (BE-03) |
+| Real Python traces | Fri 4 Dec | ✅ 24 Oct: `backend/fixtures/python/*/expected.trace.json`, from `vizctl trace` |
 | Staging | Mon 28 Dec | Not started (BE-13 §3) |
 | C++ pointer values | M2 week 3 | Not started (BE-08 §3) |
 | Sparse arrays | End of M2 | Not started (BE-04 §3) |
