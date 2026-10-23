@@ -1,4 +1,4 @@
-.PHONY: gen test golden-update images dev down reset seed
+.PHONY: gen test golden-update images dev down reset seed lint fmt vuln check
 
 include .env.example
 -include .env
@@ -6,6 +6,8 @@ export
 
 SCHEMA_ID := https://github.com/tu-hm/code-viz/schema
 GEN_PKG := github.com/tu-hm/code-viz/backend/internal/gen
+GOLANGCI_LINT := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
+GOVULNCHECK := go run golang.org/x/vuln/cmd/govulncheck@v1.9.0
 
 gen:
 	go tool go-jsonschema --only-models --tags json --capitalization ID --disable-custom-types-for-maps \
@@ -42,3 +44,17 @@ reset:
 
 seed:
 	@echo "seed: nothing to seed yet; sample traces come with BE-13 §1" >&2
+
+lint:
+	$(GOLANGCI_LINT) run ./...
+
+fmt:
+	$(GOLANGCI_LINT) fmt ./...
+
+vuln:
+	$(GOVULNCHECK) ./...
+
+check: lint vuln test
+	go mod tidy -diff
+	@$(MAKE) --no-print-directory gen
+	@test -z "$$(git status --porcelain -- internal/gen)" || { git status --short -- internal/gen; echo "check: make gen changed internal/gen; commit the regenerated code" >&2; exit 1; }
