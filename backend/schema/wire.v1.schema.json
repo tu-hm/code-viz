@@ -69,7 +69,18 @@
         "data": { "type": "string" }
       }
     },
-    "exit": { "description": "Must be the last message.", "$ref": "trace.v1.schema.json#/$defs/exit" },
+    "exit": {
+      "description": "Must be the last message.",
+      "allOf": [{ "$ref": "trace.v1.schema.json#/$defs/exit" }],
+      "properties": {
+        "lineHits": {
+          "description": "Line number to times it ran, over the whole run, from the tracer's own counter (§19.9.3). Same shape as summary.lineHits.",
+          "type": "object",
+          "propertyNames": { "pattern": "^[1-9][0-9]*$" },
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
     "log": {
       "description": "Adapter debug output, kept in internal logs and never shown to users.",
       "type": "object",

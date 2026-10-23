@@ -7,7 +7,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
 	"github.com/tu-hm/code-viz/backend/internal/gen/wire"
 )
 
@@ -67,6 +66,8 @@ func TestWireSchemaRejects(t *testing.T) {
 		{"exit without signal", exit, "/signal", unset},
 		{"exit without message", exit, "/message", unset},
 		{"exit with an unknown kind", exit, "/kind", `"crashed"`},
+		{"exit with a hit count for line 0", exit, "/lineHits", `{"0": 1}`},
+		{"exit with a negative hit count", exit, "/lineHits/13", `-1`},
 		{"log without level", log, "/level", unset},
 		{"log without message", log, "/message", unset},
 		{"log with an unknown level", log, "/level", `"trace"`},
@@ -120,7 +121,7 @@ func TestWireTypesRoundTrip(t *testing.T) {
 					wire.MessageTypeHello: &wire.Hello{},
 					wire.MessageTypeStep:  &wire.Step{},
 					wire.MessageTypeOut:   &wire.Out{},
-					wire.MessageTypeExit:  &trace.Exit{},
+					wire.MessageTypeExit:  &wire.Exit{},
 					wire.MessageTypeLog:   &wire.Log{},
 				}[head.Type]
 				if err := json.Unmarshal([]byte(line), msg); err != nil {

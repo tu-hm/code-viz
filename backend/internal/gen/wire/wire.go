@@ -4,6 +4,43 @@ package wire
 
 import trace "github.com/tu-hm/code-viz/backend/internal/gen/trace"
 
+// Must be the last message.
+type Exit struct {
+	// Code corresponds to the JSON schema field "code".
+	Code ExitCode `json:"code"`
+
+	// Kind corresponds to the JSON schema field "kind".
+	Kind ExitKind `json:"kind"`
+
+	// Line number to times it ran, over the whole run, from the tracer's own counter
+	// (§19.9.3). Same shape as summary.lineHits.
+	LineHits map[string]int `json:"lineHits,omitzero"`
+
+	// Message corresponds to the JSON schema field "message".
+	Message ExitMessage `json:"message"`
+
+	// Signal name, e.g. SIGSEGV.
+	Signal ExitSignal `json:"signal"`
+}
+
+type ExitCode *int
+
+type ExitKind string
+
+const ExitKindException ExitKind = "exception"
+const ExitKindInternalError ExitKind = "internal_error"
+const ExitKindMemoryLimit ExitKind = "memory_limit"
+const ExitKindNormal ExitKind = "normal"
+const ExitKindOutputLimit ExitKind = "output_limit"
+const ExitKindSignal ExitKind = "signal"
+const ExitKindStepLimit ExitKind = "step_limit"
+const ExitKindTimeout ExitKind = "timeout"
+
+type ExitMessage *string
+
+// Signal name, e.g. SIGSEGV.
+type ExitSignal *string
+
 // Must be the first message.
 type Hello struct {
 	// Adapter corresponds to the JSON schema field "adapter".
