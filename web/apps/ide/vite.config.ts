@@ -6,7 +6,12 @@ import { searchForWorkspaceRoot } from 'vite'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [react(), babel({ presets: [reactCompilerPreset()] }), tailwindcss()],
+  plugins: [
+    react(),
+    // default skips an uncompilable component silently
+    babel({ presets: [reactCompilerPreset({ panicThreshold: 'all_errors' })] }),
+    tailwindcss(),
+  ],
   server: {
     fs: {
       allow: [
