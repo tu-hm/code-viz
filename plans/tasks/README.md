@@ -5,7 +5,7 @@ Work lists split by role, for tracking (not implementation detail). Source docs:
 | File | Covers | Tasks |
 |---|---|---|
 | [backend-tasks.md](backend-tasks.md) | Go services, tracers, sandbox, MySQL queue, storage, infra, contracts | 14 (BE-01…BE-14), one file each in [backend/](backend/) |
-| [frontend-tasks.md](frontend-tasks.md) | IDE integration, `@viz/player`, views, narration, navigation, tests, a11y | 14 (FE-01…FE-14) |
+| [frontend-tasks.md](frontend-tasks.md) | IDE integration, `@viz/player`, views, narration, navigation, tests, a11y | 14 (FE-01…FE-14), one file each in [frontend/](frontend/) |
 | This file | Milestones, gates, cross-team handoffs, Lead/Design tasks | — |
 
 Each BE/FE task lists the fine-grained work-plan IDs it covers (`M0-05`, `M2-B04`…). The handoff and gate tables below still use those IDs.
@@ -16,7 +16,7 @@ Each BE/FE task lists the fine-grained work-plan IDs it covers (`M0-05`, `M2-B04
 |---|---|---|---|---|
 | **M0** Foundations & spikes | 26 Oct – 13 Nov 2026 | Contracts, spikes S1–S5, player scrubs a 1,000-step fixture | 13 d | 13.5 d |
 | **M1** Python beta | 16 Nov – 25 Dec 2026 | Python works end to end on staging; internal beta | 27.5 d | 27 d |
-| **M2** C++ | 28 Dec 2026 – 19 Feb 2027 | C++ with STL, pointers, globals, compile errors | 29 d | 12.5 d (+ M5 work) |
+| **M2** C++ | 28 Dec 2026 – 19 Feb 2027 | C++ with STL, pointers, globals, compile errors | 29 d | 15.5 d (+ M5 work) |
 | **M3** Launch + student UX | 22 Feb – 26 Mar 2027 | All P0 items; load + security tests; **public launch** | 20.5 d | 21.5 d |
 | **M4** Extensibility | 29 Mar – 9 Apr 2027 | Add C with no UI changes | 5 d | 1 d |
 | **M5** CP data views | 12 Apr – 7 May 2027 | All P1 views; usability test passes | 8 d | 22 d |
