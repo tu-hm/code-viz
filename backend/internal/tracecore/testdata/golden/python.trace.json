@@ -1,0 +1,226 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "py-settrace/1.2.0",
+    "id": "python3",
+    "runtime": "CPython 3.12.4"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 20
+  },
+  "steps": [
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 4,
+          "locals": [
+            {
+              "name": "square",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "kind": "function",
+          "name": "square",
+          "signature": "square(x)"
+        }
+      },
+      "i": 0,
+      "keyframe": true,
+      "line": 4,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 9,
+          "locals": [
+            {
+              "name": "square",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "v": "5"
+              }
+            },
+            {
+              "name": "a",
+              "value": {
+                "id": "o2",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 2,
+          "locals": [
+            {
+              "name": "x",
+              "value": {
+                "t": "int",
+                "v": "5"
+              }
+            }
+          ],
+          "name": "square",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            },
+            {
+              "t": "int",
+              "v": "3"
+            },
+            {
+              "t": "int",
+              "v": "5"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "type": "list"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 2,
+      "parentCallId": 0,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": "5\n"
+    },
+    {
+      "error": {
+        "line": 13,
+        "message": "list index out of range",
+        "type": "IndexError"
+      },
+      "event": "exception",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 13,
+          "locals": [
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 13,
+      "removedObjects": [
+        "o1",
+        "o2"
+      ],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 2,
+        "inferred": false,
+        "token": 1
+      },
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 1,
+      "kind": "exception",
+      "message": "IndexError: list index out of range",
+      "signal": null
+    },
+    "lineHits": {
+      "12": 5,
+      "13": 5,
+      "2": 1,
+      "4": 1,
+      "9": 1
+    },
+    "lineHitsSource": "counter",
+    "stepCount": 3,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

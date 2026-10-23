@@ -1,0 +1,162 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/1.0.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.2"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 20
+  },
+  "steps": [
+    {
+      "callId": 1,
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "depth",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "head",
+              "value": {
+                "addr": "0xmasked",
+                "t": "ptr",
+                "target": "o2",
+                "type": "Node*"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fixed": true,
+          "kind": "sequence",
+          "length": 200005,
+          "sparse": {
+            "default": {
+              "t": "int",
+              "v": "0"
+            },
+            "items": {
+              "3": {
+                "t": "int",
+                "v": "7"
+              }
+            }
+          },
+          "type": "int[200005]",
+          "window": {
+            "count": 16,
+            "start": 0
+          }
+        },
+        "o2": {
+          "fields": [
+            {
+              "name": "val",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "next",
+              "value": {
+                "addr": "0x0",
+                "t": "ptr"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Node"
+        }
+      },
+      "i": 0,
+      "keyframe": true,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": {
+        "line": 13,
+        "message": "Segmentation fault (invalid memory access)",
+        "type": "SIGSEGV"
+      },
+      "event": "exception",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 13,
+          "locals": [],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 1,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 12,
+      "removedObjects": [
+        "o1",
+        "o2"
+      ],
+      "stack": [
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": null,
+      "kind": "signal",
+      "message": "Segmentation fault",
+      "signal": "SIGSEGV"
+    },
+    "stepCount": 2,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}
