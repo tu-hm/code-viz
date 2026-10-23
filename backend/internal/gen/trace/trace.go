@@ -4,7 +4,7 @@ package trace
 
 type Access struct {
 	// Inferred corresponds to the JSON schema field "inferred".
-	Inferred *bool `json:"inferred,omitempty,omitzero"`
+	Inferred *bool `json:"inferred,omitzero"`
 
 	// Mode corresponds to the JSON schema field "mode".
 	Mode AccessMode `json:"mode"`
@@ -119,88 +119,88 @@ const FrameKindMethod FrameKind = "method"
 // Set on the return step of this frame.
 type FrameReturnValue struct {
 	// Addr corresponds to the JSON schema field "addr".
-	Addr *string `json:"addr,omitempty,omitzero"`
+	Addr *string `json:"addr,omitzero"`
 
 	// Code corresponds to the JSON schema field "code".
-	Code *int `json:"code,omitempty,omitzero"`
+	Code *int `json:"code,omitzero"`
 
 	// ID corresponds to the JSON schema field "id".
-	ID *string `json:"id,omitempty,omitzero"`
+	ID *string `json:"id,omitzero"`
 
 	// Index corresponds to the JSON schema field "index".
-	Index *int `json:"index,omitempty,omitzero"`
+	Index *int `json:"index,omitzero"`
 
 	// Len corresponds to the JSON schema field "len".
-	Len *int `json:"len,omitempty,omitzero"`
+	Len *int `json:"len,omitzero"`
 
 	// Reason corresponds to the JSON schema field "reason".
-	Reason *string `json:"reason,omitempty,omitzero"`
+	Reason *string `json:"reason,omitzero"`
 
 	// T corresponds to the JSON schema field "t".
 	T ValueT `json:"t"`
 
 	// Absent when the pointer was not followed.
-	Target *string `json:"target,omitempty,omitzero"`
+	Target *string `json:"target,omitzero"`
 
 	// Truncated corresponds to the JSON schema field "truncated".
-	Truncated *bool `json:"truncated,omitempty,omitzero"`
+	Truncated *bool `json:"truncated,omitzero"`
 
 	// Declared type in the source language.
-	Type *string `json:"type,omitempty,omitzero"`
+	Type *string `json:"type,omitzero"`
 
 	// Always a string, so 64-bit integers keep their precision.
-	V *string `json:"v,omitempty,omitzero"`
+	V *string `json:"v,omitzero"`
 }
 
 // A heap object; kind decides which other fields are set (§9.5).
 type HeapObject struct {
 	// Entries corresponds to the JSON schema field "entries".
-	Entries []Entry `json:"entries,omitempty,omitzero"`
+	Entries []Entry `json:"entries,omitzero"`
 
 	// Fields corresponds to the JSON schema field "fields".
-	Fields []Field `json:"fields,omitempty,omitzero"`
+	Fields []Field `json:"fields,omitzero"`
 
 	// Fixed corresponds to the JSON schema field "fixed".
-	Fixed *bool `json:"fixed,omitempty,omitzero"`
+	Fixed *bool `json:"fixed,omitzero"`
 
 	// Items corresponds to the JSON schema field "items".
-	Items []Value `json:"items,omitempty,omitzero"`
+	Items []Value `json:"items,omitzero"`
 
 	// Kind corresponds to the JSON schema field "kind".
 	Kind HeapObjectKind `json:"kind"`
 
 	// Real size, even when items are truncated.
-	Length *int `json:"length,omitempty,omitzero"`
+	Length *int `json:"length,omitzero"`
 
 	// Extra facts, e.g. capacity or adapter.
-	Meta map[string]interface{} `json:"meta,omitempty,omitzero"`
+	Meta map[string]interface{} `json:"meta,omitzero"`
 
 	// Name corresponds to the JSON schema field "name".
-	Name *string `json:"name,omitempty,omitzero"`
+	Name *string `json:"name,omitzero"`
 
 	// Ordered corresponds to the JSON schema field "ordered".
-	Ordered *bool `json:"ordered,omitempty,omitzero"`
+	Ordered *bool `json:"ordered,omitzero"`
 
 	// Delta only: changed cells of a sparse sequence.
-	Patch map[string]Value `json:"patch,omitempty,omitzero"`
+	Patch map[string]Value `json:"patch,omitzero"`
 
 	// Signature corresponds to the JSON schema field "signature".
-	Signature *string `json:"signature,omitempty,omitzero"`
+	Signature *string `json:"signature,omitzero"`
 
 	// Sparse corresponds to the JSON schema field "sparse".
-	Sparse *Sparse `json:"sparse,omitempty,omitzero"`
+	Sparse *Sparse `json:"sparse,omitzero"`
 
 	// Summary corresponds to the JSON schema field "summary".
-	Summary *string `json:"summary,omitempty,omitzero"`
+	Summary *string `json:"summary,omitzero"`
 
 	// Truncated corresponds to the JSON schema field "truncated".
-	Truncated *bool `json:"truncated,omitempty,omitzero"`
+	Truncated *bool `json:"truncated,omitzero"`
 
 	// Type corresponds to the JSON schema field "type".
-	Type *string `json:"type,omitempty,omitzero"`
+	Type *string `json:"type,omitzero"`
 
 	// Window corresponds to the JSON schema field "window".
-	Window *Window `json:"window,omitempty,omitzero"`
+	Window *Window `json:"window,omitzero"`
 }
 
 type HeapObjectKind string
@@ -226,7 +226,7 @@ type Language struct {
 
 type Local struct {
 	// Internal corresponds to the JSON schema field "internal".
-	Internal *bool `json:"internal,omitempty,omitzero"`
+	Internal *bool `json:"internal,omitzero"`
 
 	// Name corresponds to the JSON schema field "name".
 	Name string `json:"name"`
@@ -237,13 +237,13 @@ type Local struct {
 
 type Options struct {
 	// Variable name to the index ranges to record in full.
-	CaptureRanges map[string][][]int `json:"captureRanges,omitempty,omitzero"`
+	CaptureRanges map[string][][]int `json:"captureRanges,omitzero"`
 
 	// MaxSteps corresponds to the JSON schema field "maxSteps".
 	MaxSteps int `json:"maxSteps"`
 
 	// ShowInternals corresponds to the JSON schema field "showInternals".
-	ShowInternals *bool `json:"showInternals,omitempty,omitzero"`
+	ShowInternals *bool `json:"showInternals,omitzero"`
 
 	// StartAtLines corresponds to the JSON schema field "startAtLines".
 	StartAtLines []int `json:"startAtLines"`
@@ -279,10 +279,10 @@ type StdinPos struct {
 
 type Step struct {
 	// Access corresponds to the JSON schema field "access".
-	Access []Access `json:"access,omitempty,omitzero"`
+	Access []Access `json:"access,omitzero"`
 
 	// Set on call and return steps (§19.9.6).
-	CallID *int `json:"callId,omitempty,omitzero"`
+	CallID *int `json:"callId,omitzero"`
 
 	// Error corresponds to the JSON schema field "error".
 	Error *StepError `json:"error"`
@@ -306,7 +306,7 @@ type Step struct {
 	Line int `json:"line"`
 
 	// Set on call steps that have a traced caller.
-	ParentCallID *int `json:"parentCallId,omitempty,omitzero"`
+	ParentCallID *int `json:"parentCallId,omitzero"`
 
 	// Line just executed; null at i = 0.
 	PrevLine StepPrevLine `json:"prevLine"`
@@ -321,7 +321,7 @@ type Step struct {
 	Stderr string `json:"stderr"`
 
 	// StdinPos corresponds to the JSON schema field "stdinPos".
-	StdinPos *StdinPos `json:"stdinPos,omitempty,omitzero"`
+	StdinPos *StdinPos `json:"stdinPos,omitzero"`
 
 	// Text written during this step only.
 	Stdout string `json:"stdout"`
@@ -346,10 +346,10 @@ type Summary struct {
 	Exit Exit `json:"exit"`
 
 	// Line number to times it ran, over the whole run (§19.9.3).
-	LineHits map[string]int `json:"lineHits,omitempty,omitzero"`
+	LineHits map[string]int `json:"lineHits,omitzero"`
 
 	// gcov and counter cover the whole run; trace counts recorded steps only.
-	LineHitsSource *SummaryLineHitsSource `json:"lineHitsSource,omitempty,omitzero"`
+	LineHitsSource *SummaryLineHitsSource `json:"lineHitsSource,omitzero"`
 
 	// StepCount corresponds to the JSON schema field "stepCount".
 	StepCount int `json:"stepCount"`
@@ -361,7 +361,7 @@ type Summary struct {
 	Truncation *SummaryTruncation `json:"truncation"`
 
 	// UntracedTail corresponds to the JSON schema field "untracedTail".
-	UntracedTail *UntracedTail `json:"untracedTail,omitempty,omitzero"`
+	UntracedTail *UntracedTail `json:"untracedTail,omitzero"`
 }
 
 type SummaryLineHitsSource string
@@ -429,37 +429,37 @@ type UntracedTail struct {
 // A value; t decides which other fields are set (§9.4).
 type Value struct {
 	// Addr corresponds to the JSON schema field "addr".
-	Addr *string `json:"addr,omitempty,omitzero"`
+	Addr *string `json:"addr,omitzero"`
 
 	// Code corresponds to the JSON schema field "code".
-	Code *int `json:"code,omitempty,omitzero"`
+	Code *int `json:"code,omitzero"`
 
 	// ID corresponds to the JSON schema field "id".
-	ID *string `json:"id,omitempty,omitzero"`
+	ID *string `json:"id,omitzero"`
 
 	// Index corresponds to the JSON schema field "index".
-	Index *int `json:"index,omitempty,omitzero"`
+	Index *int `json:"index,omitzero"`
 
 	// Len corresponds to the JSON schema field "len".
-	Len *int `json:"len,omitempty,omitzero"`
+	Len *int `json:"len,omitzero"`
 
 	// Reason corresponds to the JSON schema field "reason".
-	Reason *string `json:"reason,omitempty,omitzero"`
+	Reason *string `json:"reason,omitzero"`
 
 	// T corresponds to the JSON schema field "t".
 	T ValueT `json:"t"`
 
 	// Absent when the pointer was not followed.
-	Target *string `json:"target,omitempty,omitzero"`
+	Target *string `json:"target,omitzero"`
 
 	// Truncated corresponds to the JSON schema field "truncated".
-	Truncated *bool `json:"truncated,omitempty,omitzero"`
+	Truncated *bool `json:"truncated,omitzero"`
 
 	// Declared type in the source language.
-	Type *string `json:"type,omitempty,omitzero"`
+	Type *string `json:"type,omitzero"`
 
 	// Always a string, so 64-bit integers keep their precision.
-	V *string `json:"v,omitempty,omitzero"`
+	V *string `json:"v,omitzero"`
 }
 
 type ValueT string

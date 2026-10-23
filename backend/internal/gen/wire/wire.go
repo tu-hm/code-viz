@@ -69,7 +69,7 @@ const OutStreamStdout OutStream = "stdout"
 // C++ address:type.
 type Step struct {
 	// CallID corresponds to the JSON schema field "callId".
-	CallID *int `json:"callId,omitempty,omitzero"`
+	CallID *int `json:"callId,omitzero"`
 
 	// Error corresponds to the JSON schema field "error".
 	Error *StepError `json:"error"`
@@ -84,7 +84,7 @@ type Step struct {
 	Line int `json:"line"`
 
 	// ParentCallID corresponds to the JSON schema field "parentCallId".
-	ParentCallID *int `json:"parentCallId,omitempty,omitzero"`
+	ParentCallID *int `json:"parentCallId,omitzero"`
 
 	// PrevLine corresponds to the JSON schema field "prevLine".
 	PrevLine StepPrevLine `json:"prevLine"`
@@ -93,7 +93,7 @@ type Step struct {
 	Stack []trace.Frame `json:"stack"`
 
 	// StdinPos corresponds to the JSON schema field "stdinPos".
-	StdinPos *trace.StdinPos `json:"stdinPos,omitempty,omitzero"`
+	StdinPos *trace.StdinPos `json:"stdinPos,omitzero"`
 }
 
 type StepError struct {

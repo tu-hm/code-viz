@@ -13,7 +13,7 @@ gen: gen-go
 	pnpm --dir ../web gen
 
 gen-go:
-	go tool go-jsonschema --only-models --tags json --capitalization ID --disable-custom-types-for-maps \
+	go tool go-jsonschema --only-models --tags json --disable-omitempty --capitalization ID --disable-custom-types-for-maps \
 		--schema-package $(SCHEMA_ID)/trace.v1.schema.json=$(GEN_PKG)/trace \
 		--schema-output $(SCHEMA_ID)/trace.v1.schema.json=internal/gen/trace/trace.go \
 		--schema-root-type $(SCHEMA_ID)/trace.v1.schema.json=Trace \
