@@ -17,15 +17,17 @@
 
 ## 2. Database (M1-03 · 1.5 d)
 
-- [ ] goose migrations (MySQL dialect) for `traces`, `visualizations`, `jobs`, `usage_daily` (§7.5, §7.13.2)
-- [ ] Types per §7.13.1: `BINARY(32)` cache key, `JSON`, `DATETIME(6)` UTC, `MEDIUMTEXT utf8mb4_bin` for source/stdin
-- [ ] Indexes: `cache_key` unique, `traces.updated_at`, job `claim_idx` / `lease_idx` / `trace_idx`
-- [ ] `feature_flags` table (§18.2)
-- [ ] Session settings: `READ-COMMITTED`, UTC, `parseTime=true`, `loc=UTC`
-- [ ] sqlc queries (MySQL engine)
-- [ ] Deadlock retry helper: retry 1213 / 1205 up to 3 times with jitter
+- [x] goose migrations (MySQL dialect) for `traces`, `visualizations`, `jobs`, `usage_daily` (§7.5, §7.13.2)
+- [x] Types per §7.13.1: `BINARY(32)` cache key, `JSON`, `DATETIME(6)` UTC, `MEDIUMTEXT utf8mb4_bin` for source/stdin
+- [x] Indexes: `cache_key` unique, `traces.updated_at`, job `claim_idx` / `lease_idx` / `trace_idx`
+- [x] `feature_flags` table (§18.2)
+- [x] Session settings: `READ-COMMITTED`, UTC, `parseTime=true`, `loc=UTC`
+- [x] sqlc queries (MySQL engine)
+- [x] Deadlock retry helper: retry 1213 / 1205 up to 3 times with jitter
 - [ ] Respect lock order `usage_daily → traces → visualizations → jobs`
-- [ ] **Done:** migrations go up and down; queries tested with testcontainers
+- [x] **Done:** migrations go up and down; queries tested with testcontainers
+
+One migration per table, every table `utf8mb4_bin`, with foreign keys from `visualizations` and `jobs` to `traces`. `traces` has four columns the §7.5 diagram doesn't: `chunks` (JSON: `index`, `fromStep`, `toStep`, `sizeBytes`, `sha256` per chunk, which §8.3 serves and `chunk_count` can't rebuild), `build` (JSON shaped like the API's `Build`), and `failure_stage` and `failure_kind`. Optional strings are `NOT NULL DEFAULT ''`. `claim_idx` orders `priority DESC`: with the spec's ascending key, MySQL sorts, and each claim then locks every queued row (134 of 134 in a test), so a second worker's `SKIP LOCKED` claim finds nothing. sqlc v1.31.1 runs from `make gen` through `go run` and writes `internal/gen/sqlc`, which the drift check in `make check` covers. `mysql.InTx` is the retry helper: 3 tries in all. Lock order: the queue's transactions lock `traces` before `jobs`; the create and delete transactions (§4) still have to follow it.
 
 ## 3. Object storage — `BlobStore` (M1-10 · 1.5 d)
 

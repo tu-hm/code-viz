@@ -23,6 +23,7 @@
 - [ ] API: what does `POST /visualizations/{id}/share` return before the visualization is completed?
 - [ ] API: auth scheme (`securitySchemes`) for signed-in callers.
 - [ ] API: should a failed response carry the trace ID (§5.6)?
+- [ ] Queue: cancel a running job? §7.7 and the §7.13.2 SQL cancel queued jobs only, which is what `JobQueue.Cancel` does; §7.13.2's prose and BE-05 §2–3 also stop a running one at its next lease check. Allowing it is one more status in `Cancel`'s `WHERE`, and the worker then sees `ErrLeaseLost`.
 - [ ] Lead items (option A vs B before 16 Nov, MySQL hosting, deploy path): see [README.md](README.md#lead--design-tasks-not-in-the-befe-lists).
 
 ## Backend
@@ -33,8 +34,8 @@
 | [BE-02](backend/BE-02-sandbox.md) Sandbox ⚠ | M0–M1, M3 | 🟡 | 48/54 | G1: nsjail. Docker and nsjail adapters pass `sandboxtest`. Open: Compose socket (BE-13 §1), per-image seccomp allowlist (before GA), first CI run with `test-nsjail`, fake fd-3 (BE-03/04), `ptrace` and runner image checks (BE-07) |
 | [BE-03](backend/BE-03-python-tracer.md) Python tracer | M0–M1 | 🟡 | 34/35 | Done except cosign signing (needs a registry, BE-13). S2 report in; G2 (Fri 13 Nov) open |
 | [BE-04](backend/BE-04-trace-processing.md) Trace processing | M0–M2 | 🟡 | 21/31 | §2 done in the BE-03 run. Open: §1 spike S4 (input to G3, Fri 13 Nov), goldens on both architectures in CI, §3 after BE-09 |
-| [BE-05](backend/BE-05-job-queue-worker.md) Job queue & worker | M1 | ⏳ | 0/30 | BE-02, BE-04, BE-06 §2 |
-| [BE-06](backend/BE-06-visualization-api.md) Visualization API | M0–M1 | 🟢 | 0/50 | §1 spike S5 (stretch) can start; §2+ need BE-13 §1 |
+| [BE-05](backend/BE-05-job-queue-worker.md) Job queue & worker | M1 | 🟡 | 10/30 | §1 queue adapter and its property test done. Next: §2 worker (`vizd --role=worker`) on the `JobQueue` port |
+| [BE-06](backend/BE-06-visualization-api.md) Visualization API | M0–M1 | 🟡 | 8/50 | §2 tables, sqlc and `InTx` done. Next: §3 `BlobStore`, §4 endpoints; §1 spike S5 (stretch) can start |
 | [BE-07](backend/BE-07-cpp-build.md) C++ build | M2 | ⏳ | 0/20 | BE-02, BE-05 |
 | [BE-08](backend/BE-08-cpp-tracer.md) C++ tracer ⚠ | M0, M2 | 🟡 | 4/33 | §1 done (prototype in `adapters/cpp/trace.py`, measured in S1b). §2+ need BE-07 |
 | [BE-09](backend/BE-09-cpp-stl-big-arrays.md) C++ STL & big arrays | M2 | ⏳ | 0/24 | BE-08 |
@@ -43,7 +44,7 @@
 | [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/10 | BE-06 |
 | [BE-13](backend/BE-13-environments-launch.md) Environments & launch | M1–M5 | 🟢 | 0/48 | §1 can start. BE-01 §6 already covers part of it (Compose with MySQL + SeaweedFS, `migrate up` on start); not ticked yet |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | ⏳ | 0/10 | BE-07–09 |
-| **Total** | | | **148/427** | |
+| **Total** | | | **166/427** | |
 
 ### BE-01 open items
 
