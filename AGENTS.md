@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Code visualizer: run a user's Python or C++ program once in a sandbox, record each step as a trace, replay it in the browser. This file covers the backend: Go (`cmd/`, `internal/`), tracers (`adapters/`), contracts (`api/`, `schema/`) and SQL.
+Code visualizer: run a user's Python or C++ program once in a sandbox, record each step as a trace, replay it in the browser. This file covers the backend: Go (`cmd/`, `internal/`), tracers (`adapters/`), contracts (`api/`, `schema/`) and SQL. The frontend rules are in [web/AGENTS.md](web/AGENTS.md).
 
 The spec is [plans/code-visualizer-spec_2.md](plans/code-visualizer-spec_2.md); every `§` and `D` number below points into it. Backend tasks: [plans/tasks/backend/](plans/tasks/backend/).
 

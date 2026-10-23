@@ -1,6 +1,6 @@
 # Web
 
-The browser half of the code visualizer: the IDE app, the `@viz/player` package it embeds, the design system, and the trace fixtures every view is built against. Tasks: [plans/tasks/frontend/](../plans/tasks/frontend/). Visual rules: [docs/guides/design-system.md](../docs/guides/design-system.md).
+The browser half of the code visualizer: the IDE app, the `@viz/player` package it embeds, the design system, and the trace fixtures every view is built against. Tasks: [plans/tasks/frontend/](../plans/tasks/frontend/). Visual rules: [docs/guides/design-system.md](../docs/guides/design-system.md). Rules for the code, tests and dependencies: [AGENTS.md](AGENTS.md).
 
 ## Layout
 
@@ -29,10 +29,10 @@ pnpm dev        # http://localhost:5173 with the API mocked in the browser
 ```bash
 pnpm dev          # IDE dev server
 pnpm test         # Vitest, every package
-pnpm lint         # ESLint, then Prettier --check
+pnpm lint         # ESLint (a warning fails it), then Prettier --check
 pnpm fmt          # Prettier --write, then ESLint --fix
 pnpm typecheck    # tsc in every package
-pnpm build        # production build of apps/ide
+pnpm build        # production build of apps/ide; fails if React Compiler can't compile a component
 pnpm gen          # TS types from backend/api/openapi.yaml and backend/schema/trace.v1.schema.json
 pnpm check        # gen + drift check, lint, typecheck, test, build; CI runs this
 ```
@@ -88,3 +88,5 @@ The hand-written traces are plain JSON. Edit them directly. `fixtures.test.ts` c
 - **`Failed to fetch` or connection refused on port 8080:** the backend isn't running. Start Docker, then run `make dev` in `backend/`.
 - **A CORS error on API calls or chunk downloads:** the API, or the presigned SeaweedFS URLs (`S3_PUBLIC_ENDPOINT`), don't allow the dev origin `http://localhost:5173`. This isn't verified yet; it waits on the API (BE-06).
 - **`make gen` says `pnpm: command not found`:** install pnpm and run `pnpm install` in `web/` first.
+- **`ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` on install:** a version you asked for is less than 7 days old. Pin the newest version that is older, or wait. See [Dependencies](AGENTS.md#dependencies).
+- **`Port 5173 is already in use`:** another `pnpm dev` is running; use that one. Vite stops instead of moving to 5174, because `http://localhost:5173` is the dev origin the API is meant to allow.

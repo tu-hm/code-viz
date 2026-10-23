@@ -56,6 +56,7 @@ The mock API, fixtures and configuration are in [web/README.md](web/README.md).
 | [Design system](docs/guides/design-system.md) | Tokens, the trace palette, type, frame, components, contrast rules |
 | [Task tracking](plans/tasks/README.md) | Milestones, decision gates, handoffs between backend and frontend |
 | [AGENTS.md](AGENTS.md) | Backend rules: plain Go (S1 to S12), architecture, trust boundary, MySQL, errors and logs, git |
+| [web/AGENTS.md](web/AGENTS.md) | Frontend rules: plain TypeScript (T1 to T7), React with the compiler (R1 to R8), tests, dependencies, known traps |
 | [Comments cheat sheet](docs/guides/comments-cheat-sheet.md) | Default zero comments; the eight kinds that earn one |
 | [Testing cheat sheet](docs/guides/testing-cheat-sheet.md) | 11 rules for tests that catch regressions |
 | [Database migrations](docs/guides/db-migrations.md) | goose on MySQL 8.4: online DDL, expand and contract, safe patterns |
