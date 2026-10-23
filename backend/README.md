@@ -10,6 +10,8 @@ The Go module for `vizd` (API and worker) and `vizctl`. Run every command below 
   - Linux: Docker Engine and the `docker-compose-plugin` package. Add yourself to the `docker` group with `sudo usermod -aG docker $USER`, then log out and back in.
 - **make and git.** On Linux, install them with apt or dnf. You also need gcc, but only for `go test -race`.
 
+`scripts/setup.sh` checks all of these and prints the install command for anything missing.
+
 ## First run
 
 ```sh
@@ -59,6 +61,11 @@ Everything listens on 127.0.0.1 only.
 | `make test` | Runs `go test ./...`. Needs Docker, because some tests start MySQL with testcontainers. |
 | `make images` | Builds `vizd-api:dev` and `vizd-worker:dev` for this machine's architecture |
 | `make gen` | Regenerates Go types from `api/` and `schema/` |
+| `make lint` | Runs golangci-lint v2.15.0 with `.golangci.yml`. The first run builds the linter, which takes about a minute |
+| `make fmt` | Formats Go code with goimports, then gofmt |
+| `make vuln` | Runs govulncheck v1.9.0 |
+| `make check` | Runs lint, vuln and test, then fails if `go mod tidy` or `make gen` would change anything. Run it before pushing |
+| `scripts/setup.sh` | Checks the prerequisites and prints the install command for anything missing |
 | `go run ./cmd/vizd migrate up\|down\|status` | Runs database migrations. Needs `MYSQL_DSN` |
 
 ## Common problems

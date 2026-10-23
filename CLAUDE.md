@@ -13,14 +13,16 @@ scripts/setup.sh      # checks prerequisites, prints the install command for thi
 make dev              # MySQL + SeaweedFS, migrate, seed, vizd --role=all with hot reload
 make down             # stop; make reset also drops volumes
 make gen              # Go + TS types from api/openapi.yaml and schema/*.json
-make test
+make test             # needs Docker: testcontainers starts MySQL
 make golden-update    # rewrites expected.trace.json; read the diff before committing
+make lint             # golangci-lint v2.15.0, pinned through go run
+make fmt              # goimports, then gofmt
+make vuln             # govulncheck v1.9.0, pinned
+make check            # lint, vuln, test, go mod tidy and codegen drift; run before pushing
 go test ./internal/tracecore -run TestName
-golangci-lint run ./...
-govulncheck ./...
 ```
 
-Format with `goimports -w`, then `gofmt`. Fix lint findings in the code. A `//nolint` names the linter and gives a reason. `backend/.golangci.yml` (golangci-lint v2) enforces part of this file: `_ = f()` (S3), the slog rules, a reason on every `//nolint`, and no `time.Sleep`, `log.Print*` or `fmt.Print*`.
+Format with `make fmt`. Fix lint findings in the code. A `//nolint` names the linter and gives a reason. `backend/.golangci.yml` (golangci-lint v2) enforces part of this file: `_ = f()` (S3), the slog rules, a reason on every `//nolint`, and no `time.Sleep`, `log.Print*` or `fmt.Print*`.
 
 ## How to work
 
