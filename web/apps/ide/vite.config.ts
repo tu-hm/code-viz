@@ -13,6 +13,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    strictPort: true,
     fs: {
       allow: [
         searchForWorkspaceRoot(process.cwd()),
