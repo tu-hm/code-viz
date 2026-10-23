@@ -101,7 +101,7 @@ In `utf8mb4` every character can take 4 bytes. Widening in place works only whil
 1. The migration applies, reverts and re-applies on a MySQL 8.4 container (the up/down/up test).
 2. `make gen` ran and the regenerated sqlc code is in the same commit.
 3. Every `ALTER TABLE` on an existing table names its algorithm (rule 4).
-4. Anything that changes a lock, a retry or a limit also updates §7.13 or §11 (CLAUDE.md).
+4. Anything that changes a lock, a retry or a limit also updates §7.13 or §11 (AGENTS.md).
 
 ## Version collisions
 

@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 Code visualizer: run a user's Python or C++ program once in a sandbox, record each step as a trace, replay it in the browser. This file covers the backend: Go (`cmd/`, `internal/`), tracers (`adapters/`), contracts (`api/`, `schema/`) and SQL.
 
@@ -195,7 +195,7 @@ A commit message is one line in [Conventional Commits 1.0.0](https://www.convent
 <type>(<scope>)!: <description>
 ```
 
-- **Type**, lowercase: `feat` (behavior a user or caller sees), `fix` (bug fix), `docs` (spec, plans, guides, CLAUDE.md), `test`, `refactor` (no behavior change), `perf`, `build` (Makefile, go.mod, Dockerfiles, generated code), `ci`, `chore`, `revert`.
+- **Type**, lowercase: `feat` (behavior a user or caller sees), `fix` (bug fix), `docs` (spec, plans, guides, AGENTS.md), `test`, `refactor` (no behavior change), `perf`, `build` (Makefile, go.mod, Dockerfiles, generated code), `ci`, `chore`, `revert`.
 - **Scope**, optional: the Go package or area the change lives in, such as `tracecore`, `schema`, `mysql`, `vizd` or `plans`. Leave it out when the change spans several areas.
 - **Description**: imperative, lowercase, no trailing period, states the outcome. Keep the whole line within 72 characters. `fix(mysql): stop job writes after the lease is lost`, not `fix: added leased_by check`.
 - **Breaking change**: put `!` before the colon. Here that means a change to `api/openapi.yaml` or `schema/*.json` that existing clients or stored traces cannot read.

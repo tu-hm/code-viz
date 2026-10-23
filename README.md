@@ -55,7 +55,7 @@ The mock API, fixtures and configuration are in [web/README.md](web/README.md).
 | [Web README](web/README.md) | Running the web app, the mock API, fixtures, generated types |
 | [Design system](docs/guides/design-system.md) | Tokens, the trace palette, type, frame, components, contrast rules |
 | [Task tracking](plans/tasks/README.md) | Milestones, decision gates, handoffs between backend and frontend |
-| [CLAUDE.md](CLAUDE.md) | Backend rules: plain Go (S1 to S12), architecture, trust boundary, MySQL, errors and logs, git |
+| [AGENTS.md](AGENTS.md) | Backend rules: plain Go (S1 to S12), architecture, trust boundary, MySQL, errors and logs, git |
 | [Comments cheat sheet](docs/guides/comments-cheat-sheet.md) | Default zero comments; the eight kinds that earn one |
 | [Testing cheat sheet](docs/guides/testing-cheat-sheet.md) | 11 rules for tests that catch regressions |
 | [Database migrations](docs/guides/db-migrations.md) | goose on MySQL 8.4: online DDL, expand and contract, safe patterns |
@@ -65,4 +65,4 @@ The mock API, fixtures and configuration are in [web/README.md](web/README.md).
 
 - **Contracts first.** Change `backend/api/openapi.yaml` or `backend/schema/*.json`, run `make gen`, and commit the contract, the generated code and its callers together. CI fails when generated code drifts.
 - **Locked decisions stay locked.** Changing one of D1 to D25 needs a row in the spec change log (§0.3) with the evidence.
-- **Commits** are one line in Conventional Commits form: `fix(mysql): stop job writes after the lease is lost`. Details in [CLAUDE.md](CLAUDE.md#git-and-prs).
+- **Commits** are one line in Conventional Commits form: `fix(mysql): stop job writes after the lease is lost`. Details in [AGENTS.md](AGENTS.md#git-and-prs).
