@@ -6,7 +6,7 @@ The backend is one Go module, `backend/`. It holds two binaries and a shim, the 
 
 | Binary | Where | Job | Built so far |
 |---|---|---|---|
-| `vizd` | `cmd/vizd` | The service, with roles `api`, `worker` or `all` (D3) | Config, the sandbox choice check, the MySQL pool, `vizd migrate`, `/healthz` and `/readyz`. The API is BE-06 and the worker BE-05 |
+| `vizd` | `cmd/vizd` | The service, with roles `api`, `worker` or `all` (D3) | Config, the sandbox choice check, the MySQL pool, `vizd migrate`, `/healthz` and `/readyz`, and the job worker under `worker` and `all`. The API is BE-06 |
 | `vizctl` | `cmd/vizctl` | The developer CLI (§7.10) | `trace` runs one program end to end in the Docker dev sandbox; `validate` checks a trace file. `diff` isn't built |
 | `viz-shim` | `cmd/viz-shim` | Runs inside every runner image and carries fd 1, 2 and 3 out of the sandbox as one framed stream | Done |
 
@@ -33,13 +33,13 @@ Dependencies point one way: `transport → app → domain`. `domain` and `tracec
 |---|---|---|
 | `internal/domain` | Sentinel errors (`ErrInfra`, `ErrNoJob`, `ErrLeaseLost`), the language `Manifest` and `ChunkKey`; later the job states, limits and IDs | Started |
 | `internal/tracecore` | Wire stream in, trace out: stable IDs, keyframes and deltas, limits, chunks | Done (BE-04 §2). See [tracing](tracing.md) |
-| `internal/app` | Use cases: create, get and wait, run a trace job | Empty (BE-05, BE-06) |
+| `internal/app` | Use cases: create, get and wait, run a trace job | `Worker` runs trace jobs (BE-05); `Build`, the build step, is shared with `vizctl`. Create, get and wait are BE-06. See [the worker](#the-worker) |
 | `internal/ports` | `Sandbox` and its shared test suite `sandboxtest`, `JobQueue`, `BlobStore` and `Adapters`. Later `MetaStore`, `Events` | `Sandbox`, `JobQueue` and `Adapters` done; `BlobStore` puts only. See [sandbox](sandbox.md) |
 | `internal/adapters/nsjail` | The production sandbox (D10, G1) | Done |
 | `internal/adapters/dockersandbox` | The dev sandbox for laptops; not a security boundary | Done |
-| `internal/adapters/mysql` | The connection pool, goose migrations, sqlc query files, the transaction retry helper `InTx`, and the `JobQueue` adapter on the `jobs` table | Tables and queue done (BE-06 §2, BE-05 §1); `vizd` doesn't run the queue yet (BE-05 §2) |
+| `internal/adapters/mysql` | The connection pool, goose migrations, sqlc query files, the transaction retry helper `InTx`, and the `JobQueue` adapter on the `jobs` table | Tables and queue done (BE-06 §2, BE-05 §1); the worker runs the queue |
 | `internal/adapters/blobstore` | `BlobStore` on any S3 API (aws-sdk-go-v2); SeaweedFS in dev | Put with 3 retries; presign and copy come with BE-06 |
-| `internal/adapters/manifest` | `Adapters`: every `*/manifest.yaml` in a directory, checked once at load | Done; `vizctl` uses it, the worker and `GET /languages` will |
+| `internal/adapters/manifest` | `Adapters`: every `*/manifest.yaml` in a directory, checked once at load | Done; `vizctl` and the worker use it, `GET /languages` will |
 | `internal/shim` | The `viz-shim` frame codec, shared by both sandboxes | Done |
 | `internal/transport/http` | HTTP handlers | Health probes only (BE-06) |
 | `internal/gen/{api,trace,wire,sqlc}` | Types generated from the contracts, and query code generated from the SQL, by `make gen`. Never edited | Generated |
@@ -71,7 +71,19 @@ sequenceDiagram
   B->>O: fetch chunks
 ```
 
-Built today: the sandbox, the Python tracer and `tracecore`, which `vizctl trace` runs in that order, plus the MySQL tables and the job queue adapter, which nothing calls yet. The API (BE-06), the worker (BE-05) and object storage are the next tasks. The lifecycle is spec §7.6, the job states §7.7 and the queue §7.13.2.
+Built today: everything from "lease the job" on. The worker claims jobs from MySQL, runs them through the sandbox and `tracecore`, puts the chunks in object storage and completes the trace. The API (BE-06) is next. The lifecycle is spec §7.6, the job states §7.7 and the queue §7.13.2.
+
+## The worker
+
+`app.Worker` runs one job at a time per process (one slot, §7.9), under `vizd --role=worker` or `all`.
+
+- **Loop** (`Run`, owned by `vizd`): rescue expired leases at most every 10 s, sweep sandbox leftovers every minute and old jobs every hour, then claim. An empty queue is polled every 200 ms (±20%), every 1 s after 10 empty claims; after a job it claims again at once.
+- **Job:** `queued → building → tracing → completed`, or `failed` when the build fails. `building` is skipped when the manifest has no build. Upload and `Complete` happen last.
+- **Watcher** (one goroutine per job, owned by the job): every second it writes `progress_steps` if the step count moved, else checks the lease. A lost lease cancels the job's context, which kills the sandbox, and nothing more is written.
+- **Deadlines:** sandbox start, build and trace within 30 s of the claim (§7.7); build and trace also within the 15 s wall time (§11), the build within its manifest timeout; upload and `Complete` within the 45 s lease.
+- **Outcomes:** the program's own end, timeouts and limits included, completes the trace and is never retried. `domain.ErrInfra` (sandbox, storage, a status write, a language this worker can't run) requeues, and the queue fails the second attempt with `internal_error`. Malformed tracer output fails with `internal_error` and logs the core's redacted error.
+- **Drain:** on SIGTERM `/readyz` fails, the loop stops claiming, and the running job gets 25 s. Then its context is canceled and it is requeued with a context that outlives it. HTTP shuts down after the worker returns.
+- **Name:** `leased_by` is the hostname plus a random suffix, so a restarted process never writes under its predecessor's lease.
 
 ## Shape of the code
 

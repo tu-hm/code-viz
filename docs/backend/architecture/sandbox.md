@@ -7,7 +7,7 @@ Every job runs the user's program in a sandbox (§12). The worker talks to it th
 
 Both adapters pass the shared suite in `internal/ports/sandboxtest`.
 
-Read this before you wire the worker to the sandbox (BE-05), build a runner image or tracer (BE-03, BE-07, BE-08), or write a sandbox adapter. What a runner image needs is in [adding a language adapter](../guides/language-adapter.md#runner-image-requirements); how to run the sandbox tests is in [testing](../guides/testing.md).
+Read this before you change how the worker uses the sandbox, build a runner image or tracer (BE-03, BE-07, BE-08), or write a sandbox adapter. What a runner image needs is in [adding a language adapter](../guides/language-adapter.md#runner-image-requirements); how to run the sandbox tests is in [testing](../guides/testing.md).
 
 ## The port: one box per job
 
@@ -32,7 +32,7 @@ build, err := box.Run(buildCtx, ports.Command{Args: buildCmd, Stdout: &diag, Std
 trace, err := box.Run(traceCtx, ports.Command{Args: traceCmd, Env: traceEnv, Stdout: stdout, Stderr: stderr, Wire: wire})
 ```
 
-This is a sketch; the real flow belongs to BE-05. `Files` are written into `/work` before the first `Run`. `Memory` caps memory plus swap, so there is no swap.
+This is a sketch; the real flow is `app.Worker` (`internal/app/worker.go`). `Files` are written into `/work` before the first `Run`. `Memory` caps memory plus swap, so there is no swap. `Sweep(ctx, now)` removes boxes that started longer ago than any job runs; the worker calls it every minute, the node janitor of §7.8.
 
 ### What `Run` returns
 
@@ -89,12 +89,14 @@ A background process that calls `setsid` escapes the process-group kill and keep
 
 The production adapter. vizd runs as root in a privileged worker pod on the runner node pool, and starts nsjail once per `Run`.
 
-`nsjail.New(ctx, cgroup, boxes)` takes two directories:
+`nsjail.New(ctx, cgroup, boxes, images)` takes three directories:
 
 - `cgroup` is a cgroup v2 directory that turns on the `cpu`, `memory` and `pids` controllers for its children. `New` refuses one that doesn't. `scripts/nsjail-cgroups.sh` sets up `/sys/fs/cgroup/viz` in a privileged container and then runs its arguments: `nsjail-cgroups.sh vizd --role=worker`. It first moves every process out of the root cgroup, because cgroup v2 doesn't let a cgroup hold processes while it gives controllers to its children.
 - `boxes` holds each box's `/work`. The jail's user (UID 65534) must be able to reach it, so it and every parent directory need mode 0755. Don't put it under a `t.TempDir()`, which is 0700.
 
-`SandboxSpec.Image` is the **path of an unpacked runner image** on the node, not an image name. How a manifest's image maps to that path is decided in BE-05.
+- `images` holds the unpacked runner images. `SandboxSpec.Image` is the manifest's image name, as with Docker, and the jail's root is `<images>/<Image>`: `viz-runner-python:3.12.15-1` is unpacked at `/opt/viz/rootfs/viz-runner-python:3.12.15-1` in the worker. The manifest loader refuses an image that is an absolute path or has a `..` element, so a jail's root never leaves `images`.
+
+vizd uses `/sys/fs/cgroup/viz`, `/var/lib/viz/boxes` and `/opt/viz/rootfs`. Getting the runner images unpacked there on a node is BE-13 §3.
 
 ### What a box is
 
@@ -128,7 +130,7 @@ Unlike Docker, a box has no long-running process between runs. A box that hit th
 
 ### Janitor
 
-`New` kills every process in each child of `cgroup` (`cgroup.kill`), waits until the cgroup is empty, and removes it. Then it unmounts and deletes every directory in `boxes`. Like the Docker janitor, it assumes one worker per `cgroup` and `boxes`.
+`New` kills every process in each child of `cgroup` (`cgroup.kill`), waits until the cgroup is empty, and removes it. Then it unmounts and deletes every directory in `boxes`. It assumes one worker per `cgroup` and `boxes`. `Sweep(ctx, now)` does the same, but only for boxes whose name says they started 2 minutes or more before `now`: a box whose `Close` failed while the worker runs.
 
 ## The Docker dev sandbox
 
@@ -140,7 +142,7 @@ Unlike Docker, a box has no long-running process between runs. A box that hit th
 | `test` | refused | allowed, with a warning on every start | allowed |
 | `staging`, `prod` | refused | refused | allowed |
 
-`VIZ_ENV` is required and must be one of the four values. For now vizd only checks these settings; the worker (BE-05) will open the sandbox.
+`VIZ_ENV` is required and must be one of the four values. Under `--role=worker` or `all`, vizd opens the chosen sandbox at start.
 
 ### Container settings
 
@@ -175,7 +177,7 @@ One container per box:
 ### Architecture check and janitor
 
 - `Start` refuses an image whose architecture doesn't match the daemon's: GDB's `ptrace` fails under emulation. The error says to run `make images`.
-- `dockersandbox.New` force-removes containers labelled `viz.job` whose `viz.started` is more than 2 minutes old, or missing: boxes left over from a crash. A box lives for one job, and a job's hard deadline is 30 s (§7.7), so a younger box belongs to a process that is still running. A dev worker, `vizctl` and the test packages can therefore share one Docker daemon. When two janitors race for the same leftover, the loser's "not found" or "removal in progress" counts as removed.
+- `Sweep(ctx, now)`, which `dockersandbox.New` also calls, force-removes containers labelled `viz.job` whose `viz.started` is 2 minutes or more before `now`, or missing: boxes left over from a crash or a failed `Close`. A box lives for one job, and a job's hard deadline is 30 s (§7.7), so a younger box belongs to a process that is still running. A dev worker, `vizctl` and the test packages can therefore share one Docker daemon. When two janitors race for the same leftover, the loser's "not found" or "removal in progress" counts as removed.
 
 ## Not built yet
 
@@ -184,8 +186,7 @@ One container per box:
 | A seccomp allowlist per runner image, tuned against g++, GDB and Python | BE-02 §5, before GA |
 | Fake fd-3 messages from Python user code, rejected by the core | BE-03, BE-04 |
 | Runner image check: no setuid binaries, no network tools | BE-02 §5, with the runner images (BE-03, BE-07) |
-| Mapping a manifest's image to an unpacked rootfs path on the node | BE-05 |
+| Runner images unpacked under `/opt/viz/rootfs` on each runner node | BE-13 §3 |
 | The worker pod spec on the runner node pool (privileged, `nsjail-cgroups.sh`), tested on staging | BE-13 §3 |
-| The worker opening the sandbox and running jobs | BE-05 |
 | A sandbox self-check in `/readyz` | BE-13 §3 |
 | `vizd` in Compose with the Docker socket mounted, tested | BE-13 §1 |

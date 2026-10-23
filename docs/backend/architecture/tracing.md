@@ -2,13 +2,13 @@
 
 How a program becomes a trace: the Python tracer, the wire protocol, the trace core and `vizctl`. The spec sections are §7.11.1 (Python tracer), §9 (trace format), §10 (adapters and wire protocol), §11 (limits) and §19.9 (v1.1 additions). The sandbox the tracer runs in has [its own guide](sandbox.md).
 
-Read this before you wire the worker to the core (BE-05), add a language (BE-07, BE-08, BE-14), change the wire protocol, or move the Python tracer to `sys.monitoring` (G2). The steps for those changes are in [adding or changing a language adapter](../guides/language-adapter.md). The tests and golden fixtures are in [testing](../guides/testing.md).
+Read this before you change how the worker drives the core, add a language (BE-07, BE-08, BE-14), change the wire protocol, or move the Python tracer to `sys.monitoring` (G2). The steps for those changes are in [adding or changing a language adapter](../guides/language-adapter.md). The tests and golden fixtures are in [testing](../guides/testing.md).
 
 ## The pipeline
 
 ```mermaid
 flowchart LR
-  subgraph caller["vizctl trace (later: the worker, BE-05)"]
+  subgraph caller["vizctl trace, or the worker"]
     M["manifest.yaml"]
     R["tracecore.Recorder"]
   end
@@ -40,7 +40,7 @@ A run has two halves with a hostile channel between them. Inside the sandbox, th
 
 ## One run
 
-This is what `vizctl trace` does today (`cmd/vizctl/trace.go`). The worker (BE-05) follows the same steps, with its own deadlines and storage.
+This is what `vizctl trace` does (`cmd/vizctl/trace.go`). The worker (`internal/app/worker.go`) follows the same steps, with the job's options, its own deadlines, progress and storage; both run the build through `app.Build`.
 
 ```go
 val, err := schema.New()
@@ -238,7 +238,7 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | What | Where |
 |---|---|
 | G2: keep `settrace` or move to `sys.monitoring` | Gate on Fri 13 Nov; S2 recommends `sys.monitoring` |
-| The worker running this flow and storing chunks, header and tail | BE-05 |
+| Storing `Result.Tail` as `tail.txt.gz` and listing it in the trace manifest (the worker stores chunks and header only) | BE-11 §2 |
 | Signing the runner image | BE-03 §3, needs the registry (BE-13) |
 | A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | BE-10 |
 | `startAtLines` and `captureRanges` in the tracer (both `false` in the manifest) | BE-11 |

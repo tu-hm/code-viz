@@ -34,11 +34,11 @@ curl -i http://127.0.0.1:8080/readyz    # 200: MySQL is reachable; 503 otherwise
 
 Press Ctrl-C to stop vizd. `make down` stops the containers and keeps their data. `make reset` also deletes the data.
 
-Not built yet: the API endpoints (BE-06), the job worker (BE-05) and the C++ runner image (BE-07, BE-08). `make seed` loads no sample traces until BE-13 §1.
+`--role=all` also runs the job worker: it claims queued jobs from MySQL, traces them in the Docker dev sandbox and puts the chunks in SeaweedFS. Not built yet: the API endpoints (BE-06), so jobs only come from rows you insert, and the C++ runner image (BE-07, BE-08). `make seed` loads no sample traces until BE-13 §1.
 
 ## Trace a program locally
 
-`vizctl trace` runs a language adapter in the Docker dev sandbox, the same way the worker will, and prints the trace as JSON. Build the runner images once with `make images`.
+`vizctl trace` runs a language adapter in the Docker dev sandbox, the same way the worker does, and prints the trace as JSON. Build the runner images once with `make images`.
 
 ```sh
 go run ./cmd/vizctl trace --lang python3 fixtures/python/aliasing/main.py < fixtures/python/aliasing/stdin > trace.json
@@ -49,13 +49,13 @@ go run ./cmd/vizctl validate trace.json   # silent when the trace matches schema
 
 ## Docker dev sandbox
 
-On a laptop, jobs run in Docker containers instead of nsjail, the production sandbox, which doesn't run on macOS. `VIZ_SANDBOX=docker` picks it, and it's the default with `VIZ_ENV=dev`. vizd only checks that setting for now; the job worker (BE-05) is what will run jobs through the sandbox.
+On a laptop, jobs run in Docker containers instead of nsjail, the production sandbox, which doesn't run on macOS. `VIZ_SANDBOX=docker` picks it, and it's the default with `VIZ_ENV=dev`.
 
 **It is not a security boundary.** vizd logs a warning on every start with it, and refuses to start with it unless `VIZ_ENV` is `dev` or `test`, so it never runs in staging or production. Each job still gets its own container with no network, a read-only root, a 64 MB `/work`, 32 PIDs, a memory cap, no capabilities and a non-root user.
 
 - **It needs Docker.** The sandbox talks to the daemon at `DOCKER_HOST`, or `/var/run/docker.sock` if that's unset. That works with vizd on the host and with vizd in Compose with the socket mounted. If your Docker uses a context instead (OrbStack, Colima), export `DOCKER_HOST` as shown under Common problems.
 - **It refuses emulated images.** A runner image must match your machine's architecture, because GDB's `ptrace` fails under emulation. Run `make images` once to build them for your machine. Only the Python runner image exists so far; the C++ one comes with BE-07 and BE-08.
-- **Leftovers are cleaned up.** Sandbox containers carry `viz.job` and `viz.started` labels. When a sandbox starts, it removes boxes started more than 2 minutes ago, longer than any job runs. A dev worker, `vizctl` and the tests can share one Docker daemon.
+- **Leftovers are cleaned up.** Sandbox containers carry `viz.job` and `viz.started` labels. When a sandbox starts, and every minute while the worker runs, it removes boxes started 2 minutes ago or more, longer than any job runs. A dev worker, `vizctl` and the tests can share one Docker daemon.
 
 `make test` runs the sandbox tests against your Docker, with a small busybox test image it builds itself. It also builds the runner images first, because the golden fixture test runs every `fixtures/<language>/<case>/` through `vizctl trace`.
 
