@@ -99,7 +99,8 @@ func Read(path string) (domain.Manifest, error) {
 		{"id", f.ID != ""},
 		{"displayName", f.DisplayName != ""},
 		{"editorMode", f.EditorMode != ""},
-		{"image", f.Image != ""},
+		// nsjail root is <images>/<image>; escaping it shows user code host files
+		{"image", f.Image != "" && !filepath.IsAbs(f.Image) && !slices.Contains(strings.Split(f.Image, "/"), "..")},
 		{"sourceFile", f.SourceFile != "" && !strings.Contains(f.SourceFile, "/")},
 		{"build.cmd", f.Build == nil || len(f.Build.Cmd) > 0},
 		{"build.timeoutMs", f.Build == nil || f.Build.TimeoutMs > 0},

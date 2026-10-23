@@ -41,7 +41,7 @@ rollout: { percent: 100 }
 const node = `id: node22
 displayName: "Node.js 22"
 editorMode: javascript
-image: viz-runner-node:22-1
+image: registry.internal/viz-runner-node:22-1
 sourceFile: main.js
 trace:
   cmd: ["node", "/opt/viz/tracer.js", "main.js"]
@@ -59,7 +59,7 @@ func TestLoadReadsEveryManifest(t *testing.T) {
 			ID:          "node22",
 			DisplayName: "Node.js 22",
 			EditorMode:  "javascript",
-			Image:       "viz-runner-node:22-1",
+			Image:       "registry.internal/viz-runner-node:22-1",
 			SourceFile:  "main.js",
 			TraceCmd:    []string{"node", "/opt/viz/tracer.js", "main.js"},
 		},
@@ -102,6 +102,8 @@ func TestLoadRejectsInvalidManifests(t *testing.T) {
 		{"source file in a subdirectory", map[string]string{"python": strings.Replace(python, "sourceFile: main.py", "sourceFile: src/main.py", 1)}, ": sourceFile is missing or invalid"},
 		{"build without cmd", map[string]string{"python": strings.Replace(python, `cmd: ["python3", "-I"`, `args: ["python3", "-I"`, 1)}, ": build.cmd is missing or invalid"},
 		{"build without timeout", map[string]string{"python": strings.Replace(python, "timeoutMs: 10000", "timeoutMs: 0", 1)}, ": build.timeoutMs is missing or invalid"},
+		{"image that climbs out of the images directory", map[string]string{"python": strings.Replace(python, "image: viz-runner-python", "image: ../viz-runner-python", 1)}, ": image is missing or invalid"},
+		{"image given as an absolute path", map[string]string{"python": strings.Replace(python, "image: viz-runner-python", "image: /viz-runner-python", 1)}, ": image is missing or invalid"},
 		{"two manifests with one id", map[string]string{"python": python, "python-copy": python}, `has id "python3"`},
 		{"no manifests", map[string]string{}, "no */manifest.yaml"},
 	}
