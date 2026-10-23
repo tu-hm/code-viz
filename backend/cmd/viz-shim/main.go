@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"github.com/tu-hm/code-viz/backend/internal/shim"
@@ -34,6 +35,8 @@ func main() {
 }
 
 func run(args []string) error {
+	// threads count toward the box's 32 pids and a fork bomb can take the rest; one P keeps the shim to the threads it starts with
+	runtime.GOMAXPROCS(1)
 	streams := []byte{shim.Stdout, shim.Stderr, shim.Wire}
 	readers := make([]*os.File, len(streams))
 	writers := make([]*os.File, len(streams))
@@ -50,8 +53,16 @@ func run(args []string) error {
 	cmd.Stderr = writers[1]
 	cmd.ExtraFiles = writers[2:]
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	// the program inherits 1000, so the oom killer takes it before the shim and the exit frame survives
+	if err := setOOMScore("1000"); err != nil {
+		return err
+	}
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("start %s: %w", args[0], err)
+	}
+	// lowering back to 0 needs no capability: 0 is the floor the shim started with
+	if err := setOOMScore("0"); err != nil {
+		return err
 	}
 	for _, w := range writers {
 		if err := w.Close(); err != nil {
@@ -86,6 +97,13 @@ func run(args []string) error {
 		return out.WriteExit(0, int(ws.Signal()))
 	}
 	return out.WriteExit(ws.ExitStatus(), 0)
+}
+
+func setOOMScore(adj string) error {
+	if err := os.WriteFile("/proc/self/oom_score_adj", []byte(adj), 0); err != nil {
+		return fmt.Errorf("set oom score: %w", err)
+	}
+	return nil
 }
 
 func pump(out *shim.Writer, stream byte, r *os.File) error {
