@@ -19,7 +19,6 @@
 - [ ] API: what does `POST /visualizations/{id}/share` return before the visualization is completed?
 - [ ] API: auth scheme (`securitySchemes`) for signed-in callers.
 - [ ] API: should a failed response carry the trace ID (§5.6)?
-- [ ] C++: on its own declaration line a local still shows garbage under the §7.11.2 rule `symbol.line > current line`. Hide it there (`>=` on first entry), or show `uninit` (BE-08 §3)?
 - [ ] Lead items (option A vs B before 16 Nov, MySQL hosting, deploy path): see [README.md](README.md#lead--design-tasks-not-in-the-befe-lists).
 
 ## Backend

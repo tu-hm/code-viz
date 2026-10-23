@@ -28,7 +28,7 @@ Findings, on GDB 17.1 and GCC 15.2 (x86_64):
 - `skip -gfi <glob>` matches `main.cpp` for any glob in GDB 17, so the tracer skips by function name (`^(std|__gnu_cxx)::`) and `finish`es out of any other non-user frame.
 - `step` does not stop in the caller after a return, so in `fib(n-1) + fib(n-2)` the second call reuses the first one's stack slot with no stop in between. A breakpoint on every `main.cpp` function (`rbreak`) marks each entry, which gives each call its own frame id.
 - GDB's stop banners go to fd 1. The tracer sets `suppress-cli-notifications` and points GDB's own fd 1 and 2 at `/dev/null` once the program runs. The program can't write to fd 3.
-- With the §7.11.2 rule `symbol.line > current line`, a local still shows garbage on its own declaration line (`int sum = 0;` before it runs). §3 has to decide between `>=` on first entry and `uninit`.
+- A local shows `uninit` on its own declaration line until that line has run in the current entry of its block (§7.11.2, v1.4). Without this, `int sum = 0;` showed garbage before it ran.
 
 ## 2. Tracer core (M2-B03 · 4 d)
 
@@ -45,7 +45,7 @@ Findings, on GDB 17.1 and GCC 15.2 (x86_64):
 ## 3. Variables & pointers (M2-B04 · 4 d)
 
 - [ ] Locals from `frame.block()` in declaration order
-- [ ] Hide a variable while `symbol.line > current line` (no garbage values)
+- [ ] Hide a variable while `symbol.line > current line`; `uninit` on its declaration line until it runs (no garbage values)
 - [ ] Flag `internal`: names starting with `__`, compiler-generated (`__for_range`, etc.)
 - [ ] Globals from the static block of `main.cpp` → separate **globals** frame
 - [ ] Inline values: integers, floats, `bool`, `enum` (enumerator name), `char` (+ `code`)

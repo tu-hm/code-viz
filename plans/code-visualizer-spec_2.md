@@ -93,6 +93,7 @@
 | v1.1 | 2026-10-23 | Student-friendly visualization for CP students (§19): English-only UI, decisions D20–D25, FR-27–FR-41, trace format v1.1, milestone M5 |
 | v1.2 | 2026-10-23 | **Database switched to MySQL 8.4 LTS** because PostgreSQL isn't available: own job queue with `SKIP LOCKED`, change poller instead of `LISTEN/NOTIFY`, MySQL single-flight SQL (§7.13). D4, D5, D6 and D15 changed. |
 | v1.3 | 2026-10-23 | **Frontend trimmed to the IDE.** The web app is there to show the backend's traces, not to be a production UI: no i18n files (strings written inline), no Playwright end-to-end or visual-snapshot tests. D20 changed; §13, §15 and §18 updated. |
+| v1.4 | 2026-10-23 | C++ locals are `uninit` on their declaration line until it runs (§7.11.2), instead of showing garbage. |
 
 ---
 
@@ -832,7 +833,7 @@ Database load stays small. Each job costs about 4 row writes, 3 queue writes (in
 - **Tracer:** GDB in batch mode, driven by `/opt/viz/trace.py` through GDB's Python API, with the libstdc++ pretty printers loaded.
   - The program stops at `main`. The tracer then repeats `step`. Code outside the user's file is skipped (`skip -gfi /usr/*`), and if a stop lands in non-user code the tracer runs `finish`. Each stop inside `main.cpp` is one step.
   - Frames are read from `gdb.newest_frame()` and walked outward. The list is reversed so the outermost frame comes first.
-  - Variables come from `frame.block()`. A variable is hidden while `symbol.line > current line`, which fixes the garbage values. Names that start with `__`, or are otherwise compiler-generated, are flagged `internal`.
+  - Variables come from `frame.block()`. A variable is hidden while `symbol.line > current line`. On its own declaration line it is `uninit` until that line has run in the current entry of its block, so a loop-body local is `uninit` again on each iteration and a `for` counter only on the first. This fixes the garbage values. Names that start with `__`, or are otherwise compiler-generated, are flagged `internal`.
   - Globals come from the static block of the user's compilation unit and go into a separate frame.
   - Pointers: if the target is a user `struct`/`class` or lies inside an array we already recorded, it is followed and recorded as an object keyed by `(address, type)`. Following stops after `maxPointerDepth` hops or at the per-step object budget.
   - Return values come from `finish` (`gdb.FinishBreakpoint.return_value`) when a user function returns.
