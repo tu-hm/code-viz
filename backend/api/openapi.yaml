@@ -1,0 +1,647 @@
+openapi: 3.1.1
+info:
+  title: Code Visualizer API
+  version: 1.0.0
+servers:
+  - url: /api/v1
+paths:
+  /languages:
+    get:
+      operationId: listLanguages
+      summary: Languages and their visualize capabilities
+      responses:
+        '200':
+          description: The languages. Cacheable for 5 minutes.
+          headers:
+            Cache-Control:
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Languages'
+              examples:
+                languages:
+                  value: {
+                    "languages": [
+                      {
+                        "id": "python3",
+                        "displayName": "Python 3.12",
+                        "editorMode": "python",
+                        "visualize": {
+                          "enabled": true,
+                          "capabilities": {
+                            "returnValues": true,
+                            "pointers": false,
+                            "exceptions": true,
+                            "startAtLines": true,
+                            "captureRanges": true
+                          },
+                          "limits": { "maxSteps": 1000, "maxStepsCeiling": 5000 }
+                        }
+                      },
+                      {
+                        "id": "cpp17-gcc",
+                        "displayName": "C++17 (GCC 13)",
+                        "editorMode": "c_cpp",
+                        "visualize": {
+                          "enabled": true,
+                          "capabilities": {
+                            "returnValues": true,
+                            "pointers": true,
+                            "exceptions": true,
+                            "startAtLines": true,
+                            "captureRanges": true
+                          },
+                          "limits": { "maxSteps": 1000, "maxStepsCeiling": 5000 }
+                        }
+                      }
+                    ]
+                  }
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /visualizations:
+    post:
+      operationId: createVisualization
+      summary: Create a visualization, or attach to an identical trace
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          description: A repeat of this key within 24 h returns the original response.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVisualizationRequest'
+            examples:
+              cpp:
+                value: {
+                  "language": "cpp17-gcc",
+                  "source": "#include <bits/stdc++.h>\nusing namespace std;\nint main() { int a = 1; cout << a << endl; }\n",
+                  "stdin": "",
+                  "options": {
+                    "maxSteps": 1000,
+                    "startAtLines": [],
+                    "captureRanges": { "depth": [[0, 50]] },
+                    "showInternals": false
+                  },
+                  "context": { "problemCode": null, "client": "ide-web/4.12.0" }
+                }
+      responses:
+        '201':
+          description: >-
+            Created, or attached to an identical trace. The body is the same as GET;
+            when the identical trace is already completed, so is the status.
+          headers:
+            Location:
+              required: true
+              schema:
+                type: string
+                format: uri-reference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visualization'
+              examples:
+                tracing:
+                  $ref: '#/components/examples/Tracing'
+                completed:
+                  $ref: '#/components/examples/Completed'
+                failedBuild:
+                  $ref: '#/components/examples/FailedBuild'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/UnsupportedLanguage'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Capacity'
+  /visualizations/{id}:
+    parameters:
+      - $ref: '#/components/parameters/VisualizationID'
+    get:
+      operationId: getVisualization
+      summary: Status, with long-polling; the trace manifest once completed
+      parameters:
+        - name: wait
+          in: query
+          description: >-
+            Seconds to hold the request while the status is not final and version is
+            at most since. Without it the response is immediate.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 20
+        - name: since
+          in: query
+          description: The last version the client has seen.
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: The current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visualization'
+              examples:
+                tracing:
+                  $ref: '#/components/examples/Tracing'
+                completed:
+                  $ref: '#/components/examples/Completed'
+                failedBuild:
+                  $ref: '#/components/examples/FailedBuild'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          $ref: '#/components/responses/Expired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Capacity'
+    delete:
+      operationId: deleteVisualization
+      summary: Cancel or detach
+      description: The trace job is canceled only if no other visualization still waits on it.
+      responses:
+        '204':
+          description: Detached.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Capacity'
+  /visualizations/{id}/share:
+    parameters:
+      - $ref: '#/components/parameters/VisualizationID'
+    post:
+      operationId: shareVisualization
+      summary: Create a permalink and extend retention
+      description: Calling it again returns the same link.
+      responses:
+        '200':
+          description: The permalink.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareLink'
+              examples:
+                shared:
+                  value: {"url": "https://ide.example.com/viz/viz_5f2c9d3a7b1e4c08", "expiresAt": "2027-01-21T08:12:03Z"}
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          $ref: '#/components/responses/Expired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Capacity'
+components:
+  parameters:
+    VisualizationID:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/VisualizationID'
+  headers:
+    RetryAfter:
+      description: Seconds to wait before trying again.
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+  responses:
+    InvalidRequest:
+      description: Malformed request or invalid options.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    PayloadTooLarge:
+      description: Source or stdin too large.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UnsupportedLanguage:
+      description: Language unknown, or visualize disabled for it.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    RateLimited:
+      description: Per-IP limit at the ingress, or daily quota used up.
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            rateLimited:
+              value: {
+                "error": {
+                  "code": "rate_limited",
+                  "message": "Too many visualizations. Try again in 20 seconds.",
+                  "retryAfterSec": 20,
+                  "requestId": "req_01HF8Z3K9Q"
+                }
+              }
+    Capacity:
+      description: Queue above its cap, or the database unavailable.
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: No such visualization.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Expired:
+      description: The trace is past its retention.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: The server failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  examples:
+    Tracing:
+      value: {
+        "id": "viz_5f2c9d3a7b1e4c08",
+        "status": "tracing",
+        "version": 3,
+        "language": "cpp17-gcc",
+        "createdAt": "2026-10-23T08:12:03Z",
+        "progress": { "steps": 412 }
+      }
+    Completed:
+      value: {
+        "id": "viz_5f2c9d3a7b1e4c08",
+        "status": "completed",
+        "version": 5,
+        "language": "cpp17-gcc",
+        "createdAt": "2026-10-23T08:12:03Z",
+        "expiresAt": "2026-10-30T08:12:03Z",
+        "build": { "ok": true, "durationMs": 640, "diagnostics": [] },
+        "trace": {
+          "header": {
+            "version": "1.0",
+            "id": "trc_8c1f4e2a9b7d6c35",
+            "language": { "id": "cpp17-gcc", "runtime": "GCC 13.2", "adapter": "cpp-gdb/1.0.0" },
+            "source": { "file": "main.cpp", "lineCount": 3 },
+            "options": { "maxSteps": 1000, "startAtLines": [] },
+            "summary": {
+              "stepCount": 16,
+              "truncated": false,
+              "truncation": null,
+              "exit": { "kind": "normal", "code": 0, "signal": null, "message": null }
+            },
+            "encoding": { "mode": "delta", "keyframeInterval": 50 }
+          },
+          "chunks": [
+            {
+              "index": 0,
+              "fromStep": 0,
+              "toStep": 15,
+              "sizeBytes": 18234,
+              "sha256": "9f2b6c41d0e3a87c55b1e0f4a2d9c3b7e6f1a0d4c8b2e5f7a9c1d3e5f7a9b1c3",
+              "url": "https://traces.example.com/t7/trc_8c1f4e2a9b7d6c35/chunk-0000.json.gz?sig=REDACTED"
+            }
+          ],
+          "urlsExpireAt": "2026-10-23T08:27:05Z"
+        }
+      }
+    FailedBuild:
+      value: {
+        "id": "viz_9a01be77c2d34f51",
+        "status": "failed",
+        "version": 3,
+        "language": "cpp17-gcc",
+        "createdAt": "2026-10-23T08:15:20Z",
+        "failure": { "stage": "build", "kind": "compile_error" },
+        "build": {
+          "ok": false,
+          "durationMs": 920,
+          "diagnostics": [
+            { "line": 6, "column": 14, "severity": "error", "message": "expected ';' before 'return'" }
+          ],
+          "raw": "main.cpp:6:14: error: expected ';' before 'return'"
+        }
+      }
+  schemas:
+    Languages:
+      type: object
+      required: [languages]
+      properties:
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Language'
+    Language:
+      type: object
+      required: [id, displayName, editorMode, visualize]
+      properties:
+        id:
+          type: string
+          minLength: 1
+        displayName:
+          type: string
+        editorMode:
+          type: string
+        visualize:
+          $ref: '#/components/schemas/VisualizeSupport'
+    VisualizeSupport:
+      type: object
+      required: [enabled, capabilities, limits]
+      properties:
+        enabled:
+          type: boolean
+        capabilities:
+          $ref: '#/components/schemas/Capabilities'
+        limits:
+          $ref: '#/components/schemas/StepLimits'
+    Capabilities:
+      type: object
+      required: [returnValues, pointers, exceptions, startAtLines, captureRanges]
+      properties:
+        returnValues:
+          type: boolean
+        pointers:
+          type: boolean
+        exceptions:
+          type: boolean
+        startAtLines:
+          type: boolean
+        captureRanges:
+          type: boolean
+    StepLimits:
+      type: object
+      required: [maxSteps, maxStepsCeiling]
+      properties:
+        maxSteps:
+          description: Default for options.maxSteps.
+          type: integer
+          minimum: 1
+        maxStepsCeiling:
+          description: Highest options.maxSteps accepted.
+          type: integer
+          minimum: 1
+    CreateVisualizationRequest:
+      type: object
+      required: [language, source, stdin, options, context]
+      properties:
+        language:
+          description: A language id from GET /languages.
+          type: string
+          minLength: 1
+        source:
+          type: string
+        stdin:
+          type: string
+        options:
+          $ref: '../schema/trace.v1.schema.json#/$defs/options'
+          x-go-type: trace.Options
+          x-go-type-import:
+            path: github.com/tu-hm/code-viz/backend/internal/gen/trace
+        context:
+          $ref: '#/components/schemas/ClientContext'
+    ClientContext:
+      description: Where the request came from.
+      type: object
+      required: [problemCode, client]
+      properties:
+        problemCode:
+          description: The problem page the visualizer was opened from.
+          type: [string, 'null']
+        client:
+          description: Client name and version.
+          type: string
+    VisualizationID:
+      type: string
+      pattern: '^viz_[0-9a-f]+$'
+    Visualization:
+      description: >-
+        One visualization. Which optional fields are set depends on status. A runtime
+        error in the user's program does not fail it; the error is in the trace.
+      type: object
+      required: [id, status, version, language, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/VisualizationID'
+        status:
+          type: string
+          enum: [queued, building, tracing, completed, failed, canceled]
+        version:
+          description: Goes up on every status or progress change.
+          type: integer
+          minimum: 0
+        language:
+          type: string
+          minLength: 1
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        progress:
+          $ref: '#/components/schemas/Progress'
+        build:
+          $ref: '#/components/schemas/Build'
+        failure:
+          $ref: '#/components/schemas/Failure'
+        trace:
+          $ref: '#/components/schemas/TraceManifest'
+      allOf:
+        - if:
+            properties:
+              status:
+                const: tracing
+          then:
+            required: [progress]
+        - if:
+            properties:
+              status:
+                const: completed
+          then:
+            required: [expiresAt, trace]
+        - if:
+            properties:
+              status:
+                const: failed
+          then:
+            required: [failure]
+    Progress:
+      type: object
+      required: [steps]
+      properties:
+        steps:
+          description: Steps recorded so far.
+          type: integer
+          minimum: 0
+    Build:
+      type: object
+      required: [ok, durationMs, diagnostics]
+      properties:
+        ok:
+          type: boolean
+        durationMs:
+          type: integer
+          minimum: 0
+        diagnostics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Diagnostic'
+        raw:
+          description: Compiler output as printed.
+          type: string
+    Diagnostic:
+      type: object
+      required: [line, column, severity, message]
+      properties:
+        line:
+          type: integer
+          minimum: 1
+        column:
+          type: integer
+          minimum: 1
+        severity:
+          type: string
+          enum: [error, warning]
+        message:
+          type: string
+    Failure:
+      type: object
+      required: [stage, kind]
+      properties:
+        stage:
+          type: string
+          enum: [build, trace]
+        kind:
+          type: string
+          enum: [compile_error, unsupported_module, sandbox_error, internal_error]
+    TraceManifest:
+      description: Fetching the chunks in order and concatenating their steps gives the full trace.
+      type: object
+      required: [header, chunks, urlsExpireAt]
+      properties:
+        header:
+          $ref: '#/components/schemas/TraceHeader'
+        chunks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Chunk'
+        urlsExpireAt:
+          description: Chunk URLs stop working at this time; GET the visualization again for fresh ones.
+          type: string
+          format: date-time
+    TraceHeader:
+      description: The trace document (trace.v1.schema.json) without steps.
+      type: object
+      required: [version, id, language, source, options, summary, encoding]
+      properties:
+        version:
+          $ref: '../schema/trace.v1.schema.json#/properties/version'
+        id:
+          $ref: '../schema/trace.v1.schema.json#/properties/id'
+        language:
+          $ref: '../schema/trace.v1.schema.json#/$defs/language'
+        source:
+          $ref: '../schema/trace.v1.schema.json#/$defs/source'
+        options:
+          $ref: '../schema/trace.v1.schema.json#/$defs/options'
+        summary:
+          $ref: '../schema/trace.v1.schema.json#/$defs/summary'
+        encoding:
+          $ref: '../schema/trace.v1.schema.json#/$defs/encoding'
+      x-go-type: json.RawMessage
+    Chunk:
+      description: A gzip JSON array of steps that starts with a keyframe, served from object storage.
+      type: object
+      required: [index, fromStep, toStep, sizeBytes, sha256, url]
+      properties:
+        index:
+          type: integer
+          minimum: 0
+        fromStep:
+          type: integer
+          minimum: 0
+        toStep:
+          type: integer
+          minimum: 0
+        sizeBytes:
+          type: integer
+          minimum: 0
+        sha256:
+          description: Checked by the client before it uses the chunk.
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        url:
+          description: Signed; expires at urlsExpireAt.
+          type: string
+          format: uri
+    ShareLink:
+      type: object
+      required: [url, expiresAt]
+      properties:
+        url:
+          type: string
+          format: uri
+        expiresAt:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          $ref: '#/components/schemas/Error'
+    Error:
+      type: object
+      required: [code, message, requestId]
+      properties:
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - payload_too_large
+            - unsupported_language
+            - rate_limited
+            - capacity
+            - not_found
+            - expired
+            - internal_error
+        message:
+          type: string
+        retryAfterSec:
+          description: Set with rate_limited and capacity.
+          type: integer
+          minimum: 0
+        requestId:
+          type: string

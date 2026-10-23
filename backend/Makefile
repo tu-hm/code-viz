@@ -12,6 +12,7 @@ gen:
 		--schema-output $(SCHEMA_ID)/wire.v1.schema.json=internal/gen/wire/wire.go \
 		--schema-root-type $(SCHEMA_ID)/wire.v1.schema.json=Message \
 		schema/trace.v1.schema.json schema/wire.v1.schema.json
+	go tool oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
 
 test:
 	go test ./...
