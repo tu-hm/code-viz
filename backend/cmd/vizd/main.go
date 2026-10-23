@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -13,12 +14,16 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v11"
+
+	"github.com/tu-hm/code-viz/backend/internal/adapters/mysql"
+	httptransport "github.com/tu-hm/code-viz/backend/internal/transport/http"
 )
 
 const drainTimeout = 25 * time.Second // §13
 
 type config struct {
 	HTTPAddr string `env:"VIZ_HTTP_ADDR" envDefault:":8080"`
+	MySQLDSN string `env:"MYSQL_DSN,required"`
 }
 
 func main() {
@@ -30,7 +35,7 @@ func main() {
 	}
 }
 
-func run() error {
+func run() (err error) {
 	role := flag.String("role", "", "api, worker or all")
 	flag.Parse()
 
@@ -38,45 +43,58 @@ func run() error {
 	if err := env.Parse(&cfg); err != nil {
 		return fmt.Errorf("load config: %w", err)
 	}
+	db, err := mysql.Open(cfg.MySQLDSN)
+	if err != nil {
+		return fmt.Errorf("open mysql: %w", err)
+	}
+	defer func() {
+		if cerr := db.Close(); cerr != nil {
+			err = errors.Join(err, fmt.Errorf("close mysql: %w", cerr))
+		}
+	}()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	switch *role {
-	case "api", "all":
-		return serveAPI(ctx, cfg.HTTPAddr)
-	case "worker":
-		// TODO(tu-hm): claim and run jobs here and under "all" once BE-05 lands
-		<-ctx.Done()
-		return nil
+	if flag.Arg(0) == "migrate" {
+		return mysql.Migrate(ctx, db, flag.Arg(1))
 	}
-	return fmt.Errorf("--role must be api, worker or all, got %q", *role)
+
+	if *role != "api" && *role != "worker" && *role != "all" {
+		return fmt.Errorf("--role must be api, worker or all, got %q", *role)
+	}
+	mux := http.NewServeMux()
+	// TODO(tu-hm): add the sandbox self-check to readyz for worker and all once BE-02 lands
+	httptransport.HandleProbes(mux, ctx.Done(), db.PingContext)
+	// TODO(tu-hm): claim and run jobs under worker and all once BE-05 lands; drain them before http shutdown
+	return serve(ctx, cfg.HTTPAddr, mux)
 }
 
-func serveAPI(ctx context.Context, addr string) error {
-	ln, err := net.Listen("tcp", addr)
+func serve(ctx context.Context, addr string, h http.Handler) error {
+	var lc net.ListenConfig
+	ln, err := lc.Listen(ctx, "tcp", addr)
 	if err != nil {
 		return fmt.Errorf("listen %s: %w", addr, err)
 	}
 
 	srv := &http.Server{
-		Handler:           http.NewServeMux(),
+		Handler:           h,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	errc := make(chan error, 1)
 	go func() { errc <- srv.Serve(ln) }()
-	slog.InfoContext(ctx, "api listening", "addr", ln.Addr().String())
+	slog.InfoContext(ctx, "http listening", "addr", ln.Addr().String())
 
 	select {
 	case err := <-errc:
-		return fmt.Errorf("serve api: %w", err)
+		return fmt.Errorf("serve http: %w", err)
 	case <-ctx.Done():
 	}
 
 	shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), drainTimeout)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
-		return fmt.Errorf("shut down api: %w", err)
+		return fmt.Errorf("shut down http: %w", err)
 	}
 	return nil
 }
