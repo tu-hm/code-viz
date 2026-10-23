@@ -6,9 +6,10 @@
 
 ## Now
 
-- **In progress:** BE-01 (40/46). CI runs `make check` on every push and PR to `main`, and the first run is green. Every item left waits on another task or on a decision; see [BE-01 open items](#be-01-open-items).
+- **In progress:** BE-01 (41/46). CI runs `make check` on every push and PR to `main`, and the first run is green. Every item left waits on another task or on a decision; see [BE-01 open items](#be-01-open-items).
 - **In progress:** FE-01 (26/37). The web workspace, design system, codegen, fixtures and mock API are in `web/`. Storybook (§4) is planned for week 6. The frontend is trimmed to the IDE: no i18n, no Playwright end-to-end tests (spec v1.3).
-- **Next, by the suggested order:** BE-08 §1 (GDB prototype, feeds G1 and the S1 traces due Fri 6 Nov), then BE-02 §1. On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
+- **In progress:** BE-08 §1 (3/4). The GDB prototype traces the loop, recursion and STL programs, and its output validates against the wire schema. The handoff to BE-02 needs a box with GCC and GDB.
+- **Next, by the suggested order:** BE-02 §1 (gVisor vs nsjail, decides G1 on Fri 6 Nov). On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
 ## Decisions waiting on you
@@ -18,27 +19,29 @@
 - [ ] API: what does `POST /visualizations/{id}/share` return before the visualization is completed?
 - [ ] API: auth scheme (`securitySchemes`) for signed-in callers.
 - [ ] API: should a failed response carry the trace ID (§5.6)?
+- [ ] Contract: the generated Go types drop an empty `entries`, `items` or `fields` (`omitempty`), which the schema requires. Fix the codegen before the core (BE-04) re-encodes heap objects?
+- [ ] C++: on its own declaration line a local still shows garbage under the §7.11.2 rule `symbol.line > current line`. Hide it there (`>=` on first entry), or show `uninit` (BE-08 §3)?
 - [ ] Lead items (option A vs B before 16 Nov, MySQL hosting, deploy path): see [README.md](README.md#lead--design-tasks-not-in-the-befe-lists).
 
 ## Backend
 
 | Task | Milestone | Status | Done | Next step, or what it waits on |
 |---|---|---|---|---|
-| [BE-01](backend/BE-01-foundation-contracts.md) Foundation & contracts | M0–M1 | 🟡 | 40/46 | CI runs `make check`. Open items: see [BE-01 open items](#be-01-open-items) |
-| [BE-02](backend/BE-02-sandbox.md) Sandbox ⚠ | M0–M1, M3 | 🟡 | 19/54 | §2 Docker dev adapter done and passes `sandboxtest`. §1 spike S1b needs the BE-08 §1 prototype; result decides G1 (Fri 6 Nov) |
+| [BE-01](backend/BE-01-foundation-contracts.md) Foundation & contracts | M0–M1 | 🟡 | 41/46 | CI runs `make check`. Open items: see [BE-01 open items](#be-01-open-items) |
+| [BE-02](backend/BE-02-sandbox.md) Sandbox ⚠ | M0–M1, M3 | 🟡 | 19/54 | §2 Docker dev adapter done and passes `sandboxtest`. §1 spike S1b can start once the prototype runs in a box with GCC and GDB, and `runsc` and `nsjail` are installed; result decides G1 (Fri 6 Nov) |
 | [BE-03](backend/BE-03-python-tracer.md) Python tracer | M0–M1 | ⏳ | 0/35 | §1 spike S2 comes after BE-02 §1 in the M0 order; decides G2 (Fri 13 Nov). §2+ need BE-02 §2, BE-04 |
 | [BE-04](backend/BE-04-trace-processing.md) Trace processing | M0–M2 | 🟢 | 0/31 | §1 spike S4 (input to G3, Fri 13 Nov); needs only BE-01 |
 | [BE-05](backend/BE-05-job-queue-worker.md) Job queue & worker | M1 | ⏳ | 0/30 | BE-02, BE-04, BE-06 §2 |
 | [BE-06](backend/BE-06-visualization-api.md) Visualization API | M0–M1 | 🟢 | 0/50 | §1 spike S5 (stretch) can start; §2+ need BE-13 §1 |
 | [BE-07](backend/BE-07-cpp-build.md) C++ build | M2 | ⏳ | 0/20 | BE-02, BE-05 |
-| [BE-08](backend/BE-08-cpp-tracer.md) C++ tracer ⚠ | M0, M2 | 🟢 | 0/33 | §1 GDB prototype is next; §2+ need BE-07 |
+| [BE-08](backend/BE-08-cpp-tracer.md) C++ tracer ⚠ | M0, M2 | 🟡 | 3/33 | §1 prototype in `adapters/cpp/trace.py`; handoff to BE-02 needs a GCC + GDB image. §2+ need BE-07 |
 | [BE-09](backend/BE-09-cpp-stl-big-arrays.md) C++ STL & big arrays | M2 | ⏳ | 0/24 | BE-08 |
 | [BE-10](backend/BE-10-friendly-errors.md) Friendly errors | M3 | ⏳ | 0/14 | BE-03, BE-07, BE-08 |
 | [BE-11](backend/BE-11-whole-run-trace-options.md) Whole-run data & options | M3 (M5) | ⏳ | 0/22 | BE-03, BE-07–09 |
 | [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/10 | BE-06 |
 | [BE-13](backend/BE-13-environments-launch.md) Environments & launch | M1–M5 | 🟢 | 0/48 | §1 can start. BE-01 §6 already covers part of it (Compose with MySQL + SeaweedFS, `migrate up` on start); not ticked yet |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | ⏳ | 0/10 | BE-07–09 |
-| **Total** | | | **59/427** | |
+| **Total** | | | **63/427** | |
 
 ### BE-01 open items
 
@@ -47,7 +50,6 @@
 | §2 required checks on `main` | Your decision (above) |
 | §2 Done: a PR shows every check | The first PR |
 | §6 sandbox tests on Linux runners | BE-02 §3 (testcontainers and Docker sandbox tests already run in CI) |
-| §4 Done: validates S1 prototype output | BE-08 §1 |
 | §6 multi-arch runner images | BE-03, BE-08 (`vizd` already builds for both) |
 | §6 Done: clone to completed local job | BE-02, BE-05, BE-06, BE-13 §1 |
 
@@ -86,7 +88,7 @@
 | Delivers | Due | Status |
 |---|---|---|
 | Trace schema | Wed 28 Oct | ✅ 23 Oct (`fb41bd7`) |
-| Real C++ traces (S1) | Fri 6 Nov | Not started (BE-08 §1) |
+| Real C++ traces (S1) | Fri 6 Nov | 🟡 Wire output from the prototype in `schema/testdata/wire/`; the trace format needs the core (BE-04) |
 | Format frozen | Fri 13 Nov | G3 |
 | OpenAPI | Tue 17 Nov | ✅ 23 Oct (`3ebd66b`) |
 | Local stack | Wed 18 Nov | 🟡 MySQL, SeaweedFS and migrations run; buckets, seed data and sandbox missing |

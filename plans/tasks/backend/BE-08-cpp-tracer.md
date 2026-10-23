@@ -15,10 +15,20 @@ Step through C++ with GDB's Python API (`adapters/cpp/trace.py`). The step loop 
 
 ## 1. Spike S1a — GDB prototype (M0-09 · 2 d)
 
-- [ ] GDB Python script that writes wire NDJSON on fd 3
-- [ ] Programs: a loop, a recursion, an STL example
-- [ ] Output validates against `wire.v1.schema.json`
+- [x] GDB Python script that writes wire NDJSON on fd 3
+- [x] Programs: a loop, a recursion, an STL example
+- [x] Output validates against `wire.v1.schema.json`
 - [ ] Hand to BE-02 for the gVisor/nsjail measurements
+
+The script is `adapters/cpp/trace.py`. The programs are in `fixtures/cpp/{loop,recursion,stl}`. The loop and recursion sessions are in `schema/testdata/wire/`, so the schema tests validate them in CI. The STL session validates too, but it isn't committed: the generated Go types drop an empty `entries` (and `items`, `fields`) through `omitempty`, so the round-trip test fails on a freshly constructed `std::map`. That needs a contract fix first. The handoff waits on a box with GCC and GDB to run it in: the BE-07 §2 runner image, or a throwaway image for the spike.
+
+Findings, on GDB 17.1 and GCC 15.2 (x86_64):
+
+- 1,005 steps trace in 0.8 s natively, against the 3 s target outside a sandbox.
+- `skip -gfi <glob>` matches `main.cpp` for any glob in GDB 17, so the tracer skips by function name (`^(std|__gnu_cxx)::`) and `finish`es out of any other non-user frame.
+- `step` does not stop in the caller after a return, so in `fib(n-1) + fib(n-2)` the second call reuses the first one's stack slot with no stop in between. A breakpoint on every `main.cpp` function (`rbreak`) marks each entry, which gives each call its own frame id.
+- GDB's stop banners go to fd 1. The tracer sets `suppress-cli-notifications` and points GDB's own fd 1 and 2 at `/dev/null` once the program runs. The program can't write to fd 3.
+- With the §7.11.2 rule `symbol.line > current line`, a local still shows garbage on its own declaration line (`int sum = 0;` before it runs). §3 has to decide between `>=` on first entry and `uninit`.
 
 ## 2. Tracer core (M2-B03 · 4 d)
 
