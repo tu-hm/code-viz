@@ -52,8 +52,8 @@
 | D6 | Status updates | **Long-poll** (`?wait=20`) + a **change poller** on MySQL (every 250 ms, only while requests wait). *Changed in v1.2: no `LISTEN/NOTIFY` on MySQL.* | SSE, WebSocket, binlog streaming | Above 200 poller queries/s in total, or 50 API pods | §8.3, §7.13.3 |
 | D7 | Trace delivery | **Presigned URLs** straight from object storage; a CDN later | Serving traces through the API | Egress cost or latency | §8.4 |
 | D8 | Caching | Content-addressed cache with **single-flight** on a unique `cache_key` | A separate cache store | — | §7.12 |
-| D9 | Sandbox, default | **gVisor `runsc`**, one sandbox per job, on a dedicated runner node pool | — | If spike S1 fails | §18.3, Appendix C |
-| D10 | Sandbox, Plan B | **nsjail** with a Kafel seccomp policy: `ptrace` allowed, ASLR off through `persona_addr_no_randomize` | go-judge, isolate | Used only if S1 fails for gVisor | C.9 |
+| D9 | Sandbox, default | **gVisor `runsc`**, one sandbox per job, on a dedicated runner node pool. **Dropped at G1 (v1.5):** S1 failed. | — | If spike S1 fails | §18.3, Appendix C |
+| D10 | Sandbox, Plan B | **nsjail** with a Kafel seccomp policy: `ptrace` allowed, ASLR off through `persona_addr_no_randomize`. **The production sandbox since G1 (v1.5).** | go-judge, isolate | Used only if S1 fails for gVisor | C.9 |
 | D11 | Sandbox, Plan C | **Kata + Cloud Hypervisor**: one VM per worker pod, with nsjail per job inside it | Firecracker directly, microsandbox | When a security review requires hardware isolation | C.9 |
 | D12 | Tracers | Python: `sys.settrace`. C++: GDB Python API + libstdc++ pretty printers, `-O0 -g3`, a precompiled `bits/stdc++.h`, forced flushing. | Valgrind-based tracer, `sys.monitoring` | Spike S2 (Python) | §7.11 |
 | D13 | Frontend | React 19.3 + TypeScript + Vite 8; CodeMirror 6; `@viz/player` (Web Worker engine, kind registry, custom SVG arrows); Tailwind v4 + Radix; TanStack Query; Zustand | Monaco, React Flow, Svelte | — | §18.1 |
@@ -74,7 +74,7 @@
 
 | Open item | Closed by | If the spike is inconclusive |
 |---|---|---|
-| Final sandbox: D9 or D10 | S1 | gVisor if GDB works in it; otherwise nsjail |
+| Final sandbox: D9 or D10 | S1 | **Closed at G1 (v1.5): nsjail (D10).** |
 | Python trace hook (Q4) | S2 | `sys.settrace` |
 | How arrows are drawn | S3 | Custom SVG overlay; fall back to labels with arrows on hover |
 | Keyframe and chunk sizes | S4 | Keyframe every 50 steps, chunks of 250 |
@@ -94,6 +94,7 @@
 | v1.2 | 2026-10-23 | **Database switched to MySQL 8.4 LTS** because PostgreSQL isn't available: own job queue with `SKIP LOCKED`, change poller instead of `LISTEN/NOTIFY`, MySQL single-flight SQL (§7.13). D4, D5, D6 and D15 changed. |
 | v1.3 | 2026-10-23 | **Frontend trimmed to the IDE.** The web app is there to show the backend's traces, not to be a production UI: no i18n files (strings written inline), no Playwright end-to-end or visual-snapshot tests. D20 changed; §13, §15 and §18 updated. |
 | v1.4 | 2026-10-23 | C++ locals are `uninit` on their declaration line until it runs (§7.11.2), instead of showing garbage. |
+| v1.5 | 2026-10-23 | **G1: the production sandbox is nsjail (D10), not gVisor (D9).** Spike S1b: gVisor runs GDB, but a 1,000-step trace takes 7–9 s on its default platform (target 3 s) and `personality(ADDR_NO_RANDOMIZE)` fails, so traces aren't deterministic (§7.12). nsjail: 1.5 s, 4–8 ms starts, ASLR off. Worker pods run privileged on the runner node pool. Report: `plans/spikes/s1b-sandbox.md`. |
 
 ---
 
@@ -579,7 +580,7 @@ flowchart LR
   B -- "trace chunks<br/>signed URLs" --> OBJ[(Object storage<br/>t7/ · t90/ prefixes)]
   API <-->|"SQL · change poller"| PG[(MySQL 8.4<br/>metadata · jobs · quotas)]
   PG <-->|"claim jobs · SKIP LOCKED"| WRK["vizd --role=worker<br/>× M runner nodes"]
-  WRK -- "1 sandbox per job" --> SB[gVisor sandbox<br/>runner image + tracer<br/>no network]
+  WRK -- "1 sandbox per job" --> SB[nsjail sandbox<br/>runner image + tracer<br/>no network]
   SB -- "NDJSON on fd 3" --> WRK
   WRK -- "put chunks" --> OBJ
 ```
@@ -621,7 +622,7 @@ flowchart TB
   end
   subgraph impl["adapters · swappable"]
     direction LR
-    A1[mysql] ~~~ A2[mysqlqueue] ~~~ A3[s3] ~~~ A4[runsc]
+    A1[mysql] ~~~ A2[mysqlqueue] ~~~ A3[s3] ~~~ A4[nsjail]
   end
   transport --> app
   app --> ports
@@ -637,7 +638,7 @@ flowchart TB
 | `JobQueue` | Enqueue, lease, cancel, retry | `jobs` table with `SKIP LOCKED` (§7.13.2) | NATS JetStream | Queue work takes more than 30% of MySQL CPU, claim p95 above 200 ms, or over 500 jobs/s |
 | `Events` | Wake up long-polls; progress | Change poller on `traces.updated_at` (§7.13.3) | NATS core pub/sub | Poller queries above 200/s in total, or more than 50 API pods |
 | `BlobStore` | Put chunks; sign URLs; copy on share | S3 API (aws-sdk-go-v2) | Same, with a CDN in front | Egress cost or latency |
-| `Sandbox` | Run a build or trace with limits | gVisor `runsc` | Firecracker, or a remote sandbox service | Stronger isolation needed |
+| `Sandbox` | Run a build or trace with limits | nsjail (D10) | Kata + Cloud Hypervisor (D11), or a remote sandbox service | Stronger isolation needed |
 | `Adapters` | Language manifests and capabilities | YAML files mounted as a ConfigMap | Same | — |
 | `RateLimiter` | Per-user burst limits | Not needed in v1 (ingress handles bursts; quotas live in MySQL) | Valkey + redis_rate | Rate-limited endpoint above 2,000 req/s |
 
@@ -1497,7 +1498,7 @@ Most of these are now decided (§0). Q4 and Q9 stay open until the M0 spikes.
 | Q6 | C++ dialect: `gnu++17` or `gnu++20`? | **Decided (D18):** `gnu++17` |
 | Q7 | AI step explanations (FR-21): which provider, what cost per trace, and do we cache them? | **Decided (D19):** not in v1 |
 | Q8 | Interactive stdin in a later version? | **Decided (D19):** no |
-| Q9 | Sandbox: gVisor, nsjail or go-judge (Appendix C)? | **Open until S1.** Default: gVisor; nsjail if GDB fails (D9, D10) |
+| Q9 | Sandbox: gVisor, nsjail or go-judge (Appendix C)? | **Closed at G1 (v1.5): nsjail (D10).** gVisor failed S1 |
 | Q10 | Managed cloud (S3/GCS + managed MySQL) or self-hosted (SeaweedFS + our own MySQL)? | **Decided (D4):** managed services |
 
 ## 18. Recommended tech stack
@@ -1550,20 +1551,20 @@ These recommendations reflect what was current in October 2026. They follow four
 
 | Component | Pick | Notes |
 |---|---|---|
-| Isolation | **gVisor (`runsc`)**, with one sandbox per job started by the Go worker | gVisor is written in Go and is mature. It joined the CNCF as a Sandbox project on 2026-09-28, so its governance is broadening beyond Google. On Kubernetes it plugs in through `RuntimeClass`. |
-| Isolation, Plan B and Plan C | **Plan B (D10): nsjail** with a Kafel seccomp policy. **Plan C (D11): Kata + Cloud Hypervisor**, one VM per worker pod with nsjail per job. | Details in Appendix C.9; all alternatives, including Rust options, in Appendix C. Avoid ptrace-based sandboxes: they conflict with GDB. |
+| Isolation | **nsjail (D10)**, with one jail per command started by the Go worker | Chosen at G1 (v1.5). gVisor ran GDB but failed S1: 7–9 s per 1,000 steps on its default platform, and no way to turn ASLR off. nsjail: 1.5 s, 4–8 ms starts, ASLR off. |
+| Isolation, Plan C | **Plan C (D11): Kata + Cloud Hypervisor**, one VM per worker pod with nsjail per job. | Details in Appendix C.9; all alternatives, including Rust options, in Appendix C. Avoid ptrace-based sandboxes: they conflict with GDB. |
 | Python tracer | Python script using `sys.settrace` (v1) | It must run inside the user's interpreter. `sys.monitoring` is to be benchmarked (Q4). |
 | C++ tracer | **GDB Python API** script + libstdc++ pretty printers | Keep the step loop **inside** the sandbox. Driving GDB/MI from Go on the host (e.g. `cyrus-and/gdb`) would cross the sandbox boundary on every step: slower, and the debugger would sit closer to the host. |
 | Generic DAP bridge (future languages) | A **static Go binary** built with **google/go-dap**, copied into each runner image | It talks to the language's own debug adapter (debugpy, Delve, js-debug…) inside the sandbox and writes the wire protocol on fd 3. Go code is reused for every language added later (§10.4). |
 | Runner images | Debian slim base, pinned toolchain versions, built with **Docker BuildKit**, scanned with **Trivy**, signed with **cosign** | One image per adapter (`viz-runner-python`, `viz-runner-cpp`) |
 
-> **Risk to settle first:** GDB needs `ptrace` *inside* the sandbox. Confirm it works under the chosen sandbox (gVisor or go-judge with a custom seccomp profile) in spike S1 (§18.7) before committing.
+> **Settled at G1 (v1.5):** GDB needs `ptrace` *inside* the sandbox. It works under nsjail, and a 1,000-step trace takes 1.5 s (spike S1b).
 
 ### 18.4 Infrastructure
 
 | Concern | Pick | Notes |
 |---|---|---|
-| Orchestration | **Kubernetes** with a dedicated **runner node pool** where gVisor is installed. The API and workers run as Deployments. | For the M1 beta, 2–3 VMs running systemd + Docker + `runsc` are enough. |
+| Orchestration | **Kubernetes** with a dedicated **runner node pool** for the privileged worker pods that run nsjail. The API and workers run as Deployments. | For the M1 beta, 2–3 VMs running systemd + Docker + nsjail are enough. |
 | Autoscaling | **KEDA MySQL scaler** on in-flight jobs per slot (§7.9). Cluster autoscaler for runner nodes. HPA on CPU for API pods. | No metrics exporter needed for the queue |
 | Trace delivery | **Presigned object-storage URLs** in v1; a **CDN with signed URLs** after the egress trigger (§7.9) | No API in the data path |
 | Frontend hosting | Static build on a CDN (Cloudflare or CloudFront) | The API sits on its own subdomain |
@@ -1582,11 +1583,11 @@ flowchart LR
   UI -- "chunks via presigned URL" --> S3
   subgraph Go["vizd (Go 1.27)"]
     API["--role=api<br/>net/http · oapi-codegen"]
-    WRK["--role=worker<br/>job queue · tracecore · runsc"]
+    WRK["--role=worker<br/>job queue · tracecore · nsjail"]
   end
   API <--> PG[(MySQL 8.4<br/>sqlc · jobs table · change poller)]
   WRK <--> PG
-  WRK -- "OCI run" --> SB[gVisor sandbox<br/>runner image + tracer]
+  WRK -- "nsjail run" --> SB[nsjail sandbox<br/>runner image + tracer]
   SB -- "NDJSON on fd 3" --> WRK
   WRK -- "put chunks" --> S3[(S3-compatible<br/>t7/ · t90/)]
 ```
@@ -1611,7 +1612,7 @@ viz/
 │   │   ├── mysql/                   # sqlc queries, change poller (Events)
 │   │   ├── mysqlqueue/              # JobQueue (SKIP LOCKED)
 │   │   ├── s3/                      # BlobStore, presign
-│   │   └── runsc/                   # Sandbox (gVisor)
+│   │   └── nsjail/                  # Sandbox (D10)
 │   ├── transport/http/              # oapi-codegen strict server, long-poll
 │   └── gen/                         # generated types (do not edit)
 ├── adapters/                        # language adapters (data + images)
