@@ -59,6 +59,8 @@ Two sets of goldens pin trace output (test 8):
 
 `make golden-update` rewrites both from real runs. Read the diff before you commit it: a golden that changed is a behavior that changed.
 
+Both sets must pass on amd64 and arm64. CI runs them on amd64 inside `make check` and on arm64 in the `golden-arm64` job (`ubuntu-24.04-arm`). The core's goldens mask `0x…` addresses and `long double` values; nothing else needs a mask, because heap ids become `o1, o2…` and the Python fixtures and C++ wire sessions come out the same on both architectures. A new fixture must stay away from what really differs between them: an address printed by the program, a C++ local shown before it's assigned (stack garbage), a `char` above 127 (signed on amd64, unsigned on arm64) and `long double` arithmetic (80-bit on amd64, 128-bit on arm64).
+
 `go test` caches the `vizctl` result and can't see changes to `tracer.py`, which lives in the runner image. After editing a tracer, run `make runner-images` and then `go test -count=1 ./cmd/vizctl`.
 
 | Python fixture | What it pins |

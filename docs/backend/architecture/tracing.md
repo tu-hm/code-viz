@@ -239,7 +239,6 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 |---|---|
 | G2: keep `settrace` or move to `sys.monitoring` | Gate on Fri 13 Nov; S2 recommends `sys.monitoring` |
 | The worker running this flow and storing chunks, header and tail | BE-05 |
-| Running the goldens on amd64 and arm64 in CI | BE-04 §2 |
 | Signing the runner image | BE-03 §3, needs the registry (BE-13) |
 | A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | BE-10 |
 | `startAtLines` and `captureRanges` in the tracer (both `false` in the manifest) | BE-11 |
