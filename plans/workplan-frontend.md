@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Role** | The web app: IDE integration, the `@viz/player` package (trace engine, renderer, views), source parsing with tree-sitter, narration, navigation, compare, design-system implementation, Storybook and Playwright tests, accessibility |
+| **Role** | The web app: IDE integration, the `@viz/player` package (trace engine, renderer, views), source parsing with tree-sitter, narration, navigation, compare, design-system implementation, Storybook, accessibility |
 | **Based on** | `code-visualizer-spec.md` v1.1 and `code-visualizer-workplan.md`. Every **§** points to the spec. |
 | **Start** | Monday 2026-10-26 |
 | **Capacity** | 4.5 focus days per week, for one frontend engineer |
@@ -14,8 +14,8 @@
 | Milestone | FE load | FE capacity | Verdict |
 |---|---|---|---|
 | M0 (3 wks) | 13.5 days | 13.5 | Fits exactly |
-| M1 (6 wks, option A) | 27 days | 27 | Fits exactly. Weeks 7–9 pull work forward from M2 and M3. |
-| M2 (4 wks) | 12.5 days left (17.5 planned) | 18 | Fits. M2-F02, F03 and F05 are done in M1 week 9. If M2 stretches for backend (option A), continue with M5 tasks (see *M4 and M5*). |
+| M1 (6 wks, option A) | 26.5 days | 27 | Fits exactly. Weeks 7–9 pull work forward from M2 and M3. |
+| M2 (4 wks) | 11.5 days left (16.5 planned) | 18 | Fits. M2-F02, F03 and F05 are done in M1 week 9. If M2 stretches for backend (option A), continue with M5 tasks (see *M4 and M5*). |
 | M3 (5 wks) | 21.5 days | 22.5 | Fits |
 | M4 (2 wks) | 1 day + buffer | 9 | Slack: start M5 early |
 | M5 (4 wks) | 22 days | 18 | Over by 4 days, unless M2 or M4 slack was used; cut list in *M4 and M5* |
@@ -54,12 +54,11 @@ What FE gives BE:
 | 3 | 9–13 Nov | Finish **M0-16 engine** · M0-18 controls · M0-19 basic state panel → M0 demo | 4.5 |
 | 4 | 16–20 Nov | M1-13 IDE (MSW until OpenAPI on Tue) · M1-14 API client · start M1-16 heap cards | 4.5 |
 | 5 | 23–27 Nov | Finish M1-16 · **M1-17 arrows** | 4 |
-| 6 | 30 Nov – 4 Dec | M1-15 states · M1-18 narration v0 · M1-19 Storybook | 4.5 |
+| 6 | 30 Nov – 4 Dec | M1-15 states · M1-18 narration v0 · M1-19 Storybook | 4 |
 | 7 | 7–11 Dec | **M1-F01 tree-sitter spike (S8)** · start M1-F02 matrix view | 4.5 |
 | 8 | 14–18 Dec | Finish M1-F02 · M1-F03 Go to… · M1-F04 expected-output compare | 4.5 |
 | 9 | 21–25 Dec | Pulled forward from M2: **M2-F05** tree-sitter in the player · M2-F02 value formatters · M2-F03 record cards | 5 |
 
-M1-20 (end-to-end on staging) moves to M2 week 1, because staging lands on 28 Dec.
 
 ## 4. M0 tasks (FE)
 
@@ -83,23 +82,22 @@ M1-20 (end-to-end on staging) moves to M2 week 1, because staging lands on 28 De
 |---|---|---|---|---|---|
 | M1-13 | IDE: CodeMirror 6 editor, language picker from `GET /languages`, Visualize button and shortcut | 2 | M1-01 | Matches the §5.1 mock | §5.1 |
 | M1-14 | API client (openapi-fetch + TanStack Query), long-poll loop, cancel | 1.5 | M1-01 | Survives an API restart mid-poll | §8.3 |
-| M1-15 | States: loading, build error, runtime error, step limit, busy and retry | 2 | M0-20 | A story and an end-to-end test per §5.6 state | §5.6 |
+| M1-15 | States: loading, build error, runtime error, step limit, busy and retry | 2 | M0-20 | A story per §5.6 state | §5.6 |
 | M1-16 | Heap cards and kind registry (`sequence`, `set`, `mapping`, `record`, `function`, `opaque`) | 3 | M0-19 | Matches the §5.3 mock | §9.5, §7.10 |
 | M1-17 | Arrow overlay from S3: bundling, hover highlight, label fallback above 30 arrows | 2 | M0-13, M1-16 | Meets the S3 numbers in the real UI | §5.9 |
 | M1-18 | Narration v0: call, return, value changes, output | 1.5 | M0-16 | Every fixture step has a line | §19.5 |
-| M1-19 | Storybook on fixtures, plus visual regression | 1 | M1-16 | CI flags unintended visual changes | §15 |
+| M1-19 | Storybook on fixtures | 0.5 | M1-16 | Every fixture renders in a story | §15 |
 | M1-F01 | **S8** web-tree-sitter (C++ and Python grammars, lazy-loaded): subscript and identifier detection on 50 real CP solutions | 2 | M0-17 | Accuracy measured; ≥ 95% target; bundle size noted | §18.7, D23 |
 | M1-F02 | Matrix view: auto-switch for 2-D data, `[x]` writes from the diff, `·` for unset cells, i and j markers, frozen headers, 30 × 30 scroll | 3 | M1-16, DS designs | Matches the §19.4.3 mock on the DP fixture | §19.4.3 |
 | M1-F03 | Go to…: next change (variable, cell, array), next time a line runs, next call, next print, error, step over and out | 2.5 | M0-16 | Every §19.8 jump has a unit test on fixtures | §19.8 |
 | M1-F04 | Expected-output compare: paste, normalized compare, first difference mapped to its step, "output ended early" | 1.5 | M0-16 | Matches the §19.7 mock | §19.7 |
 
-**Total: 22 days.** M1-20 (Playwright on staging, 1 day) moves to M2.
+**Total: 21.5 days.**
 
 ## 6. M2: C++ support and student views (FE tasks)
 
 | ID | Task | Days | Depends on | Done when | Spec |
 |---|---|---|---|---|---|
-| M1-20 | Playwright end-to-end on staging, carried over from M1 | 1 | M1-12 | Runs nightly | §15 |
 | M2-F01 | Pointer arrows from `ptr` values; `∅` for null; address on hover; "Show memory addresses" setting | 2 | M2-B04 | Matches the §5.4 mock | §5.4, §9.4 |
 | M2-F02 | Value formatters: C++ (`char`, `enum`, `bool`, `long long`, floats) and Python | 1.5 | M1-16 | One test per formatter | §19.4.6 |
 | M2-F03 | Record cards and the array-of-structs table | 1.5 | M1-16 | Edge-list fixture renders as a table | §19.4 |
@@ -109,7 +107,7 @@ M1-20 (end-to-end on staging) moves to M2 week 1, because staging lands on 28 De
 | M2-F07 | Big arrays: 16-cell window following the active marker, minimap, non-zero only, Go to index | 3 | M2-B08 (fixtures until then) | Smooth on a 200,005-element sparse fixture | §19.4.2 |
 | M2-F08 | Matrix inferred reads `(x)` from the line, labelled "read (inferred)" | 1.5 | M2-F05, M1-F02 | Matches the §19.4.3 mock | §19.9.2 |
 
-**Total: 17.5 days, of which 12.5 remain under option A** (M2-F02, F03 and F05 are done in M1 week 9). With option A, backend's M2 runs about 6.5 weeks; FE then continues with M5-F01, F04, F05 and F06 (see *M4 and M5*) during that time.
+**Total: 16.5 days, of which 11.5 remain under option A** (M2-F02, F03 and F05 are done in M1 week 9). With option A, backend's M2 runs about 6.5 weeks; FE then continues with M5-F01, F04, F05 and F06 (see *M4 and M5*) during that time.
 
 ## 7. M3: launch polish and student UX (FE tasks)
 

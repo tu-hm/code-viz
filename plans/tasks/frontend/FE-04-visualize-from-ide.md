@@ -4,8 +4,8 @@
 |---|---|
 | **Milestone** | M1 (week 4) |
 | **Estimate** | 3.5 days |
-| **Depends on** | BE-01 §5 (OpenAPI, Tue 17 Nov), FE-01 §6 (MSW, config); BE-06 + BE-13 §1 for the real API |
-| **Blocks** | FE-05 (states), FE-12 (permalink loading), FE-01 §5 (E2E) |
+| **Depends on** | BE-01 §5 (OpenAPI, Tue 17 Nov), FE-01 §5 (MSW, config); BE-06 + BE-13 §1 for the real API |
+| **Blocks** | FE-05 (states), FE-12 (permalink loading) |
 | **Covers** | M1-13, M1-14 |
 | **Spec** | §5.1, §8.1–§8.5, §8.7 |
 

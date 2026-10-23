@@ -22,8 +22,8 @@ Every state other than "ready".
 - [ ] **Basic runtime error** (`exit.kind = exception | signal`): `!` step, status-bar message, **Jump to error step**; signals mapped (`SIGSEGV`, `SIGFPE`, `SIGABRT` → readable text)
 - [ ] **Internal error / sandbox error**: "Something went wrong on our side", trace/request ID, Report link
 - [ ] **Expired / not found** (`410` / `404`)
-- [ ] One story + one E2E test (MSW scenario) per state
-- [ ] **Done:** every §5.6 state has a story and an E2E test
+- [ ] One story per state, driven by an MSW scenario
+- [ ] **Done:** every §5.6 state has a story
 
 ## 2. Compile errors & warnings panel (M2-F04 · 2 d)
 
@@ -38,7 +38,7 @@ Every state other than "ready".
 🔁 Agree the payload shape with BE + DS before M3 (BE-10 §1).
 
 - [ ] Banner: title from `error.kind`, line, step
-- [ ] Message + hint templates for every §19.6 row (i18n keys), values filled from the payload
+- [ ] Message + hint templates for every §19.6 row, values filled from the payload
 - [ ] **Jump to step N**, **Show values at step N−1**, **Raw message ▾**
 - [ ] Fallback to the raw message for unknown kinds
 - [ ] Python and C++ fixtures for each kind
@@ -56,4 +56,4 @@ Every state other than "ready".
 
 ## Done when
 
-Every §5.6 and §19.6 state has a story and an E2E test.
+Every §5.6 and §19.6 state has a story.

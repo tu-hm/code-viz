@@ -5,7 +5,7 @@
 | **Milestone** | M1 → M5 (spread out) |
 | **Estimate** | 19.5 days |
 | **Depends on** | BE-01 §6 (images), BE-02, BE-05, BE-06 |
-| **Blocks** | FE nightly E2E (staging), launch |
+| **Blocks** | Launch |
 | **Covers** | M1-02, M1-11, M1-12, M3-B07, M3-B09, M3-B10, M5-B02, M5-B03 |
 | **Spec** | §7.8, §7.9, §13, §18.2, §18.4 |
 

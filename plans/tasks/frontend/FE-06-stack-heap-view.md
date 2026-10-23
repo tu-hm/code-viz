@@ -33,7 +33,7 @@
 - [ ] Click a frame title → jump the code pane to its line
 - [ ] **Done:** matches the §5.3 mock
 
-## 3. Value formatters (M2-F02 · 1.5 d · M2; was pulled into M1 week 9, moved back to fit FE-01 §6 + FE-02 §4)
+## 3. Value formatters (M2-F02 · 1.5 d · M2; was pulled into M1 week 9, moved back to fit FE-01 §5 + FE-02 §4)
 
 - [ ] Formatter registry keyed by language + type
 - [ ] C++: `char` as `'a'` (`97` on hover), `bool` true/false, `enum` names, `long long`/unsigned, floats to 6 significant digits (full on hover)
@@ -43,7 +43,7 @@
 - [ ] One unit test per formatter
 - [ ] **Done:** one test per formatter passes
 
-## 4. Record cards & array-of-structs table (M2-F03 · 1.5 d · M2; was pulled into M1 week 9, moved back to fit FE-01 §6 + FE-02 §4)
+## 4. Record cards & array-of-structs table (M2-F03 · 1.5 d · M2; was pulled into M1 week 9, moved back to fit FE-01 §5 + FE-02 §4)
 
 - [ ] Struct/class cards with nested fields and pointer fields (`●` for FE-07)
 - [ ] Array/vector of structs or tuples → table: one row per element, one column per field

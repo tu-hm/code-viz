@@ -16,8 +16,8 @@ Each BE/FE task lists the fine-grained work-plan IDs it covers (`M0-05`, `M2-B04
 | Milestone | Dates | Goal | BE load | FE load |
 |---|---|---|---|---|
 | **M0** Foundations & spikes | 26 Oct – 13 Nov 2026 | Contracts, spikes S1–S5, player scrubs a 1,000-step fixture | 13 d | 13.5 d |
-| **M1** Python beta | 16 Nov – 25 Dec 2026 | Python works end to end on staging; internal beta | 27.5 d | 27 d |
-| **M2** C++ | 28 Dec 2026 – 19 Feb 2027 | C++ with STL, pointers, globals, compile errors | 29 d | 15.5 d (+ M5 work) |
+| **M1** Python beta | 16 Nov – 25 Dec 2026 | Python works end to end on staging; internal beta | 27.5 d | 26.5 d |
+| **M2** C++ | 28 Dec 2026 – 19 Feb 2027 | C++ with STL, pointers, globals, compile errors | 29 d | 14.5 d (+ M5 work) |
 | **M3** Launch + student UX | 22 Feb – 26 Mar 2027 | All P0 items; load + security tests; **public launch** | 20.5 d | 21.5 d |
 | **M4** Extensibility | 29 Mar – 9 Apr 2027 | Add C with no UI changes | 5 d | 1 d |
 | **M5** CP data views | 12 Apr – 7 May 2027 | All P1 views; usability test passes | 8 d | 22 d |

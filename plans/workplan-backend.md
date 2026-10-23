@@ -33,7 +33,7 @@ FE builds on **fixtures** until each item lands. The fallback column says what F
 | `api/openapi.yaml` | M1-01 | **Tue 17 Nov** | IDE and API client | MSW mocks from the spec §8 examples |
 | Local stack (`vizd --role=all`) | M1-02 | Wed 18 Nov | Developing against the real API | MSW |
 | Real Python traces | M1-05/06 | Fri 4 Dec | Replacing the Python fixtures | Fixtures |
-| Staging environment | M1-12 | Mon 28 Dec | Nightly end-to-end tests | Local stack |
+| Staging environment | M1-12 | Mon 28 Dec | Checking the IDE against real traces | Local stack |
 | C++ traces with `ptr` values | M2-B04 | M2, week 3 | Pointer arrows | Fixtures with `ptr` |
 | Sparse sequences and dirty cells | M2-B08 | End of M2 | Big-array view | Fixtures |
 | Friendly-error payloads, `lineHits`, untraced tail | M3-B01–B03 | M3, week 2 | Error UI, hit-count gutter, step-limit banner | Fixtures |

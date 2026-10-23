@@ -7,7 +7,7 @@
 ## Now
 
 - **In progress:** BE-01 (40/46). CI runs `make check` on every push and PR to `main`, and the first run is green. Every item left waits on another task or on a decision; see [BE-01 open items](#be-01-open-items).
-- **In progress:** FE-01 (26/45). The web workspace, design system, codegen, fixtures and mock API are in `web/`. Storybook (§4) is planned for week 6; end-to-end on staging (§5) waits on BE-13 §3.
+- **In progress:** FE-01 (26/37). The web workspace, design system, codegen, fixtures and mock API are in `web/`. Storybook (§4) is planned for week 6. The frontend is trimmed to the IDE: no i18n, no Playwright end-to-end tests (spec v1.3).
 - **Next, by the suggested order:** BE-08 §1 (GDB prototype, feeds G1 and the S1 traces due Fri 6 Nov), then BE-02 §1. On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
@@ -55,21 +55,21 @@
 
 | Task | Milestone | Status | Done | Next step, or what it waits on |
 |---|---|---|---|---|
-| [FE-01](frontend/FE-01-foundation-fixtures.md) Foundation & fixtures | M0–M2 | 🟡 | 26/45 | §4 Storybook and visual regression (week 6); §6 against `make dev` waits on BE-06; §5 waits on staging |
+| [FE-01](frontend/FE-01-foundation-fixtures.md) Foundation & fixtures | M0–M1 | 🟡 | 26/37 | §4 Storybook (week 6); §5 against `make dev` waits on BE-06 |
 | [FE-02](frontend/FE-02-trace-player-controls.md) Trace player & controls | M0–M1, M3 | 🟢 | 0/43 | §1 can start: fixtures, trace types and the store are in |
 | [FE-03](frontend/FE-03-code-pane.md) Code pane | M0, M3 | 🟢 | 0/15 | §1 can start; §2 needs BE-11 §1 |
-| [FE-04](frontend/FE-04-visualize-from-ide.md) Visualize from the IDE | M1 | 🟢 | 0/18 | Can start against the mock API (FE-01 §6); the real API is BE-06 |
+| [FE-04](frontend/FE-04-visualize-from-ide.md) Visualize from the IDE | M1 | 🟢 | 0/18 | Can start against the mock API (FE-01 §5); the real API is BE-06 |
 | [FE-05](frontend/FE-05-run-states-errors.md) Run states & errors | M1–M3 | ⏳ | 0/29 | FE-04; BE-07 §2, BE-10, BE-11 |
 | [FE-06](frontend/FE-06-stack-heap-view.md) Stack & heap view | M0–M2, M4 | ⏳ | 0/34 | FE-02 §2; BE-09 §1 |
 | [FE-07](frontend/FE-07-reference-pointer-arrows.md) Reference & pointer arrows | M0–M2 | 🟢 | 0/21 | §1 spike S3 can start on the fixtures; §2 needs FE-06 §2 |
 | [FE-08](frontend/FE-08-array-matrix-views.md) Array & matrix views | M1–M2 | ⏳ | 0/37 | FE-03, FE-06; BE-09 §2 |
-| [FE-09](frontend/FE-09-narration-input-cursor.md) Narration & input cursor | M1, M3 | ⏳ | 0/19 | FE-02 §2, FE-08 §3 |
+| [FE-09](frontend/FE-09-narration-input-cursor.md) Narration & input cursor | M1, M3 | ⏳ | 0/18 | FE-02 §2, FE-08 §3 |
 | [FE-10](frontend/FE-10-goto-expected-output.md) Go to… & expected output | M1 | ⏳ | 0/20 | FE-02 §2, FE-03 |
 | [FE-11](frontend/FE-11-watch-timeline.md) Watch panel & timeline | M3, M5 | ⏳ | 0/12 | FE-08 §3, FE-10 §1 |
-| [FE-12](frontend/FE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/9 | BE-12, FE-02 §3 |
-| [FE-13](frontend/FE-13-mobile-a11y-analytics.md) Mobile, a11y & analytics | M3 | ⏳ | 0/24 | FE-02 §4, FE-06, FE-07 |
+| [FE-12](frontend/FE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/8 | BE-12, FE-02 §3 |
+| [FE-13](frontend/FE-13-mobile-a11y-analytics.md) Mobile, a11y & analytics | M3 | ⏳ | 0/23 | FE-02 §4, FE-06, FE-07 |
 | [FE-14](frontend/FE-14-cp-data-views.md) CP data views | M5 | ⏳ | 0/32 | FE-06, FE-08, FE-10 |
-| **Total** | | | **26/358** | |
+| **Total** | | | **26/347** | |
 
 ## Decision gates
 

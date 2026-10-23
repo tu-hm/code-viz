@@ -128,12 +128,11 @@ Each gate result goes into the spec's change log (§0.3), even when the default 
 | M1-12 | Staging with OpenTofu: Kubernetes namespace, runner node pool with the G1 sandbox, KEDA MySQL scaler, managed MySQL 8.4 and bucket | BE | 2.5 | M1-07 | Staging autoscales from 1 to 3 runner pods under load | §18.4 |
 | M1-13 | IDE: CodeMirror 6 editor, language picker from `GET /languages`, Visualize button and shortcut | FE | 2 | M1-01 | Matches the §5.1 mock | §5.1 |
 | M1-14 | API client (openapi-fetch + TanStack Query), long-poll loop, cancel | FE | 1.5 | M1-01 | Survives an API restart mid-poll | §8.3 |
-| M1-15 | States: loading progress, build error, runtime error banner, step-limit banner, busy and retry | FE | 2 | M0-20 | Every §5.6 state has a story and an end-to-end test | §5.6 |
+| M1-15 | States: loading progress, build error, runtime error banner, step-limit banner, busy and retry | FE | 2 | M0-20 | Every §5.6 state has a story | §5.6 |
 | M1-16 | Heap cards and kind registry (`sequence`, `set`, `mapping`, `record`, `function`, `opaque` fallback) | FE | 3 | M0-19 | Matches the §5.3 mock | §9.5, §7.10 |
 | M1-17 | Arrow overlay from S3, with bundling and hover highlight | FE | 2 | M0-13, M1-16 | Meets the S3 numbers in the real UI | §5.9 |
 | M1-18 | Narration v0: call, return, value changes, output (subset of §19.5) | FE | 1.5 | M0-16 | Every fixture step has a narration line | §19.5 |
-| M1-19 | Storybook on fixtures, plus visual regression | FE | 1 | M1-16 | CI flags unintended visual changes | §15 |
-| M1-20 | Playwright end-to-end: visualize the Python samples on staging | FE | 1 | M1-12 | Runs nightly against staging | §15 |
+| M1-19 | Storybook on fixtures | FE | 0.5 | M1-16 | Every fixture renders in a story | §15 |
 | M1-21 | Hi-fi designs for the P0 student views: big array, index markers, matrix, expected output, friendly errors, Go to… | DS | 6 | — | Matrix, Go to… and compare by **Fri 4 Dec**; the rest before M2 ends | §19 |
 | M1-22 | Design QA of the M1 build | DS | 2 | M1-17 | Issues filed and fixed | — |
 | M1-23 | Internal beta: invite 10–20 students and teachers; feedback form | Lead | 1 | M1-12 | Feedback collected before G4 | — |
@@ -143,7 +142,7 @@ Each gate result goes into the spec's change log (§0.3), even when the default 
 | Milestone | Spec estimate | BE load | FE load | Available per person | Verdict |
 |---|---|---|---|---|---|
 | M0 | 3 weeks | 13 days | 13.5 days | 13.5 days | Fits, but tight. S5 is the first thing to move. |
-| M1 | 3 weeks | **27.5 days** (+2.5 for the MySQL job queue) | 14 days (+12.5 pulled forward under A) | 13.5 days (27 over 6 weeks) | **BE is over by about 14 days.** FE fits. |
+| M1 | 3 weeks | **27.5 days** (+2.5 for the MySQL job queue) | 12.5 days (+12.5 pulled forward under A) | 13.5 days (27 over 6 weeks) | **BE is over by about 14 days.** FE fits. |
 | M2 | 4 weeks | **29 days** | 17.5 days | 18 days | **BE is over by about 11 days.** FE fits. |
 | M3 | 5 weeks | 20.5 days | 21.5 days | 22.5 days | Both fit |
 

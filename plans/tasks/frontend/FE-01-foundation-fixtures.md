@@ -2,12 +2,12 @@
 
 | | |
 |---|---|
-| **Milestone** | M0 (weeks 1–2) → M1 (weeks 4, 6) → M2 (week 1) |
-| **Estimate** | 6 days |
-| **Depends on** | BE-01 §3 (trace schema, Wed 28 Oct), BE-01 §5 (OpenAPI, Tue 17 Nov), BE-13 §1 (local stack), BE-13 §3 (staging, Mon 28 Dec) |
+| **Milestone** | M0 (weeks 1–2) → M1 (weeks 4, 6) |
+| **Estimate** | 4.5 days |
+| **Depends on** | BE-01 §3 (trace schema, Wed 28 Oct), BE-01 §5 (OpenAPI, Tue 17 Nov), BE-13 §1 (local stack) |
 | **Blocks** | Every other FE task |
-| **Covers** | M0-02, M0-07, M0-08, M1-19, M1-20, + new: dev workflow & app plumbing |
-| **Spec** | §9, §13 (i18n), §15, §18.1, D14 |
+| **Covers** | M0-02, M0-07, M0-08, M1-19, + new: dev workflow & app plumbing |
+| **Spec** | §9, §15, §18.1, D14 |
 
 The web workspace, generated types, fixture traces, and the test harness every view is built on.
 
@@ -48,24 +48,14 @@ Hand-written until real traces arrive (C++ from S1 on Fri 6 Nov, Python on Fri 4
 - [ ] Later fixtures are added by the task that needs them (C++ STL, `ptr`, sparse 200,005-element array, build error, step limit…)
 - [x] **Done:** every fixture passes the schema
 
-## 4. Storybook & visual regression (M1-19 · 1 d · week 6)
+## 4. Storybook (M1-19 · 0.5 d · week 6)
 
 - [ ] Storybook (React + Vite) for `@viz/player` and `apps/ide`
 - [ ] Fixture decorator: pick a fixture + step from story args
-- [ ] Playwright visual snapshots of every story, light and dark
 - [ ] axe-core addon on every story
-- [ ] Baselines updated only on purpose (separate `pnpm test:visual:update`)
-- [ ] **Done:** CI flags an unintended visual change
+- [ ] **Done:** every fixture renders in a story, light and dark
 
-## 5. End-to-end on staging (M1-20 · 1 d · M2 week 1)
-
-- [ ] Playwright suite: open IDE → Visualize Python fixture code → step to the end → check output
-- [ ] Same flow for C++ once BE-07/BE-08 land (skipped until then)
-- [ ] Nightly GitHub Actions run against staging; failures post to the team channel
-- [ ] Same suite runs against MSW in PR CI (fast mode)
-- [ ] **Done:** E2E runs nightly on staging
-
-## 6. Dev workflow & app plumbing (new · 1 d · M1 week 4)
+## 5. Dev workflow & app plumbing (new · 1 d · M1 week 4)
 
 **Config**
 - [x] `VITE_API_BASE_URL` (default `http://localhost:8080/api/v1`) and `VITE_USE_MSW=true|false`; `.env.example` in `apps/ide`
@@ -75,10 +65,9 @@ Hand-written until real traces arrive (C++ from S1 on Fri 6 Nov, Python on Fri 4
 **Against the local stack**
 - [ ] Load seeded traces from `make seed` (Python + C++) without running jobs
 - [ ] Verify CORS for the API and for presigned SeaweedFS chunk URLs (`S3_PUBLIC_ENDPOINT`, BE-06 §3) from the Vite dev origin
-- [ ] Note common problems in the web README (CORS origin missing, MSW still on, Docker not running)
+- [x] Note common problems in the web README (CORS origin missing, MSW still on, Docker not running)
 
 **App plumbing**
-- [x] i18next + react-i18next with `en.json`; lint rule against hard-coded UI strings (§13, D20)
 - [x] Feature-flag client: read flags (env or API), `useFlag()` hook; everything behind a flag until M3 — env only (`VITE_FLAGS`); the API has no flags endpoint
 - [x] Error boundary around the player with a "Something went wrong" fallback and the trace ID
 
@@ -86,4 +75,4 @@ Hand-written until real traces arrive (C++ from S1 on Fri 6 Nov, Python on Fri 4
 
 ## Done when
 
-Every fixture loads in Storybook, visual regression and E2E run (PR + nightly), and FE works against MSW or `make dev` with one env switch.
+Every fixture loads in Storybook, and FE works against MSW or `make dev` with one env switch.

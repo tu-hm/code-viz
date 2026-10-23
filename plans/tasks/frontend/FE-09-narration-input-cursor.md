@@ -17,7 +17,6 @@ Deterministic, template-based narration built in the browser (no AI, D22).
 - [ ] Rules: Call `f(args)`, Return `f returns v`, Output `Printed "…"`, Other changes `x = v (was w)` up to 3 then "+N more", fallback `Line L ran`
 - [ ] Error rule hooks into FE-05 §3 message when present
 - [ ] Shown under the step counter as `» …`
-- [ ] All templates in i18n files
 - [ ] **Done:** every fixture step has a line
 
 ## 2. Full narration (M3-F01 · 2 d)

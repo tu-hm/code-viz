@@ -63,7 +63,7 @@
 | D17 | Retention | 7 days; 90 days once shared; share links can be revoked | — | Privacy review | §7.5 |
 | D18 | C++ dialect | `gnu++17` | `gnu++20` | If the judge's default changes | §7.11.2 |
 | D19 | Not in v1 | Interactive stdin, AI step explanations, a Pyodide local mode for Python, multi-region | — | Roadmap review after launch | §2, C.6 |
-| D20 | Audience and UI | CP and olympiad students; **English-only UI** (strings still kept in i18n files) | Beginner-first UI; Vietnamese UI | After the usability test (§19.11) | §19 |
+| D20 | Audience and UI | CP and olympiad students; **English-only UI**, strings written inline (v1.3) | Beginner-first UI; Vietnamese UI | After the usability test (§19.11) | §19 |
 | D21 | C++ build | Safety checks **on by default**: `_GLIBCXX_DEBUG` + UBSan, plus `--coverage` and `-Wall -Wextra -Wshadow`. One switch turns checks off to match the judge. | Checks off by default; ASan | If the overhead breaks time limits (spike S7) | §19.6 |
 | D22 | Narration | Deterministic templates computed in the browser; no AI in v1 | LLM explanations | P2 review | §19.5 |
 | D23 | Source parsing | **web-tree-sitter** in the browser (C++ and Python grammars) for index markers, inferred reads, branch outcomes and input tokens | Regexes; server-side parsing | If accuracy misses the target in spike S8 | §19.4.1, §19.9.2 |
@@ -92,6 +92,7 @@
 | v1.0 | 2026-10-23 | **Baseline locked** (§0). Plan B is nsjail; Plan C is Kata + Cloud Hypervisor (C.9). |
 | v1.1 | 2026-10-23 | Student-friendly visualization for CP students (§19): English-only UI, decisions D20–D25, FR-27–FR-41, trace format v1.1, milestone M5 |
 | v1.2 | 2026-10-23 | **Database switched to MySQL 8.4 LTS** because PostgreSQL isn't available: own job queue with `SKIP LOCKED`, change poller instead of `LISTEN/NOTIFY`, MySQL single-flight SQL (§7.13). D4, D5, D6 and D15 changed. |
+| v1.3 | 2026-10-23 | **Frontend trimmed to the IDE.** The web app is there to show the backend's traces, not to be a production UI: no i18n files (strings written inline), no Playwright end-to-end or visual-snapshot tests. D20 changed; §13, §15 and §18 updated. |
 
 ---
 
@@ -1437,7 +1438,7 @@ All of these are configurable per language in the manifest, with global ceilings
 | Graceful operations | Rolling deploys with no failed jobs: workers drain within 25 s, and long-polls end cleanly so clients retry |
 | Capacity, initial | 1 job/s peak (beta sizing in §7.9), autoscaling to 50 jobs/s without design changes |
 | Browser support | Last 2 versions of Chrome, Edge, Firefox and Safari; iOS Safari 17+; Android Chrome |
-| Localization | **English only** (D20). All UI strings still go through i18n files, so other languages can be added later. |
+| Localization | **English only** (D20). Strings are written inline; a second language would bring i18n in then. |
 
 ## 14. Analytics
 
@@ -1464,7 +1465,7 @@ All of these are configurable per language in the manifest, with global ceilings
   - a segfault becomes an error step with the right exit kind;
   - Python `input()` doesn't produce a step outside the user's file.
 - **Adapter unit tests:** one per type-map row in §10.3.
-- **UI:** Storybook stories driven by fixture traces, visual regression tests, keyboard-only tests, and axe accessibility checks.
+- **UI:** Storybook stories driven by fixture traces, and axe accessibility checks.
 - **Load:** k6 at 2× expected peak. Check queue latency and how autoscaling responds.
 - **Security:** fork bomb, network attempts, writing outside `/work`, huge output, infinite loops, deep recursion, fake fd-3 messages, and a 50 MB single-line stdout.
 
@@ -1521,10 +1522,9 @@ These recommendations reflect what was current in October 2026. They follow four
 | Reference arrows | **Custom SVG overlay**: `ResizeObserver` + `getBoundingClientRect`, cubic Bézier paths | The layout is fixed columns (stack, then heap), not a free-form graph. About 150 lines of code, with full control over bundling and hover highlighting (§5.9). | **@xyflow/react** (React Flow 12) if we add a "graph mode" for linked lists and trees, with **elkjs** for automatic layout |
 | Player package | **`@viz/player`**: trace engine, renderer, and kind and formatter registries (§7.10) | Reused by the IDE, the permalink page and future embeds. It has no IDE dependency. | — |
 | Long lists | **TanStack Virtual** | Heap columns with hundreds of objects, and containers with "show more" | react-window |
-| Internationalization | **i18next** + **react-i18next** | English only at launch (D20); strings stay in i18n files | Lingui |
 | Source parsing (browser) | **web-tree-sitter** with the C++ and Python grammars | Index markers, inferred reads, branch outcomes and input tokens (D23) | Regexes (fragile) |
 | Graph and tree layout | **elkjs** (layered) | Stable layouts between steps for the graph and tree views (§19.4.5) | d3-force (nodes move between steps) |
-| Testing | **Vitest** + Testing Library · **Playwright** (end-to-end and visual snapshots) · **Storybook** with fixture traces · **axe-core** · **MSW** to mock the API | The same fixture traces drive unit tests, stories and end-to-end tests | Cypress |
+| Testing | **Vitest** + Testing Library · **Storybook** with fixture traces · **axe-core** · **MSW** to mock the API | The same fixture traces drive unit tests and stories | Playwright, if end-to-end tests are ever needed |
 
 ### 18.2 Backend (Go)
 
@@ -1566,7 +1566,7 @@ These recommendations reflect what was current in October 2026. They follow four
 | Autoscaling | **KEDA MySQL scaler** on in-flight jobs per slot (§7.9). Cluster autoscaler for runner nodes. HPA on CPU for API pods. | No metrics exporter needed for the queue |
 | Trace delivery | **Presigned object-storage URLs** in v1; a **CDN with signed URLs** after the egress trigger (§7.9) | No API in the data path |
 | Frontend hosting | Static build on a CDN (Cloudflare or CloudFront) | The API sits on its own subdomain |
-| CI/CD | **GitHub Actions**: lint, test, build images, Playwright, deploy | Golden-trace and conformance suites (§15) block merges |
+| CI/CD | **GitHub Actions**: lint, test, build images, deploy | Golden-trace and conformance suites (§15) block merges |
 | Infrastructure as code | **OpenTofu** (or Terraform) | — |
 
 ### 18.5 How it fits together

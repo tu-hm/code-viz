@@ -15,7 +15,7 @@
 - [ ] No arrows; `●──▶ #id` tap scrolls to the card
 - [ ] Touch: swipe-free; buttons ≥ 44 px
 - [ ] Data views (matrix, big array) scroll horizontally inside their card
-- [ ] Test on iOS Safari 17+ and Android Chrome (Playwright device profiles)
+- [ ] Check by hand on iOS Safari 17+ and Android Chrome
 - [ ] **Done:** matches the §5.8 mock
 
 ## 2. Accessibility (M3-F10 · 2 d)
@@ -26,7 +26,6 @@
 - [ ] WCAG 2.2 AA contrast in light and dark; Okabe–Ito palette checked with deuteranopia/protanopia simulation
 - [ ] `prefers-reduced-motion` turns off fades
 - [ ] Radix dialogs/menus: focus trap and restore
-- [ ] Keyboard-only Playwright test of the main flow
 - [ ] **Done:** axe-core clean on every story; §5.10 checklist passes
 
 ## 3. Analytics (M3-F11 · 1 d)

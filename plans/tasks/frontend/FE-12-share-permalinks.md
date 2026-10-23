@@ -19,7 +19,6 @@
 - [ ] `404` / `410` → "This link was revoked or has expired"
 - [ ] **Open in new tab** in the header uses the permalink
 - [ ] `viz_open` with entry point `permalink`; `viz_share` event
-- [ ] E2E: share → open in a fresh context → right step; revoke → 404 screen
 
 ## Done when
 
