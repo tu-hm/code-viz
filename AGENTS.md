@@ -16,6 +16,7 @@ make gen              # Go + TS types from api/openapi.yaml and schema/*.json
 make test             # needs Docker: testcontainers starts MySQL
 make test-nsjail      # needs Docker: nsjail sandbox tests in a privileged container
 make golden-update    # rewrites expected.trace.json; read the diff before committing
+go run ./cmd/vizctl trace --lang python3 main.py < input   # trace in the Docker dev sandbox; make images first
 make lint             # golangci-lint v2.15.0, pinned through go run
 make fmt              # goimports, then gofmt
 make vuln             # govulncheck v1.9.0, pinned

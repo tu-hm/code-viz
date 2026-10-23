@@ -175,7 +175,7 @@ One container per box:
 ### Architecture check and janitor
 
 - `Start` refuses an image whose architecture doesn't match the daemon's: GDB's `ptrace` fails under emulation. The error says to run `make images`.
-- `dockersandbox.New` force-removes every container labelled `viz.job`, left over from a crash. It removes them all, whoever started them, so two processes that each call `New` against one Docker daemon delete each other's boxes. Don't run a dev worker and the dockersandbox tests at the same time.
+- `dockersandbox.New` force-removes containers labelled `viz.job` whose `viz.started` is more than 2 minutes old, or missing: boxes left over from a crash. A box lives for one job, and a job's hard deadline is 30 s (§7.7), so a younger box belongs to a process that is still running. A dev worker, `vizctl` and the test packages can therefore share one Docker daemon. When two janitors race for the same leftover, the loser's "not found" or "removal in progress" counts as removed.
 
 ## Runner image requirements
 
@@ -196,7 +196,8 @@ For nsjail, the image is unpacked into a directory on the node (for example `doc
 
 | Run | What it covers |
 |---|---|
-| `go test ./internal/adapters/dockersandbox/` | The shared suite against the Docker adapter, plus adapter-only cases: missing image, emulated image, unreachable daemon, the janitor, `Close`. About 10 s once images are cached |
+| `go test ./internal/adapters/dockersandbox/` | The shared suite against the Docker adapter, plus adapter-only cases: missing image, emulated image, unreachable daemon, the janitor (old leftovers go, running boxes stay), `Close`. About 10 s once images are cached |
+| `go test ./cmd/vizctl` | Every `fixtures/<language>/<case>/` through `vizctl trace` in the Docker sandbox, against its `expected.trace.json`, plus the build-step failures. Needs the runner images (`make runner-images`; `make test` builds them) |
 | `make test-nsjail` | The shared suite against the nsjail adapter, plus adapter-only cases: missing image, failed jail setup, a cgroup without controllers, the janitor, `Close`. Builds `viz-nsjail-test:dev` and runs it privileged with `scripts/nsjail-cgroups.sh`. `go test ./...` skips these tests outside that container. `make check` runs it, so CI covers both adapters |
 | `go test ./internal/shim -fuzz=FuzzReader -fuzztime=30s` | Fuzzes the frame reader. Commit any failing input it finds (test 9) |
 | `go test ./cmd/vizd` | The `VIZ_ENV` and `VIZ_SANDBOX` rules |

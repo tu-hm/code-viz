@@ -34,7 +34,18 @@ curl -i http://127.0.0.1:8080/readyz    # 200: MySQL is reachable; 503 otherwise
 
 Press Ctrl-C to stop vizd. `make down` stops the containers and keeps their data. `make reset` also deletes the data.
 
-Not built yet: the API endpoints (BE-06), the job worker (BE-05) and the runner images (BE-03, BE-08). `make seed` loads nothing until BE-13 §1 adds sample traces.
+Not built yet: the API endpoints (BE-06), the job worker (BE-05) and the C++ runner image (BE-07, BE-08). `make seed` loads nothing until BE-13 §1 adds sample traces.
+
+## Trace a program locally
+
+`vizctl trace` runs a language adapter in the Docker dev sandbox, the same way the worker will, and prints the trace as JSON. Build the runner images once with `make images`.
+
+```sh
+go run ./cmd/vizctl trace --lang python3 fixtures/python/aliasing/main.py < fixtures/python/aliasing/stdin > trace.json
+go run ./cmd/vizctl validate trace.json   # silent when the trace matches schema/trace.v1.schema.json
+```
+
+`--lang` is a manifest `id` from `adapters/*/manifest.yaml`. A program that fails its build step (a syntax error, or an import outside `modules.allow`) prints `compile_error` or `unsupported_module` with the diagnostics and exits 1. The Python tracer's contract with the core is in spec §7.11.1 and §10.1.
 
 ## Docker dev sandbox
 
@@ -43,10 +54,10 @@ On a laptop, jobs run in Docker containers instead of nsjail, the production san
 **It is not a security boundary.** vizd logs a warning on every start with it, and refuses to start with it unless `VIZ_ENV` is `dev` or `test`, so it never runs in staging or production. Each job still gets its own container with no network, a read-only root, a 64 MB `/work`, 32 PIDs, a memory cap, no capabilities and a non-root user.
 
 - **It needs Docker.** The sandbox talks to the daemon at `DOCKER_HOST`, or `/var/run/docker.sock` if that's unset. That works with vizd on the host and with vizd in Compose with the socket mounted. If your Docker uses a context instead (OrbStack, Colima), export `DOCKER_HOST` as shown under Common problems.
-- **It refuses emulated images.** A runner image must match your machine's architecture, because GDB's `ptrace` fails under emulation. Run `make images` once to build them for your machine. The runner images themselves arrive with the tracers (BE-03, BE-08); until then `make images` builds only vizd.
-- **Leftovers are cleaned up.** Sandbox containers carry a `viz.job` label, and the sandbox removes any left from an earlier run when it starts.
+- **It refuses emulated images.** A runner image must match your machine's architecture, because GDB's `ptrace` fails under emulation. Run `make images` once to build them for your machine. Only the Python runner image exists so far; the C++ one comes with BE-07 and BE-08.
+- **Leftovers are cleaned up.** Sandbox containers carry `viz.job` and `viz.started` labels. When a sandbox starts, it removes boxes started more than 2 minutes ago, longer than any job runs. A dev worker, `vizctl` and the tests can share one Docker daemon.
 
-`make test` runs the sandbox tests against your Docker, with a small busybox test image it builds itself.
+`make test` runs the sandbox tests against your Docker, with a small busybox test image it builds itself. It also builds the runner images first, because the golden fixture test runs every `fixtures/<language>/<case>/` through `vizctl trace`.
 
 The port contract, `viz-shim` and its frame format, every container setting and what a runner image needs are in the [sandbox guide](../docs/guides/sandbox.md).
 
@@ -72,8 +83,11 @@ Everything listens on 127.0.0.1 only.
 | `make down` | Stops the containers and keeps their data |
 | `make reset` | Stops the containers and deletes their data |
 | `make seed` | Loads sample data (nothing yet) |
-| `make test` | Runs `go test ./...`. Needs Docker, because some tests start MySQL with testcontainers and the sandbox tests start containers. |
-| `make images` | Builds `vizd-api:dev` and `vizd-worker:dev` for this machine's architecture |
+| `make test` | Builds the runner images, then runs `go test ./...`. Needs Docker, because some tests start MySQL with testcontainers, and the sandbox and fixture tests start containers. |
+| `make images` | Builds `vizd-api:dev`, `vizd-worker:dev` and the runner images for this machine's architecture |
+| `make runner-images` | Builds only the runner images, tagged with each manifest's `image` |
+| `make golden-update` | Rewrites the tracecore goldens and every `fixtures/*/*/expected.trace.json` from real runs. Read the diff before committing |
+| `go run ./cmd/vizctl trace\|validate` | Traces a program in the Docker dev sandbox, or checks a trace file (see Trace a program locally) |
 | `make gen` | Regenerates Go types from `api/` and `schema/` |
 | `make lint` | Runs golangci-lint v2.15.0 with `.golangci.yml`. The first run builds the linter, which takes about a minute |
 | `make fmt` | Formats Go code with goimports, then gofmt |
