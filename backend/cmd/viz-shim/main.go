@@ -1,14 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"os/signal"
 	"runtime"
 	"syscall"
+
+	"golang.org/x/sys/unix"
 
 	"github.com/tu-hm/code-viz/backend/internal/shim"
 )
@@ -37,10 +39,8 @@ func main() {
 func run(args []string) error {
 	// threads count toward the box's 32 pids and a fork bomb can take the rest; one P keeps the shim to the threads it starts with
 	runtime.GOMAXPROCS(1)
-	streams := []byte{shim.Stdout, shim.Stderr, shim.Wire}
-	readers := make([]*os.File, len(streams))
-	writers := make([]*os.File, len(streams))
-	for i := range streams {
+	var readers, writers [3]*os.File
+	for i := range readers {
 		r, w, err := os.Pipe()
 		if err != nil {
 			return fmt.Errorf("pipe: %w", err)
@@ -71,10 +71,8 @@ func run(args []string) error {
 	}
 
 	out := shim.NewWriter(os.Stdout)
-	pumped := make(chan error, len(streams))
-	for i, stream := range streams {
-		go func() { pumped <- pump(out, stream, readers[i]) }()
-	}
+	forwarded := make(chan error, 1)
+	go func() { forwarded <- forward(out, readers) }()
 
 	var exitErr *exec.ExitError
 	if err := cmd.Wait(); err != nil && !errors.As(err, &exitErr) {
@@ -84,11 +82,7 @@ func run(args []string) error {
 	if err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL); err != nil && !errors.Is(err, syscall.ESRCH) {
 		return fmt.Errorf("kill process group: %w", err)
 	}
-	var err error
-	for range streams {
-		err = errors.Join(err, <-pumped)
-	}
-	if err != nil {
+	if err := <-forwarded; err != nil {
 		return err
 	}
 
@@ -106,20 +100,104 @@ func setOOMScore(adj string) error {
 	return nil
 }
 
-func pump(out *shim.Writer, stream byte, r *os.File) error {
+func forward(out *shim.Writer, pipes [3]*os.File) error {
+	defer runtime.KeepAlive(pipes) // a collected os.File closes its fd; the loop holds only the numbers
+	var fds [3]unix.PollFd
+	for i, p := range pipes {
+		fd := int(p.Fd()) // Fd switches the pipe to blocking reads
+		if err := unix.SetNonblock(fd, true); err != nil {
+			return fmt.Errorf("set nonblock: %w", err)
+		}
+		fds[i] = unix.PollFd{Fd: int32(fd), Events: unix.POLLIN} //nolint:gosec // fds stay below RLIMIT_NOFILE, far under 2^31
+	}
+	stdout, stderr, wire := &fds[0], &fds[1], &fds[2]
 	buf := make([]byte, shim.MaxPayload)
-	for {
-		n, err := r.Read(buf)
-		if n > 0 {
-			if werr := out.Write(stream, buf[:n]); werr != nil {
-				return fmt.Errorf("write frame: %w", werr)
+	chunk := make([]byte, shim.MaxPayload)
+	midLine := false
+
+	for stdout.Fd >= 0 || stderr.Fd >= 0 || wire.Fd >= 0 {
+		_, err := unix.Poll(fds[:], -1)
+		if errors.Is(err, unix.EINTR) {
+			continue
+		}
+		if err != nil {
+			return fmt.Errorf("poll: %w", err)
+		}
+		var data []byte
+		if wire.Revents != 0 {
+			n, err := read(wire, chunk)
+			if err != nil {
+				return fmt.Errorf("read stream %d: %w", shim.Wire, err)
 			}
+			data = chunk[:n]
 		}
-		if errors.Is(err, io.EOF) {
-			return nil
+
+		// fd 1/2 bytes written before a wire line began are readable once its first byte is => drain them right before the first line a read starts; a read that only continues a line drains nothing (§10.1)
+		if midLine && len(data) > 0 && bytes.IndexByte(data, '\n') < 0 {
+			if err := send(out, shim.Wire, data); err != nil {
+				return err
+			}
+			continue
 		}
+		head := 0
+		if midLine {
+			head = bytes.IndexByte(data, '\n') + 1
+		}
+		if err := send(out, shim.Wire, data[:head]); err != nil {
+			return err
+		}
+		if err := drain(out, shim.Stdout, stdout, buf); err != nil {
+			return err
+		}
+		if err := drain(out, shim.Stderr, stderr, buf); err != nil {
+			return err
+		}
+		if err := send(out, shim.Wire, data[head:]); err != nil {
+			return err
+		}
+		if len(data) > 0 {
+			midLine = data[len(data)-1] != '\n'
+		}
+	}
+	return nil
+}
+
+func drain(out *shim.Writer, stream byte, p *unix.PollFd, buf []byte) error {
+	for p.Fd >= 0 {
+		n, err := read(p, buf)
 		if err != nil {
 			return fmt.Errorf("read stream %d: %w", stream, err)
 		}
+		if n == 0 {
+			return nil
+		}
+		if err := send(out, stream, buf[:n]); err != nil {
+			return err
+		}
 	}
+	return nil
+}
+
+func read(p *unix.PollFd, buf []byte) (int, error) {
+	n, err := unix.Read(int(p.Fd), buf)
+	if errors.Is(err, unix.EAGAIN) {
+		return 0, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+	if n == 0 {
+		p.Fd = -1
+	}
+	return n, nil
+}
+
+func send(out *shim.Writer, stream byte, p []byte) error {
+	if len(p) == 0 {
+		return nil
+	}
+	if err := out.Write(stream, p); err != nil {
+		return fmt.Errorf("write frame: %w", err)
+	}
+	return nil
 }

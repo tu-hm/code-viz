@@ -65,6 +65,8 @@ The tracer writes the wire protocol to fd 3 (§10.1), but `docker run` can't han
 - `viz-shim` with no arguments waits for SIGTERM. The Docker adapter uses it as the container's main process.
 - `viz-shim -- cmd args...` starts `cmd` with stdin on `/dev/null` and pipes on fd 1, 2 and 3. It writes everything it reads as frames to its own stdout. When `cmd` exits, it kills `cmd`'s process group, waits for every pipe to reach EOF, and then writes one exit frame.
 
+**Output written before a wire line goes out ahead of it.** One loop reads all three pipes. Before it forwards a byte on fd 3 that starts a new line, it reads fd 1 and 2 until they're empty. A pipe write can be read as soon as it returns, so everything the program wrote before the tracer began that line is already waiting, and the core gives it to the right step (§10.1). The reverse isn't guaranteed: if the shim reads a line late, output the program wrote after that line can already be waiting too, and goes out ahead of it.
+
 The shim protects itself in two ways, because a killed shim loses the exit frame and the run ends as a broken stream:
 
 - **The program is the out-of-memory killer's first choice.** The shim starts `cmd` with `oom_score_adj` 1000 and keeps its own at 0. Without this, the kernel sometimes picked the shim for a second kill while the first victim's memory was still charged.

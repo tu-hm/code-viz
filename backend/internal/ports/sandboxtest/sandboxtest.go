@@ -198,6 +198,59 @@ func Run(t *testing.T, sb ports.Sandbox, image string) {
 		}
 	})
 
+	t.Run("output written before a wire line arrives before it", func(t *testing.T) {
+		t.Parallel()
+		box := start(t, sb, image, nil)
+		var stdout, stderr, wire bytes.Buffer
+		var stdoutAt []int
+		ctx, cancel := context.WithTimeout(t.Context(), time.Minute)
+		defer cancel()
+		exit, err := box.Run(ctx, ports.Command{
+			Args: sh(`i=0; while [ $i -lt 3000 ]; do
+				i=$((i+1)); printf o$i
+				if [ $((i % 100)) = 0 ]; then
+					head -c 70000 /dev/zero; printf .
+					printf "s$i\ns$i\n" >&3
+					{ printf s$i; head -c 100000 /dev/zero | tr '\0' w; echo; } >&3
+				else
+					printf .
+				fi
+				printf "s$i\n" >&3
+			done`),
+			Stdout: &stdout,
+			Stderr: &stderr,
+			Wire: writerFunc(func(p []byte) (int, error) {
+				for _, b := range p {
+					if wire.Len() == 0 || wire.Bytes()[wire.Len()-1] == '\n' {
+						stdoutAt = append(stdoutAt, stdout.Len())
+					}
+					wire.WriteByte(b)
+				}
+				return len(p), nil
+			}),
+		})
+		if err != nil || exit != (ports.Exit{}) || stderr.Len() > 0 {
+			t.Fatalf("exit %+v, err %v, stderr %q", exit, err, stderr.String())
+		}
+
+		if got := bytes.Count(stdout.Bytes(), []byte(".")); got != 3000 {
+			t.Fatalf("stdout holds %d o tokens, want 3000", got)
+		}
+		lines := strings.Split(strings.TrimSuffix(wire.String(), "\n"), "\n")
+		if len(lines) != 3090 {
+			t.Fatalf("wire holds %d lines, want 3090", len(lines))
+		}
+		for j, line := range lines {
+			var i int
+			if _, err := fmt.Sscanf(line, "s%d", &i); err != nil {
+				t.Fatalf("wire line %d: %v", j, err)
+			}
+			if got := bytes.Count(stdout.Bytes()[:stdoutAt[j]], []byte(".")); got < i {
+				t.Fatalf("wire line %d (s%d) arrived after only %d o tokens, want o%d before it", j, i, got, i)
+			}
+		}
+	})
+
 	t.Run("deadline kills a busy loop and ends with time limit", func(t *testing.T) {
 		t.Parallel()
 		box := start(t, sb, image, nil)
