@@ -116,6 +116,7 @@ Python has no compiler, so its build step is a check that runs before anything i
 | `--coverage` | Line hits for BE-11. The `.gcno` files land in `/work` |
 | `-Wall -Wextra -Wshadow` | The warnings panel (§19.6). Warnings come back from a build that succeeds |
 | `-fdiagnostics-plain-output` | No colors, carets, fix-its or URLs: `raw` is plain text with one diagnostic per line |
+| `--param ggc-min-heapsize=32768 --param ggc-min-expand=30` | GCC sizes its garbage-collected heap from the host's RAM, not the box's 256 MiB. Collecting early keeps a build that can't use the PCH inside the box, for 5–10% more build time and the same code ([S7](../../../plans/spikes/s7-safety-checks.md)) |
 | `/opt/viz/flush_init.cpp` | Unbuffered stdout and `std::unitbuf` before `main` (§7.11.2) |
 
 - **Safety checks (D21, §19.6).** `build.safetyFlags` (`-D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all`) go after `build.cmd` unless the request sets `options.safetyChecks: false`. Unset and `true` mean on (`domain.SafetyChecks`). `NormalizeOptions` keeps the field only when it's `false`, so unset and `true` share a cache key and `false` gets its own. `CheckRequest` rejects `false` for a language with no `build.safetyFlags`, such as Python. With checks on, the containers are libstdc++'s debug ones, so a trace shows `std::__debug::vector<int, …>`.

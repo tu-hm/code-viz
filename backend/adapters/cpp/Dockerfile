@@ -43,7 +43,7 @@ RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/000-local-lib.conf \
     && mv /usr/local/lib64/libstdc++.so.*-gdb.py /usr/local/share/gdb/auto-load/usr/local/lib64/ \
     && cd "/usr/local/include/c++/$(g++ -dumpfullversion)/$(g++ -dumpmachine)/bits" \
     && mkdir stdc++.h.gch \
-    && flags='-std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output -x c++-header stdc++.h' \
+    && flags='-std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 -x c++-header stdc++.h' \
     && g++ $flags -o stdc++.h.gch/checks-off.gch \
     && g++ $flags -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all -o stdc++.h.gch/checks-on.gch \
     && rm stdc++.h.gch/*.gcno \

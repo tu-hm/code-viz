@@ -60,7 +60,7 @@ For nsjail, the image is unpacked into a directory on the node (for example with
 
 ```sh
 docker run --rm -i -w /work --tmpfs /work -e TMPDIR=/work viz-runner-cpp:13.5-gdb14-1 \
-  sh -c 'cat > main.cpp && g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output main.cpp /opt/viz/flush_init.cpp -o main -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all -H 2>&1' \
+  sh -c 'cat > main.cpp && g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 main.cpp /opt/viz/flush_init.cpp -o main -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all -H 2>&1' \
   < main.cpp | grep '^[!x]'
 ```
 
