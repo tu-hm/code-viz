@@ -14,7 +14,7 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 ## 1. `@viz/player` skeleton (M0-15 · 1 d · week 2)
 
 - [x] `loadTrace(source)`: header + chunk list from a file (fixtures) or an API response (§8.3) — `@viz/player` `load.ts`; the API source takes the manifest plus a `refresh` callback the host wires to its client (FE-04)
-- [x] Fetch chunks in order, gunzip if not done by the browser, **verify `sha256`** before use (§8.4) — hash over the bytes as received; against `make dev` every chunk fails it, because the backend hashes the gzip object it serves with `Content-Encoding: gzip` (open, backend side)
+- [x] Fetch chunks in order, gunzip if not done by the browser, **verify `sha256`** before use (§8.4) — hash over the unzipped JSON (§8.4), checked against `make dev`
 - [x] Unknown fields ignored; unknown `kind` → `opaque`, unknown `t` → plain text (§9.7)
 - [x] Refresh expired chunk URLs: if `urlsExpireAt` has passed, re-`GET /visualizations/{id}` before fetching (§8.4) — checked before every chunk; seen against the real API
 - [x] Typed errors: checksum mismatch, network, schema version too new — `ChecksumError`, `NetworkError`, `VersionError` by `name`, so they survive Comlink

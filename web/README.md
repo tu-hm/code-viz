@@ -89,7 +89,6 @@ The hand-written traces are plain JSON. Edit them directly. `fixtures.test.ts` c
 - **You see mock data while expecting the real backend:** MSW is still on. Run `VITE_USE_MSW=false pnpm dev`.
 - **`Failed to fetch` or connection refused on port 8080:** the backend isn't running. Start Docker, then run `make dev` in `backend/`.
 - **A CORS error on API calls or chunk downloads:** the API, or the presigned SeaweedFS URLs (`S3_PUBLIC_ENDPOINT`), don't allow the dev origin `http://localhost:5173`. Both allow it under `make dev` (checked 24 Oct); look at `CORS_ORIGINS` in `backend/.env`, and rerun `make seed` after changing it.
-- **Every trace from `make dev` fails with `ChecksumError`:** the API hashes the gzipped chunk, but object storage serves it with `Content-Encoding: gzip`, so the browser only ever sees the unzipped JSON. Open; the fix is on the backend side (FE-02 report).
 - **`make gen` says `pnpm: command not found`:** install pnpm and run `pnpm install` in `web/` first.
 - **`ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` on install:** a version you asked for is less than 7 days old. Pin the newest version that is older, or wait. See [Dependencies](AGENTS.md#dependencies).
 - **`Port 5173 is already in use`:** another `pnpm dev` is running; use that one. Vite stops instead of moving to 5174, because `http://localhost:5173` is the dev origin the API is meant to allow.

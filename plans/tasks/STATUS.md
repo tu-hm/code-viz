@@ -7,7 +7,7 @@
 ## Now
 
 - **In progress:** BE-01 (41/46). CI runs `make check` on every push and PR to `main`, and the first run is green. Every item left waits on another task or on a decision; see [BE-01 open items](#be-01-open-items).
-- **In progress:** FE-02 (33/43). `@viz/player` loads a trace in a Web Worker and steps it within the §13 budget (worst step 1.4 ms on 1,000 steps), inside the §5.2 shell with settings and autoplay; `?fixture=<name>` under `pnpm dev` shows it. What's left is slots for other tasks, and a backend fix: chunk `sha256` covers the gzip bytes, which a browser never sees.
+- **In progress:** FE-02 (33/43). `@viz/player` loads a trace in a Web Worker and steps it within the §13 budget (worst step 1.4 ms on 1,000 steps), inside the §5.2 shell with settings and autoplay; `?fixture=<name>` under `pnpm dev` shows it. Real Python traces from `make dev` load; what's left is slots for other tasks.
 - **In progress:** FE-01 (26/37). The web workspace, design system, codegen, fixtures and mock API are in `web/`. Storybook (§4) is planned for week 6. The frontend is trimmed to the IDE: no i18n, no Playwright end-to-end tests (spec v1.3).
 - **Done:** BE-08 §1 (4/4). The GDB prototype traces the loop, recursion and STL programs, its output validates against the wire schema, and it ran under both sandboxes for S1b.
 - **In progress:** BE-02 (48/54). G1 is decided: nsjail (spec v1.5, [S1b report](../spikes/s1b-sandbox.md)). The nsjail adapter passes `sandboxtest`, and `make check` runs the suite against both adapters. What's left waits on other tasks; see the task file.
@@ -63,7 +63,7 @@
 | Task | Milestone | Status | Done | Next step, or what it waits on |
 |---|---|---|---|---|
 | [FE-01](frontend/FE-01-foundation-fixtures.md) Foundation & fixtures | M0–M1 | 🟡 | 26/37 | §4 Storybook (week 6); §5 against `make dev` can start: the API is in (BE-06) |
-| [FE-02](frontend/FE-02-trace-player-controls.md) Trace player & controls | M0–M1, M3 | 🟡 | 33/43 | Loader, worker engine, controls, shell, settings, autoplay and the perf budget are in. Open: slots for FE-03/05/06/12, Shift shortcuts (FE-10), breakpoints from the gutter (FE-03), profile storage (auth). Real API loads fail `sha256`: the backend hashes the gzip object it serves with `Content-Encoding: gzip` |
+| [FE-02](frontend/FE-02-trace-player-controls.md) Trace player & controls | M0–M1, M3 | 🟡 | 33/43 | Loader, worker engine, controls, shell, settings, autoplay and the perf budget are in. Open: slots for FE-03/05/06/12, Shift shortcuts (FE-10), breakpoints from the gutter (FE-03), profile storage (auth) |
 | [FE-03](frontend/FE-03-code-pane.md) Code pane | M0, M3 | 🟢 | 0/15 | §1 can start; §2 needs BE-11 §1 |
 | [FE-04](frontend/FE-04-visualize-from-ide.md) Visualize from the IDE | M1 | 🟢 | 0/18 | Can start, against the mock API (FE-01 §5) or the real one under `make dev` (BE-06) |
 | [FE-05](frontend/FE-05-run-states-errors.md) Run states & errors | M1–M3 | ⏳ | 0/29 | FE-04; BE-07 §2, BE-10, BE-11 |
