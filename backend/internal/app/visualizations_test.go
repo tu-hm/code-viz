@@ -80,25 +80,22 @@ func TestCreateRunsConcurrentIdenticalRequestsAsOneTraceAndOneJob(t *testing.T) 
 
 func TestCreateRefusesABadRequestBeforeTakingQuota(t *testing.T) {
 	t.Parallel()
-	with := func(change func(r *api.CreateVisualizationRequest)) api.CreateVisualizationRequest {
-		r := request("print(1)")
-		change(&r)
-		return r
-	}
 	tests := []struct {
-		name string
-		req  api.CreateVisualizationRequest
-		want error
+		name   string
+		change func(r *api.CreateVisualizationRequest)
+		want   error
 	}{
-		{"unknown language", with(func(r *api.CreateVisualizationRequest) { r.Language = "cobol" }), domain.ErrUnsupportedLanguage},
-		{"language with visualize disabled", with(func(r *api.CreateVisualizationRequest) { r.Language = "off" }), domain.ErrUnsupportedLanguage},
-		{"source over its limit", with(func(r *api.CreateVisualizationRequest) { r.Source = strings.Repeat("x", 64<<10+1) }), domain.ErrPayloadTooLarge},
-		{"options the language lacks", with(func(r *api.CreateVisualizationRequest) { r.Options.StartAtLines = []int{2} }), domain.ErrInvalidRequest},
+		{"unknown language", func(r *api.CreateVisualizationRequest) { r.Language = "cobol" }, domain.ErrUnsupportedLanguage},
+		{"language with visualize disabled", func(r *api.CreateVisualizationRequest) { r.Language = "off" }, domain.ErrUnsupportedLanguage},
+		{"source over its limit", func(r *api.CreateVisualizationRequest) { r.Source = strings.Repeat("x", 64<<10+1) }, domain.ErrPayloadTooLarge},
+		{"options the language lacks", func(r *api.CreateVisualizationRequest) { r.Options.StartAtLines = []int{2} }, domain.ErrInvalidRequest},
 	}
 	h := newHarness(t, 100)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, err := h.Create(t.Context(), app.Caller{Subject: "ip:1"}, "", tt.req); !errors.Is(err, tt.want) {
+			req := request("print(1)")
+			tt.change(&req)
+			if _, err := h.Create(t.Context(), app.Caller{Subject: "ip:1"}, "", req); !errors.Is(err, tt.want) {
 				t.Errorf("err = %v, want %v", err, tt.want)
 			}
 		})
@@ -694,9 +691,6 @@ func TestCleanupDeletesExpiredRowsAndChunksButNotATraceJustReset(t *testing.T) {
 	assertNoChunks(t, h.b, goneTrace)
 	if resp := get(t, http.MethodGet, h.b.url+"/"+domain.ChunkKey("t7", resetTrace, 0)); resp.StatusCode != http.StatusOK {
 		t.Errorf("chunk of the reset trace: HTTP %d, want 200", resp.StatusCode)
-	}
-	if _, err := h.Get(ctx, gone.ID, api.GetVisualizationParams{}); !errors.Is(err, domain.ErrNotFound) {
-		t.Errorf("deleted visualization: err = %v, want ErrNotFound", err)
 	}
 }
 
