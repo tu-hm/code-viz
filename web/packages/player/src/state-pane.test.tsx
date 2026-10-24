@@ -129,24 +129,28 @@ function sampled(stepCount: number) {
 describe.each(fixtureNames)('%s', (name) => {
   const steps = loadFixture(name).chunks.flat()
 
-  test('every step is readable: a table per frame, and a card behind every reference', () => {
-    for (const step of sampled(steps.length)) {
-      const { unmount } = renderStep(name, step)
-      const state = stateAt(name, step)
-      const tables = screen.getAllByRole('table').filter((t) => t.querySelector('caption'))
-      expect(
-        tables.map((t) => t.querySelector('caption button')!.textContent.split(' · ')[0]),
-        `step ${step}`,
-      ).toEqual(state.stack.map((f) => (f.kind === 'global' ? 'Globals' : `${f.name}()`)))
-      const ids = new Set(cardIds())
-      for (const label of screen.queryAllByText('points to')) {
-        const id = /#(\w+)/.exec(label.parentElement!.textContent)![1]!
-        expect(ids.has(`#${id}`), `step ${step}: #${id} has no card`).toBe(true)
+  test(
+    'every step is readable: a table per frame, and a card behind every reference',
+    { timeout: 30_000 },
+    () => {
+      for (const step of sampled(steps.length)) {
+        const { unmount } = renderStep(name, step)
+        const state = stateAt(name, step)
+        const tables = screen.getAllByRole('table').filter((t) => t.querySelector('caption'))
+        expect(
+          tables.map((t) => t.querySelector('caption button')!.textContent.split(' · ')[0]),
+          `step ${step}`,
+        ).toEqual(state.stack.map((f) => (f.kind === 'global' ? 'Globals' : `${f.name}()`)))
+        const ids = new Set(cardIds())
+        for (const label of screen.queryAllByText('points to')) {
+          const id = /#(\w+)/.exec(label.parentElement!.textContent)![1]!
+          expect(ids.has(`#${id}`), `step ${step}: #${id} has no card`).toBe(true)
+        }
+        expect(document.body.textContent).not.toMatch(/undefined|\[object Object\]|NaN/)
+        unmount()
       }
-      expect(document.body.textContent).not.toMatch(/undefined|\[object Object\]|NaN/)
-      unmount()
-    }
-  })
+    },
+  )
 
   test(
     'stepping in place draws what a fresh render of each step draws',

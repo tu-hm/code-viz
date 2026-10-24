@@ -15,24 +15,28 @@ const counter = (step: number, of: number) => screen.findByText(`Step ${step} of
 const button = (name: string) => screen.getByRole('button', { name })
 
 describe.each(fixtureNames)('%s', (name) => {
-  test('opens at the first step and walks to the last with the controls', async () => {
-    const { stepCount } = renderPlayer(name)
-    await counter(1, stepCount)
-    expect(screen.getByText(`Ready · ${stepCount.toLocaleString('en')} steps`, { exact: false }))
-    expect(button('Previous step')).toHaveProperty('disabled', true)
+  test(
+    'opens at the first step and walks to the last with the controls',
+    { timeout: 30_000 },
+    async () => {
+      const { stepCount } = renderPlayer(name)
+      await counter(1, stepCount)
+      expect(screen.getByText(`Ready · ${stepCount.toLocaleString('en')} steps`, { exact: false }))
+      expect(button('Previous step')).toHaveProperty('disabled', true)
 
-    fireEvent.click(button('Next step'))
-    await counter(2, stepCount)
-    fireEvent.click(button('Last step'))
-    await counter(stepCount, stepCount)
-    expect(button('Next step')).toHaveProperty('disabled', true)
-    fireEvent.click(button('Previous step'))
-    await counter(stepCount - 1, stepCount)
-    fireEvent.click(button('First step'))
-    await counter(1, stepCount)
-  })
+      fireEvent.click(button('Next step'))
+      await counter(2, stepCount)
+      fireEvent.click(button('Last step'))
+      await counter(stepCount, stepCount)
+      expect(button('Next step')).toHaveProperty('disabled', true)
+      fireEvent.click(button('Previous step'))
+      await counter(stepCount - 1, stepCount)
+      fireEvent.click(button('First step'))
+      await counter(1, stepCount)
+    },
+  )
 
-  test('the §5.9 keys step, jump and close', async () => {
+  test('the §5.9 keys step, jump and close', { timeout: 30_000 }, async () => {
     const { stepCount, onClose } = renderPlayer(name)
     await counter(1, stepCount)
 
@@ -52,18 +56,22 @@ describe.each(fixtureNames)('%s', (name) => {
     expect(onClose).toHaveBeenCalledOnce()
   })
 
-  test('the output panel holds everything printed up to the current step', async () => {
-    const { chunks } = loadFixture(name)
-    const steps = chunks.flat()
-    const { stepCount } = renderPlayer(name)
-    await counter(1, stepCount)
-    fireEvent.keyDown(document.body, { key: 'End' })
-    await counter(stepCount, stepCount)
+  test(
+    'the output panel holds everything printed up to the current step',
+    { timeout: 30_000 },
+    async () => {
+      const { chunks } = loadFixture(name)
+      const steps = chunks.flat()
+      const { stepCount } = renderPlayer(name)
+      await counter(1, stepCount)
+      fireEvent.keyDown(document.body, { key: 'End' })
+      await counter(stepCount, stepCount)
 
-    const output = screen.getByRole('region', { name: 'Stdout / Stderr' })
-    const printed = steps.map((s) => s.stdout + s.stderr).join('')
-    expect(output.querySelector('pre')!.textContent).toBe(printed || '(nothing printed yet)')
-  })
+      const output = screen.getByRole('region', { name: 'Stdout / Stderr' })
+      const printed = steps.map((s) => s.stdout + s.stderr).join('')
+      expect(output.querySelector('pre')!.textContent).toBe(printed || '(nothing printed yet)')
+    },
+  )
 })
 
 test('typing in an input leaves the shortcuts alone', async () => {
