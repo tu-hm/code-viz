@@ -26,6 +26,7 @@ type Poller struct {
 
 	mu      sync.Mutex
 	waiters map[*waiter]struct{}
+	stopped bool
 	active  chan struct{}
 }
 
@@ -48,6 +49,10 @@ func NewPoller(db *sql.DB, now func() time.Time, after func(time.Duration) <-cha
 func (p *Poller) Wait(ctx context.Context, traceID string, since int64) error {
 	w := &waiter{traceID: traceID, since: since, woken: make(chan struct{})}
 	p.mu.Lock()
+	if p.stopped {
+		p.mu.Unlock()
+		return nil
+	}
 	if len(p.waiters) >= maxParked {
 		p.mu.Unlock()
 		return domain.ErrCapacity
@@ -72,8 +77,10 @@ func (p *Poller) Wait(ctx context.Context, traceID string, since int64) error {
 	}
 }
 
-// Run polls every 250 ms while requests are parked, and blocks without querying while none are. It returns when ctx is done.
+// Run polls every 250 ms while requests are parked, and blocks without querying while none are. It returns when ctx is done,
+// and then wakes every parked request and parks no more, so long-polls end with their current state on shutdown (§13).
 func (p *Poller) Run(ctx context.Context) {
+	defer p.stop()
 	for {
 		select {
 		case <-ctx.Done():
@@ -104,6 +111,16 @@ func (p *Poller) pollWhileParked(ctx context.Context) {
 		}
 		p.wake(rows)
 		from = advance(from, rows)
+	}
+}
+
+func (p *Poller) stop() {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.stopped = true
+	for w := range p.waiters {
+		delete(p.waiters, w)
+		close(w.woken)
 	}
 }
 

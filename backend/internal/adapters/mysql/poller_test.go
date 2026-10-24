@@ -125,6 +125,38 @@ func TestWaitRefusesThe5001stRequestAndFreesSlotsWhenCtxEnds(t *testing.T) {
 	}
 }
 
+func TestStoppedPollerWakesParkedRequestsAndParksNoMore(t *testing.T) {
+	t.Parallel()
+	asked := make(chan struct{}, 1)
+	p := mysql.NewPoller(nil, func() time.Time { return t0 }, func(time.Duration) <-chan time.Time {
+		asked <- struct{}{}
+		return nil
+	})
+	ctx, cancel := context.WithCancel(t.Context())
+	stopped := make(chan struct{})
+	go func() {
+		defer close(stopped)
+		p.Run(ctx)
+	}()
+
+	parked := parkOnX(t, p, 0)
+	select {
+	case <-asked:
+	case <-time.After(time.Minute):
+		t.Fatal("poller did not start polling for the parked request within a minute")
+	}
+	cancel()
+	<-stopped
+
+	if err := receive(t, parked.err); err != nil {
+		t.Errorf("request parked before the stop: err = %v, want nil", err)
+	}
+	late := parkOnX(t, p, 0)
+	if err := receive(t, late.err); err != nil {
+		t.Errorf("request after the stop: err = %v, want nil", err)
+	}
+}
+
 func TestPollerKeepsRequestsParkedThroughAFailedQuery(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
