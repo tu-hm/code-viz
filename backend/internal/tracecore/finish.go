@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"slices"
 	"strconv"
 
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
@@ -30,7 +31,7 @@ type Outcome struct {
 type Result struct {
 	Header Header
 	Steps  []trace.Step
-	Tail   []byte     // output after the step limit, stored as tail.txt.gz (§19.9.5); nil otherwise
+	Tail   []byte     // output after the last step, stored as tail.txt.gz (§19.9.5): past the step limit, or all of it without steps
 	Logs   []wire.Log // adapter log messages: internal logs only, never shown to users
 }
 
@@ -98,6 +99,9 @@ func (r *Recorder) Finish(out Outcome, runErr error) (*Result, error) {
 		last := &r.steps[len(r.steps)-1]
 		last.Stdout += string(r.stdout)
 		last.Stderr += string(r.stderr)
+	case len(r.stdout)+len(r.stderr) > 0:
+		// no step to hold it (a start line that never ran, a crash before main)
+		res.Tail = slices.Concat(r.stdout, r.stderr)
 	}
 
 	res.Header = Header{

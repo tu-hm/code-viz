@@ -194,6 +194,14 @@ func TestStepLimit(t *testing.T) {
 	}
 }
 
+func TestOutputWithoutAStepGoesToTheTail(t *testing.T) {
+	writes := append(wireLines(helloLine), write{1, "out"}, write{2, "err"})
+	res := mustRecord(t, config(t, 3, tracecore.DefaultLimits), tracecore.Outcome{}, append(writes, wireLines(exitLine("normal", 0))...))
+	if string(res.Tail) != "outerr" || len(res.Steps) != 0 || res.Header.Summary.UntracedTail != nil {
+		t.Errorf("tail %q, %d steps, untracedTail %+v; want tail \"outerr\", no steps and no untracedTail", res.Tail, len(res.Steps), res.Header.Summary.UntracedTail)
+	}
+}
+
 func TestStepCountCountsRecordedStepsOnly(t *testing.T) {
 	rec := tracecore.NewRecorder(config(t, 2, tracecore.DefaultLimits))
 	var got []int
