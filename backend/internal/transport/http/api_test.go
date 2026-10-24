@@ -86,6 +86,11 @@ func TestEachErrorCodeAnswersWithItsStatusAndTheEnvelope(t *testing.T) {
 			body: "{", code: api.ErrorCodeInvalidRequest, status: http.StatusBadRequest,
 		},
 		{
+			name: "body that is not application/json", s: s, method: http.MethodPost, path: "/visualizations", target: "/api/v1/visualizations",
+			body: createBody(t, nil), header: http.Header{"Content-Type": {"text/plain"}},
+			code: api.ErrorCodeInvalidRequest, status: http.StatusBadRequest,
+		},
+		{
 			name: "options outside their range", s: s, method: http.MethodPost, path: "/visualizations", target: "/api/v1/visualizations",
 			body: createBody(t, func(r *api.CreateVisualizationRequest) { r.Options.MaxSteps = 0 }),
 			code: api.ErrorCodeInvalidRequest, status: http.StatusBadRequest,
@@ -621,7 +626,11 @@ func (s *stack) complete(t *testing.T, l ports.Lease) {
 
 func newRequest(t *testing.T, method, target, body string) *http.Request {
 	t.Helper()
-	return httptest.NewRequestWithContext(t.Context(), method, target, strings.NewReader(body))
+	r := httptest.NewRequestWithContext(t.Context(), method, target, strings.NewReader(body))
+	if body != "" {
+		r.Header.Set("Content-Type", "application/json")
+	}
+	return r
 }
 
 func createBody(t *testing.T, change func(r *api.CreateVisualizationRequest)) string {

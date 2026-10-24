@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math"
+	"mime"
 	"net/http"
 	"strconv"
 
@@ -27,7 +28,7 @@ func HandleAPI(mux *http.ServeMux, viz *app.Visualizations, ipKey []byte, origin
 	routes.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
 		writeError(w, r, fmt.Errorf("no route %s %s: %w", r.Method, r.URL.Path, domain.ErrNotFound))
 	})
-	strict := api.NewStrictHandlerWithOptions(&server{viz: viz}, nil, api.StrictHTTPServerOptions{
+	strict := api.NewStrictHandlerWithOptions(&server{viz: viz}, []api.StrictMiddlewareFunc{jsonOnly}, api.StrictHTTPServerOptions{
 		RequestErrorHandlerFunc:  writeBodyError,
 		ResponseErrorHandlerFunc: writeError,
 	})
@@ -37,6 +38,17 @@ func HandleAPI(mux *http.ServeMux, viz *app.Visualizations, ipKey []byte, origin
 		ErrorHandlerFunc: writeParamError,
 	})
 	mux.Handle(basePath+"/", boundary(ipKey, cors(origins, routes)))
+}
+
+// text/plain POST skips the CORS preflight => a foreign page could spend its visitor's quota
+func jsonOnly(next api.StrictHandlerFunc, _ string) api.StrictHandlerFunc {
+	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		mediaType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+		if r.ContentLength != 0 && (err != nil || mediaType != "application/json") {
+			return nil, fmt.Errorf("the request body must be application/json: %w", domain.ErrInvalidRequest)
+		}
+		return next(ctx, w, r, request)
+	}
 }
 
 type server struct {
