@@ -22,7 +22,7 @@ curl -sS -o /dev/null -X PUT http://127.0.0.1:28333/viz-traces
 export MYSQL_DSN='viz:viz@tcp(127.0.0.1:23306)/viz' VIZ_ENV=dev VIZ_SANDBOX=docker VIZ_HTTP_ADDR=127.0.0.1:18080
 export VIZ_ADAPTERS_DIR="$backend/adapters" S3_ENDPOINT=http://127.0.0.1:28333 S3_PUBLIC_ENDPOINT=http://127.0.0.1:28333
 export S3_BUCKET=viz-traces S3_PATH_STYLE=true AWS_REGION=us-east-1 AWS_ACCESS_KEY_ID=viz AWS_SECRET_ACCESS_KEY=viz
-export VIZ_IP_HASH_KEY=load-spike-ip-hash-key-not-a-secret VIZ_SLOTS=100000
+export VIZ_IP_HASH_KEY=load-spike-ip-hash-key-not-a-secret VIZ_SLOTS=100000 VIZ_WEB_ORIGIN=http://localhost:5173
 "$vizd_bin" migrate up >/dev/null 2>&1
 
 api=http://127.0.0.1:18080/api/v1

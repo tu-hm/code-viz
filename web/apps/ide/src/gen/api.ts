@@ -73,11 +73,15 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create a permalink and extend retention
-         * @description Calling it again returns the same link.
+         * Create a share link and keep the visualization for 90 days
+         * @description Only the caller that created the visualization can share it, and only once it is completed. The link opens a new visualization ID of the same trace, which anyone can GET; the visualization and the link expire 90 days after the share. Calling it again returns the same link until it is revoked.
          */
         post: operations["shareVisualization"];
-        delete?: never;
+        /**
+         * Revoke the share link
+         * @description The link's ID answers 404 for everyone from then on; the visualization itself is unchanged and keeps its 90 days. Only the caller that created the visualization can revoke. Sharing again makes a new link.
+         */
+        delete: operations["revokeShare"];
         options?: never;
         head?: never;
         patch?: never;
@@ -297,7 +301,7 @@ export interface components {
         };
     };
     responses: {
-        /** @description Malformed request or invalid options. */
+        /** @description Malformed request or invalid options, or a share before the visualization is completed. */
         InvalidRequest: {
             headers: {
                 [name: string]: unknown;
@@ -459,6 +463,8 @@ export interface operations {
             /** @description The current state. */
             200: {
                 headers: {
+                    /** @description "public, max-age=60" for a share link, which reads the same for every caller; "no-store" otherwise. */
+                    "Cache-Control": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -506,7 +512,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The permalink. */
+            /** @description The share link. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -515,8 +521,32 @@ export interface operations {
                     "application/json": components["schemas"]["ShareLink"];
                 };
             };
+            400: components["responses"]["InvalidRequest"];
             404: components["responses"]["NotFound"];
             410: components["responses"]["Expired"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["Capacity"];
+        };
+    };
+    revokeShare: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["VisualizationID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Revoked, or there was no link. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["Capacity"];
         };

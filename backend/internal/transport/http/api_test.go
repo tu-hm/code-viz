@@ -145,8 +145,8 @@ func TestEachErrorCodeAnswersWithItsStatusAndTheEnvelope(t *testing.T) {
 			code: api.ErrorCodeNotFound, status: http.StatusNotFound,
 		},
 		{
-			name: "share before it is built", s: s, method: http.MethodPost, path: "/visualizations/{id}/share", target: "/api/v1/visualizations/" + broken.ID + "/share",
-			code: api.ErrorCodeNotFound, status: http.StatusNotFound,
+			name: "share before it is completed", s: s, method: http.MethodPost, path: "/visualizations/{id}/share", target: "/api/v1/visualizations/" + broken.ID + "/share",
+			code: api.ErrorCodeInvalidRequest, status: http.StatusBadRequest,
 		},
 		{
 			name: "visualization past its retention", s: s, method: http.MethodGet, path: "/visualizations/{id}", target: "/api/v1/visualizations/" + old.ID,
@@ -308,6 +308,65 @@ func TestGetShowsEachStateAsTheContractSays(t *testing.T) {
 			if chunk := fetch(t, got.Trace.Chunks[0].URL); !bytes.Equal(chunk, chunkBody(t)) {
 				t.Errorf("signed chunk URL gave %d bytes, want the chunk", len(chunk))
 			}
+		})
+	}
+}
+
+func TestShareReShareAndRevokeAsTheContractSays(t *testing.T) {
+	t.Parallel()
+	s := newStack(t, newDB(t), 100)
+	v := s.create(t, "print(1)")
+	job, err := s.q.Claim(t.Context(), "w1", s.now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.complete(t, job.Lease)
+	share := "/api/v1/visualizations/" + v.ID + "/share"
+
+	shared := s.serve(newRequest(t, http.MethodPost, share, ""))
+	checkContract(t, http.MethodPost, "/visualizations/{id}/share", shared)
+	link := decode[api.ShareLink](t, shared)
+	id, ok := strings.CutPrefix(link.URL, ide+"/viz/")
+	if shared.Code != http.StatusOK || !ok || id == v.ID {
+		t.Fatalf("share: got %d with %s, want 200 with a new ID under %s/viz/", shared.Code, link.URL, ide)
+	}
+	again := s.serve(newRequest(t, http.MethodPost, share, ""))
+	if diff := cmp.Diff(shared.Body.String(), again.Body.String()); again.Code != http.StatusOK || diff != "" {
+		t.Errorf("share again: %d (-first +again):\n%s", again.Code, diff)
+	}
+
+	const other = "198.51.100.7:41000"
+	tests := []struct {
+		name   string
+		peer   string
+		method string
+		path   string
+		target string
+		status int
+		cache  string
+	}{
+		{"another caller reads the link", other, http.MethodGet, "/visualizations/{id}", "/api/v1/visualizations/" + id, http.StatusOK, "public, max-age=60"},
+		{"the owner reads the visualization", "", http.MethodGet, "/visualizations/{id}", "/api/v1/visualizations/" + v.ID, http.StatusOK, "no-store"},
+		{"another caller can't share it", other, http.MethodPost, "/visualizations/{id}/share", share, http.StatusNotFound, ""},
+		{"another caller can't revoke it", other, http.MethodDelete, "/visualizations/{id}/share", share, http.StatusNotFound, ""},
+		{"the owner revokes it", "", http.MethodDelete, "/visualizations/{id}/share", share, http.StatusNoContent, ""},
+		{"the revoked link is gone for another caller", other, http.MethodGet, "/visualizations/{id}", "/api/v1/visualizations/" + id, http.StatusNotFound, ""},
+		{"the revoked link is gone for the owner", "", http.MethodGet, "/visualizations/{id}", "/api/v1/visualizations/" + id, http.StatusNotFound, ""},
+		{"the owner still reads the visualization", "", http.MethodGet, "/visualizations/{id}", "/api/v1/visualizations/" + v.ID, http.StatusOK, "no-store"},
+		{"the owner revokes again", "", http.MethodDelete, "/visualizations/{id}/share", share, http.StatusNoContent, ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newRequest(t, tt.method, tt.target, "")
+			if tt.peer != "" {
+				r.RemoteAddr = tt.peer
+			}
+			rec := s.serve(r)
+
+			if rec.Code != tt.status || rec.Header().Get("Cache-Control") != tt.cache {
+				t.Errorf("got %d with Cache-Control %q, want %d with %q", rec.Code, rec.Header().Get("Cache-Control"), tt.status, tt.cache)
+			}
+			checkContract(t, tt.method, tt.path, rec)
 		})
 	}
 }
@@ -570,12 +629,13 @@ func newStack(t *testing.T, db *sql.DB, maxQueued int) *stack {
 	}
 	s := &stack{db: db, q: mysql.NewQueue(db), now: day0}
 	s.viz = &app.Visualizations{
-		Store:    mysql.NewStore(db, maxQueued),
-		Adapters: adapters,
-		Blobs:    newBucket(t),
-		Events:   mysql.NewPoller(db, time.Now, time.After),
-		Now:      func() time.Time { return s.now },
-		Random:   rand.Reader,
+		Store:     mysql.NewStore(db, maxQueued),
+		Adapters:  adapters,
+		Blobs:     newBucket(t),
+		Events:    mysql.NewPoller(db, time.Now, time.After),
+		Now:       func() time.Time { return s.now },
+		Random:    rand.Reader,
+		WebOrigin: ide,
 	}
 	mux := http.NewServeMux()
 	httptransport.HandleAPI(mux, s.viz, ipKey, []string{ide})

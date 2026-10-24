@@ -239,6 +239,9 @@ func readVisualization(ctx context.Context, qs *sqlc.Queries, id string) (ports.
 	return ports.Visualization{
 		ID:            r.ID,
 		TraceID:       r.TraceID,
+		Subject:       r.Subject,
+		Shared:        r.Shared,
+		ShareID:       r.ShareID.String,
 		Detached:      r.Detached,
 		CreatedAt:     r.CreatedAt,
 		ExpiresAt:     r.ExpiresAt,
@@ -294,6 +297,81 @@ func (s *Store) detach(ctx context.Context, tx *sql.Tx, id, traceID string, now 
 	return s.queue.Cancel(ctx, tx, traceID, now)
 }
 
+func (s *Store) Share(ctx context.Context, sh ports.NewShare, now time.Time) (ports.ShareLink, error) {
+	expiresAt := now.Add(domain.SharedRetention)
+	var link ports.ShareLink
+	err := InTx(ctx, s.db, func(tx *sql.Tx) error {
+		qs := sqlc.New(tx)
+		// lock order: traces → visualizations
+		status, err := qs.LockTrace(ctx, sh.TraceID)
+		if err != nil {
+			return fmt.Errorf("lock trace %s: %w", sh.TraceID, err)
+		}
+		if status != sqlc.TracesStatusCompleted {
+			return fmt.Errorf("trace %s is %s again: %w", sh.TraceID, status, domain.ErrExpired)
+		}
+		from, err := qs.LockShareID(ctx, sh.From)
+		if err != nil {
+			return fmt.Errorf("lock visualization %s: %w", sh.From, err)
+		}
+		if from.ShareID.Valid {
+			link = ports.ShareLink{ID: from.ShareID.String, ExpiresAt: from.ExpiresAt}
+			return nil
+		}
+
+		if err := qs.ShareTrace(ctx, sqlc.ShareTraceParams{ID: sh.TraceID, ExpiresAt: expiresAt}); err != nil {
+			return fmt.Errorf("share trace %s: %w", sh.TraceID, err)
+		}
+		err = qs.InsertShareLink(ctx, sqlc.InsertShareLinkParams{
+			ID:        sh.ID,
+			TraceID:   sh.TraceID,
+			Subject:   sh.Subject,
+			Now:       now,
+			ExpiresAt: expiresAt,
+		})
+		if err != nil {
+			return fmt.Errorf("insert share link: %w", err)
+		}
+		err = qs.SetShareID(ctx, sqlc.SetShareIDParams{ID: sh.From, ShareID: sql.NullString{String: sh.ID, Valid: true}, ExpiresAt: expiresAt})
+		if err != nil {
+			return fmt.Errorf("set share link of visualization %s: %w", sh.From, err)
+		}
+		link = ports.ShareLink{ID: sh.ID, ExpiresAt: expiresAt}
+		return nil
+	})
+	if err != nil {
+		return ports.ShareLink{}, fmt.Errorf("share: %w", unreachable(err))
+	}
+	return link, nil
+}
+
+func (s *Store) Unshare(ctx context.Context, id, subject string) error {
+	err := InTx(ctx, s.db, func(tx *sql.Tx) error {
+		qs := sqlc.New(tx)
+		shareID, err := qs.LockOwnedShareID(ctx, sqlc.LockOwnedShareIDParams{ID: id, Subject: subject})
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("visualization %s of %s: %w", id, subject, domain.ErrNotFound)
+		}
+		if err != nil {
+			return fmt.Errorf("lock visualization %s: %w", id, err)
+		}
+		if !shareID.Valid {
+			return nil
+		}
+		if err := qs.DeleteVisualization(ctx, shareID.String); err != nil {
+			return fmt.Errorf("delete share link %s: %w", shareID.String, err)
+		}
+		if err := qs.ClearShareID(ctx, id); err != nil {
+			return fmt.Errorf("clear share link of visualization %s: %w", id, err)
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("unshare: %w", unreachable(err))
+	}
+	return nil
+}
+
 func (s *Store) DeleteExpired(ctx context.Context, now time.Time) ([]ports.ExpiredTrace, error) {
 	for {
 		n, err := sqlc.New(s.db).DeleteExpiredVisualizations(ctx, now)
@@ -317,12 +395,10 @@ func (s *Store) DeleteExpired(ctx context.Context, now time.Time) ([]ports.Expir
 		expired = make([]ports.ExpiredTrace, len(rows))
 		for i, r := range rows {
 			ids[i] = r.ID
-			keys := make([]string, r.ChunkCount)
-			for c := range keys {
-				keys[c] = domain.ChunkKey(r.StoragePrefix, r.ID, c)
-			}
-			if r.Tail != nil {
-				keys = append(keys, domain.TailKey(r.StoragePrefix, r.ID))
+			keys := domain.TraceKeys(r.StoragePrefix, r.ID, r.ChunkCount, r.Tail != nil)
+			if r.StoragePrefix == domain.SharedPrefix {
+				// share copies t7 → t90 and leaves t7 => URLs signed before the share keep working
+				keys = append(keys, domain.TraceKeys(domain.NewPrefix, r.ID, r.ChunkCount, r.Tail != nil)...)
 			}
 			expired[i] = ports.ExpiredTrace{ID: r.ID, Keys: keys}
 		}

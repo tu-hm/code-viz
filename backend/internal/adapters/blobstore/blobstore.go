@@ -85,6 +85,18 @@ func (b *Bucket) Sign(ctx context.Context, key string, ttl time.Duration) (strin
 	return req.URL, nil
 }
 
+func (b *Bucket) Copy(ctx context.Context, from, to string) error {
+	_, err := b.client.CopyObject(ctx, &s3.CopyObjectInput{
+		Bucket:     aws.String(b.name),
+		CopySource: aws.String(b.name + "/" + from),
+		Key:        aws.String(to),
+	})
+	if err != nil {
+		return fmt.Errorf("copy %s to %s: %w: %w", from, to, domain.ErrInfra, err)
+	}
+	return nil
+}
+
 func (b *Bucket) Delete(ctx context.Context, keys []string) error {
 	for batch := range slices.Chunk(keys, 1000) { // DeleteObjects takes at most 1,000 keys
 		objects := make([]types.ObjectIdentifier, len(batch))

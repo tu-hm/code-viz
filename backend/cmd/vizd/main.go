@@ -135,6 +135,7 @@ type apiConfig struct {
 	S3Bucket         string   `env:"S3_BUCKET,required"`
 	S3PathStyle      bool     `env:"S3_PATH_STYLE"`
 	CORSOrigins      []string `env:"CORS_ORIGINS"`
+	WebOrigin        string   `env:"VIZ_WEB_ORIGIN,required"`
 	IPHashKey        string   `env:"VIZ_IP_HASH_KEY,required"`
 	Slots            int      `env:"VIZ_SLOTS,required"`
 }
@@ -166,12 +167,13 @@ func newAPI(ctx context.Context, db *sql.DB, mux *http.ServeMux) (*app.Visualiza
 
 	poller := mysql.NewPoller(db, time.Now, time.After)
 	viz := &app.Visualizations{
-		Store:    mysql.NewStore(db, cfg.Slots*10),
-		Adapters: adapters,
-		Blobs:    blobs,
-		Events:   poller,
-		Now:      func() time.Time { return time.Now().UTC() },
-		Random:   rand.Reader,
+		Store:     mysql.NewStore(db, cfg.Slots*10),
+		Adapters:  adapters,
+		Blobs:     blobs,
+		Events:    poller,
+		Now:       func() time.Time { return time.Now().UTC() },
+		Random:    rand.Reader,
+		WebOrigin: cfg.WebOrigin,
 	}
 	httptransport.HandleAPI(mux, viz, []byte(cfg.IPHashKey), cfg.CORSOrigins)
 	return viz, poller, nil

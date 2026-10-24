@@ -59,6 +59,33 @@ func TestPutStoresGzippedJSONUnderChunkKey(t *testing.T) {
 	}
 }
 
+func TestCopyKeepsTheBodyAndHeadersUnderTheNewKey(t *testing.T) {
+	bucket := createBucket(t)
+	b := newBucket(t, s3, bucket)
+	from, to := domain.ChunkKey("t7", "trc_0123", 0), domain.ChunkKey("t90", "trc_0123", 0)
+	if err := b.Put(t.Context(), from, "application/json", []byte("chunk")); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := b.Copy(t.Context(), from, to); err != nil {
+		t.Fatal(err)
+	}
+
+	original := do(t, http.MethodGet, s3+"/"+bucket+"/"+from)
+	if original.StatusCode != http.StatusOK {
+		t.Fatalf("get original after the copy: HTTP %d, want 200", original.StatusCode)
+	}
+	resp := do(t, http.MethodGet, s3+"/"+bucket+"/"+to)
+	if resp.StatusCode != http.StatusOK || string(resp.body) != "chunk" {
+		t.Fatalf("get copy: HTTP %d, body %q; want 200, \"chunk\"", resp.StatusCode, resp.body)
+	}
+	for _, h := range []string{"Content-Type", "Content-Encoding", "Cache-Control"} {
+		if got, want := resp.Header.Get(h), original.Header.Get(h); got != want {
+			t.Errorf("copy's %s = %q, want the original's %q", h, got, want)
+		}
+	}
+}
+
 func TestPutRetriesThreeTimesThenFailsAsInfraError(t *testing.T) {
 	var attempts atomic.Int32
 	down := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -76,7 +103,7 @@ func TestPutRetriesThreeTimesThenFailsAsInfraError(t *testing.T) {
 	}
 }
 
-func TestPutAndDeleteOnUnreachableEndpointAreInfraErrors(t *testing.T) {
+func TestPutCopyAndDeleteOnUnreachableEndpointAreInfraErrors(t *testing.T) {
 	var lc net.ListenConfig
 	ln, err := lc.Listen(t.Context(), "tcp", "127.0.0.1:0")
 	if err != nil {
@@ -91,6 +118,9 @@ func TestPutAndDeleteOnUnreachableEndpointAreInfraErrors(t *testing.T) {
 
 	if err := b.Put(t.Context(), key, "application/json", []byte("x")); !errors.Is(err, domain.ErrInfra) {
 		t.Errorf("put: err = %v, want ErrInfra", err)
+	}
+	if err := b.Copy(t.Context(), key, domain.ChunkKey("t90", "trc_0123", 0)); !errors.Is(err, domain.ErrInfra) {
+		t.Errorf("copy: err = %v, want ErrInfra", err)
 	}
 	if err := b.Delete(t.Context(), []string{key}); !errors.Is(err, domain.ErrInfra) {
 		t.Errorf("delete: err = %v, want ErrInfra", err)

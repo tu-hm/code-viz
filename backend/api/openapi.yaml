@@ -151,6 +151,14 @@ paths:
       responses:
         '200':
           description: The current state.
+          headers:
+            Cache-Control:
+              description: >-
+                "public, max-age=60" for a share link, which reads the same for every caller;
+                "no-store" otherwise.
+              required: true
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -190,22 +198,44 @@ paths:
       - $ref: '#/components/parameters/VisualizationID'
     post:
       operationId: shareVisualization
-      summary: Create a permalink and extend retention
-      description: Calling it again returns the same link.
+      summary: Create a share link and keep the visualization for 90 days
+      description: >-
+        Only the caller that created the visualization can share it, and only once it is completed.
+        The link opens a new visualization ID of the same trace, which anyone can GET; the
+        visualization and the link expire 90 days after the share. Calling it again returns the
+        same link until it is revoked.
       responses:
         '200':
-          description: The permalink.
+          description: The share link.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ShareLink'
               examples:
                 shared:
-                  value: {"url": "https://ide.example.com/viz/viz_5f2c9d3a7b1e4c08", "expiresAt": "2027-01-21T08:12:03Z"}
+                  value: {"url": "https://ide.example.com/viz/viz_c41e7a90d2b85f36", "expiresAt": "2027-01-21T08:12:03Z"}
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '410':
           $ref: '#/components/responses/Expired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Capacity'
+    delete:
+      operationId: revokeShare
+      summary: Revoke the share link
+      description: >-
+        The link's ID answers 404 for everyone from then on; the visualization itself is unchanged
+        and keeps its 90 days. Only the caller that created the visualization can revoke. Sharing
+        again makes a new link.
+      responses:
+        '204':
+          description: Revoked, or there was no link.
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
         '503':
@@ -227,7 +257,7 @@ components:
         minimum: 0
   responses:
     InvalidRequest:
-      description: Malformed request or invalid options.
+      description: Malformed request or invalid options, or a share before the visualization is completed.
       content:
         application/json:
           schema:

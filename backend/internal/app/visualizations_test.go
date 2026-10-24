@@ -466,7 +466,7 @@ func TestGetShowsWhatEachStateHas(t *testing.T) {
 			traceID := traceOf(t, h.db, v.ID)
 			tt.prepare(t, v, traceID)
 
-			got, err := h.Get(ctx, v.ID, api.GetVisualizationParams{})
+			got, _, err := h.Get(ctx, v.ID, api.GetVisualizationParams{})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -506,14 +506,14 @@ func TestGetFailsOnceTheVisualizationExpiresOrForAnUnknownID(t *testing.T) {
 	v := h.create(t, "ip:1", "x")
 
 	h.now = day0.Add(7 * 24 * time.Hour)
-	if _, err := h.Get(ctx, v.ID, api.GetVisualizationParams{}); err != nil {
+	if _, _, err := h.Get(ctx, v.ID, api.GetVisualizationParams{}); err != nil {
 		t.Errorf("at its expiry: %v", err)
 	}
 	h.now = h.now.Add(time.Microsecond)
-	if _, err := h.Get(ctx, v.ID, api.GetVisualizationParams{}); !errors.Is(err, domain.ErrExpired) {
+	if _, _, err := h.Get(ctx, v.ID, api.GetVisualizationParams{}); !errors.Is(err, domain.ErrExpired) {
 		t.Errorf("past its expiry: err = %v, want ErrExpired", err)
 	}
-	if _, err := h.Get(ctx, "viz_0123", api.GetVisualizationParams{}); !errors.Is(err, domain.ErrNotFound) {
+	if _, _, err := h.Get(ctx, "viz_0123", api.GetVisualizationParams{}); !errors.Is(err, domain.ErrNotFound) {
 		t.Errorf("unknown id: err = %v, want ErrNotFound", err)
 	}
 }
@@ -625,7 +625,7 @@ func TestGetWaitsOnlyWhileNothingNewerThanSinceIsFinal(t *testing.T) {
 			}
 			h.Events = tt.events(h)
 
-			got, err := h.Get(t.Context(), v.ID, tt.p)
+			got, _, err := h.Get(t.Context(), v.ID, tt.p)
 			if !errors.Is(err, tt.err) {
 				t.Fatalf("err = %v, want %v", err, tt.err)
 			}
@@ -650,7 +650,7 @@ func TestGetRefusesAWaitOutside0To20SecondsOrANegativeSince(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, err := h.Get(t.Context(), v.ID, tt.p); !errors.Is(err, domain.ErrInvalidRequest) {
+			if _, _, err := h.Get(t.Context(), v.ID, tt.p); !errors.Is(err, domain.ErrInvalidRequest) {
 				t.Errorf("err = %v, want ErrInvalidRequest", err)
 			}
 		})
@@ -707,6 +707,275 @@ func TestDeleteByAnotherCallerIsNotFoundAndChangesNothing(t *testing.T) {
 	}
 	if got := readJob(t, h.db, id).Status; got != "queued" {
 		t.Errorf("job is %s, want queued", got)
+	}
+}
+
+func TestShareMakesANewIDAnyoneCanReadFor90Days(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+	h := newHarness(t, 100)
+	v := h.create(t, "ip:1", "x")
+	traceID := traceOf(t, h.db, v.ID)
+	h.complete(t, traceID)
+	h.addTail(t, traceID)
+	before, _, err := h.Get(ctx, v.ID, api.GetVisualizationParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	h.now = day0.Add(time.Hour)
+
+	link, err := h.Share(ctx, app.Caller{Subject: "ip:1"}, v.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ninety := h.now.Add(90 * 24 * time.Hour)
+	id := linkID(t, link)
+	if id == v.ID || !link.ExpiresAt.Equal(ninety) {
+		t.Fatalf("link opens %s until %v, want a new ID until %v", id, link.ExpiresAt, ninety)
+	}
+	h.now = day0.Add(30 * 24 * time.Hour)
+	got, shared, err := h.Get(ctx, id, api.GetVisualizationParams{})
+	if err != nil {
+		t.Fatalf("get the link a month on: %v", err)
+	}
+	if !shared || got.Status != api.VisualizationStatusCompleted || !got.ExpiresAt.Equal(ninety) {
+		t.Errorf("link reads shared %t, %s until %v; want shared, completed until %v", shared, got.Status, got.ExpiresAt, ninety)
+	}
+	if diff := cmp.Diff(jsonValue(t, before.Trace.Header), jsonValue(t, got.Trace.Header)); diff != "" {
+		t.Errorf("link's trace header (-visualization +link):\n%s", diff)
+	}
+	for url, body := range map[string][]byte{got.Trace.Chunks[0].URL: chunkBody(t), got.Trace.Tail.URL: tailBody} {
+		resp := get(t, http.MethodGet, url)
+		if !strings.Contains(url, "/t90/") || resp.StatusCode != http.StatusOK || !bytes.Equal(resp.body, body) {
+			t.Errorf("GET %s: HTTP %d with %d bytes, want 200 from t90 with the object", url, resp.StatusCode, len(resp.body))
+		}
+	}
+	if resp := get(t, http.MethodGet, before.Trace.Chunks[0].URL); resp.StatusCode != http.StatusOK {
+		t.Errorf("chunk URL signed before the share: HTTP %d, want 200", resp.StatusCode)
+	}
+
+	own, shared, err := h.Get(ctx, v.ID, api.GetVisualizationParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if shared || !own.ExpiresAt.Equal(ninety) {
+		t.Errorf("visualization reads shared %t until %v, want not shared until %v", shared, own.ExpiresAt, ninety)
+	}
+	var prefix string
+	var traceExpiry time.Time
+	if err := h.db.QueryRowContext(ctx, "SELECT storage_prefix, expires_at FROM traces WHERE id = ?", traceID).Scan(&prefix, &traceExpiry); err != nil {
+		t.Fatal(err)
+	}
+	if prefix != "t90" || !traceExpiry.Equal(ninety) {
+		t.Errorf("trace under %s until %v, want t90 until %v", prefix, traceExpiry, ninety)
+	}
+}
+
+func TestShareAgainReturnsTheSameLinkUntilItIsRevoked(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+	h := newHarness(t, 100)
+	owner := app.Caller{Subject: "ip:1"}
+	v := h.create(t, "ip:1", "x")
+	h.complete(t, traceOf(t, h.db, v.ID))
+
+	first := h.share(t, owner, v.ID)
+	h.now = h.now.Add(time.Hour)
+	if diff := cmp.Diff(first, h.share(t, owner, v.ID)); diff != "" {
+		t.Errorf("sharing again (-first +again):\n%s", diff)
+	}
+	if n := countRows(t, h.db, "SELECT COUNT(*) FROM visualizations"); n != 2 {
+		t.Errorf("%d visualizations after sharing twice, want 2", n)
+	}
+
+	if err := h.Unshare(ctx, owner, v.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := h.Get(ctx, linkID(t, first), api.GetVisualizationParams{}); !errors.Is(err, domain.ErrNotFound) {
+		t.Errorf("revoked link: err = %v, want ErrNotFound", err)
+	}
+	if _, _, err := h.Get(ctx, v.ID, api.GetVisualizationParams{}); err != nil {
+		t.Errorf("visualization after the revoke: %v", err)
+	}
+	if err := h.Unshare(ctx, owner, v.ID); err != nil {
+		t.Errorf("revoking again: %v", err)
+	}
+
+	next := h.share(t, owner, v.ID)
+	if linkID(t, next) == linkID(t, first) {
+		t.Errorf("sharing after the revoke gave the revoked link %s again", next.URL)
+	}
+	if _, _, err := h.Get(ctx, linkID(t, first), api.GetVisualizationParams{}); !errors.Is(err, domain.ErrNotFound) {
+		t.Errorf("revoked link after sharing again: err = %v, want ErrNotFound", err)
+	}
+}
+
+func TestEachOwnerOfASharedTraceGetsALinkTheyAloneRevoke(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+	h := newHarness(t, 100)
+	a, b := h.create(t, "ip:1", "x"), h.create(t, "ip:2", "x")
+	h.complete(t, traceOf(t, h.db, a.ID))
+	linkA := h.share(t, app.Caller{Subject: "ip:1"}, a.ID)
+	linkB := h.share(t, app.Caller{Subject: "ip:2"}, b.ID)
+
+	if err := h.Unshare(ctx, app.Caller{Subject: "ip:1"}, a.ID); err != nil {
+		t.Fatal(err)
+	}
+
+	if linkID(t, linkA) == linkID(t, linkB) {
+		t.Fatalf("both owners got the link %s", linkA.URL)
+	}
+	if _, _, err := h.Get(ctx, linkID(t, linkB), api.GetVisualizationParams{}); err != nil {
+		t.Errorf("the other owner's link after the first revoked: %v", err)
+	}
+}
+
+func TestShareAndUnshareRefuseWhatTheCallerCannotShare(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+	h := newHarness(t, 100)
+	owner := app.Caller{Subject: "ip:1"}
+	completed := h.create(t, "ip:1", "completed")
+	h.complete(t, traceOf(t, h.db, completed.ID))
+	link := h.share(t, owner, completed.ID)
+	failed := h.create(t, "ip:1", "failed")
+	l := h.claim(t, traceOf(t, h.db, failed.ID))
+	if err := h.q.Fail(ctx, l, api.FailureKindCompileError, json.RawMessage(`{"ok":false,"durationMs":1,"diagnostics":[]}`), h.now); err != nil {
+		t.Fatal(err)
+	}
+	deleted := h.create(t, "ip:1", "deleted")
+	h.complete(t, traceOf(t, h.db, deleted.ID))
+	h.delete(t, deleted.ID)
+	expired := h.create(t, "ip:1", "expired")
+	h.complete(t, traceOf(t, h.db, expired.ID))
+	if _, err := h.db.ExecContext(ctx, "UPDATE visualizations SET expires_at = ? WHERE id = ?", day0.Add(-time.Second), expired.ID); err != nil {
+		t.Fatal(err)
+	}
+	queued := h.create(t, "ip:1", "queued")
+
+	tests := []struct {
+		name    string
+		caller  app.Caller
+		id      string
+		share   error
+		unshare error
+	}{
+		{"another caller's visualization", app.Caller{Subject: "ip:2"}, completed.ID, domain.ErrNotFound, domain.ErrNotFound},
+		{"an unknown ID", owner, "viz_0123", domain.ErrNotFound, domain.ErrNotFound},
+		{"a share link", owner, linkID(t, link), domain.ErrNotFound, domain.ErrNotFound},
+		{"a queued visualization", owner, queued.ID, domain.ErrInvalidRequest, nil},
+		{"a failed build", owner, failed.ID, domain.ErrInvalidRequest, nil},
+		{"a deleted visualization", owner, deleted.ID, domain.ErrInvalidRequest, nil},
+		{"an expired visualization", owner, expired.ID, domain.ErrExpired, nil},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if _, err := h.Share(ctx, tt.caller, tt.id); !errors.Is(err, tt.share) {
+				t.Errorf("share: err = %v, want %v", err, tt.share)
+			}
+			if err := h.Unshare(ctx, tt.caller, tt.id); !errors.Is(err, tt.unshare) {
+				t.Errorf("unshare: err = %v, want %v", err, tt.unshare)
+			}
+		})
+	}
+	if diff := cmp.Diff([]string{linkID(t, link)}, ids(t, h.db, "SELECT id FROM visualizations WHERE shared")); diff != "" {
+		t.Errorf("share links (-want +got):\n%s", diff)
+	}
+}
+
+func TestConcurrentSharesOfOneVisualizationMakeOneLink(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t, 100)
+	v := h.create(t, "ip:1", "x")
+	h.complete(t, traceOf(t, h.db, v.ID))
+	const callers = 8
+
+	type result struct {
+		link api.ShareLink
+		err  error
+	}
+	results := make(chan result, callers)
+	for range callers {
+		go func() {
+			link, err := h.Share(t.Context(), app.Caller{Subject: "ip:1"}, v.ID)
+			results <- result{link, err}
+		}()
+	}
+	links := map[string]bool{}
+	for range callers {
+		r := <-results
+		if r.err != nil {
+			t.Fatal(r.err)
+		}
+		links[r.link.URL] = true
+	}
+
+	if len(links) != 1 {
+		t.Errorf("%d distinct links, want 1: %v", len(links), links)
+	}
+	if n := countRows(t, h.db, "SELECT COUNT(*) FROM visualizations WHERE shared"); n != 1 {
+		t.Errorf("%d share links stored, want 1", n)
+	}
+}
+
+func TestShareMakesNoLinkWhileStorageIsDown(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t, 100)
+	v := h.create(t, "ip:1", "x")
+	traceID := traceOf(t, h.db, v.ID)
+	h.complete(t, traceID)
+	h.Blobs = blobStore(t, closedEndpoint(t), "down")
+
+	if _, err := h.Share(t.Context(), app.Caller{Subject: "ip:1"}, v.ID); !errors.Is(err, domain.ErrInfra) {
+		t.Fatalf("err = %v, want ErrInfra", err)
+	}
+
+	if n := countRows(t, h.db, "SELECT COUNT(*) FROM visualizations WHERE shared OR share_id IS NOT NULL"); n != 0 {
+		t.Errorf("%d visualizations with a link, want 0", n)
+	}
+	if got := readTrace(t, h.db, traceID).StoragePrefix; got != "t7" {
+		t.Errorf("trace under %s, want t7", got)
+	}
+}
+
+func TestCleanupDeletesASharedTraceWithBothCopiesOnlyAfter90Days(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+	h := newHarness(t, 100)
+	v := h.create(t, "ip:1", "x")
+	traceID := traceOf(t, h.db, v.ID)
+	h.complete(t, traceID)
+	h.addTail(t, traceID)
+	h.share(t, app.Caller{Subject: "ip:1"}, v.ID)
+	var keys []string
+	for _, prefix := range []string{"t7", "t90"} {
+		keys = append(keys, domain.TraceKeys(prefix, traceID, 1, true)...)
+	}
+
+	if err := h.Cleanup(ctx, day0.Add(90*24*time.Hour)); err != nil {
+		t.Fatal(err)
+	}
+	if n := countRows(t, h.db, "SELECT COUNT(*) FROM visualizations"); n != 2 {
+		t.Errorf("%d visualizations at 90 days, want 2", n)
+	}
+	for _, key := range keys {
+		if resp := get(t, http.MethodGet, h.b.url+"/"+key); resp.StatusCode != http.StatusOK {
+			t.Errorf("%s at 90 days: HTTP %d, want 200", key, resp.StatusCode)
+		}
+	}
+
+	if err := h.Cleanup(ctx, day0.Add(90*24*time.Hour+time.Microsecond)); err != nil {
+		t.Fatal(err)
+	}
+	if n := countRows(t, h.db, "SELECT COUNT(*) FROM visualizations") + countRows(t, h.db, "SELECT COUNT(*) FROM traces"); n != 0 {
+		t.Errorf("%d rows left past 90 days, want 0", n)
+	}
+	for _, key := range keys {
+		if resp := get(t, http.MethodGet, h.b.url+"/"+key); resp.StatusCode != http.StatusNotFound {
+			t.Errorf("%s past 90 days: HTTP %d, want 404", key, resp.StatusCode)
+		}
 	}
 }
 
@@ -877,10 +1146,31 @@ func newHarness(t *testing.T, maxQueued int) *harness {
 		Events: waitFunc(func(context.Context, string, int64) error {
 			return errors.New("no wait expected")
 		}),
-		Now:    func() time.Time { return h.now },
-		Random: &counterReader{},
+		Now:       func() time.Time { return h.now },
+		Random:    &counterReader{},
+		WebOrigin: ide,
 	}
 	return h
+}
+
+const ide = "https://ide.example.com"
+
+func (h *harness) share(t *testing.T, c app.Caller, id string) api.ShareLink {
+	t.Helper()
+	link, err := h.Share(t.Context(), c, id)
+	if err != nil {
+		t.Fatalf("share %s: %v", id, err)
+	}
+	return link
+}
+
+func linkID(t *testing.T, link api.ShareLink) string {
+	t.Helper()
+	id, ok := strings.CutPrefix(link.URL, ide+"/viz/")
+	if !ok {
+		t.Fatalf("link %s isn't under %s/viz/", link.URL, ide)
+	}
+	return id
 }
 
 func request(source string) api.CreateVisualizationRequest {
@@ -920,7 +1210,7 @@ func (h *harness) statuses(t *testing.T, vs ...api.Visualization) map[string]api
 	t.Helper()
 	got := map[string]api.VisualizationStatus{}
 	for _, v := range vs {
-		cur, err := h.Get(t.Context(), v.ID, api.GetVisualizationParams{})
+		cur, _, err := h.Get(t.Context(), v.ID, api.GetVisualizationParams{})
 		if err != nil {
 			t.Fatal(err)
 		}

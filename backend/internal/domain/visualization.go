@@ -22,6 +22,8 @@ func (s TraceStatus) Final() bool {
 const (
 	// Retention is how long a new or reset trace is kept (D17).
 	Retention = 7 * 24 * time.Hour
+	// SharedRetention is how long a share link, its visualization and their trace are kept from the share on (D17).
+	SharedRetention = 90 * 24 * time.Hour
 	// IdempotencyWindow is how long a repeated Idempotency-Key returns the visualization the first request created (§8.2).
 	IdempotencyWindow = 24 * time.Hour
 	// MaxActive is how many visualizations a caller may have queued or running; a create past it detaches the oldest queued one (§11).

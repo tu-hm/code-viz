@@ -29,7 +29,6 @@ const (
 	leaseTime      = 45 * time.Second // upload and Complete finish inside the lease (§7.13.2)
 	cleanupTimeout = 10 * time.Second // box Close and the last write, after the job's ctx is done
 	memory         = 256 << 20        // §11
-	storagePrefix  = "t7"             // §7.5: new traces live 7 days
 )
 
 // Worker claims trace jobs and runs them one at a time (§7.7, §7.9). Every field is required.
@@ -271,7 +270,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 	}
 	stored := make([]ports.Chunk, len(chunks))
 	for i, c := range chunks {
-		if err := w.Blobs.Put(ctx, domain.ChunkKey(storagePrefix, l.TraceID, c.Index), "application/json", c.Gzip); err != nil {
+		if err := w.Blobs.Put(ctx, domain.ChunkKey(domain.NewPrefix, l.TraceID, c.Index), "application/json", c.Gzip); err != nil {
 			return fmt.Errorf("upload chunk %d: %w", c.Index, err)
 		}
 		stored[i] = ports.Chunk{Index: c.Index, FromStep: c.FromStep, ToStep: c.ToStep, SizeBytes: len(c.Gzip), SHA256: c.SHA256}
@@ -282,7 +281,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 		if err != nil {
 			return fmt.Errorf("gzip tail: %w", err)
 		}
-		if err := w.Blobs.Put(ctx, domain.TailKey(storagePrefix, l.TraceID), "text/plain; charset=utf-8", gz); err != nil {
+		if err := w.Blobs.Put(ctx, domain.TailKey(domain.NewPrefix, l.TraceID), "text/plain; charset=utf-8", gz); err != nil {
 			return fmt.Errorf("upload tail: %w", err)
 		}
 		tail = &ports.Tail{SizeBytes: len(gz), SHA256: sum}
@@ -297,7 +296,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 		Chunks:        stored,
 		Tail:          tail,
 		ExitKind:      exitKind,
-		StoragePrefix: storagePrefix,
+		StoragePrefix: domain.NewPrefix,
 		Build:         build,
 	}, w.Now())
 	if err != nil {

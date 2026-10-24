@@ -388,7 +388,10 @@ type ServerInterface interface {
 	// GetVisualization Status, with long-polling; the trace manifest once completed
 	// (GET /visualizations/{id})
 	GetVisualization(w http.ResponseWriter, r *http.Request, id VisualizationID, params GetVisualizationParams)
-	// ShareVisualization Create a permalink and extend retention
+	// RevokeShare Revoke the share link
+	// (DELETE /visualizations/{id}/share)
+	RevokeShare(w http.ResponseWriter, r *http.Request, id VisualizationID)
+	// ShareVisualization Create a share link and keep the visualization for 90 days
 	// (POST /visualizations/{id}/share)
 	ShareVisualization(w http.ResponseWriter, r *http.Request, id VisualizationID)
 }
@@ -529,6 +532,32 @@ func (siw *ServerInterfaceWrapper) GetVisualization(w http.ResponseWriter, r *ht
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetVisualization(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RevokeShare operation middleware
+func (siw *ServerInterfaceWrapper) RevokeShare(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id VisualizationID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RevokeShare(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -688,6 +717,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/visualizations", wrapper.CreateVisualization)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/visualizations/{id}", wrapper.DeleteVisualization)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/visualizations/{id}", wrapper.GetVisualization)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/visualizations/{id}/share", wrapper.RevokeShare)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/visualizations/{id}/share", wrapper.ShareVisualization)
 
 	return m
@@ -953,15 +983,23 @@ type GetVisualizationResponseObject interface {
 	VisitGetVisualizationResponse(w http.ResponseWriter) error
 }
 
-type GetVisualization200JSONResponse Visualization
+type GetVisualization200ResponseHeaders struct {
+	CacheControl string
+}
+
+type GetVisualization200JSONResponse struct {
+	Body    Visualization
+	Headers GetVisualization200ResponseHeaders
+}
 
 func (response GetVisualization200JSONResponse) VisitGetVisualizationResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", fmt.Sprint(response.Headers.CacheControl))
 	w.WriteHeader(200)
 	_, err := buf.WriteTo(w)
 	return err
@@ -1038,6 +1076,65 @@ func (response GetVisualization503JSONResponse) VisitGetVisualizationResponse(w 
 	return err
 }
 
+type RevokeShareRequestObject struct {
+	ID VisualizationID `json:"id"`
+}
+
+type RevokeShareResponseObject interface {
+	VisitRevokeShareResponse(w http.ResponseWriter) error
+}
+
+type RevokeShare204Response struct {
+}
+
+func (response RevokeShare204Response) VisitRevokeShareResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type RevokeShare404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response RevokeShare404JSONResponse) VisitRevokeShareResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevokeShare500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response RevokeShare500JSONResponse) VisitRevokeShareResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevokeShare503JSONResponse struct{ CapacityJSONResponse }
+
+func (response RevokeShare503JSONResponse) VisitRevokeShareResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ShareVisualizationRequestObject struct {
 	ID VisualizationID `json:"id"`
 }
@@ -1056,6 +1153,20 @@ func (response ShareVisualization200JSONResponse) VisitShareVisualizationRespons
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ShareVisualization400JSONResponse struct{ InvalidRequestJSONResponse }
+
+func (response ShareVisualization400JSONResponse) VisitShareVisualizationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -1131,7 +1242,10 @@ type StrictServerInterface interface {
 	// GetVisualization Status, with long-polling; the trace manifest once completed
 	// (GET /visualizations/{id})
 	GetVisualization(ctx context.Context, request GetVisualizationRequestObject) (GetVisualizationResponseObject, error)
-	// ShareVisualization Create a permalink and extend retention
+	// RevokeShare Revoke the share link
+	// (DELETE /visualizations/{id}/share)
+	RevokeShare(ctx context.Context, request RevokeShareRequestObject) (RevokeShareResponseObject, error)
+	// ShareVisualization Create a share link and keep the visualization for 90 days
 	// (POST /visualizations/{id}/share)
 	ShareVisualization(ctx context.Context, request ShareVisualizationRequestObject) (ShareVisualizationResponseObject, error)
 }
@@ -1278,6 +1392,32 @@ func (sh *strictHandler) GetVisualization(w http.ResponseWriter, r *http.Request
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetVisualizationResponseObject); ok {
 		if err := validResponse.VisitGetVisualizationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RevokeShare operation middleware
+func (sh *strictHandler) RevokeShare(w http.ResponseWriter, r *http.Request, id VisualizationID) {
+	var request RevokeShareRequestObject
+
+	request.ID = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RevokeShare(ctx, request.(RevokeShareRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RevokeShare")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RevokeShareResponseObject); ok {
+		if err := validResponse.VisitRevokeShareResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

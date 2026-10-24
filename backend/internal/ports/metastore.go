@@ -22,6 +22,15 @@ type MetaStore interface {
 	// Detach detaches the visualization with id that subject created, and cancels its trace's queued job when no other visualization
 	// waits on it (§8.5). Returns domain.ErrNotFound when subject created no visualization with id.
 	Detach(ctx context.Context, id, subject string, now time.Time) error
+	// Share gives the visualization sh.From a share link: a new visualization of the same trace, sh.ID, which anyone can read.
+	// The link and sh.From are kept for domain.SharedRetention from now, the trace at least as long, and the trace's storage
+	// prefix becomes t90, where the caller has copied its objects (§8.6). When sh.From has a link already, it returns that one
+	// and changes nothing.
+	// Returns domain.ErrExpired when the trace is no longer completed.
+	Share(ctx context.Context, sh NewShare, now time.Time) (ShareLink, error)
+	// Unshare deletes the share link of the visualization with id that subject created; one without a link is not an error.
+	// Returns domain.ErrNotFound when subject created no visualization with id, or id is itself a share link.
+	Unshare(ctx context.Context, id, subject string) error
 	// DeleteExpired deletes every visualization that expired before now, then up to 1,000 expired traces with their jobs, and
 	// returns those traces. It is called until it returns none (§7.13.1).
 	DeleteExpired(ctx context.Context, now time.Time) ([]ExpiredTrace, error)
@@ -41,10 +50,27 @@ type NewVisualization struct {
 	Options        trace.Options // normalized
 }
 
+// NewShare is a share link about to be made for the visualization From.
+type NewShare struct {
+	ID      string // viz_
+	From    string
+	TraceID string
+	Subject string // From's creator, who owns the link too
+}
+
+// ShareLink is the visualization a share link reads, and when it expires.
+type ShareLink struct {
+	ID        string
+	ExpiresAt time.Time
+}
+
 // Visualization is one visualization with what the API shows of its trace (§8.3).
 type Visualization struct {
 	ID            string
 	TraceID       string
+	Subject       string
+	Shared        bool   // a share link, made by Share
+	ShareID       string // its share link; "" without one
 	Detached      bool
 	CreatedAt     time.Time
 	ExpiresAt     time.Time

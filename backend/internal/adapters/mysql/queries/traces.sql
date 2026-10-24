@@ -32,6 +32,9 @@ SET status = 'failed', failure_stage = sqlc.arg(failure_stage), failure_kind = s
   version = version + 1, updated_at = sqlc.arg(now)
 WHERE id = sqlc.arg(id);
 
+-- name: ShareTrace :exec
+UPDATE traces SET storage_prefix = 't90', expires_at = GREATEST(expires_at, sqlc.arg(expires_at)) WHERE id = sqlc.arg(id);
+
 -- name: InsertTrace :execrows
 INSERT INTO traces (id, cache_key, language, source, stdin, options, updated_at, expires_at)
 VALUES (sqlc.arg(id), sqlc.arg(cache_key), sqlc.arg(language), sqlc.arg(source), sqlc.arg(stdin), sqlc.arg(options), sqlc.arg(now), sqlc.arg(expires_at))

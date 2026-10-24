@@ -21,12 +21,13 @@ const (
 
 // Visualizations runs the visualization API (§8). Every field is required.
 type Visualizations struct {
-	Store    ports.MetaStore
-	Adapters ports.Adapters
-	Blobs    ports.BlobStore
-	Events   ports.Events
-	Now      func() time.Time
-	Random   io.Reader // source of the IDs; crypto/rand.Reader in production
+	Store     ports.MetaStore
+	Adapters  ports.Adapters
+	Blobs     ports.BlobStore
+	Events    ports.Events
+	Now       func() time.Time
+	Random    io.Reader // source of the IDs; crypto/rand.Reader in production
+	WebOrigin string    // the IDE's origin; a share link is {WebOrigin}/viz/{id} (§8.6)
 }
 
 // Caller is who sends a request.
@@ -78,38 +79,40 @@ func (s *Visualizations) Create(ctx context.Context, c Caller, idempotencyKey st
 	return s.render(ctx, v, now)
 }
 
-// Get returns the visualization with id (§8.3). With p.Since set, it first waits up to p.Wait seconds while the
-// status isn't final and the version is at most p.Since; running out of time is not an error.
+// Get returns the visualization with id (§8.3), and whether it is a share link, which reads the same for every caller,
+// so caches may keep it (§7.8). With p.Since set, it first waits up to p.Wait seconds while the status isn't final and
+// the version is at most p.Since; running out of time is not an error.
 // It returns domain.ErrNotFound, ErrExpired, ErrInvalidRequest for a wait outside 0..20 or a negative since,
 // ErrCapacity when the pod already parks its most requests, or ErrInfra when MySQL is unreachable.
-func (s *Visualizations) Get(ctx context.Context, id string, p api.GetVisualizationParams) (api.Visualization, error) {
+func (s *Visualizations) Get(ctx context.Context, id string, p api.GetVisualizationParams) (api.Visualization, bool, error) {
 	var wait time.Duration
 	if p.Wait != nil {
 		wait = time.Duration(*p.Wait) * time.Second
 	}
 	if wait < 0 || wait > maxWait {
-		return api.Visualization{}, fmt.Errorf("wait must be from 0 to %d seconds: %w", int(maxWait.Seconds()), domain.ErrInvalidRequest)
+		return api.Visualization{}, false, fmt.Errorf("wait must be from 0 to %d seconds: %w", int(maxWait.Seconds()), domain.ErrInvalidRequest)
 	}
 	if p.Since != nil && *p.Since < 0 {
-		return api.Visualization{}, fmt.Errorf("since must be 0 or more: %w", domain.ErrInvalidRequest)
+		return api.Visualization{}, false, fmt.Errorf("since must be 0 or more: %w", domain.ErrInvalidRequest)
 	}
 
 	v, err := s.read(ctx, id)
 	if err != nil {
-		return api.Visualization{}, err
+		return api.Visualization{}, false, err
 	}
 	if wait > 0 && p.Since != nil && !v.Detached && !v.Status.Final() && v.Version <= int64(*p.Since) {
 		waitCtx, cancel := context.WithTimeout(ctx, wait)
 		err := s.Events.Wait(waitCtx, v.TraceID, int64(*p.Since))
 		cancel()
 		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
-			return api.Visualization{}, fmt.Errorf("wait for trace %s: %w", v.TraceID, err)
+			return api.Visualization{}, false, fmt.Errorf("wait for trace %s: %w", v.TraceID, err)
 		}
 		if v, err = s.read(ctx, id); err != nil {
-			return api.Visualization{}, err
+			return api.Visualization{}, false, err
 		}
 	}
-	return s.render(ctx, v, s.Now())
+	out, err := s.render(ctx, v, s.Now())
+	return out, v.Shared, err
 }
 
 func (s *Visualizations) read(ctx context.Context, id string) (ports.Visualization, error) {
@@ -173,6 +176,58 @@ func (s *Visualizations) render(ctx context.Context, v ports.Visualization, now 
 // unknown id; it returns ErrInfra when MySQL is unreachable.
 func (s *Visualizations) Delete(ctx context.Context, c Caller, id string) error {
 	return s.Store.Detach(ctx, id, c.Subject, s.Now())
+}
+
+// Share gives the visualization with id that c created a share link, or returns the one it has (§8.6). The link is a new
+// visualization of the same trace, so revoking it leaves id readable. It returns domain.ErrNotFound when c didn't create id,
+// ErrExpired, ErrInvalidRequest until the visualization is completed, or ErrInfra when MySQL or object storage is unreachable.
+func (s *Visualizations) Share(ctx context.Context, c Caller, id string) (api.ShareLink, error) {
+	v, err := s.Store.Visualization(ctx, id)
+	if err != nil {
+		return api.ShareLink{}, err
+	}
+	if v.Subject != c.Subject || v.Shared {
+		return api.ShareLink{}, fmt.Errorf("visualization %s of %s: %w", id, c.Subject, domain.ErrNotFound)
+	}
+	now := s.Now()
+	if now.After(v.ExpiresAt) {
+		return api.ShareLink{}, fmt.Errorf("visualization %s: %w", id, domain.ErrExpired)
+	}
+	if v.ShareID != "" {
+		return s.shareLink(ports.ShareLink{ID: v.ShareID, ExpiresAt: v.ExpiresAt}), nil
+	}
+	if v.Detached || v.Status != domain.TraceCompleted {
+		return api.ShareLink{}, fmt.Errorf("only a completed visualization can be shared: %w", domain.ErrInvalidRequest)
+	}
+
+	if v.StoragePrefix != domain.SharedPrefix {
+		from := domain.TraceKeys(v.StoragePrefix, v.TraceID, len(v.Chunks), v.Tail != nil)
+		to := domain.TraceKeys(domain.SharedPrefix, v.TraceID, len(v.Chunks), v.Tail != nil)
+		for i := range from {
+			if err := s.Blobs.Copy(ctx, from[i], to[i]); err != nil {
+				return api.ShareLink{}, fmt.Errorf("share %s: %w", id, err)
+			}
+		}
+	}
+	shareID, err := domain.NewVisualizationID(s.Random)
+	if err != nil {
+		return api.ShareLink{}, err
+	}
+	link, err := s.Store.Share(ctx, ports.NewShare{ID: shareID, From: id, TraceID: v.TraceID, Subject: c.Subject}, now)
+	if err != nil {
+		return api.ShareLink{}, err
+	}
+	return s.shareLink(link), nil
+}
+
+func (s *Visualizations) shareLink(l ports.ShareLink) api.ShareLink {
+	return api.ShareLink{URL: s.WebOrigin + "/viz/" + l.ID, ExpiresAt: l.ExpiresAt}
+}
+
+// Unshare revokes the share link of the visualization with id when c created it, so the link reads as not found (§8.6).
+// Another caller gets domain.ErrNotFound, as for an unknown id; it returns ErrInfra when MySQL is unreachable.
+func (s *Visualizations) Unshare(ctx context.Context, c Caller, id string) error {
+	return s.Store.Unshare(ctx, id, c.Subject)
 }
 
 // Cleanup deletes the visualizations and traces that expired before now, then the chunks and tails of those traces

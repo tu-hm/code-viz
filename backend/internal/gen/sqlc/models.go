@@ -160,4 +160,5 @@ type Visualization struct {
 	ExpiresAt      time.Time
 	Detached       bool
 	IdempotencyKey sql.NullString
+	ShareID        sql.NullString
 }

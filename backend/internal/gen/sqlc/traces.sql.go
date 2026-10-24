@@ -272,6 +272,20 @@ func (q *Queries) SetTraceStatus(ctx context.Context, arg SetTraceStatusParams) 
 	return err
 }
 
+const shareTrace = `-- name: ShareTrace :exec
+UPDATE traces SET storage_prefix = 't90', expires_at = GREATEST(expires_at, ?) WHERE id = ?
+`
+
+type ShareTraceParams struct {
+	ExpiresAt interface{}
+	ID        string
+}
+
+func (q *Queries) ShareTrace(ctx context.Context, arg ShareTraceParams) error {
+	_, err := q.db.ExecContext(ctx, shareTrace, arg.ExpiresAt, arg.ID)
+	return err
+}
+
 const traceInput = `-- name: TraceInput :one
 SELECT language, source, stdin, options FROM traces WHERE id = ?
 `

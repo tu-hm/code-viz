@@ -45,3 +45,4 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 ## Backend
 
 - [Lease rules](backend/lease-rules.md): what keeps a stale worker from writing, and the gap the lease leaves in object storage
+- [Share links](backend/share-links.md): a link is its own row, never found by "owned" lookups, expiring with the owner's row; `t7/` stays until the cleanup

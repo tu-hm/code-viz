@@ -47,6 +47,15 @@ func (q *Queries) ActiveVisualizations(ctx context.Context, subject string) ([]A
 	return items, nil
 }
 
+const clearShareID = `-- name: ClearShareID :exec
+UPDATE visualizations SET share_id = NULL WHERE id = ?
+`
+
+func (q *Queries) ClearShareID(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, clearShareID, id)
+	return err
+}
+
 const countWaiting = `-- name: CountWaiting :one
 SELECT COUNT(*) FROM visualizations WHERE trace_id = ? AND detached = FALSE
 `
@@ -70,12 +79,45 @@ func (q *Queries) DeleteExpiredVisualizations(ctx context.Context, now time.Time
 	return result.RowsAffected()
 }
 
+const deleteVisualization = `-- name: DeleteVisualization :exec
+DELETE FROM visualizations WHERE id = ?
+`
+
+func (q *Queries) DeleteVisualization(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteVisualization, id)
+	return err
+}
+
 const detachVisualization = `-- name: DetachVisualization :exec
 UPDATE visualizations SET detached = TRUE WHERE id = ?
 `
 
 func (q *Queries) DetachVisualization(ctx context.Context, id string) error {
 	_, err := q.db.ExecContext(ctx, detachVisualization, id)
+	return err
+}
+
+const insertShareLink = `-- name: InsertShareLink :exec
+INSERT INTO visualizations (id, trace_id, subject, shared, created_at, expires_at)
+VALUES (?, ?, ?, TRUE, ?, ?)
+`
+
+type InsertShareLinkParams struct {
+	ID        string
+	TraceID   string
+	Subject   string
+	Now       time.Time
+	ExpiresAt time.Time
+}
+
+func (q *Queries) InsertShareLink(ctx context.Context, arg InsertShareLinkParams) error {
+	_, err := q.db.ExecContext(ctx, insertShareLink,
+		arg.ID,
+		arg.TraceID,
+		arg.Subject,
+		arg.Now,
+		arg.ExpiresAt,
+	)
 	return err
 }
 
@@ -105,8 +147,40 @@ func (q *Queries) InsertVisualization(ctx context.Context, arg InsertVisualizati
 	return err
 }
 
+const lockOwnedShareID = `-- name: LockOwnedShareID :one
+SELECT share_id FROM visualizations WHERE id = ? AND subject = ? AND shared = FALSE FOR UPDATE
+`
+
+type LockOwnedShareIDParams struct {
+	ID      string
+	Subject string
+}
+
+func (q *Queries) LockOwnedShareID(ctx context.Context, arg LockOwnedShareIDParams) (sql.NullString, error) {
+	row := q.db.QueryRowContext(ctx, lockOwnedShareID, arg.ID, arg.Subject)
+	var share_id sql.NullString
+	err := row.Scan(&share_id)
+	return share_id, err
+}
+
+const lockShareID = `-- name: LockShareID :one
+SELECT share_id, expires_at FROM visualizations WHERE id = ? FOR UPDATE
+`
+
+type LockShareIDRow struct {
+	ShareID   sql.NullString
+	ExpiresAt time.Time
+}
+
+func (q *Queries) LockShareID(ctx context.Context, id string) (LockShareIDRow, error) {
+	row := q.db.QueryRowContext(ctx, lockShareID, id)
+	var i LockShareIDRow
+	err := row.Scan(&i.ShareID, &i.ExpiresAt)
+	return i, err
+}
+
 const ownedVisualizationTrace = `-- name: OwnedVisualizationTrace :one
-SELECT trace_id FROM visualizations WHERE id = ? AND subject = ?
+SELECT trace_id FROM visualizations WHERE id = ? AND subject = ? AND shared = FALSE
 `
 
 type OwnedVisualizationTraceParams struct {
@@ -122,7 +196,7 @@ func (q *Queries) OwnedVisualizationTrace(ctx context.Context, arg OwnedVisualiz
 }
 
 const readVisualization = `-- name: ReadVisualization :one
-SELECT v.id, v.trace_id, v.detached, v.created_at, v.expires_at,
+SELECT v.id, v.trace_id, v.subject, v.shared, v.share_id, v.detached, v.created_at, v.expires_at,
   t.language, t.status, t.version, t.progress_steps, t.build, t.failure_stage, t.failure_kind,
   t.header, t.chunks, t.tail, t.storage_prefix
 FROM visualizations v
@@ -133,6 +207,9 @@ WHERE v.id = ?
 type ReadVisualizationRow struct {
 	ID            string
 	TraceID       string
+	Subject       string
+	Shared        bool
+	ShareID       sql.NullString
 	Detached      bool
 	CreatedAt     time.Time
 	ExpiresAt     time.Time
@@ -155,6 +232,9 @@ func (q *Queries) ReadVisualization(ctx context.Context, id string) (ReadVisuali
 	err := row.Scan(
 		&i.ID,
 		&i.TraceID,
+		&i.Subject,
+		&i.Shared,
+		&i.ShareID,
 		&i.Detached,
 		&i.CreatedAt,
 		&i.ExpiresAt,
@@ -205,4 +285,19 @@ func (q *Queries) RepeatedVisualization(ctx context.Context, arg RepeatedVisuali
 	var id string
 	err := row.Scan(&id)
 	return id, err
+}
+
+const setShareID = `-- name: SetShareID :exec
+UPDATE visualizations SET share_id = ?, expires_at = ? WHERE id = ?
+`
+
+type SetShareIDParams struct {
+	ShareID   sql.NullString
+	ExpiresAt time.Time
+	ID        string
+}
+
+func (q *Queries) SetShareID(ctx context.Context, arg SetShareIDParams) error {
+	_, err := q.db.ExecContext(ctx, setShareID, arg.ShareID, arg.ExpiresAt, arg.ID)
+	return err
 }

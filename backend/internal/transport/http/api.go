@@ -78,11 +78,15 @@ func (s *server) CreateVisualization(ctx context.Context, req api.CreateVisualiz
 }
 
 func (s *server) GetVisualization(ctx context.Context, req api.GetVisualizationRequestObject) (api.GetVisualizationResponseObject, error) {
-	v, err := s.viz.Get(ctx, req.ID, req.Params)
+	v, shared, err := s.viz.Get(ctx, req.ID, req.Params)
 	if err != nil {
 		return nil, err
 	}
-	return api.GetVisualization200JSONResponse(v), nil
+	cache := "no-store"
+	if shared {
+		cache = "public, max-age=60" // §7.8: a share link that goes viral
+	}
+	return api.GetVisualization200JSONResponse{Body: v, Headers: api.GetVisualization200ResponseHeaders{CacheControl: cache}}, nil
 }
 
 func (s *server) DeleteVisualization(ctx context.Context, req api.DeleteVisualizationRequestObject) (api.DeleteVisualizationResponseObject, error) {
@@ -92,9 +96,19 @@ func (s *server) DeleteVisualization(ctx context.Context, req api.DeleteVisualiz
 	return api.DeleteVisualization204Response{}, nil
 }
 
-func (s *server) ShareVisualization(_ context.Context, req api.ShareVisualizationRequestObject) (api.ShareVisualizationResponseObject, error) {
-	// TODO(tu-hm): share links in BE-12; until then 404, as for any route vizd doesn't serve
-	return nil, fmt.Errorf("share %s: %w", req.ID, domain.ErrNotFound)
+func (s *server) ShareVisualization(ctx context.Context, req api.ShareVisualizationRequestObject) (api.ShareVisualizationResponseObject, error) {
+	link, err := s.viz.Share(ctx, info(ctx).caller, req.ID)
+	if err != nil {
+		return nil, err
+	}
+	return api.ShareVisualization200JSONResponse(link), nil
+}
+
+func (s *server) RevokeShare(ctx context.Context, req api.RevokeShareRequestObject) (api.RevokeShareResponseObject, error) {
+	if err := s.viz.Unshare(ctx, info(ctx).caller, req.ID); err != nil {
+		return nil, err
+	}
+	return api.RevokeShare204Response{}, nil
 }
 
 var errorStatuses = []struct {
