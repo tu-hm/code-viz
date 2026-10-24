@@ -3,6 +3,13 @@ name: code-viz
 services:
   mysql:
     image: mysql:8.4.13@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69
+    # §7.13; 8.4's defaults already, pinned so an image or my.cnf change can't move them
+    command:
+      - --default-storage-engine=InnoDB
+      - --character-set-server=utf8mb4
+      - --default-time-zone=+00:00
+      - --binlog-format=ROW
+      - --sql-mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
     environment:
       MYSQL_DATABASE: viz
       MYSQL_USER: viz
