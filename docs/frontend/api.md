@@ -39,7 +39,7 @@ Every body is JSON in UTF-8. There is no sign-in yet: every caller is anonymous 
 3. Open the visualizer in its loading state with the `201` body. The status can already be final: an identical trace that finished earlier comes back `completed`, at once.
 4. While the status isn't final, `GET /visualizations/{id}?wait=20&since=<version>`. The server holds each request until the visualization changes or 20 seconds pass.
 5. On `completed`, download `trace.chunks[]` from their signed URLs, check each one's `sha256`, and hand the steps to the player. `loadTrace` in `@viz/player` does this step.
-6. On **Cancel**, **Close**, or a new **Visualize**, stop polling and `DELETE /visualizations/{id}`.
+6. On **Cancel**, **Close**, or a new **Visualize**, stop polling and `DELETE /visualizations/{id}` while its status isn't final. Leave a final one alone: a `DELETE` turns even a completed visualization `canceled`, and its chunk URLs could no longer be refreshed.
 
 ```ts
 import type { components } from './gen/api.ts'
@@ -58,7 +58,7 @@ async function visualize(body: components['schemas']['CreateVisualizationRequest
 }
 ```
 
-`call` stands for your client: `openapi-fetch` with TanStack Query in FE-04. It throws the error envelope as a typed error and retries per [Errors](#errors).
+The IDE's client (FE-04) is two files. `apps/ide/src/api.ts` wraps `openapi-fetch`, checks source and stdin sizes before sending, and throws the error envelope as an `ApiError`: `status`, `code` (`null` when the body isn't the envelope, such as a proxy's 502 page), `retryAfterSec` and `requestId`. `apps/ide/src/visualize.ts` holds the TanStack Query parts: the create mutation, the long-poll query and cancel. A create retries network errors only, with the same key; a poll also retries `502`–`504` and honours `Retry-After`, up to 6 times (about a minute), resuming from the last `version`.
 
 ## `GET /languages`
 
@@ -346,7 +346,7 @@ Chunks come straight from object storage (or a CDN), never from the API:
 - **Chunks never change.** Storage serves them with `Cache-Control: private, max-age=86400, immutable`, so the browser caches them.
 - **`trace.tail`** (`sizeBytes`, `sha256`, `url`) is set when the program printed more after the last recorded step: past the step limit, or anything at all in a trace with no steps, such as when no start line ran. It is gzipped text, stdout then stderr, checked like a chunk and signed with the same expiry. Show it after the recorded output, marked as not traced (§19.9.5).
 
-`loadTrace(source)` from `@viz/player` does the chunk part: download, gzip, `sha256`, refreshing expired URLs through a callback, the version check and the order check. Give it `{ manifest: v.trace, refresh }`, where `refresh` GETs the visualization again and returns its `trace`. It throws errors named `NetworkError`, `ChecksumError` or `VersionError`. It doesn't fetch `trace.tail` yet.
+`loadTrace(source)` from `@viz/player` does the chunk part: download, gzip, `sha256`, refreshing expired URLs through a callback, the version check and the order check. Give it `{ manifest: v.trace, refresh }`, where `refresh` GETs the visualization again and returns its `trace`. openapi-fetch's response types turn the schema's tuples into arrays, so `header.options.captureRanges` comes back as `number[][]`; `toManifest` in `apps/ide/src/visualizer.tsx` checks the pairs back into the player's `[number, number]`. It throws errors named `NetworkError`, `ChecksumError` or `VersionError`. It doesn't fetch `trace.tail` yet.
 
 ## Reading the trace
 
