@@ -2,6 +2,7 @@
 package app
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"io"
@@ -20,7 +21,7 @@ import (
 const maxBuildOutput = 64 << 10
 
 // gcc's format, which tracer.py --check prints too: main.py:3:5: error: invalid syntax
-var diagnostic = regexp.MustCompile(`^(\d+):(\d+): (error|warning): (.*)$`)
+var diagnostic = regexp.MustCompile(`^(.+?):(\d+):(\d+): (error|fatal error|warning|note): (.*)$`)
 
 // Build runs m's build step in box under m.Build.Timeout (§10.2), with m.Build.SafetyFlags unless opts switch them off,
 // and returns it as the API shows it, with the failure kind when it failed. The error is for a sandbox failure, never for a failed build.
@@ -65,22 +66,46 @@ func Build(ctx context.Context, box ports.Box, m domain.Manifest, opts trace.Opt
 }
 
 func diagnostics(file, out string) []api.Diagnostic {
+	f := regexp.QuoteMeta(file)
+	// main.cpp:12:20:   required from here; In file included from main.cpp:1:
+	contextAt := regexp.MustCompile(`(?:^|from )` + f + `:(\d+):(?:(\d+):)?`)
+	// ld, no column: /work/main.cpp:7: undefined reference to `solve(int)'
+	undefinedRef := regexp.MustCompile(`(?:^|/)` + f + `:(\d+): (undefined reference to .*)$`)
+
 	ds := []api.Diagnostic{}
-	for line := range strings.Lines(out) {
-		rest, ok := strings.CutPrefix(strings.TrimRight(line, "\r\n"), file+":")
-		if !ok {
-			continue
-		}
-		m := diagnostic.FindStringSubmatch(rest)
-		if m == nil {
-			continue
-		}
-		l, lerr := strconv.Atoi(m[1])
-		c, cerr := strconv.Atoi(m[2])
+	add := func(line, column, severity, msg string) {
+		l, lerr := strconv.Atoi(line)
+		c, cerr := strconv.Atoi(cmp.Or(column, "1"))
 		if lerr != nil || cerr != nil || l < 1 || c < 1 {
+			return
+		}
+		ds = append(ds, api.Diagnostic{Line: l, Column: c, Severity: api.DiagnosticSeverity(severity), Message: msg})
+	}
+	// gcc prints context only when it changes => last user location printed still applies to later diagnostics
+	var near []string
+	for line := range strings.Lines(out) {
+		line = strings.TrimRight(line, "\r\n")
+		if d := diagnostic.FindStringSubmatch(line); d != nil {
+			path, at, severity, msg := d[1], d[2:4], d[4], d[5]
+			if path != file {
+				at = near
+			}
+			if severity == "note" || at == nil {
+				continue
+			}
+			if severity == "fatal error" {
+				severity = "error"
+			}
+			add(at[0], at[1], severity, msg)
 			continue
 		}
-		ds = append(ds, api.Diagnostic{Line: l, Column: c, Severity: api.DiagnosticSeverity(m[3]), Message: m[4]})
+		if ref := undefinedRef.FindStringSubmatch(line); ref != nil {
+			add(ref[1], "", "error", ref[2])
+			continue
+		}
+		if at := contextAt.FindStringSubmatch(line); at != nil {
+			near = at[1:]
+		}
 	}
 	return ds
 }

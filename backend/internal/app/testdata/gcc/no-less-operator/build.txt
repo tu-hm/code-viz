@@ -1,0 +1,63 @@
+In file included from /usr/local/include/c++/13.5.0/cassert:43,
+                 from stdc++.h:33:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h: In instantiation of 'void std::sort(_RAIter, _RAIter) [with _RAIter = P*]':
+main.cpp:10:9:   required from here
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: error: no match for 'operator<' in '* __first < * __first' (operand types are 'P' and 'P')
+In file included from /usr/local/include/c++/13.5.0/bits/stl_algobase.h:64,
+                 from /usr/local/include/c++/13.5.0/algorithm:60,
+                 from stdc++.h:51:
+/usr/local/include/c++/13.5.0/bits/stl_pair.h:835:5: note: candidate: 'template<class _T1, class _T2> constexpr bool std::operator<(const pair<_T1, _T2>&, const pair<_T1, _T2>&)'
+/usr/local/include/c++/13.5.0/bits/stl_pair.h:835:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::pair<_T1, _T2>'
+In file included from /usr/local/include/c++/13.5.0/bits/stl_algobase.h:67:
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:455:5: note: candidate: 'template<class _Iterator> constexpr bool std::operator<(const reverse_iterator<_Iterator>&, const reverse_iterator<_Iterator>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:455:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::reverse_iterator<_Iterator>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:500:5: note: candidate: 'template<class _IteratorL, class _IteratorR> constexpr bool std::operator<(const reverse_iterator<_Iterator>&, const reverse_iterator<_IteratorR>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:500:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::reverse_iterator<_Iterator>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1705:5: note: candidate: 'template<class _IteratorL, class _IteratorR> constexpr bool std::operator<(const move_iterator<_IteratorL>&, const move_iterator<_IteratorR>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1705:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::move_iterator<_IteratorL>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1771:5: note: candidate: 'template<class _Iterator> constexpr bool std::operator<(const move_iterator<_IteratorL>&, const move_iterator<_IteratorL>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1771:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::move_iterator<_IteratorL>'
+In file included from /usr/local/include/c++/13.5.0/debug/debug.h:90,
+                 from /usr/local/include/c++/13.5.0/bits/stl_algobase.h:69:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: error: no match for 'operator<' in '* __first < * __first' (operand types are 'P' and 'P')
+/usr/local/include/c++/13.5.0/bits/stl_pair.h:835:5: note: candidate: 'template<class _T1, class _T2> constexpr bool std::operator<(const pair<_T1, _T2>&, const pair<_T1, _T2>&)'
+/usr/local/include/c++/13.5.0/bits/stl_pair.h:835:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::pair<_T1, _T2>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:455:5: note: candidate: 'template<class _Iterator> constexpr bool std::operator<(const reverse_iterator<_Iterator>&, const reverse_iterator<_Iterator>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:455:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::reverse_iterator<_Iterator>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:500:5: note: candidate: 'template<class _IteratorL, class _IteratorR> constexpr bool std::operator<(const reverse_iterator<_Iterator>&, const reverse_iterator<_IteratorR>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:500:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::reverse_iterator<_Iterator>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1705:5: note: candidate: 'template<class _IteratorL, class _IteratorR> constexpr bool std::operator<(const move_iterator<_IteratorL>&, const move_iterator<_IteratorR>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1705:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::move_iterator<_IteratorL>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1771:5: note: candidate: 'template<class _Iterator> constexpr bool std::operator<(const move_iterator<_IteratorL>&, const move_iterator<_IteratorL>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1771:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_algo.h:4859:7: note:   'P' is not derived from 'const std::move_iterator<_IteratorL>'
+In file included from /usr/local/include/c++/13.5.0/debug/functions.h:32,
+                 from /usr/local/include/c++/13.5.0/debug/debug.h:141:
+/usr/local/include/c++/13.5.0/bits/stl_function.h: In instantiation of 'constexpr bool std::less<_Tp>::operator()(const _Tp&, const _Tp&) const [with _Tp = P]':
+/usr/local/include/c++/13.5.0/bits/stl_map.h:511:32:   required from 'std::__cxx1998::map<_Key, _Tp, _Compare, _Alloc>::mapped_type& std::__cxx1998::map<_Key, _Tp, _Compare, _Alloc>::operator[](const key_type&) [with _Key = P; _Tp = int; _Compare = std::less<P>; _Alloc = std::allocator<std::pair<const P, int> >; mapped_type = int; key_type = P]'
+main.cpp:12:14:   required from here
+/usr/local/include/c++/13.5.0/bits/stl_function.h:408:20: error: no match for 'operator<' in '__x < __y' (operand types are 'const P' and 'const P')
+/usr/local/include/c++/13.5.0/bits/stl_pair.h:835:5: note: candidate: 'template<class _T1, class _T2> constexpr bool std::operator<(const pair<_T1, _T2>&, const pair<_T1, _T2>&)'
+/usr/local/include/c++/13.5.0/bits/stl_pair.h:835:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_function.h:408:20: note:   'const P' is not derived from 'const std::pair<_T1, _T2>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:455:5: note: candidate: 'template<class _Iterator> constexpr bool std::operator<(const reverse_iterator<_Iterator>&, const reverse_iterator<_Iterator>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:455:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_function.h:408:20: note:   'const P' is not derived from 'const std::reverse_iterator<_Iterator>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:500:5: note: candidate: 'template<class _IteratorL, class _IteratorR> constexpr bool std::operator<(const reverse_iterator<_Iterator>&, const reverse_iterator<_IteratorR>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:500:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_function.h:408:20: note:   'const P' is not derived from 'const std::reverse_iterator<_Iterator>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1705:5: note: candidate: 'template<class _IteratorL, class _IteratorR> constexpr bool std::operator<(const move_iterator<_IteratorL>&, const move_iterator<_IteratorR>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1705:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_function.h:408:20: note:   'const P' is not derived from 'const std::move_iterator<_IteratorL>'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1771:5: note: candidate: 'template<class _Iterator> constexpr bool std::operator<(const move_iterator<_IteratorL>&, const move_iterator<_IteratorL>&)'
+/usr/local/include/c++/13.5.0/bits/stl_iterator.h:1771:5: note:   template argument deduction/substitution failed:
+/usr/local/include/c++/13.5.0/bits/stl_function.h:408:20: note:   'const P' is not derived from 'const std::move_iterator<_IteratorL>'
