@@ -173,7 +173,10 @@ export function Ide() {
           language={language}
           draft={draft}
           cursor={cursor}
-          onLanguage={setLanguageId}
+          onLanguage={(id) => {
+            setLanguageId(id)
+            setCursor(null)
+          }}
           onCode={(code) => edit({ code })}
           onStdin={(stdin) => edit({ stdin })}
           onVisualize={run === null && visualizeOn && language.visualize.enabled ? visualize : null}

@@ -411,6 +411,13 @@ describe('ended without a trace (§5.6, §8.3)', () => {
     const editor = await screen.findByRole('textbox', { name: 'Code editor' })
     expect(document.activeElement).toBe(editor)
     expect(caretLine()).toBe(6)
+
+    fireEvent.change(screen.getByRole('combobox', { name: 'Language' }), {
+      target: { value: languages.languages[1]!.id },
+    })
+    const other = await screen.findByRole('textbox', { name: 'Code editor' })
+    expect(other).not.toBe(editor)
+    expect(document.activeElement).not.toBe(other)
   })
 
   test('an unsupported module says to use Run', async () => {
