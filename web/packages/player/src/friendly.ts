@@ -4,7 +4,7 @@ export type StepError = NonNullable<Step['error']>
 
 export type Part = string | { code: string }
 
-export type Friendly = { title: string; message: Part[]; hint: Part[] }
+type Friendly = { title: string; message: Part[]; hint: Part[] }
 
 const code = (text: string) => ({ code: text })
 
@@ -95,7 +95,7 @@ function recursion({ depth, limit }: ErrorValues): Friendly {
   }
 }
 
-// §19.6 message templates; null => show the runtime's own message
+// friendly fills the §19.6 templates; null => show the runtime's own message
 export function friendly(error: StepError): Friendly | null {
   const values = error.values ?? {}
   switch (error.kind) {
