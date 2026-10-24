@@ -59,6 +59,10 @@
   --color-trace-arrow-active: var(--trace-arrow-active);
   --color-trace-heat: var(--trace-heat);
 
+  --color-syntax-keyword: var(--syntax-keyword);
+  --color-syntax-string: var(--syntax-string);
+  --color-syntax-comment: var(--syntax-comment);
+
   --shadow-raised: var(--elevation-raised);
   --shadow-popover: var(--elevation-popover);
 }

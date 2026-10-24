@@ -39,6 +39,14 @@ function luminance(hex: string) {
   return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!
 }
 
+function over(fg: string, alpha: number, bg: string) {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(i, i + 2), 16)
+  return `#${[1, 3, 5]
+    .map((i) => Math.round(alpha * channel(fg, i) + (1 - alpha) * channel(bg, i)))
+    .map((c) => c.toString(16).padStart(2, '0'))
+    .join('')}`
+}
+
 function contrast(a: string, b: string) {
   const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
   return (hi! + 0.05) / (lo! + 0.05)
@@ -77,7 +85,12 @@ const pairs: [fg: string, bgs: string[], min: number][] = [
   ['content-tertiary', ['bg-canvas', 'bg-surface'], mark],
   ['border-control', ['bg-canvas', 'bg-surface'], mark],
   ['border-focus', ['bg-canvas', 'bg-surface'], mark],
+  ['syntax-keyword', ['bg-surface', 'trace-executed-bg', 'trace-error-bg'], text],
+  ['syntax-string', ['bg-surface', 'trace-executed-bg', 'trace-error-bg'], text],
+  ['syntax-comment', ['bg-surface', 'trace-executed-bg', 'trace-error-bg'], text],
 ]
+
+const heatTints = [0.15, 0.25, 0.4]
 
 describe.each(Object.entries(themes))('%s theme', (_, vars) => {
   const cases = pairs.flatMap(([fg, bgs, min]) => bgs.map((bg) => ({ fg, bg, min })))
@@ -85,4 +98,12 @@ describe.each(Object.entries(themes))('%s theme', (_, vars) => {
   test.each(cases)('$fg on $bg is at least $min:1', ({ fg, bg, min }) => {
     expect(contrast(resolve(vars, fg), resolve(vars, bg))).toBeGreaterThanOrEqual(min)
   })
+
+  test.each(heatTints)(
+    'content-primary on trace-heat at %s over bg-surface is at least 4.5:1',
+    (alpha) => {
+      const tint = over(resolve(vars, 'trace-heat'), alpha, resolve(vars, 'bg-surface'))
+      expect(contrast(resolve(vars, 'content-primary'), tint)).toBeGreaterThanOrEqual(text)
+    },
+  )
 })

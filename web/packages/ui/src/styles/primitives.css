@@ -68,10 +68,12 @@
   --green-light-tint: #e7f3ed;
   --green-light-mark: #009e73;
   --green-light-ink: #007c5a;
+  --green-light-deep: #006c4f;
   --green-dark-tint: #002518;
   --green-dark-mark: #14a97e;
   --green-dark-ink: #1fae84;
 
   --purple-light-ink: #9f5d81;
+  --purple-light-deep: #8d4b70;
   --purple-dark-ink: #cc79a7;
 }

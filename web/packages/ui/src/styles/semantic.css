@@ -51,6 +51,10 @@
   --trace-arrow-active: var(--blue-light-ink);
   --trace-heat: var(--amber-light-mark);
 
+  --syntax-keyword: var(--purple-light-deep);
+  --syntax-string: var(--green-light-deep);
+  --syntax-comment: var(--slate-11);
+
   --elevation-raised: 0 1px 2px rgb(12 14 18 / 0.05);
   --elevation-popover: 0 18px 36px -12px rgb(12 14 18 / 0.18);
 }
@@ -105,6 +109,10 @@
   --trace-arrow: var(--slate-dark-9);
   --trace-arrow-active: var(--blue-dark-ink);
   --trace-heat: var(--amber-dark-ink);
+
+  --syntax-keyword: var(--purple-dark-ink);
+  --syntax-string: var(--green-dark-ink);
+  --syntax-comment: var(--slate-dark-11);
 
   /* near-black shadow vanishes on the black canvas => ring instead */
   --elevation-raised: 0 0 0 1px var(--slate-dark-4);
