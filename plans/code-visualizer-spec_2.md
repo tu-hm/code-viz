@@ -1117,7 +1117,7 @@ A failed build:
 - Chunks are downloaded **directly from object storage** (or the CDN) using `trace.chunks[].url`. They are not served by `vizd`.
 - A chunk is a JSON array of steps (§9.2), gzip-compressed and served with `Content-Encoding: gzip`. Every chunk starts with a keyframe.
 - **URLs expire after 15 minutes.** To get fresh ones, call `GET /visualizations/{id}` again. Because the chunks never change, the browser caches them (`Cache-Control: private, max-age=86400, immutable`).
-- The client checks `sha256` before using a chunk.
+- The client checks `sha256` before using a chunk. It is the hash of the unzipped JSON, because the browser removes `Content-Encoding: gzip` before the client sees the bytes.
 
 ### 8.5 `DELETE /visualizations/{id}`
 
