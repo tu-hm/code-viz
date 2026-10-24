@@ -1,6 +1,10 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"time"
+)
 
 // ErrInfra marks a failure of the infrastructure, not of the user's program. Only these are retried (§7.7).
 var ErrInfra = errors.New("infrastructure error")
@@ -31,3 +35,17 @@ var ErrNotFound = errors.New("not found")
 
 // ErrExpired means the visualization is past its retention (§11).
 var ErrExpired = errors.New("expired")
+
+// RetryError is ErrQuotaExceeded or ErrCapacity with how long the caller should wait before trying again (§8.7).
+type RetryError struct {
+	Err   error
+	After time.Duration
+}
+
+func (e *RetryError) Error() string {
+	return fmt.Sprintf("%v, retry after %v", e.Err, e.After)
+}
+
+func (e *RetryError) Unwrap() error {
+	return e.Err
+}
