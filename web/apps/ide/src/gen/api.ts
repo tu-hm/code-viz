@@ -175,9 +175,10 @@ export interface components {
         TraceManifest: {
             header: components["schemas"]["TraceHeader"];
             chunks: components["schemas"]["Chunk"][];
+            tail?: components["schemas"]["Tail"];
             /**
              * Format: date-time
-             * @description Chunk URLs stop working at this time; GET the visualization again for fresh ones.
+             * @description Chunk and tail URLs stop working at this time; GET the visualization again for fresh ones.
              */
             urlsExpireAt: string;
         };
@@ -198,6 +199,17 @@ export interface components {
             toStep: number;
             sizeBytes: number;
             /** @description Hex SHA-256 of the chunk's JSON after gzip is removed, because browsers undo Content-Encoding before the client sees the bytes. Checked by the client before it uses the chunk. */
+            sha256: string;
+            /**
+             * Format: uri
+             * @description Signed; expires at urlsExpireAt.
+             */
+            url: string;
+        };
+        /** @description What the program printed after the last recorded step, as text (tail.txt.gz, §19.9.5). Set when the trace stopped at the step limit and the program printed more. */
+        Tail: {
+            sizeBytes: number;
+            /** @description Hex SHA-256 of the text after gzip is removed, like a chunk's. */
             sha256: string;
             /**
              * Format: uri

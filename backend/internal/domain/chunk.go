@@ -6,3 +6,8 @@ import "fmt"
 func ChunkKey(prefix, traceID string, i int) string {
 	return fmt.Sprintf("%s/%s/chunk-%04d.json.gz", prefix, traceID, i)
 }
+
+// TailKey is the object key of a trace's output after the step limit (§19.9.5).
+func TailKey(prefix, traceID string) string {
+	return fmt.Sprintf("%s/%s/tail.txt.gz", prefix, traceID)
+}

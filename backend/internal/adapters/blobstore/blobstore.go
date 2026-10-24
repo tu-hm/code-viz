@@ -59,12 +59,12 @@ func New(ctx context.Context, cfg Config) (*Bucket, error) {
 	return &Bucket{client: client, presign: s3.NewPresignClient(public), name: cfg.Bucket}, nil
 }
 
-func (b *Bucket) Put(ctx context.Context, key string, gz []byte) error {
+func (b *Bucket) Put(ctx context.Context, key, contentType string, gz []byte) error {
 	_, err := b.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:          aws.String(b.name),
 		Key:             aws.String(key),
 		Body:            bytes.NewReader(gz),
-		ContentType:     aws.String("application/json"),
+		ContentType:     aws.String(contentType),
 		ContentEncoding: aws.String("gzip"),
 		CacheControl:    aws.String("private, max-age=86400, immutable"),
 	})

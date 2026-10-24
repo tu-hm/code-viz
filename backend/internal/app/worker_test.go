@@ -282,6 +282,67 @@ func TestRunKeepsTheStepsOfAProgramThatRunsPastTheWallTime(t *testing.T) {
 	}
 }
 
+func TestRunStoresTheOutputAfterTheStepLimitAsTheTail(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name  string
+		steps int
+		tail  string
+	}{
+		{"a program that prints past the step limit has a tail", 1001, "after the limit\n"},
+		{"a program that ends within the step limit has none", 1000, ""},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			db, b := newDB(t), newBucket(t)
+			sb := newFakeSandbox(func(_ context.Context, cmd ports.Command) (ports.Exit, error) {
+				lines := []string{fakeHello}
+				for i := range tc.steps {
+					lines = append(lines, fakeStep(i+1))
+				}
+				if err := play(cmd, lines...); err != nil {
+					return ports.Exit{}, err
+				}
+				if _, err := io.WriteString(cmd.Stdout, "after the limit\n"); err != nil {
+					return ports.Exit{}, err
+				}
+				return ports.Exit{}, play(cmd, fakeExit)
+			})
+			id := addJob(t, db, "nobuild", "x", "")
+			start(t, newWorker(t, db, fakeAdapters(t), sb, b)).idle(t)
+
+			d := readDocs(t, db, id)
+			resp := get(t, http.MethodGet, b.url+"/"+domain.TailKey("t7", id))
+			if tc.tail == "" {
+				if d.Tail != nil || resp.StatusCode != http.StatusNotFound {
+					t.Errorf("tail %+v, GET tail.txt.gz: HTTP %d; want none and 404", d.Tail, resp.StatusCode)
+				}
+				return
+			}
+			if resp.StatusCode != http.StatusOK || d.Tail == nil {
+				t.Fatalf("tail %+v, GET tail.txt.gz: HTTP %d; want it listed and 200", d.Tail, resp.StatusCode)
+			}
+			zr, err := gzip.NewReader(bytes.NewReader(resp.body))
+			if err != nil {
+				t.Fatal(err)
+			}
+			text, err := io.ReadAll(zr)
+			if err != nil {
+				t.Fatal(err)
+			}
+			sum := sha256.Sum256(text)
+			want := ports.Tail{SizeBytes: len(resp.body), SHA256: hex.EncodeToString(sum[:])}
+			if string(text) != tc.tail || *d.Tail != want {
+				t.Errorf("tail.txt.gz holds %q, listed as %+v; want %q, listed as %+v", text, *d.Tail, tc.tail, want)
+			}
+			if got := resp.Header.Get("Content-Type"); got != "text/plain; charset=utf-8" {
+				t.Errorf("Content-Type = %q, want text/plain; charset=utf-8", got)
+			}
+		})
+	}
+}
+
 func TestRunStopsAndWritesNothingOnceTheLeaseIsLost(t *testing.T) {
 	t.Parallel()
 	db, b := newDB(t), newBucket(t)
@@ -778,20 +839,22 @@ func readJob(t *testing.T, db *sql.DB, traceID string) jobRow {
 type docs struct {
 	Header trace.Trace
 	Chunks []ports.Chunk
+	Tail   *ports.Tail
 	Build  *api.Build
 }
 
 func readDocs(t *testing.T, db *sql.DB, id string) docs {
 	t.Helper()
-	var header, chunks, build []byte
-	if err := db.QueryRowContext(t.Context(), "SELECT header, chunks, build FROM traces WHERE id = ?", id).Scan(&header, &chunks, &build); err != nil {
+	var header, chunks, tail, build []byte
+	err := db.QueryRowContext(t.Context(), "SELECT header, chunks, tail, build FROM traces WHERE id = ?", id).Scan(&header, &chunks, &tail, &build)
+	if err != nil {
 		t.Fatal(err)
 	}
 	var d docs
 	for _, f := range []struct {
 		raw []byte
 		v   any
-	}{{header, &d.Header}, {chunks, &d.Chunks}, {build, &d.Build}} {
+	}{{header, &d.Header}, {chunks, &d.Chunks}, {tail, &d.Tail}, {build, &d.Build}} {
 		if f.raw == nil {
 			continue
 		}

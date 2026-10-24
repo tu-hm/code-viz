@@ -57,11 +57,12 @@ type Visualization struct {
 	FailureKind   api.FailureKind
 	Header        json.RawMessage // set once completed
 	Chunks        []Chunk
+	Tail          *Tail
 	StoragePrefix string
 }
 
 // ExpiredTrace is a trace the retention cleanup deleted.
 type ExpiredTrace struct {
-	ID        string
-	ChunkKeys []string
+	ID   string
+	Keys []string // its chunks and tail in object storage
 }

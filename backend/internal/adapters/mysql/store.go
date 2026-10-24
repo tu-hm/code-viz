@@ -230,6 +230,12 @@ func readVisualization(ctx context.Context, qs *sqlc.Queries, id string) (ports.
 			return ports.Visualization{}, fmt.Errorf("decode chunks of trace %s: %w", r.TraceID, err)
 		}
 	}
+	var tail *ports.Tail
+	if r.Tail != nil {
+		if err := json.Unmarshal(r.Tail, &tail); err != nil {
+			return ports.Visualization{}, fmt.Errorf("decode tail of trace %s: %w", r.TraceID, err)
+		}
+	}
 	return ports.Visualization{
 		ID:            r.ID,
 		TraceID:       r.TraceID,
@@ -245,6 +251,7 @@ func readVisualization(ctx context.Context, qs *sqlc.Queries, id string) (ports.
 		FailureKind:   api.FailureKind(r.FailureKind),
 		Header:        r.Header,
 		Chunks:        chunks,
+		Tail:          tail,
 		StoragePrefix: r.StoragePrefix,
 	}, nil
 }
@@ -314,7 +321,10 @@ func (s *Store) DeleteExpired(ctx context.Context, now time.Time) ([]ports.Expir
 			for c := range keys {
 				keys[c] = domain.ChunkKey(r.StoragePrefix, r.ID, c)
 			}
-			expired[i] = ports.ExpiredTrace{ID: r.ID, ChunkKeys: keys}
+			if r.Tail != nil {
+				keys = append(keys, domain.TailKey(r.StoragePrefix, r.ID))
+			}
+			expired[i] = ports.ExpiredTrace{ID: r.ID, Keys: keys}
 		}
 		if len(ids) == 0 {
 			return nil

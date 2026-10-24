@@ -28,7 +28,7 @@ SELECT COUNT(*) FROM visualizations WHERE trace_id = sqlc.arg(trace_id) AND deta
 -- name: ReadVisualization :one
 SELECT v.id, v.trace_id, v.detached, v.created_at, v.expires_at,
   t.language, t.status, t.version, t.progress_steps, t.build, t.failure_stage, t.failure_kind,
-  t.header, t.chunks, t.storage_prefix
+  t.header, t.chunks, t.tail, t.storage_prefix
 FROM visualizations v
 JOIN traces t ON t.id = v.trace_id
 WHERE v.id = sqlc.arg(id);

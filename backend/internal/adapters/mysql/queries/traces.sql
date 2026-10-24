@@ -22,7 +22,7 @@ WHERE id = sqlc.arg(id);
 -- name: CompleteTrace :exec
 UPDATE traces
 SET status = 'completed', header = sqlc.arg(header), chunks = sqlc.arg(chunks), chunk_count = sqlc.arg(chunk_count),
-  exit_kind = sqlc.arg(exit_kind), storage_prefix = sqlc.arg(storage_prefix), build = sqlc.arg(build),
+  tail = sqlc.arg(tail), exit_kind = sqlc.arg(exit_kind), storage_prefix = sqlc.arg(storage_prefix), build = sqlc.arg(build),
   version = version + 1, updated_at = sqlc.arg(now)
 WHERE id = sqlc.arg(id);
 
@@ -42,13 +42,13 @@ SELECT id, status, failure_kind, expires_at FROM traces WHERE cache_key = sqlc.a
 
 -- name: ResetTrace :exec
 UPDATE traces
-SET status = 'queued', version = version + 1, progress_steps = 0, header = NULL, chunks = NULL, chunk_count = 0,
+SET status = 'queued', version = version + 1, progress_steps = 0, header = NULL, chunks = NULL, chunk_count = 0, tail = NULL,
   storage_prefix = '', exit_kind = '', build = NULL, failure_stage = '', failure_kind = '',
   updated_at = sqlc.arg(now), expires_at = sqlc.arg(expires_at)
 WHERE id = sqlc.arg(id);
 
 -- name: LockExpiredTraces :many
-SELECT id, storage_prefix, chunk_count FROM traces
+SELECT id, storage_prefix, chunk_count, tail FROM traces
 WHERE expires_at < sqlc.arg(now)
 ORDER BY expires_at
 LIMIT 1000

@@ -124,7 +124,7 @@ func (q *Queries) OwnedVisualizationTrace(ctx context.Context, arg OwnedVisualiz
 const readVisualization = `-- name: ReadVisualization :one
 SELECT v.id, v.trace_id, v.detached, v.created_at, v.expires_at,
   t.language, t.status, t.version, t.progress_steps, t.build, t.failure_stage, t.failure_kind,
-  t.header, t.chunks, t.storage_prefix
+  t.header, t.chunks, t.tail, t.storage_prefix
 FROM visualizations v
 JOIN traces t ON t.id = v.trace_id
 WHERE v.id = ?
@@ -145,6 +145,7 @@ type ReadVisualizationRow struct {
 	FailureKind   string
 	Header        []byte
 	Chunks        []byte
+	Tail          []byte
 	StoragePrefix string
 }
 
@@ -166,6 +167,7 @@ func (q *Queries) ReadVisualization(ctx context.Context, id string) (ReadVisuali
 		&i.FailureKind,
 		&i.Header,
 		&i.Chunks,
+		&i.Tail,
 		&i.StoragePrefix,
 	)
 	return i, err

@@ -274,6 +274,16 @@ type StepLimits struct {
 	MaxStepsCeiling int `json:"maxStepsCeiling"`
 }
 
+// Tail What the program printed after the last recorded step, as text (tail.txt.gz, §19.9.5). Set when the trace stopped at the step limit and the program printed more.
+type Tail struct {
+	// Sha256 Hex SHA-256 of the text after gzip is removed, like a chunk's.
+	Sha256    string `json:"sha256"`
+	SizeBytes int    `json:"sizeBytes"`
+
+	// URL Signed; expires at urlsExpireAt.
+	URL string `json:"url"`
+}
+
 // TraceHeader The trace document (trace.v1.schema.json) without steps.
 type TraceHeader = json.RawMessage
 
@@ -284,7 +294,10 @@ type TraceManifest struct {
 	// Header The trace document (trace.v1.schema.json) without steps.
 	Header TraceHeader `json:"header"`
 
-	// UrlsExpireAt Chunk URLs stop working at this time; GET the visualization again for fresh ones.
+	// Tail What the program printed after the last recorded step, as text (tail.txt.gz, §19.9.5). Set when the trace stopped at the step limit and the program printed more.
+	Tail *Tail `json:"tail,omitempty"`
+
+	// UrlsExpireAt Chunk and tail URLs stop working at this time; GET the visualization again for fresh ones.
 	UrlsExpireAt time.Time `json:"urlsExpireAt"`
 }
 

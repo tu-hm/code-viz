@@ -1,0 +1,5 @@
+-- +goose Up
+ALTER TABLE traces ADD COLUMN tail JSON NULL, ALGORITHM=INSTANT;
+
+-- +goose Down
+ALTER TABLE traces DROP COLUMN tail, ALGORITHM=INSTANT;

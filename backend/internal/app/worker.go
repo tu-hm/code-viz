@@ -267,10 +267,21 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 	}
 	stored := make([]ports.Chunk, len(chunks))
 	for i, c := range chunks {
-		if err := w.Blobs.Put(ctx, domain.ChunkKey(storagePrefix, l.TraceID, c.Index), c.Gzip); err != nil {
+		if err := w.Blobs.Put(ctx, domain.ChunkKey(storagePrefix, l.TraceID, c.Index), "application/json", c.Gzip); err != nil {
 			return fmt.Errorf("upload chunk %d: %w", c.Index, err)
 		}
 		stored[i] = ports.Chunk{Index: c.Index, FromStep: c.FromStep, ToStep: c.ToStep, SizeBytes: len(c.Gzip), SHA256: c.SHA256}
+	}
+	var tail *ports.Tail
+	if res.Tail != nil {
+		gz, sum, err := res.TailGzip()
+		if err != nil {
+			return fmt.Errorf("gzip tail: %w", err)
+		}
+		if err := w.Blobs.Put(ctx, domain.TailKey(storagePrefix, l.TraceID), "text/plain; charset=utf-8", gz); err != nil {
+			return fmt.Errorf("upload tail: %w", err)
+		}
+		tail = &ports.Tail{SizeBytes: len(gz), SHA256: sum}
 	}
 	header, err := json.Marshal(res.Header)
 	if err != nil {
@@ -280,6 +291,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 	err = w.Queue.Complete(ctx, l, ports.CompletedTrace{
 		Header:        header,
 		Chunks:        stored,
+		Tail:          tail,
 		ExitKind:      exitKind,
 		StoragePrefix: storagePrefix,
 		Build:         build,

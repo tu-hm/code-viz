@@ -57,9 +57,16 @@ type Job struct {
 type CompletedTrace struct {
 	Header        json.RawMessage // the trace without steps
 	Chunks        []Chunk
+	Tail          *Tail // nil unless the trace stopped at the step limit
 	ExitKind      trace.ExitKind
 	StoragePrefix string          // t7 or t90
 	Build         json.RawMessage // api.Build; nil when the language has no build
+}
+
+// Tail describes tail.txt.gz, the output after the last recorded step (§19.9.5).
+type Tail struct {
+	SizeBytes int    `json:"sizeBytes"`
+	SHA256    string `json:"sha256"`
 }
 
 type Chunk struct {

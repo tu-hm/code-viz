@@ -147,11 +147,18 @@ func (q *Queue) Complete(ctx context.Context, l ports.Lease, t ports.CompletedTr
 	if err != nil {
 		return fmt.Errorf("encode chunks: %w", err)
 	}
+	var tailJSON []byte
+	if t.Tail != nil {
+		if tailJSON, err = json.Marshal(t.Tail); err != nil {
+			return fmt.Errorf("encode tail: %w", err)
+		}
+	}
 	return q.leased(ctx, l, func(qs *sqlc.Queries, _ lockedJob) error {
 		err := qs.CompleteTrace(ctx, sqlc.CompleteTraceParams{
 			Header:        t.Header,
 			Chunks:        chunksJSON,
 			ChunkCount:    len(chunks),
+			Tail:          tailJSON,
 			ExitKind:      string(t.ExitKind),
 			StoragePrefix: t.StoragePrefix,
 			Build:         t.Build,

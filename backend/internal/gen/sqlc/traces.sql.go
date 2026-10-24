@@ -15,7 +15,7 @@ import (
 const completeTrace = `-- name: CompleteTrace :exec
 UPDATE traces
 SET status = 'completed', header = ?, chunks = ?, chunk_count = ?,
-  exit_kind = ?, storage_prefix = ?, build = ?,
+  tail = ?, exit_kind = ?, storage_prefix = ?, build = ?,
   version = version + 1, updated_at = ?
 WHERE id = ?
 `
@@ -24,6 +24,7 @@ type CompleteTraceParams struct {
 	Header        []byte
 	Chunks        []byte
 	ChunkCount    int
+	Tail          []byte
 	ExitKind      string
 	StoragePrefix string
 	Build         []byte
@@ -36,6 +37,7 @@ func (q *Queries) CompleteTrace(ctx context.Context, arg CompleteTraceParams) er
 		arg.Header,
 		arg.Chunks,
 		arg.ChunkCount,
+		arg.Tail,
 		arg.ExitKind,
 		arg.StoragePrefix,
 		arg.Build,
@@ -125,7 +127,7 @@ func (q *Queries) InsertTrace(ctx context.Context, arg InsertTraceParams) (int64
 }
 
 const lockExpiredTraces = `-- name: LockExpiredTraces :many
-SELECT id, storage_prefix, chunk_count FROM traces
+SELECT id, storage_prefix, chunk_count, tail FROM traces
 WHERE expires_at < ?
 ORDER BY expires_at
 LIMIT 1000
@@ -136,6 +138,7 @@ type LockExpiredTracesRow struct {
 	ID            string
 	StoragePrefix string
 	ChunkCount    int
+	Tail          []byte
 }
 
 func (q *Queries) LockExpiredTraces(ctx context.Context, now time.Time) ([]LockExpiredTracesRow, error) {
@@ -147,7 +150,12 @@ func (q *Queries) LockExpiredTraces(ctx context.Context, now time.Time) ([]LockE
 	var items []LockExpiredTracesRow
 	for rows.Next() {
 		var i LockExpiredTracesRow
-		if err := rows.Scan(&i.ID, &i.StoragePrefix, &i.ChunkCount); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.StoragePrefix,
+			&i.ChunkCount,
+			&i.Tail,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -213,7 +221,7 @@ func (q *Queries) RequeueTrace(ctx context.Context, arg RequeueTraceParams) erro
 
 const resetTrace = `-- name: ResetTrace :exec
 UPDATE traces
-SET status = 'queued', version = version + 1, progress_steps = 0, header = NULL, chunks = NULL, chunk_count = 0,
+SET status = 'queued', version = version + 1, progress_steps = 0, header = NULL, chunks = NULL, chunk_count = 0, tail = NULL,
   storage_prefix = '', exit_kind = '', build = NULL, failure_stage = '', failure_kind = '',
   updated_at = ?, expires_at = ?
 WHERE id = ?

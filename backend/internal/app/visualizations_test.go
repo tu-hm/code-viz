@@ -406,6 +406,24 @@ func TestGetShowsWhatEachStateHas(t *testing.T) {
 			},
 		},
 		{
+			name: "completed past the step limit lists its tail",
+			prepare: func(t *testing.T, _ api.Visualization, traceID string) {
+				h.complete(t, traceID)
+				h.addTail(t, traceID)
+			},
+			want: api.Visualization{
+				Status:    "completed",
+				Version:   2,
+				ExpiresAt: ptr(day0.Add(week)),
+				Build:     &api.Build{Ok: true, DurationMs: 640, Diagnostics: []api.Diagnostic{}},
+				Trace: &api.TraceManifest{
+					Chunks:       []api.Chunk{{Index: 0, FromStep: 0, ToStep: 2}},
+					Tail:         &api.Tail{SizeBytes: 27, Sha256: strings.Repeat("ab", 32)},
+					UrlsExpireAt: day0.Add(15 * time.Minute),
+				},
+			},
+		},
+		{
 			name: "a failed build shows the failure and the build",
 			prepare: func(t *testing.T, _ api.Visualization, traceID string) {
 				l := h.claim(t, traceID)
@@ -458,7 +476,7 @@ func TestGetShowsWhatEachStateHas(t *testing.T) {
 				want.Trace.Header = completedHeader(traceID)
 				want.Trace.Chunks[0].Sha256, want.Trace.Chunks[0].SizeBytes = chunkSum(t)
 			}
-			ignoreURL := cmpopts.IgnoreFields(api.Chunk{}, "URL")
+			ignoreURL := cmp.Options{cmpopts.IgnoreFields(api.Chunk{}, "URL"), cmpopts.IgnoreFields(api.Tail{}, "URL")}
 			if diff := cmp.Diff(want, got, ignoreURL, cmp.Transformer("json", func(m json.RawMessage) any { return jsonValue(t, m) })); diff != "" {
 				t.Errorf("visualization (-want +got):\n%s", diff)
 			}
@@ -469,6 +487,13 @@ func TestGetShowsWhatEachStateHas(t *testing.T) {
 			resp := get(t, http.MethodGet, got.Trace.Chunks[0].URL)
 			if resp.StatusCode != http.StatusOK || !bytes.Equal(resp.body, chunkBody(t)) {
 				t.Errorf("signed chunk URL: HTTP %d with %d bytes, want 200 with the chunk", resp.StatusCode, len(resp.body))
+			}
+			if got.Trace.Tail == nil {
+				return
+			}
+			resp = get(t, http.MethodGet, got.Trace.Tail.URL)
+			if resp.StatusCode != http.StatusOK || !bytes.Equal(resp.body, tailBody) {
+				t.Errorf("signed tail URL: HTTP %d with %d bytes, want 200 with the tail", resp.StatusCode, len(resp.body))
 			}
 		})
 	}
@@ -685,13 +710,14 @@ func TestDeleteByAnotherCallerIsNotFoundAndChangesNothing(t *testing.T) {
 	}
 }
 
-func TestCleanupDeletesExpiredRowsAndChunksButNotATraceJustReset(t *testing.T) {
+func TestCleanupDeletesExpiredRowsChunksAndTailsButNotATraceJustReset(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 	h := newHarness(t, 100)
 	gone, reset := h.create(t, "ip:1", "gone"), h.create(t, "ip:2", "reset")
 	goneTrace, resetTrace := traceOf(t, h.db, gone.ID), traceOf(t, h.db, reset.ID)
 	h.complete(t, goneTrace)
+	h.addTail(t, goneTrace)
 	h.complete(t, resetTrace)
 	h.now = day0.Add(8 * 24 * time.Hour)
 	again := h.create(t, "ip:3", "reset")
@@ -710,6 +736,9 @@ func TestCleanupDeletesExpiredRowsAndChunksButNotATraceJustReset(t *testing.T) {
 		t.Errorf("%d jobs left for the deleted trace, want 0", n)
 	}
 	assertNoChunks(t, h.b, goneTrace)
+	if resp := get(t, http.MethodGet, h.b.url+"/"+domain.TailKey("t7", goneTrace)); resp.StatusCode != http.StatusNotFound {
+		t.Errorf("tail of the deleted trace: HTTP %d, want 404", resp.StatusCode)
+	}
 	if resp := get(t, http.MethodGet, h.b.url+"/"+domain.ChunkKey("t7", resetTrace, 0)); resp.StatusCode != http.StatusOK {
 		t.Errorf("chunk of the reset trace: HTTP %d, want 200", resp.StatusCode)
 	}
@@ -775,7 +804,7 @@ func TestCleanupLeavesChunksItCannotDeleteAndLogsTheirTraces(t *testing.T) {
 		}
 		logged = append(logged, rec.Msg+" "+strings.Join(rec.TraceIDs, ","))
 	}
-	if diff := cmp.Diff([]string{"chunks of expired traces left behind " + id}, logged); diff != "" {
+	if diff := cmp.Diff([]string{"objects of expired traces left behind " + id}, logged); diff != "" {
 		t.Errorf("log records (-want +got):\n%s", diff)
 	}
 }
@@ -919,7 +948,7 @@ func (h *harness) complete(t *testing.T, traceID string) {
 	if err := h.q.Tracing(ctx, l, h.now); err != nil {
 		t.Fatal(err)
 	}
-	if err := h.b.Put(ctx, domain.ChunkKey("t7", traceID, 0), chunkBody(t)); err != nil {
+	if err := h.b.Put(ctx, domain.ChunkKey("t7", traceID, 0), "application/json", chunkBody(t)); err != nil {
 		t.Fatal(err)
 	}
 	sha, size := chunkSum(t)
@@ -941,6 +970,19 @@ func completedHeader(traceID string) json.RawMessage {
 		`"options":{"maxSteps":1000,"startAtLines":[]},` +
 		`"summary":{"stepCount":3,"truncated":false,"truncation":null,"exit":{"kind":"normal","code":0,"signal":null,"message":null}},` +
 		`"encoding":{"mode":"delta","keyframeInterval":50}}`)
+}
+
+var tailBody = []byte("output after the step limit")
+
+func (h *harness) addTail(t *testing.T, traceID string) {
+	t.Helper()
+	if err := h.b.Put(t.Context(), domain.TailKey("t7", traceID), "text/plain; charset=utf-8", tailBody); err != nil {
+		t.Fatal(err)
+	}
+	tail := `{"sizeBytes":27,"sha256":"` + strings.Repeat("ab", 32) + `"}`
+	if _, err := h.db.ExecContext(t.Context(), "UPDATE traces SET tail = ? WHERE id = ?", tail, traceID); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func chunkBody(t *testing.T) []byte {

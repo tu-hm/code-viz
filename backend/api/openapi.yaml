@@ -557,8 +557,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Chunk'
+        tail:
+          $ref: '#/components/schemas/Tail'
         urlsExpireAt:
-          description: Chunk URLs stop working at this time; GET the visualization again for fresh ones.
+          description: Chunk and tail URLs stop working at this time; GET the visualization again for fresh ones.
           type: string
           format: date-time
     TraceHeader:
@@ -600,6 +602,22 @@ components:
           minimum: 0
         sha256:
           description: Hex SHA-256 of the chunk's JSON after gzip is removed, because browsers undo Content-Encoding before the client sees the bytes. Checked by the client before it uses the chunk.
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        url:
+          description: Signed; expires at urlsExpireAt.
+          type: string
+          format: uri
+    Tail:
+      description: What the program printed after the last recorded step, as text (tail.txt.gz, §19.9.5). Set when the trace stopped at the step limit and the program printed more.
+      type: object
+      required: [sizeBytes, sha256, url]
+      properties:
+        sizeBytes:
+          type: integer
+          minimum: 0
+        sha256:
+          description: Hex SHA-256 of the text after gzip is removed, like a chunk's.
           type: string
           pattern: '^[0-9a-f]{64}$'
         url:

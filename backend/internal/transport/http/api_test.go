@@ -605,7 +605,7 @@ func (s *stack) complete(t *testing.T, l ports.Lease) {
 	if err := s.q.Tracing(ctx, l, s.now); err != nil {
 		t.Fatal(err)
 	}
-	if err := s.viz.Blobs.Put(ctx, domain.ChunkKey("t7", l.TraceID, 0), chunkBody(t)); err != nil {
+	if err := s.viz.Blobs.Put(ctx, domain.ChunkKey("t7", l.TraceID, 0), "application/json", chunkBody(t)); err != nil {
 		t.Fatal(err)
 	}
 	sum := sha256.Sum256(chunkBody(t))

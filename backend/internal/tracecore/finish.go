@@ -195,22 +195,30 @@ func (res *Result) Chunks() ([]Chunk, error) {
 		if err != nil {
 			return nil, err
 		}
-		var buf bytes.Buffer
-		zw := gzip.NewWriter(&buf)
-		if _, err := zw.Write(raw); err != nil {
+		gz, sum, err := pack(raw)
+		if err != nil {
 			return nil, err
 		}
-		if err := zw.Close(); err != nil {
-			return nil, err
-		}
-		sum := sha256.Sum256(raw)
-		chunks = append(chunks, Chunk{
-			Index:    len(chunks),
-			FromStep: from,
-			ToStep:   to - 1,
-			Gzip:     buf.Bytes(),
-			SHA256:   hex.EncodeToString(sum[:]),
-		})
+		chunks = append(chunks, Chunk{Index: len(chunks), FromStep: from, ToStep: to - 1, Gzip: gz, SHA256: sum})
 	}
 	return chunks, nil
+}
+
+// TailGzip returns tail.txt.gz and the hex SHA-256 of the text in it.
+func (res *Result) TailGzip() ([]byte, string, error) {
+	return pack(res.Tail)
+}
+
+// pack gzips raw and hashes it before gzip: browsers undo Content-Encoding: gzip before the client can hash
+func pack(raw []byte) ([]byte, string, error) {
+	var buf bytes.Buffer
+	zw := gzip.NewWriter(&buf)
+	if _, err := zw.Write(raw); err != nil {
+		return nil, "", err
+	}
+	if err := zw.Close(); err != nil {
+		return nil, "", err
+	}
+	sum := sha256.Sum256(raw)
+	return buf.Bytes(), hex.EncodeToString(sum[:]), nil
 }

@@ -142,6 +142,7 @@ type Trace struct {
 	FailureKind   string
 	UpdatedAt     time.Time
 	ExpiresAt     time.Time
+	Tail          []byte
 }
 
 type UsageDaily struct {

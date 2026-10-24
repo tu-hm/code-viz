@@ -33,7 +33,7 @@ func TestPutStoresGzippedJSONUnderChunkKey(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := newBucket(t, s3, bucket).Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 3), buf.Bytes()); err != nil {
+	if err := newBucket(t, s3, bucket).Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 3), "application/json", buf.Bytes()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -67,7 +67,7 @@ func TestPutRetriesThreeTimesThenFailsAsInfraError(t *testing.T) {
 	}))
 	t.Cleanup(down.Close)
 
-	err := newBucket(t, down.URL, "down").Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 0), []byte("x"))
+	err := newBucket(t, down.URL, "down").Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 0), "application/json", []byte("x"))
 	if !errors.Is(err, domain.ErrInfra) {
 		t.Fatalf("err = %v, want ErrInfra", err)
 	}
@@ -89,7 +89,7 @@ func TestPutAndDeleteOnUnreachableEndpointAreInfraErrors(t *testing.T) {
 	b := newBucket(t, closed, "down")
 	key := domain.ChunkKey("t7", "trc_0123", 0)
 
-	if err := b.Put(t.Context(), key, []byte("x")); !errors.Is(err, domain.ErrInfra) {
+	if err := b.Put(t.Context(), key, "application/json", []byte("x")); !errors.Is(err, domain.ErrInfra) {
 		t.Errorf("put: err = %v, want ErrInfra", err)
 	}
 	if err := b.Delete(t.Context(), []string{key}); !errors.Is(err, domain.ErrInfra) {
@@ -111,7 +111,7 @@ func TestSignedURLDownloadsFromThePublicEndpoint(t *testing.T) {
 
 	b := newBucketWithPublic(t, s3, public.URL, bucket)
 	key := domain.ChunkKey("t7", "trc_0123", 0)
-	if err := b.Put(t.Context(), key, []byte("chunk")); err != nil {
+	if err := b.Put(t.Context(), key, "application/json", []byte("chunk")); err != nil {
 		t.Fatal(err)
 	}
 	signed, err := b.Sign(t.Context(), key, 15*time.Minute)
@@ -140,7 +140,7 @@ func TestDeleteRemovesTheKeysAndSkipsMissingOnes(t *testing.T) {
 	b := newBucket(t, s3, bucket)
 	keys := []string{domain.ChunkKey("t7", "trc_a", 0), domain.ChunkKey("t7", "trc_a", 1), domain.ChunkKey("t7", "trc_b", 0)}
 	for _, key := range keys {
-		if err := b.Put(t.Context(), key, []byte("x")); err != nil {
+		if err := b.Put(t.Context(), key, "application/json", []byte("x")); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -168,7 +168,7 @@ func TestDeleteRemovesMoreKeysThanOneDeleteObjectsCallTakes(t *testing.T) {
 	}
 	stored := []string{keys[0], keys[1000]}
 	for _, key := range stored {
-		if err := b.Put(t.Context(), key, []byte("x")); err != nil {
+		if err := b.Put(t.Context(), key, "application/json", []byte("x")); err != nil {
 			t.Fatal(err)
 		}
 	}

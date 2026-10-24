@@ -158,6 +158,13 @@ func (s *Visualizations) render(ctx context.Context, v ports.Visualization, now 
 		}
 		out.ExpiresAt = &v.ExpiresAt
 		out.Trace = &api.TraceManifest{Header: v.Header, Chunks: chunks, UrlsExpireAt: now.Add(chunkURLTTL)}
+		if v.Tail != nil {
+			url, err := s.Blobs.Sign(ctx, domain.TailKey(v.StoragePrefix, v.TraceID), chunkURLTTL)
+			if err != nil {
+				return api.Visualization{}, fmt.Errorf("sign tail of trace %s: %w", v.TraceID, err)
+			}
+			out.Trace.Tail = &api.Tail{SizeBytes: v.Tail.SizeBytes, Sha256: v.Tail.SHA256, URL: url}
+		}
 	}
 	return out, nil
 }
@@ -168,8 +175,8 @@ func (s *Visualizations) Delete(ctx context.Context, c Caller, id string) error 
 	return s.Store.Detach(ctx, id, c.Subject, s.Now())
 }
 
-// Cleanup deletes the visualizations and traces that expired before now, then the chunks of those traces (§7.5).
-// Chunks it fails to delete stay behind as orphans, logged by trace ID (§7.8).
+// Cleanup deletes the visualizations and traces that expired before now, then the chunks and tails of those traces
+// (§7.5). Objects it fails to delete stay behind as orphans, logged by trace ID (§7.8).
 func (s *Visualizations) Cleanup(ctx context.Context, now time.Time) error {
 	for {
 		expired, err := s.Store.DeleteExpired(ctx, now)
@@ -183,10 +190,10 @@ func (s *Visualizations) Cleanup(ctx context.Context, now time.Time) error {
 		var keys []string
 		for i, t := range expired {
 			ids[i] = t.ID
-			keys = append(keys, t.ChunkKeys...)
+			keys = append(keys, t.Keys...)
 		}
 		if err := s.Blobs.Delete(ctx, keys); err != nil {
-			slog.ErrorContext(ctx, "chunks of expired traces left behind", "trace_ids", ids, "err", err)
+			slog.ErrorContext(ctx, "objects of expired traces left behind", "trace_ids", ids, "err", err)
 		}
 	}
 }
