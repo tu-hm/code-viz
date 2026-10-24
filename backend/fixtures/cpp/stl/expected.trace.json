@@ -1,0 +1,1166 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.1.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 23
+  },
+  "steps": [
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "uninit",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fixed": true,
+          "items": [
+            {
+              "id": "o2",
+              "t": "ref",
+              "type": "int [4]"
+            },
+            {
+              "id": "o3",
+              "t": "ref",
+              "type": "int [4]"
+            },
+            {
+              "id": "o4",
+              "t": "ref",
+              "type": "int [4]"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "truncated": false,
+          "type": "int [3][4]"
+        },
+        "o2": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "int [4]"
+        },
+        "o3": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "int [4]"
+        },
+        "o4": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "int [4]"
+        }
+      },
+      "i": 0,
+      "keyframe": true,
+      "line": 12,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 13,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o5": {
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "meta": {
+            "summary": "std::__debug::vector of length 3, capacity 3"
+          },
+          "type": "std::__debug::vector<int, std::allocator<int> >"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 14,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "t": "uninit",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o5": {
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "meta": {
+            "summary": "std::__debug::vector of length 3, capacity 3"
+          },
+          "type": "std::__debug::vector<int, std::allocator<int> >"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 15,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o6": {
+          "entries": [],
+          "kind": "mapping",
+          "length": 0,
+          "meta": {
+            "summary": "std::__debug::map with 0 elements"
+          },
+          "ordered": true,
+          "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 16,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o6": {
+          "entries": [
+            {
+              "key": {
+                "t": "str",
+                "type": "const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >",
+                "v": "a"
+              },
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "kind": "mapping",
+          "length": 1,
+          "meta": {
+            "summary": "std::__debug::map with 1 element"
+          },
+          "ordered": true,
+          "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 17,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            },
+            {
+              "name": "name",
+              "value": {
+                "t": "uninit",
+                "type": "std::string"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o6": {
+          "entries": [
+            {
+              "key": {
+                "t": "str",
+                "type": "const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >",
+                "v": "a"
+              },
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "key": {
+                "t": "str",
+                "type": "const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >",
+                "v": "b"
+              },
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "mapping",
+          "length": 2,
+          "meta": {
+            "summary": "std::__debug::map with 2 elements"
+          },
+          "ordered": true,
+          "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+        }
+      },
+      "i": 5,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 18,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 18,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            },
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "viz"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "t": "uninit",
+                "type": "Point"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 18,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 19,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 19,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            },
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "viz"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "Point"
+              }
+            },
+            {
+              "name": "q",
+              "value": {
+                "t": "uninit",
+                "type": "Point *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o7": {
+          "fields": [
+            {
+              "name": "x",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "y",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Point"
+        }
+      },
+      "i": 7,
+      "keyframe": false,
+      "line": 19,
+      "prevLine": 18,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 20,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 20,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            },
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "viz"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "Point"
+              }
+            },
+            {
+              "name": "q",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "type": "Point *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 20,
+      "prevLine": 19,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 21,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 21,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            },
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "viz"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "Point"
+              }
+            },
+            {
+              "name": "q",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "type": "Point *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o3": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "7"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          ],
+          "kind": "sequence",
+          "length": 4,
+          "truncated": false,
+          "type": "int [4]"
+        }
+      },
+      "i": 9,
+      "keyframe": false,
+      "line": 21,
+      "prevLine": 20,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 22,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 22,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            },
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "viz"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "Point"
+              }
+            },
+            {
+              "name": "q",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "type": "Point *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 22,
+      "prevLine": 21,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": "1 viz 1\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 23,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [3][4]"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 23,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            },
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "viz"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "Point"
+              }
+            },
+            {
+              "name": "q",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "type": "Point *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 11,
+      "keyframe": false,
+      "line": 23,
+      "prevLine": 22,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 12,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

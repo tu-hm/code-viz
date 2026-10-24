@@ -1,0 +1,7 @@
+*
+!go.mod
+!go.sum
+!cmd/viz-shim/
+!internal/shim/
+!adapters/cpp/flush_init.cpp
+!adapters/cpp/trace.py

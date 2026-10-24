@@ -44,6 +44,7 @@ images: runner-images
 
 runner-images:
 	docker build --file adapters/python/Dockerfile --tag "$$(sed -n 's/^image: //p' adapters/python/manifest.yaml)" .
+	docker build --file adapters/cpp/Dockerfile --tag "$$(sed -n 's/^image: //p' adapters/cpp/manifest.yaml)" .
 
 dev:
 	docker compose up --detach --wait

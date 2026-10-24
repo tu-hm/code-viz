@@ -28,7 +28,8 @@ def in_source(frame):
 
 
 def text(s):
-    if isinstance(s, gdb.LazyString):
+    # gdb 14 doesn't export gdb.LazyString
+    if type(s).__name__ == "LazyString":
         return s.value().string(length=s.length)
     if isinstance(s, gdb.Value) and s.type.strip_typedefs().code == gdb.TYPE_CODE_PTR:
         return s.string()

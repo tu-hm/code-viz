@@ -99,7 +99,15 @@ var address = regexp.MustCompile(`0x[0-9a-f]+`)
 
 func mask(tr *trace.Trace) {
 	tr.ID = "trc_0"
+	maskedAddr := "0xdeadbeef"
 	for _, s := range tr.Steps {
+		for _, f := range s.Frames {
+			for i, l := range f.Locals {
+				if l.Value.T == trace.ValueTPtr {
+					f.Locals[i].Value.Addr = &maskedAddr
+				}
+			}
+		}
 		for id, obj := range s.Heap {
 			if obj.Kind != trace.HeapObjectKindOpaque {
 				continue
@@ -115,20 +123,41 @@ func TestTraceNamesBuildFailure(t *testing.T) {
 	t.Chdir("../..")
 	tests := []struct {
 		name string
+		lang string
+		file string
 		src  string
 		want string
 	}{
-		{"syntax error is compile_error", "def f(:\n    pass\n", "vizctl trace: compile_error:\nmain.py:1:"},
-		{"blocked import is unsupported_module", "import os\nimport numpy\n", "vizctl trace: unsupported_module:\nmain.py:2:1: error: numpy"},
+		{
+			name: "python syntax error is compile_error",
+			lang: "python3",
+			file: "main.py",
+			src:  "def f(:\n    pass\n",
+			want: "vizctl trace: compile_error:\nmain.py:1:",
+		},
+		{
+			name: "python blocked import is unsupported_module",
+			lang: "python3",
+			file: "main.py",
+			src:  "import os\nimport numpy\n",
+			want: "vizctl trace: unsupported_module:\nmain.py:2:1: error: numpy",
+		},
+		{
+			name: "c++ missing semicolon is compile_error with gcc's message",
+			lang: "cpp17-gcc",
+			file: "main.cpp",
+			src:  "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int x = 1;\n    cout << x\n    return 0;\n}\n",
+			want: "vizctl trace: compile_error:\nmain.cpp: In function 'int main()':\nmain.cpp:6:14: error: expected ';' before 'return'\n",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			src := filepath.Join(t.TempDir(), "main.py")
+			src := filepath.Join(t.TempDir(), tc.file)
 			if err := os.WriteFile(src, []byte(tc.src), 0o644); err != nil {
 				t.Fatal(err)
 			}
 			var stdout, stderr bytes.Buffer
-			code := run(t.Context(), []string{"trace", "--lang", "python3", src}, strings.NewReader(""), &stdout, &stderr)
+			code := run(t.Context(), []string{"trace", "--lang", tc.lang, src}, strings.NewReader(""), &stdout, &stderr)
 			if code != 1 || !strings.HasPrefix(stderr.String(), tc.want) {
 				t.Fatalf("exit %d, stderr:\n%s\nwant exit 1 and stderr starting with:\n%s", code, stderr.String(), tc.want)
 			}

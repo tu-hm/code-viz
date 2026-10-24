@@ -1,0 +1,21 @@
+id: cpp17-gcc
+displayName: "C++17 (GCC 13)"
+editorMode: c_cpp
+image: viz-runner-cpp:13.5-gdb14-1
+sourceFile: main.cpp
+build:
+  cmd: ["g++", "-std=gnu++17", "-O0", "-g3", "-fno-omit-frame-pointer", "--coverage", "-Wall", "-Wextra", "-Wshadow", "-fdiagnostics-plain-output", "main.cpp", "/opt/viz/flush_init.cpp", "-o", "main"]
+  safetyFlags: ["-D_GLIBCXX_DEBUG", "-fsanitize=undefined", "-fno-sanitize-recover=all"]
+  env: { TMPDIR: /work }
+  timeoutMs: 10000
+trace:
+  cmd: ["gdb", "-q", "-nx", "-batch", "-x", "/opt/viz/trace.py", "--args", "./main"]
+  env: { VIZ_PROTOCOL_FD: "3" }
+capabilities:
+  returnValues: true
+  pointers: true
+  exceptions: true
+  startAtLines: false
+  captureRanges: false
+enabled: false
+rollout: { percent: 100 }
