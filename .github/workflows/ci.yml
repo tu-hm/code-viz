@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  backend:
+  backend-static:
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -32,14 +32,40 @@ jobs:
       - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.cache/go-build
-          key: go-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-${{ github.run_id }}
+          key: go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-${{ github.run_id }}
           restore-keys: |
-            go-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-
-            go-build-${{ runner.os }}-${{ runner.arch }}-
+            go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-
+            go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-
 
       # ── parallel: lint + vuln + mod-tidy ──
       - name: lint & vuln & mod tidy
         run: make check-static
+
+      # ── codegen drift check ──
+      - name: gen check
+        run: make gen-check
+
+  backend-test:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        with:
+          path: ~/.cache/go-build
+          key: go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-${{ github.run_id }}
+          restore-keys: |
+            go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-
+            go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-
 
       # ── tests: -short on PRs, full on push to main ──
       - name: test
@@ -47,12 +73,16 @@ jobs:
           GOTEST_SHORT: ${{ github.event_name == 'pull_request' && '-short' || '' }}
         run: make test GOTEST_FLAGS="-vet=off $GOTEST_SHORT"
 
-      - name: test-nsjail
-        run: make test-nsjail
-
-      # ── codegen drift check ──
-      - name: gen check
-        run: make gen-check
+  backend-nsjail:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: make test-nsjail
 
   golden-arm64:
     runs-on: ubuntu-24.04-arm
@@ -71,10 +101,10 @@ jobs:
       - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.cache/go-build
-          key: go-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-${{ github.run_id }}
+          key: go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-${{ github.run_id }}
           restore-keys: |
-            go-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-
-            go-build-${{ runner.os }}-${{ runner.arch }}-
+            go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-
+            go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-
 
       - run: make runner-images
       - run: go test -count=1 -run Golden ./internal/tracecore ./cmd/vizctl
