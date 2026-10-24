@@ -64,6 +64,11 @@ seed:
 	200|409) ;; \
 	*) echo "seed: create bucket $(S3_BUCKET): HTTP $$code" >&2; exit 1 ;; \
 	esac
+	@origins=$$(printf '%s' "$(CORS_ORIGINS)" | tr ',' '\n' | sed 's|.*|<AllowedOrigin>&</AllowedOrigin>|' | tr -d '\n') && \
+	code=$$(curl -sS -o /dev/null -w '%{http_code}' -X PUT -H 'Content-Type: application/xml' \
+		--data-binary "<CORSConfiguration><CORSRule>$$origins<AllowedMethod>GET</AllowedMethod><ExposeHeader>Content-Length</ExposeHeader><ExposeHeader>ETag</ExposeHeader></CORSRule></CORSConfiguration>" \
+		"$(S3_ENDPOINT)/$(S3_BUCKET)?cors") && \
+	test "$$code" = 200 || { echo "seed: set CORS on $(S3_BUCKET): HTTP $$code" >&2; exit 1; }
 
 lint:
 	$(GOLANGCI_LINT) run ./...
