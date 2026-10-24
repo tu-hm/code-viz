@@ -101,6 +101,7 @@
 | v1.9 | 2026-10-24 | **C++ tracer contract (BE-08).** `trace.py` puts a breakpoint on every statement row of `main.cpp`, read from the binary's DWARF line table because GDB's own table drops a one-line loop's back edge, and resumes with `continue`. Library code runs at full speed, callbacks from it (comparators) become calls, and a one-line loop gives one step per iteration, like Python. Compiler-generated functions (implicit constructors and destructors, which `ptype` leaves out) make no steps, and the rows GCC puts at a closing brace (VLA saves, temporaries) make a `}` step only as the epilogue. Returns come from one `gdb.FinishBreakpoint` on the innermost call: the return step carries the returning frame with its locals at the epilogue and `returnValue`, and a frame left by an exception, `exit()` or `longjmp` gets none. A signal gives one `exception` step at the innermost call's line, then `exit {kind: "signal"}`. Deep recursion with ordinary frames ends as `memory_limit`, not `SIGSEGV`, because stack pages count toward the memory limit. After the step limit the tracer deletes its breakpoints and runs to the real exit untraced; code before `main` and after it returns is untraced too. A pointer to a `main.cpp` struct becomes a record; another pointer gets `target` and `index` when it points into a C array recorded in the same step. C arrays and containers record 100 items, with `window`, until sparse arrays (BE-09): at 1,000, one `int[200005]` cost 34 KB of wire and 3 ms of core per step (§7.11.2, §11). A `std::string` records its first 1,000 bytes as UTF-8, with `len` and `truncated` past that, and a value the libstdc++ printers fail on is `unreadable` rather than the end of the trace. glibc's `rand()` needs no seed for repeatable runs (§7.12). The manifest stays `enabled: false`. |
 | v1.10 | 2026-10-24 | **C++ type map and sparse arrays (BE-09, BE-04 §3).** The type map is `adapters/cpp/typemap.json`, not YAML, because GDB's Python has no YAML parser; it names each library template's kind and reader, and the manifest has no `typeMap` key (§10.2, §17). Type names are GDB's, through libstdc++'s type printers, with the safety-check namespaces taken out, so `std::vector<int>` reads the same with checks on or off. Only a readable `const char*` becomes a string. Sets, maps and their unordered forms carry `ordered`, `std::array` and `std::bitset` carry `fixed`, records flatten their base classes, and anything else is `opaque` with GDB's text cut to 200 characters (§10.3). A container read item by item through the pretty printers (`deque`, `list`, sets, maps) records 100 items with its real `length`: at 1,000 a 1,000-entry `map` took 13.5 s per 1,000 steps. An array of scalars longer than 64 (`T[N]`, `std::array`, `std::vector`) is a sparse sequence instead: one memory read per step, diffed in the tracer (S6: 0.1 ms per step at 200,005 ints), sent as a `patch` of its changed cells against the previous step (§10.1, §19.9.1). The core keeps each sparse sequence's cells, rejects a patch it cannot apply, and builds keyframes and delta patches from its own copy. Two §11 limits are new: 10,000 non-default cells per sequence (more keeps a window of the first 1,000) and 100,000 per step (`size_limit`). A 1,000-step DFS over two `int[200005]` stores 32 KB gzipped. Python lists (§19.9.1's last bullet) stay dense; no task owns them yet. |
 | v1.11 | 2026-10-24 | **Output order on fd 1/2.** C++ output sometimes landed one step early: `viz-shim` read a wire line, then drained fd 1/2, and by then GDB had resumed the program and it had printed again. `viz-shim` now counts the bytes waiting on fd 3, drains fd 1/2, and forwards only those bytes, and the C++ tracer resumes the program only once fd 3 is empty (§10.1). |
+| v1.12 | 2026-10-24 | **Friendly errors (BE-10), trace format v1.2.** A step's `error` may carry `kind`, the §19.6 row it matches (`index_out_of_range`, `signed_overflow`, `division_by_zero`, `empty_container`, `recursion_too_deep`), and `values`, what the error involves as far as the tracer can read it; an error without `kind` is shown by its message. Program values in `values` are decimal strings, as in `value.v` (§9.2, §9.7, §19.6). The C++ tracer stops on the check functions themselves (`__ubsan_handle_*` except the vptr cache miss, `__gnu_debug::_Error_formatter::_M_error`, `std::__glibcxx_assert_fail`), so a failed check is one `exception` step on the user's line before the program dies; its `type` is `UBSan` or `libstdc++` and its `message` the check's own words. A `SIGSEGV` within 64 KiB of the stack pointer is `recursion_too_deep`. The Python tracer reads the failing subscript or division from the source (`co_positions` and the AST), and the values from names, constants and integer arithmetic only, so reading them never runs the program's code. The exit stays what the process did: `SIGABRT` after a libstdc++ check, exit code 1 after UBSan. |
 
 ---
 
@@ -1206,9 +1207,12 @@ One format for all languages. The UI only understands these types. Adapters tran
   "removedObjects": [],       // delta only: object ids no longer reachable
   "stdout": "",               // text written during this step only
   "stderr": "",
-  "error": null               // { "type": "IndexError", "message": "list index out of range", "line": 2 }
+  "error": null               // { "type": "IndexError", "message": "list index out of range", "line": 2,
+                              //   "kind": "index_out_of_range", "values": { "name": "x", "index": "5", "size": 2 } }
 }
 ```
+
+`kind` and `values` are optional (trace format v1.2, §19.6).
 
 ### 9.3 Frame
 
@@ -1290,6 +1294,7 @@ Any value may also have `type`, the declared type in the source language (e.g. `
 
 - **Minor version** (e.g. `1.1`): adds optional fields or a new `kind`/`t`. Old UIs must ignore fields they don't know, and must render an unknown `kind` as `opaque` and an unknown `t` as plain text.
 - **Trace format v1.1** (§19.9) is the first minor version. It adds sparse sequences and patches, access hints, line hits, input position, the untraced tail and call identity.
+- **Trace format v1.2** adds `kind` and `values` to a step's `error` (§19.6).
 - **Major version** (e.g. `2.0`): breaking changes. The API serves the major version the client asks for (`Accept: application/vnd.viz.trace+json; version=1`).
 
 ## 10. Language adapters (extensibility)
@@ -2011,6 +2016,18 @@ Message templates (one sentence plus one hint):
 | Recursion too deep (Python) | Python stops at 1,000 nested calls by default. | Use `sys.setrecursionlimit(10**6)` or an iterative DFS. |
 | Python `IndexError` | Index 5 is out of range for list `x` (length 2). | Same as C++. |
 | Anything else | The raw message | — |
+
+**Payload (trace format v1.2).** The error step's `error` keeps `type`, `message` (the runtime's own words, the "raw message") and `line`, and adds `kind`, the row above, and `values`, what the tracer could read. Program values are decimal strings, counts are integers, and any value can be missing:
+
+| `kind` | Rows | `values` | C++ | Python |
+|---|---|---|---|---|
+| `index_out_of_range` | Index out of range, Python `IndexError` | `index`, `size`, `type` of the container, `name` | `vector` and `deque` through `_GLIBCXX_DEBUG`, `string` and `std::array` through their assertions, a C array through UBSan (no `name`) | A subscript on a `list`, `tuple`, `str`, `range` or `deque`; `name` is the subscripted expression's text, e.g. `grid[r]` |
+| `signed_overflow` | Signed overflow | `op`, `operands`, `type`, `max` | UBSan | — |
+| `division_by_zero` | Division by zero | `expr`, `divisor` (Python) | UBSan, integer division and `%` | `ZeroDivisionError` |
+| `empty_container` | Empty container | `call` (`front`, `top`, `operator*`, …), `type`, `name` | `front`, `back`, `top`, `pop` on an empty container, `*s.begin()` on an empty set | — |
+| `recursion_too_deep` | Recursion too deep | `depth` (calls on the stack), `limit` (Python) | `SIGSEGV` from the stack running out | `RecursionError` |
+
+`name` is the variable that holds the container in the user's frame or the globals. The source text of a C++ expression such as `a[i]` isn't known: GCC's checks report no column, or one that points at the operator. FE and Design sign off on this shape before M3 (BE-10 §1).
 
 ### 19.7 Expected output and the first wrong step
 

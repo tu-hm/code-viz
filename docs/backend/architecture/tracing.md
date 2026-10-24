@@ -165,7 +165,22 @@ sequenceDiagram
 | Output | The Python tracer captures stdout and stderr itself and sends `out` messages of at most 16,384 characters (64 KiB as UTF-8). The C++ program writes its own fd 1 and 2. `viz-shim` forwards what it wrote before a wire line ahead of that line, and the tracer doesn't resume the program until `viz-shim` has read the line, so nothing written later overtakes it (§10.1). Output between step k−1 and step k belongs to step k: it was printed while step k's `prevLine` ran. Output after the last step goes to the last step |
 | Step limit | The tracer sends at most `maxSteps + 1` steps. The extra one is a marker that the program went on. The core drops it, records `truncation.step_limit`, and keeps reading `out` and `exit` for the untraced tail. Not a kill (D25) |
 | Line hits | `exit.lineHits` counts every line event in `main.py` over the whole run, untraced tail included. It becomes `summary.lineHits` with `lineHitsSource: "counter"` (§19.9.3). The C++ tracer sends none; C++ counts come from gcov (BE-11) |
-| Exceptions | Python: one `exception` step where the exception is raised in `main.py` (`line` is the raising line), not one per frame it unwinds through. Uncaught: `exit {kind: "exception", code: 1, message: "IndexError: …"}`. `SystemExit(n)`: `exit {kind: "normal", code: n}`. C++: a signal gives one `exception` step with `error {type: "SIGSEGV", message, line}`, then `exit {kind: "signal"}`. A caught C++ exception makes no step; an uncaught one ends in `abort()` and shows as `SIGABRT` |
+| Exceptions | Python: one `exception` step where the exception is raised in `main.py` (`line` is the raising line), not one per frame it unwinds through. Uncaught: `exit {kind: "exception", code: 1, message: "IndexError: …"}`. `SystemExit(n)`: `exit {kind: "normal", code: n}`. C++: a signal or a failed safety check gives one `exception` step with `error {type: "SIGSEGV", message, line}`, then the program's real exit. A caught C++ exception makes no step; an uncaught one ends in `abort()` and shows as `SIGABRT`. An error may carry `kind` and `values` ([Friendly errors](#friendly-errors-196)) |
+
+## Friendly errors (§19.6)
+
+From trace format v1.2 an error step's `error` may carry `kind`, the §19.6 message it matches, and `values`, what the error involves. Without `kind`, the UI shows `message`, the runtime's own words. Program values are decimal strings, as in `value.v`; counts are integers. A value the tracer couldn't read is left out.
+
+| `kind` | C++ | Python | `values` |
+|---|---|---|---|
+| `index_out_of_range` | `vector` and `deque` through `_GLIBCXX_DEBUG`'s subscript check; `string` and `std::array` through their assertions; a C array through UBSan | `IndexError` raised by a subscript (not by `pop()`) | `index`, `size`, `type`, and `name` except for a C array |
+| `signed_overflow` | UBSan: `+`, `-`, `*`, negation, `INT_MIN / -1` | — | `op`, `operands`, `type`, `max` |
+| `division_by_zero` | UBSan, integer `/` and `%` | `ZeroDivisionError` | Python: `expr` and `divisor`, the source text |
+| `empty_container` | `front`, `back`, `top`, `pop_back` … on an empty container; `*s.begin()` on an empty set | — | `call`, `type`, `name` |
+| `recursion_too_deep` | `SIGSEGV` with the fault within 64 KiB of the stack pointer | `RecursionError` | `depth`, the calls on the stack; Python adds `limit` |
+
+- **`name`** is how the program names the container. In C++ it's the local, parameter (a reference is followed) or global whose address and type match the container's, so `s.v[2]` gets none: a struct and its first member share an address. In Python it's the subscripted expression's text, from `ast.unparse`, so `grid[r][c]` gives `grid[r]`.
+- **No source text in C++.** `a[i]` isn't known: UBSan reports a column that points at the operator or the `]`, and libstdc++ reports none.
 
 ## Inside the Python tracer
 
@@ -199,6 +214,10 @@ settrace calls the hook as a Python function, so the hook itself fails first whe
 - wraps `sys.setrecursionlimit` and `sys.getrecursionlimit` and keeps 50 frames of headroom above the user's limit for its own work.
 
 The user sees one exception step, line counts keep going, and the exit is right. The tracer's own frames still cost about 3 frames of depth in the main thread.
+
+### Error values
+
+The exception step's `kind` comes from the exception's type ([Friendly errors](#friendly-errors-196)). Its values come from the expression that raised it: the position of the instruction at `f_lasti` (`co_positions()`) is the span of a `Subscript`, `BinOp` or `AugAssign` node in the parsed `main.py`. The tracer then evaluates that node's parts again, but only names, constants, subscripts of a `list`, `tuple`, `str`, `range`, `deque` or `dict` by an `int` or `str`, and integer `+`, `-`, `*`, `//`, `%`. Anything else could run the program's code (a property, a `__getitem__`, an `__index__`, a call), so that value is left out: `a[f(x)]` gets `name` and `size` but no `index`. The source is parsed once, at the first exception.
 
 ### Threads
 
@@ -305,8 +324,20 @@ A length outside `[0, 2^32)` comes from garbage memory and makes the object `opa
 ### Signals and deep recursion
 
 - **A signal ends the trace.** Any signal GDB stops on (`SIGSEGV`, `SIGFPE`, `SIGABRT`, …) gives one `exception` step at the innermost call's current line, with `error {type: "SIGSEGV", message: "Segmentation fault", line}` (`message` is `strsignal`'s text), then `exit {kind: "signal", signal: "SIGSEGV"}`. An uncaught C++ exception ends in `abort()`, so it shows as `SIGABRT`. A signal before `main` gives only the exit. When GDB can't find any call's frame any more, as after a return to a smashed address, the error step repeats the last step's stack and line.
+- **A stack overflow is `recursion_too_deep`.** A `SIGSEGV` whose fault address (`$_siginfo`) is within 64 KiB of the stack pointer comes from the stack running out: a wild pointer faults far from it, and below the stack pointer the kernel grows the stack. `depth` is the number of traced calls on the stack.
 - **Deep recursion with small frames ends as `memory_limit`, not `SIGSEGV`.** Stack pages count toward the 256 MB memory limit (§11), so the out-of-memory kill comes before the stack overflows. A real `SIGSEGV` needs huge frames: the `stack-overflow` fixture uses 32 MiB ones.
 - **SIGKILL from outside.** When the program dies of SIGKILL, as it does in the out-of-memory kill, the tracer kills itself with SIGKILL too. The core then gets no `exit` message, takes the outcome from the sandbox and reports `memory_limit`. An `exit {kind: "signal"}` from the tracer would win over the sandbox's outcome ([Finishing](#finishing)).
+
+### Safety checks
+
+With the safety checks on (D21), a failed check reports and then ends the program: UBSan's handler prints and exits with code 1, and libstdc++ prints and calls `abort()`. The tracer stops at the check itself, so the error lands on the user's line with the values still readable:
+
+- **Breakpoints on the check functions.** When tracing starts, `info functions` finds every `__ubsan_handle_*`, `__gnu_debug::_Error_formatter::_M_error` and `std::__glibcxx_assert_fail`, and the tracer breaks on each one's first instruction. Not on `__ubsan_handle_dynamic_type_cache_miss`: vptr checks call it on every cache miss, and it reports only when the type is really wrong. With the checks off nothing calls them.
+- **Arguments by calling convention.** These functions have no debug info, so the tracer reads `x0`–`x3` on aarch64 and `rdi`, `rsi`, `rdx`, `rcx` on x86-64. A UBSan handler gets a pointer to its source location and type descriptors, then the operands, each the value itself when it fits 64 bits and a pointer to it otherwise. `_M_error` gets the `_Error_formatter`, whose layout the program's own debug info describes: the message template and its parameters, such as the index and the size. `__glibcxx_assert_fail` gets the condition's text (`!this->empty()`, `__n < this->size()`), and the values come from the library frame that asserted it.
+- **The user's line.** The error step is a snapshot at the innermost traced call's current line, like a signal's. The library function the program called (`operator[]`, `front`) is the frame just inside it, which also gives `call`.
+- **Then untraced.** After the error step the tracer deletes its breakpoints and lets the program finish. The report goes to stderr and lands on the error step, the last one, and the exit is what the process did: `SIGABRT` after libstdc++, `exit {kind: "normal", code: 1}` after UBSan.
+- **`message`** is UBSan's first line for the checks with a `kind` (`signed integer overflow: 2000000000 + 1000000000 cannot be represented in type 'int'`), the check's name for the others (`shift out of bounds`, while stderr has UBSan's full text), libstdc++'s message with its parameters filled in (`attempt to subscript container with out-of-bounds index 5, but container only holds 5 elements`), or `Assertion '!this->empty()' failed.`. `type` is `UBSan` or `libstdc++`.
+- **A `size_t` index reads as signed:** `v[i - 1]` at `i = 0` is index `-1`, as the program wrote it.
 
 ### After the step limit
 
@@ -333,6 +364,8 @@ An exception in the tracer's own code sends `log` (level `error`) and `exit {kin
 - Containers read through the pretty printers, and arrays of non-scalars, keep 100 items.
 - A `vector` that changes length or capacity is sent whole on that step, all its non-default cells included.
 - A step that changes most of a 200,005-int array (a `sort`) costs about 6 ms to diff, against 0.1 ms for a few cells.
+- A safety check that fails after the step limit, or before `main`, gives no error step: only the exit and the report on stderr. So does a failed vptr check.
+- Deep recursion that ends as `memory_limit` has no error step, so no `recursion_too_deep`.
 
 ### Numbers
 
@@ -415,11 +448,10 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | Sparse Python lists (§19.9.1's last bullet); Python lists stay dense, cut at 1,000 items | No task yet |
 | `target` and `index` for a pointer into a `vector`'s buffer | No task yet |
 | C++ line hits from gcov (the C++ `exit` has no `lineHits`) | BE-11 §1 |
-| C++ errors in words: a UBSan or debug-container failure on the user's line, with the values involved (today only signals become error steps) | BE-10 |
 | Offering C++ through the API: the manifest stays `enabled: false` | A separate decision |
 | Storing `Result.Tail` as `tail.txt.gz` and listing it in the trace manifest (the worker stores chunks and header only) | BE-11 §2 |
 | Signing the runner image | BE-03 §3, needs the registry (BE-13) |
-| A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | BE-10 |
+| A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | No task yet |
 | `startAtLines` and `captureRanges` in the tracer (both `false` in the manifest) | BE-11 |
 | A test that fake fd-3 messages from user code end as `internal_error` | BE-02 §5 |
 | `sys.stdin.buffer`, `open(0)` and `sys.stdout.buffer` (fd 0 is `/dev/null`; the writers are text only) | Not planned |
