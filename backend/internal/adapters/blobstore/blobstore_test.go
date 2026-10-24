@@ -159,6 +159,41 @@ func TestDeleteRemovesTheKeysAndSkipsMissingOnes(t *testing.T) {
 	}
 }
 
+func TestDeleteRemovesMoreKeysThanOneDeleteObjectsCallTakes(t *testing.T) {
+	bucket := createBucket(t)
+	b := newBucket(t, s3, bucket)
+	keys := make([]string, 1001)
+	for i := range keys {
+		keys[i] = domain.ChunkKey("t7", "trc_a", i)
+	}
+	stored := []string{keys[0], keys[1000]}
+	for _, key := range stored {
+		if err := b.Put(t.Context(), key, []byte("x")); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := b.Delete(t.Context(), keys); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, key := range stored {
+		if code := do(t, http.MethodGet, s3+"/"+bucket+"/"+key).StatusCode; code != http.StatusNotFound {
+			t.Errorf("GET %s after delete: HTTP %d, want 404", key, code)
+		}
+	}
+}
+
+func TestDeleteOfAKeyTheStoreRefusesIsInfraError(t *testing.T) {
+	b := newBucket(t, s3, createBucket(t))
+	refused := "../x"
+
+	err := b.Delete(t.Context(), []string{domain.ChunkKey("t7", "trc_a", 0), refused})
+	if !errors.Is(err, domain.ErrInfra) {
+		t.Errorf("err = %v, want ErrInfra", err)
+	}
+}
+
 func newBucket(t *testing.T, endpoint, bucket string) ports.BlobStore {
 	t.Helper()
 	return newBucketWithPublic(t, endpoint, "", bucket)
