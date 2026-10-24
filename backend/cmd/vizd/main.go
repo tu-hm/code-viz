@@ -281,7 +281,6 @@ func pickSandbox(vizEnv, sandbox string) (string, error) {
 }
 
 // serve answers HTTP until ctx is done, and shuts down once worked is closed: probes keep answering while the worker drains.
-// Shutting down calls onShutdown.
 func serve(ctx context.Context, addr string, h http.Handler, worked <-chan struct{}, onShutdown func()) error {
 	var lc net.ListenConfig
 	ln, err := lc.Listen(ctx, "tcp", addr)
