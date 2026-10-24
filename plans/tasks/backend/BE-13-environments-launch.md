@@ -22,7 +22,7 @@
 - [ ] Separate MySQL users and S3 keys for api and worker, with the §12 permissions, so permission bugs show up locally
 - [ ] Change poller and KEDA-style queries go to the primary, as in production
 - [ ] Seed data: a few completed Python and C++ traces (chunks in SeaweedFS + rows in MySQL), so FE can work against the local stack without running jobs (`make seed`)
-- [ ] Note in the dev README: SeaweedFS only partly supports S3 lifecycle rules, so expiry is tested on staging, not locally
+- [ ] Note in the dev README: expiry is the nightly cleanup, not lifecycle rules, because SeaweedFS only partly supports them (spec v1.7)
 - [ ] **Done:** `make dev` brings up the system from a clean checkout
 
 ## 2. Observability (M1-11 · 1 d · may slip to M2 week 1)
@@ -38,7 +38,7 @@
 - [ ] One deploy path for the M1 beta: Kubernetes staging (recommended), **not** the "2–3 VMs with systemd + Docker + runsc" option in §18.4. Update §18.4 and add a change-log row (§0.3)
 
 **Infrastructure (OpenTofu)**
-- [ ] Kubernetes cluster, managed MySQL 8.4, bucket with lifecycle rules (`t7/` 7 d, `t90/` 90 d) and CORS
+- [ ] Kubernetes cluster, managed MySQL 8.4, bucket with CORS. *v1.7: the M1 beta runs `vizd --role=all` and SeaweedFS on one server*
 - [ ] Dedicated runner node pool, set up the way G1 decided (BE-02 §1): gVisor or nsjail installed, the pod privileges and mounts it needs, no secrets on these nodes except the worker's scoped ones
 - [ ] Get runner images onto runner nodes: pre-pull them (DaemonSet), or unpack the rootfs to `/opt/viz/rootfs-*` for nsjail; pin by digest
 - [ ] Ingress with TLS and the per-IP rate limit (30/min on create)

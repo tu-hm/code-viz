@@ -47,7 +47,7 @@
 | D1 | Scope | Python 3.12 and C++17 (GCC 13). Other languages come later as adapters. | Java, C, JavaScript in v1 | After M4 | §2, §10 |
 | D2 | Execution model | **Record once** in a sandbox, **replay** in the browser. Trace format v1: a keyframe every 50 steps, deltas in between, chunks of 250 steps. | A live debugging session | Not in v1 | §9 |
 | D3 | Backend | **Go 1.27**, one binary `vizd` (roles `api`, `worker`, `all`) plus `vizctl`. A modular monolith with ports. | Separate services; Rust | If the teams split | §7.2, §7.4, C.7 |
-| D4 | State | Only **MySQL 8.4 LTS** (managed, high availability, binlog point-in-time recovery) and **S3-compatible object storage** (managed). *Changed in v1.2: PostgreSQL isn't available.* | PostgreSQL (not available), Valkey, NATS, self-hosted MinIO | §7.9 triggers | §7.13, §7.9 |
+| D4 | State | Only **MySQL 8.4 LTS** (managed, high availability, binlog point-in-time recovery) and **S3-compatible object storage**: **SeaweedFS on the server's own disk** for the M1 beta. *Changed in v1.2: PostgreSQL isn't available. Changed in v1.7: no managed object storage.* | PostgreSQL (not available), Valkey, NATS, self-hosted MinIO | §7.9 triggers | §7.13, §7.9 |
 | D5 | Jobs | Own **`jobs` table on MySQL** claimed with `SKIP LOCKED`, behind the `JobQueue` port. Infrastructure errors are retried once. 30 s deadline. *Changed in v1.2: River needs PostgreSQL.* | River, NATS JetStream, Asynq | Queue work above 30% of MySQL CPU, claim p95 above 200 ms, or above 500 jobs/s | §7.7, §7.13.2 |
 | D6 | Status updates | **Long-poll** (`?wait=20`) + a **change poller** on MySQL (every 250 ms, only while requests wait). *Changed in v1.2: no `LISTEN/NOTIFY` on MySQL.* | SSE, WebSocket, binlog streaming | Above 200 poller queries/s in total, or 50 API pods | §8.3, §7.13.3 |
 | D7 | Trace delivery | **Presigned URLs** straight from object storage; a CDN later | Serving traces through the API | Egress cost or latency | §8.4 |
@@ -95,6 +95,7 @@
 | v1.3 | 2026-10-23 | **Frontend trimmed to the IDE.** The web app is there to show the backend's traces, not to be a production UI: no i18n files (strings written inline), no Playwright end-to-end or visual-snapshot tests. D20 changed; §13, §15 and §18 updated. |
 | v1.4 | 2026-10-23 | C++ locals are `uninit` on their declaration line until it runs (§7.11.2), instead of showing garbage. |
 | v1.5 | 2026-10-23 | **G1: the production sandbox is nsjail (D10), not gVisor (D9).** Spike S1b: gVisor runs GDB, but a 1,000-step trace takes 7–9 s on its default platform (target 3 s) and `personality(ADDR_NO_RANDOMIZE)` fails, so traces aren't deterministic (§7.12). nsjail: 1.5 s, 4–8 ms starts, ASLR off. Worker pods run privileged on the runner node pool. Report: `plans/spikes/s1b-sandbox.md`. |
+| v1.7 | 2026-10-24 | **Object storage is SeaweedFS on the server's own disk** (D4), because our infrastructure may have no managed S3. The M1 beta runs `vizd --role=all` and SeaweedFS on one server. Presigned URLs stay (D7). SeaweedFS only partly supports lifecycle rules, so the nightly cleanup deletes expired chunks with their rows (§7.5, §7.8). **API rules (BE-06):** `wait` without `since` returns at once; a detached visualization reads `canceled`; a repeated `Idempotency-Key` returns the same visualization in its current state; a cache hit inherits the trace's expiry (§8.2, §8.3, §8.5). |
 | v1.6 | 2026-10-24 | **Python tracer contract (BE-03).** The Python build step is a check (`tracer.py --check`): syntax errors become `compile_error` with diagnostics, blocked imports `unsupported_module` (§7.11.1, §10.2). The trace runs with `python3 -s -P` and `PYTHONHASHSEED=0` instead of `-I`, which ignored the seed, so set order changed between runs (§7.12). Wire `exit` carries the tracer's `lineHits`. A tracer sends one step past `maxSteps` to mark that the program went on, and the core keeps reading for the untraced tail instead of killing (§10.1, D25). §11 says what the heap-object and size limits do to a Python trace. |
 
 ---
@@ -690,7 +691,7 @@ erDiagram
 ```
 
 - **Object keys:** `{t7|t90}/{traceId}/chunk-0000.json.gz`, one chunk per 250 steps. Chunk boundaries line up with keyframes (250 = 5 × 50).
-- **Retention:** new traces go under `t7/` (a 7-day lifecycle rule). Sharing does a server-side copy to `t90/` (90-day rule) and updates `storage_prefix`. A nightly `DELETE … WHERE expires_at < now()` removes rows.
+- **Retention:** new traces go under `t7/` and expire 7 days after they were created. Sharing does a server-side copy to `t90/` (90 days) and updates `storage_prefix`. A nightly cleanup deletes the rows past `expires_at`, then the chunks of the traces it deleted. *v1.7: SeaweedFS only partly supports lifecycle rules, so the cleanup deletes chunks, not the bucket.*
 - **Why a trace and a visualization are separate:** many users (visualizations) can share one trace (single-flight and cache). Ownership, sharing and quotas belong to the visualization, never to the trace.
 
 ### 7.6 Request lifecycle
@@ -759,6 +760,7 @@ stateDiagram-v2
 | Tracer output is broken or malicious | Schema validation fails, and the job fails with `internal_error`. A redacted sample is logged. | "Something went wrong" plus a trace ID |
 | A permalink goes viral | Each view is one small JSON request (cached for 60 s), and chunks come from storage or CDN | Nothing |
 | The change poller's query fails | It retries on the next tick. Parked requests re-read their row when they time out, so no update is lost, at worst it's late. | At most one `wait` period of delay |
+| The nightly cleanup can't delete a trace's chunks | Its rows are already gone, so the chunks stay as orphans. The cleanup logs the trace ID and goes on. | Nothing |
 | Deadlock or lock-wait timeout (MySQL 1213, 1205) | The transaction is retried up to 3 times with jitter (§7.13.4) | Nothing, or a short delay |
 
 ### 7.9 Scaling model
@@ -998,7 +1000,9 @@ The response is cacheable for 5 minutes.
 
 ### 8.2 `POST /visualizations`
 
-Headers: `Idempotency-Key: <uuid>` (optional, honored for 24 h).
+Headers: `Idempotency-Key: <uuid>` (optional, honored for 24 h). A repeat from the same caller returns `201` with the visualization the first request created, in its current state; it doesn't count against the quota.
+
+A visualization lives until its trace expires. A cache hit on an older trace inherits that trace's `expiresAt`.
 
 ```json
 {
@@ -1029,7 +1033,7 @@ A successful request always returns **`201 Created`**, with `Location` and the s
 ### 8.3 `GET /visualizations/{id}?wait=20&since=3`
 
 - **Without `wait`:** returns immediately.
-- **With `wait` (seconds, max 20):** if the status is not final and `version` is still ≤ `since`, the server holds the request until something changes or `wait` runs out. Then it returns `200` with the current state.
+- **With `wait` (seconds, max 20):** if the status is not final and `version` is still ≤ `since`, the server holds the request until something changes or `wait` runs out. Then it returns `200` with the current state. Without `since`, `wait` is ignored and the request returns at once.
 - `version` goes up on every status or progress change. Clients loop `GET ?wait=20&since=<version>` until the status is final.
 
 While tracing:
@@ -1117,7 +1121,7 @@ A failed build:
 
 ### 8.5 `DELETE /visualizations/{id}`
 
-Returns `204`. The visualization is detached. Its trace job is canceled only if no other visualization still waits on it (§7.7).
+Returns `204`. The visualization is detached: from then on `GET` returns it with `status: canceled` until it expires. Its trace job is canceled only if no other visualization still waits on it (§7.7). A visualization detached because its caller started a third active one (§11) reads the same way.
 
 ### 8.6 `POST /visualizations/{id}/share` (P1)
 
@@ -1410,7 +1414,7 @@ All of these are configurable per language in the manifest, with global ceilings
 | Create rate per IP (ingress) | 30/min | — | `429` with `Retry-After` |
 | Daily quota (MySQL) | Anonymous 100, signed in 1,000 | — | `429` with `Retry-After` (next UTC midnight) |
 | Active visualizations per user | 2 | — | A third request detaches the oldest queued one (§8.5 rules) |
-| Trace retention | 7 days; 90 days once shared (`t7/` and `t90/` lifecycle rules, §7.5) | — | `410 expired` |
+| Trace retention | 7 days; 90 days once shared (`t7/` and `t90/`; the nightly cleanup deletes rows and chunks, §7.5) | — | `410 expired` |
 
 ## 12. Security and sandboxing
 
@@ -1505,7 +1509,7 @@ Most of these are now decided (§0). Q4 and Q9 stay open until the M0 spikes.
 | Q7 | AI step explanations (FR-21): which provider, what cost per trace, and do we cache them? | **Decided (D19):** not in v1 |
 | Q8 | Interactive stdin in a later version? | **Decided (D19):** no |
 | Q9 | Sandbox: gVisor, nsjail or go-judge (Appendix C)? | **Closed at G1 (v1.5): nsjail (D10).** gVisor failed S1 |
-| Q10 | Managed cloud (S3/GCS + managed MySQL) or self-hosted (SeaweedFS + our own MySQL)? | **Decided (D4):** managed services |
+| Q10 | Managed cloud (S3/GCS + managed MySQL) or self-hosted (SeaweedFS + our own MySQL)? | **Decided (D4, v1.7):** managed MySQL; SeaweedFS on the server's disk for the beta |
 
 ## 18. Recommended tech stack
 
@@ -1545,7 +1549,7 @@ These recommendations reflect what was current in October 2026. They follow four
 | Database | **MySQL 8.4 LTS** (or 9.7 LTS; managed, HA, binlog point-in-time recovery) + **go-sql-driver/mysql** + **sqlc** + **goose** | Type-safe SQL without an ORM. Stores traces, visualizations, quotas and jobs (§7.5). MySQL 8.0 is end-of-life since April 2026. | Atlas for migrations; GORM (not recommended) |
 | Connection pooling | Go's `database/sql` pool; **ProxySQL** or **RDS Proxy** once the trigger fires | Transactions keep one backend connection until commit | — |
 | Rate limits and cache | **Ingress rate limiting** (per IP), with **daily quotas, concurrency caps and the cache index in MySQL**, all in the create transaction | Exact and transactional, with no extra system to run (§7.1 #1) | **Valkey 8+** + **go-redis v9** + **redis_rate**, only after the §7.9 trigger (Valkey is BSD-licensed; Redis 8 is AGPL) |
-| Object storage | S3 API via **aws-sdk-go-v2**. Managed: **S3 / GCS / Cloudflare R2**. Self-hosted: **SeaweedFS** (Apache-2.0). | Trace chunks are immutable blobs, downloaded by the browser through **presigned URLs**. Lifecycle rules on `t7/` and `t90/` handle expiry (§7.5). | **Avoid MinIO Community Edition**: its repository was archived in April 2026 and it no longer gets updates. Garage (AGPL). |
+| Object storage | S3 API via **aws-sdk-go-v2**. Managed: **S3 / GCS / Cloudflare R2**. Self-hosted: **SeaweedFS** (Apache-2.0). | Trace chunks are immutable blobs, downloaded by the browser through **presigned URLs**. The nightly cleanup deletes expired chunks (§7.5). **M1 beta (v1.7): SeaweedFS on the server's disk.** | **Avoid MinIO Community Edition**: its repository was archived in April 2026 and it no longer gets updates. Garage (AGPL). |
 | Compression | **klauspost/compress** (gzip, zstd) + **andybalholm/brotli** | Fast, pure Go | Standard library gzip |
 | Schema validation | **santhosh-tekuri/jsonschema v6** in the worker; Go structs generated with **go-jsonschema**; TypeScript types with **json-schema-to-typescript** | Every wire message from the sandbox is untrusted (§12) and is validated before use | Hand-written structs with `DisallowUnknownFields` |
 | Packaging | **One static binary, `vizd`** (`--role=api\|worker\|all`), plus **`vizctl`** (run an adapter locally, print or validate a trace) | One build and one image for the services; `vizctl` reuses `tracecore` | Separate services, only if the teams split |
@@ -1570,7 +1574,7 @@ These recommendations reflect what was current in October 2026. They follow four
 
 | Concern | Pick | Notes |
 |---|---|---|
-| Orchestration | **Kubernetes** with a dedicated **runner node pool** for the privileged worker pods that run nsjail. The API and workers run as Deployments. | For the M1 beta, 2–3 VMs running systemd + Docker + nsjail are enough. |
+| Orchestration | **Kubernetes** with a dedicated **runner node pool** for the privileged worker pods that run nsjail. The API and workers run as Deployments. | For the M1 beta, 2–3 VMs running systemd + Docker + nsjail are enough. *v1.7: the beta runs `vizd --role=all` and SeaweedFS on one server.* |
 | Autoscaling | **KEDA MySQL scaler** on in-flight jobs per slot (§7.9). Cluster autoscaler for runner nodes. HPA on CPU for API pods. | No metrics exporter needed for the queue |
 | Trace delivery | **Presigned object-storage URLs** in v1; a **CDN with signed URLs** after the egress trigger (§7.9) | No API in the data path |
 | Frontend hosting | Static build on a CDN (Cloudflare or CloudFront) | The API sits on its own subdomain |

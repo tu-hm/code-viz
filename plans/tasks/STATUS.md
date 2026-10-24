@@ -20,7 +20,6 @@
 
 - [ ] G2 (Fri 13 Nov): keep `sys.settrace` (D12) or switch to `sys.monitoring`? S2 recommends `sys.monitoring`: tied on a 1,000-step trace, 1.5–3.4× faster after the step limit ([S2 report](../spikes/s2-python-hook.md)).
 - [ ] Mark the CI checks as required on `main` (BE-01 §2)? This blocks direct pushes to `main`, so every change would go through a PR.
-- [ ] API: what does `wait` do when `since` is missing?
 - [ ] API: what does `POST /visualizations/{id}/share` return before the visualization is completed?
 - [ ] API: auth scheme (`securitySchemes`) for signed-in callers.
 - [ ] API: should a failed response carry the trace ID (§5.6)?

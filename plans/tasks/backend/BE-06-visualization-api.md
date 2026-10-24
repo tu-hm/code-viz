@@ -38,8 +38,8 @@ One migration per table, every table `utf8mb4_bin`, with foreign keys from `visu
 - [x] Keys: `{t7|t90}/{traceId}/chunk-0000.json.gz`
 - [x] Upload with `Content-Encoding: gzip`, `Cache-Control: private, max-age=86400, immutable`
 - [ ] Bucket CORS: allow `GET` from the IDE origins (`CORS_ORIGINS`), expose `Content-Length`, `ETag`; set up in Compose and OpenTofu
-- [ ] Lifecycle rules: `t7/` 7 days, `t90/` 90 days
-- [ ] **Done:** the browser downloads a chunk from a presigned URL locally and on staging; objects expire on staging
+- [ ] Expiry: the nightly cleanup (§4) deletes a trace's chunks after its rows; SeaweedFS only partly supports lifecycle rules (spec v1.7)
+- [ ] **Done:** the browser downloads a chunk from a presigned URL locally and on staging; expired chunks are deleted
 
 **Status (24 Oct):** `ports.BlobStore` puts gzipped chunks through `internal/adapters/blobstore` (tested against SeaweedFS), `domain.ChunkKey` builds the keys, and `make seed` creates the dev bucket. Left: presign with `S3_PUBLIC_ENDPOINT`, server-side copy, bucket CORS, lifecycle rules and OpenTofu.
 
