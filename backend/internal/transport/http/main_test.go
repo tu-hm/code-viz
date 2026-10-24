@@ -102,16 +102,9 @@ func seaweedFS() (image string, cmd []string, err error) {
 
 func newDB(t *testing.T) *sql.DB {
 	t.Helper()
-	root, err := mysql.Open(rootDSN)
-	if err != nil {
-		t.Fatal(err)
-	}
+	root := openDB(t, rootDSN)
 	name := fmt.Sprintf("test%d", resource.Add(1))
-	_, err = root.ExecContext(t.Context(), "CREATE DATABASE "+name)
-	if cerr := root.Close(); cerr != nil {
-		t.Error(cerr)
-	}
-	if err != nil {
+	if _, err := root.ExecContext(t.Context(), "CREATE DATABASE "+name); err != nil {
 		t.Fatal(err)
 	}
 
