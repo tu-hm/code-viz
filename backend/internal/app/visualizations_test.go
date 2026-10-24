@@ -611,6 +611,27 @@ func TestGetWaitsOnlyWhileNothingNewerThanSinceIsFinal(t *testing.T) {
 	}
 }
 
+func TestGetRefusesAWaitOutside0To20SecondsOrANegativeSince(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t, 100)
+	v := h.create(t, "ip:1", "x")
+	tests := []struct {
+		name string
+		p    api.GetVisualizationParams
+	}{
+		{"a wait under 0 s is invalid", api.GetVisualizationParams{Wait: ptr(-1), Since: ptr(0)}},
+		{"a wait over 20 s is invalid", api.GetVisualizationParams{Wait: ptr(21), Since: ptr(0)}},
+		{"a negative since is invalid", api.GetVisualizationParams{Wait: ptr(20), Since: ptr(-1)}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if _, err := h.Get(t.Context(), v.ID, tt.p); !errors.Is(err, domain.ErrInvalidRequest) {
+				t.Errorf("err = %v, want ErrInvalidRequest", err)
+			}
+		})
+	}
+}
+
 func TestDeleteCancelsTheJobOnlyOnceNoOtherVisualizationWaits(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
