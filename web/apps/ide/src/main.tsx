@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './app.tsx'
@@ -19,6 +20,8 @@ if (import.meta.env.DEV) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App fixture={fixture} />
+    <QueryClientProvider client={new QueryClient()}>
+      <App fixture={fixture} />
+    </QueryClientProvider>
   </StrictMode>,
 )

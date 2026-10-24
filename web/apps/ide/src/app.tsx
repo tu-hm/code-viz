@@ -2,6 +2,7 @@ import { Player } from '@viz/player'
 import type { DevFixture } from './dev-fixture.ts'
 import { PlayerErrorBoundary } from './error-boundary.tsx'
 import { useFlag } from './flags.ts'
+import { Ide } from './ide.tsx'
 
 export function App({ fixture }: { fixture: DevFixture | null }) {
   const visualize = useFlag('visualize')
@@ -18,12 +19,5 @@ export function App({ fixture }: { fixture: DevFixture | null }) {
       </PlayerErrorBoundary>
     )
   }
-  return (
-    <main className="flex min-h-dvh flex-col gap-4 p-6">
-      <h1 className="mono-label text-muted-foreground">Code Visualizer</h1>
-      <PlayerErrorBoundary>
-        <p className="text-faint">Nothing to visualize yet.</p>
-      </PlayerErrorBoundary>
-    </main>
-  )
+  return <Ide />
 }

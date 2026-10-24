@@ -81,21 +81,23 @@ export function setFontSize(view: EditorView, fontSize: Settings['fontSize']) {
   view.dispatch({ effects: size.reconfigure(sizeThemes.get(fontSize)!) })
 }
 
-const highlighter = tagHighlighter([
-  {
-    tag: [
-      tags.keyword,
-      tags.processingInstruction,
-      tags.standard(tags.typeName),
-      tags.bool,
-      tags.null,
-      tags.self,
-    ],
-    class: 'text-syntax-keyword',
-  },
-  { tag: [tags.string, tags.escape], class: 'text-syntax-string' },
-  { tag: tags.comment, class: 'text-syntax-comment' },
-])
+export const syntaxColors = syntaxHighlighting(
+  tagHighlighter([
+    {
+      tag: [
+        tags.keyword,
+        tags.processingInstruction,
+        tags.standard(tags.typeName),
+        tags.bool,
+        tags.null,
+        tags.self,
+      ],
+      class: 'text-syntax-keyword',
+    },
+    { tag: [tags.string, tags.escape], class: 'text-syntax-string' },
+    { tag: tags.comment, class: 'text-syntax-comment' },
+  ]),
+)
 
 function latest<T>(effect: StateEffectType<T>, initial: T) {
   return StateField.define<T>({
@@ -346,7 +348,7 @@ export function createCodeView(
       EditorView.contentAttributes.of({ 'aria-label': 'Code' }),
       language.of([]),
       size.of([]),
-      syntaxHighlighting(highlighter),
+      syntaxColors,
       lines.init(() => options.lines),
       EditorView.decorations.compute([lines], decorate),
       gutter({

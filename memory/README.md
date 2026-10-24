@@ -42,6 +42,7 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 
 - [Code pane keyboard](frontend/code-pane-keyboard.md): the code pane takes focus for the caret and Enter, but ← → Home End Space Esc stay the player's
 - [Go to… search rules](frontend/goto-search.md): "next change" reads the innermost frame that declares the name and follows refs, not pointers; a line jump skips return steps
+- [Visualize run](frontend/visualize-run.md): the create keeps its promise so Close can delete an unanswered run; the long-poll is one `queryFn` loop that resumes from the cached version; only unfinished runs are deleted
 - [Vendored agent skills](frontend/vendored-agent-skills.md): React, composition and web design skills live as plain copies in `web/.claude/skills`; `web/AGENTS.md` wins over them
 
 ## Backend

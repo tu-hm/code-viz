@@ -1,3 +1,4 @@
+export { loadLanguage, syntaxColors } from './code-view.ts'
 export type * from './gen/trace.ts'
 export { loadTrace, type FileSource, type Manifest } from './load.ts'
 export { Player, type LanguageInfo } from './player.tsx'
