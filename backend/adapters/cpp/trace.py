@@ -1,5 +1,6 @@
 import array
 import collections
+import fcntl
 import itertools
 import json
 import math
@@ -7,6 +8,7 @@ import os
 import re
 import signal
 import struct
+import termios
 import traceback
 
 import gdb
@@ -61,6 +63,9 @@ class Return(gdb.FinishBreakpoint):
 
 def send(msg):
     wire.write(json.dumps(msg, separators=(",", ":")) + "\n")
+    # program writes fd 1/2 itself => keep it stopped until viz-shim has read this line, or its next output can overtake it (§10.1)
+    while struct.unpack("i", fcntl.ioctl(WIRE_FD, termios.FIONREAD, bytes(4)))[0]:
+        os.sched_yield()  # sleep(10 µs) instead: 1,000 steps 0.2 s => 1.5 s in a 1-vCPU box
 
 
 def run(cmd):

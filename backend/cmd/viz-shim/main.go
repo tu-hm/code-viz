@@ -1,7 +1,8 @@
+//go:build linux
+
 package main
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -112,8 +113,6 @@ func forward(out *shim.Writer, pipes [3]*os.File) error {
 	}
 	stdout, stderr, wire := &fds[0], &fds[1], &fds[2]
 	buf := make([]byte, shim.MaxPayload)
-	chunk := make([]byte, shim.MaxPayload)
-	midLine := false
 
 	for stdout.Fd >= 0 || stderr.Fd >= 0 || wire.Fd >= 0 {
 		_, err := unix.Poll(fds[:], -1)
@@ -123,28 +122,13 @@ func forward(out *shim.Writer, pipes [3]*os.File) error {
 		if err != nil {
 			return fmt.Errorf("poll: %w", err)
 		}
-		var data []byte
-		if wire.Revents != 0 {
-			n, err := read(wire, chunk)
+		// count fd 3, then drain fd 1/2 => output written before those bytes is waiting already; a tracer that holds the program until fd 3 empties lets none in after them (§10.1)
+		unread := 0
+		if wire.Fd >= 0 {
+			unread, err = unix.IoctlGetInt(int(wire.Fd), unix.TIOCINQ) // linux's name for FIONREAD
 			if err != nil {
-				return fmt.Errorf("read stream %d: %w", shim.Wire, err)
+				return fmt.Errorf("count stream %d: %w", shim.Wire, err)
 			}
-			data = chunk[:n]
-		}
-
-		// fd 1/2 bytes written before a wire line began are readable once its first byte is => drain them right before the first line a read starts; a read that only continues a line drains nothing (§10.1)
-		if midLine && len(data) > 0 && bytes.IndexByte(data, '\n') < 0 {
-			if err := send(out, shim.Wire, data); err != nil {
-				return err
-			}
-			continue
-		}
-		head := 0
-		if midLine {
-			head = bytes.IndexByte(data, '\n') + 1
-		}
-		if err := send(out, shim.Wire, data[:head]); err != nil {
-			return err
 		}
 		if err := drain(out, shim.Stdout, stdout, buf); err != nil {
 			return err
@@ -152,11 +136,18 @@ func forward(out *shim.Writer, pipes [3]*os.File) error {
 		if err := drain(out, shim.Stderr, stderr, buf); err != nil {
 			return err
 		}
-		if err := send(out, shim.Wire, data[head:]); err != nil {
-			return err
+		if unread == 0 && wire.Revents&unix.POLLHUP != 0 {
+			wire.Fd = -1
 		}
-		if len(data) > 0 {
-			midLine = data[len(data)-1] != '\n'
+		for unread > 0 {
+			n, err := read(wire, buf[:min(unread, len(buf))])
+			if err != nil {
+				return fmt.Errorf("read stream %d: %w", shim.Wire, err)
+			}
+			if err := send(out, shim.Wire, buf[:n]); err != nil {
+				return err
+			}
+			unread -= n
 		}
 	}
 	return nil
