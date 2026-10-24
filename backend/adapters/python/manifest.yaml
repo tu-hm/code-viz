@@ -14,7 +14,7 @@ capabilities:
   returnValues: true
   pointers: false
   exceptions: true
-  startAtLines: false
+  startAtLines: true
   captureRanges: false
 modules:
   allow:

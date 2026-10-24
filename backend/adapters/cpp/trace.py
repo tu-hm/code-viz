@@ -924,16 +924,18 @@ def frame_name(frame, kind):
     return frame.name().split("[abi:")[0]
 
 
-def result_address(frame, returns):
+def result_in_memory(frame, returns):
     arch = frame.architecture()
     if arch.name() != "aarch64" or returns.strip_typedefs().code not in (gdb.TYPE_CODE_STRUCT, gdb.TYPE_CODE_UNION):
-        return None
+        return False
     # aapcs64 result address in x8 isn't kept, gdb 14 reads x8 at return; gcc -O0 saves it iff result in memory
     start = int(frame.function().value().address)
     prologue = arch.disassemble(start, gdb.find_pc_line(start).last)
-    if not any(re.search(r"\bx8\b", insn["asm"]) for insn in prologue):
-        return None
-    return int(frame.read_register("x8"))
+    return any(re.search(r"\bx8\b", insn["asm"]) for insn in prologue)
+
+
+def result_address(frame, returns):
+    return int(frame.read_register("x8")) if result_in_memory(frame, returns) else None
 
 
 def stack_of(calls, globals_, snap, line, again=None):
@@ -1016,7 +1018,7 @@ def called(frame, pc, line, calls, globals_):
         disarm(calls[-1])
     returns = frame.function().type.target()
     call = {"id": next(call_ids), "frame": frame, "name": name, "kind": kind,
-            "returns": returns, "result_at": result_address(frame, returns), "line": line, "pc": pc,
+            "returns": returns, "result_at": result_address(frame, returns), "result_lost": False, "line": line, "pc": pc,
             "shown": pc, "pending": None, "finish": None, "scope": {"line": None, "live": [], "ran": {}}}
     calls.append(call)
     arm(call)
@@ -1026,6 +1028,35 @@ def called(frame, pc, line, calls, globals_):
         msg["parentCallId"] = calls[-2]["id"]
     call["seen"] = msg
     return msgs + [msg]
+
+
+def joined(frame, pc, line, lines, calls, globals_):
+    # first start line: the user's calls already running get records, outermost first, and this stop is a line step
+    traced = {function_block(at).start for at in lines}
+    frames, older = [], frame
+    while older is not None:
+        block = function_block(older.pc())
+        if older.type() == gdb.NORMAL_FRAME and block is not None and block.start in traced:
+            frames.append(older)
+        older = older.older()
+    for f in reversed(frames):
+        kind = frame_kind(f)
+        returns = f.function().type.target()
+        # x8 was reused since the call: a result returned in memory can't be found
+        calls.append({"id": next(call_ids), "frame": f, "name": frame_name(f, kind), "kind": kind, "returns": returns,
+                      "result_at": None, "result_lost": result_in_memory(f, returns), "line": f.find_sal().line,
+                      "pc": f.pc(), "shown": f.pc(), "pending": None, "finish": None,
+                      "scope": {"line": None, "live": [], "ran": {}}})
+    arm(calls[-1])
+    msg = snapshot("line", line, None, calls, globals_)
+    calls[-1]["line"], calls[-1]["pc"], calls[-1]["shown"] = line, pc, pc
+    shown = {entry["id"]: entry for entry in msg["stack"]}
+    for call in calls:
+        entry = shown.get(str(call["id"]), {"id": str(call["id"]), "name": call["name"], "kind": call["kind"],
+                                             "line": call["line"], "locals": [], "returnValue": None})
+        call["seen"] = {"stack": [entry], "heap": msg["heap"]}
+    calls[-1]["seen"] = msg
+    return [msg]
 
 
 def at_row(frame, pc, row, calls, globals_):
@@ -1073,7 +1104,7 @@ def returned(call, calls, globals_):
                           call["returns"])
     if call["returns"].code == gdb.TYPE_CODE_VOID:
         result = None
-    elif value is None:
+    elif value is None or call["result_lost"]:
         result = {"t": "unavailable", "reason": "unknown_return", "type": type_name(call["returns"])}
     else:
         result = encode(value, snap, 0)
@@ -1305,6 +1336,7 @@ def open_stdin():
 
 def trace():
     max_steps = int(os.environ.get("VIZ_MAX_STEPS", "1000"))
+    start_lines = {int(line) for line in os.environ.get("VIZ_START_AT_LINES", "").split(",") if line}
     for cmd in ("set pagination off", "set confirm off", "set suppress-cli-notifications on",
                 "set print inferior-events off", "set print thread-events off", "set startup-with-shell off",
                 "set disable-randomization on", "set backtrace past-main on",
@@ -1321,8 +1353,9 @@ def trace():
     lines = line_stops(gdb.current_progspace().filename)
     body = function_block(int(main.value().address))
     entry = min(pc for pc in lines if body.start <= pc < body.end)
-    # breakpoints only once main runs: global constructors stay untraced and fast
-    breaks = [gdb.Breakpoint("*%#x" % entry, internal=True)]
+    # breakpoints only once main runs, or a start line: until then the program runs untraced and fast
+    starts = [pc for pc, (line, _) in lines.items() if line in start_lines] if start_lines else [entry]
+    breaks = [gdb.Breakpoint("*%#x" % pc, internal=True) for pc in starts]
     open_stdin()
     run("run")
     null = os.open(os.devnull, os.O_RDWR)
@@ -1346,10 +1379,14 @@ def trace():
             send_step(crashed(failed(checks[pc], frame, calls, globals_), calls, globals_, last))
             return untraced(breaks, calls, lines)
         if last is None:
-            breaks.pop().delete()
+            for bp in breaks:
+                bp.delete()
             checks = check_functions()
             breaks = [gdb.Breakpoint("*%#x" % at, internal=True) for at in list(lines) + list(checks)]
-            msgs = called(frame, pc, lines[pc][0], calls, globals_)
+            if start_lines:
+                msgs = joined(frame, pc, lines[pc][0], lines, calls, globals_)
+            else:
+                msgs = called(frame, pc, lines[pc][0], calls, globals_)
         else:
             msgs = []
             if returning:

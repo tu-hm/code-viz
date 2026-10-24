@@ -26,7 +26,7 @@ if TYPE_CHECKING:
                       Value)
 
 LANGUAGE = "python3"
-ADAPTER = "py-settrace/0.2.0"
+ADAPTER = "py-settrace/0.3.0"
 SOURCE = "main.py"
 STDIN = "/work/stdin"
 MAX_ITEMS = 1000
@@ -49,12 +49,14 @@ ARITHMETIC: dict[type[ast.operator], Callable[[int, int], int]] = {
 
 wire: io.TextIOWrapper
 max_steps = 1000
+start_lines: set[int] = set()
+call_hook: TraceFunction
 sent = 0
 tail = False
 next_call = 0
 call_ids: dict[types.FrameType, int] = {}
 pending: set[types.FrameType] = set()
-last_lines: dict[types.FrameType, int] = {}
+last_lines: dict[types.FrameType, int | None] = {}
 raised: dict[types.FrameType, BaseException] = {}
 depths: dict[types.FrameType, int] = {}
 starters: dict[threading.Thread, list[types.FrameType]] = {}
@@ -227,7 +229,7 @@ def stack_of(frame: types.FrameType | None) -> list[types.FrameType]:
 
 
 def step(frame: types.FrameType, event: Event, error: StepError | None = None, returned: object = None) -> None:
-    global sent, tail
+    global sent, tail, call_hook
     frames = stack_of(frame)
     kept = frames if len(frames) <= MAX_FRAMES + 1 else frames[:1] + frames[-MAX_FRAMES:]
     seen: set[int] = set()
@@ -256,7 +258,7 @@ def step(frame: types.FrameType, event: Event, error: StepError | None = None, r
     last_lines[frame] = line
     sent += 1
     if sent > max_steps:
-        tail = True
+        tail, call_hook = True, count_call
         sys.settrace(count_call)
         threading.settrace(count_call)
 
@@ -281,7 +283,7 @@ def getrecursionlimit() -> int:
 
 def rearm(frame: types.FrameType, event: str, arg: Any) -> None:
     sys.setprofile(None)
-    sys.settrace(count_call if tail else on_call)
+    sys.settrace(call_hook)
 
 
 def check_depth(frame: types.FrameType) -> None:
@@ -447,6 +449,35 @@ def count_line(frame: types.FrameType, event: str, arg: Any) -> TraceFunction:
     return count_line
 
 
+def wait_call(frame: types.FrameType, event: str, arg: Any) -> TraceFunction | None:
+    if frame.f_code.co_filename != SOURCE:
+        return None
+    check_depth(frame)
+    return wait_line
+
+
+def wait_line(frame: types.FrameType, event: str, arg: Any) -> TraceFunction:
+    if event == "line" and frame.f_lineno in start_lines:
+        begin(frame)
+        return on_event(frame, event, arg)
+    count_line(frame, event, arg)
+    return wait_line
+
+
+def begin(frame: types.FrameType) -> None:
+    global next_call, call_hook
+    call_hook = on_call
+    sys.settrace(on_call)
+    threading.settrace(on_call)
+    # frames already running get call ids as if traced from their call; their next line follows their call site
+    for f in stack_of(frame):
+        call_ids[f] = next_call
+        next_call += 1
+        last_lines[f] = f.f_lineno
+        f.f_trace = on_event
+    last_lines[frame] = None
+
+
 def wait_for_threads() -> None:
     for thread in threading.enumerate():
         if thread is not threading.current_thread() and not thread.daemon:
@@ -459,8 +490,9 @@ def describe(exc: BaseException) -> str:
 
 
 def trace(path: str) -> Exit:
-    global stdin, stdin_text, stdin_size, token_ends, max_steps, source
+    global stdin, stdin_text, stdin_size, token_ends, max_steps, start_lines, call_hook, source
     max_steps = int(os.environ.get("VIZ_MAX_STEPS", "1000"))
+    start_lines = {int(line) for line in os.environ.get("VIZ_START_AT_LINES", "").split(",") if line}
     with open(path, "rb") as f:
         src = f.read()
     source = src
@@ -490,8 +522,9 @@ def trace(path: str) -> Exit:
     try:
         # dont_inherit: the user's program must not get this file's __future__ annotations
         program = compile(src, path, "exec", dont_inherit=True)
-        threading.settrace(on_call)
-        sys.settrace(on_call)
+        call_hook = wait_call if start_lines else on_call
+        threading.settrace(call_hook)
+        sys.settrace(call_hook)
         exec(program, module.__dict__)
     except SystemExit as e:
         if isinstance(e.code, int):

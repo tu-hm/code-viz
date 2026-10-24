@@ -52,8 +52,9 @@ func TestPortsAgreeAcrossLanguages(t *testing.T) {
 			first := portOf(t, goldens[0])
 			for _, golden := range goldens[1:] {
 				want, got := first, portOf(t, golden)
+				named := len(want.Kinds) > 0 && len(got.Kinds) > 0
 				want.Kinds, got.Kinds = common(first.Kinds, got.Kinds), common(got.Kinds, first.Kinds)
-				if len(got.Kinds) == 0 {
+				if named && len(got.Kinds) == 0 {
 					t.Errorf("%s and %s have no variable name in common", goldens[0], golden)
 				}
 				if diff := cmp.Diff(want, got); diff != "" {
@@ -143,8 +144,8 @@ func portOf(t *testing.T, golden string) port {
 	if !tr.Summary.Truncated {
 		p.CallDepths, p.Returns = depths, returns
 	}
-	if last := tr.Steps[len(tr.Steps)-1]; last.Error != nil {
-		d := len(last.Stack) - len(tr.Steps[0].Stack)
+	if n := len(tr.Steps); n > 0 && tr.Steps[n-1].Error != nil {
+		d := len(tr.Steps[n-1].Stack) - len(tr.Steps[0].Stack)
 		p.ErrorDepth = &d
 	}
 	p.Aliases = slices.Sorted(maps.Keys(aliases))

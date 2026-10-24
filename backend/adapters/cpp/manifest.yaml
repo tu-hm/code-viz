@@ -16,7 +16,7 @@ capabilities:
   returnValues: true
   pointers: true
   exceptions: true
-  startAtLines: false
+  startAtLines: true
   captureRanges: false
 enabled: false
 rollout: { percent: 100 }

@@ -1,0 +1,41 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "py-settrace/0.3.0",
+    "id": "python3",
+    "runtime": "CPython 3.12.15"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": [
+      3
+    ]
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 4
+  },
+  "steps": [],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "lineHits": {
+      "1": 1,
+      "2": 1,
+      "4": 1
+    },
+    "lineHitsSource": "counter",
+    "stepCount": 0,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.2"
+}

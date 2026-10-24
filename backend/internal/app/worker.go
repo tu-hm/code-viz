@@ -246,7 +246,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 	}
 	exit, err := box.Run(runCtx, ports.Command{
 		Args:   m.TraceCmd,
-		Env:    append([]string{"VIZ_MAX_STEPS=" + strconv.Itoa(job.Options.MaxSteps)}, m.TraceEnv...),
+		Env:    TraceEnv(m, job.Options),
 		Stdout: rec.Stdout(),
 		Stderr: rec.Stderr(),
 		Wire:   rec.Wire(),
@@ -317,6 +317,19 @@ func (w *Worker) fail(ctx context.Context, l ports.Lease) {
 	if err := w.Queue.Fail(ctx, l, api.FailureKindInternalError, nil, w.Now()); err != nil {
 		slog.ErrorContext(ctx, "fail job", "trace_id", l.TraceID, "err", err)
 	}
+}
+
+// TraceEnv is the environment of m's trace command for opts (§10.2): the step limit and the start lines, then m's trace.env.
+func TraceEnv(m domain.Manifest, opts trace.Options) []string {
+	env := []string{"VIZ_MAX_STEPS=" + strconv.Itoa(opts.MaxSteps)}
+	if len(opts.StartAtLines) > 0 {
+		lines := make([]string, len(opts.StartAtLines))
+		for i, line := range opts.StartAtLines {
+			lines[i] = strconv.Itoa(line)
+		}
+		env = append(env, "VIZ_START_AT_LINES="+strings.Join(lines, ","))
+	}
+	return append(env, m.TraceEnv...)
 }
 
 func lineCount(src string) int {

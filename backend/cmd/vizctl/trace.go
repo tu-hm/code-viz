@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -146,7 +145,7 @@ func record(ctx context.Context, m domain.Manifest, src, stdin []byte, opts trac
 	defer cancelTrace()
 	exit, err := box.Run(traceCtx, ports.Command{
 		Args:   m.TraceCmd,
-		Env:    append([]string{"VIZ_MAX_STEPS=" + strconv.Itoa(opts.MaxSteps)}, m.TraceEnv...),
+		Env:    app.TraceEnv(m, opts),
 		Stdout: rec.Stdout(),
 		Stderr: rec.Stderr(),
 		Wire:   rec.Wire(),
