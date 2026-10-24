@@ -1,4 +1,4 @@
-import type { EditorView } from '@codemirror/view'
+import { EditorView } from '@codemirror/view'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import {
   createCodeView,
@@ -20,6 +20,7 @@ type CodePaneProps = {
   editorMode: string
   state: StepState | null
   breakpoints: number[]
+  revealed: { line: number } | null
   lineHits: Summary['lineHits']
   lineHitsSource: Summary['lineHitsSource']
   fontSize: Settings['fontSize']
@@ -53,6 +54,7 @@ export function CodePane({
   editorMode,
   state,
   breakpoints,
+  revealed,
   lineHits,
   lineHitsSource,
   fontSize,
@@ -103,6 +105,17 @@ export function CodePane({
   }, [focus])
 
   useEffect(() => setFontSize(view.current!, fontSize), [fontSize])
+
+  useEffect(() => {
+    if (revealed === null) return
+    const v = view.current!
+    const { from } = v.state.doc.line(revealed.line)
+    v.dispatch({
+      selection: { anchor: from },
+      effects: EditorView.scrollIntoView(from, { y: 'center' }),
+    })
+    v.focus()
+  }, [revealed])
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted">

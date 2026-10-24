@@ -7,6 +7,9 @@ export const speeds = [0.5, 1, 2, 4] as const
 export const densities = ['compact', 'comfortable'] as const
 export const fontSizes = ['s', 'm', 'l'] as const
 export const themes = ['system', 'light', 'dark'] as const
+export const viewAs = ['table', 'cells'] as const
+
+export type ViewAs = (typeof viewAs)[number]
 
 export type Settings = {
   maxSteps: number
@@ -37,11 +40,15 @@ type PlayerState = {
   jumpChange: string
   jumpCall: string | null
   notice: string | null
+  views: Record<string, ViewAs>
+  revealed: { line: number } | null
   go: (step: number) => void
   setPlaying: (playing: boolean) => void
   updateSettings: (patch: Partial<Settings>) => void
   setSplit: (split: number) => void
   toggleBreakpoint: (line: number) => void
+  setView: (variable: string, view: ViewAs) => void
+  revealLine: (line: number) => void
 }
 
 export const defaultSettings: Settings = {
@@ -117,6 +124,8 @@ export const usePlayer = create<PlayerState>()(
       jumpChange: '',
       jumpCall: null,
       notice: null,
+      views: {},
+      revealed: null,
       go: (step) => set({ step, playing: false, notice: null }),
       setPlaying: (playing) => set({ playing }),
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
@@ -127,6 +136,8 @@ export const usePlayer = create<PlayerState>()(
             ? breakpoints.filter((b) => b !== line)
             : [...breakpoints, line].sort((a, b) => a - b),
         })),
+      setView: (variable, view) => set(({ views }) => ({ views: { ...views, [variable]: view } })),
+      revealLine: (line) => set({ revealed: { line } }),
     }),
     {
       name: 'viz-player',

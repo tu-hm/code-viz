@@ -39,3 +39,8 @@ if (typeof Range !== 'undefined') {
   Range.prototype.getClientRects = () => Object.assign([], { item: () => null })
   Range.prototype.getBoundingClientRect = () => new DOMRect()
 }
+
+// jsdom has no scrollIntoView; the state pane keeps the active frame in view with it
+if (typeof Element !== 'undefined') {
+  Element.prototype.scrollIntoView = () => {}
+}

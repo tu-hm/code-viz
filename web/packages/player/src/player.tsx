@@ -23,6 +23,7 @@ import {
 } from './output.tsx'
 import { useSession, type LoadedTrace } from './session.ts'
 import { SettingsDialog } from './settings.tsx'
+import { StatePane } from './state-pane.tsx'
 import { StatusBar } from './status-bar.tsx'
 import { useStepParam } from './step-param.ts'
 import { usePlayer } from './store.ts'
@@ -34,7 +35,6 @@ export type LanguageInfo = {
 }
 
 type Slots = {
-  statePane?: ReactNode
   share?: ReactNode
   banner?: ReactNode
 }
@@ -196,6 +196,7 @@ function CodeBox({
   const state = usePlayer((s) => s.current)
   const breakpoints = usePlayer((s) => s.breakpoints)
   const fontSize = usePlayer((s) => s.settings.fontSize)
+  const revealed = usePlayer((s) => s.revealed)
   const toggleBreakpoint = usePlayer((s) => s.toggleBreakpoint)
   return (
     <CodePane
@@ -203,6 +204,7 @@ function CodeBox({
       editorMode={editorMode}
       state={state}
       breakpoints={breakpoints}
+      revealed={revealed}
       lineHits={header.summary.lineHits}
       lineHitsSource={header.summary.lineHitsSource}
       fontSize={fontSize}
@@ -272,6 +274,38 @@ function OutputBox({ trace }: { trace: LoadedTrace }) {
   )
 }
 
+function StateBox({
+  languageId,
+  pointers,
+  onShowRange,
+}: {
+  languageId: string
+  pointers: boolean
+  onShowRange?: (variable: string) => void
+}) {
+  const state = usePlayer((s) => s.current)
+  const showInternals = usePlayer((s) => s.settings.showInternals)
+  const showUnreachable = usePlayer((s) => s.settings.showUnreachable)
+  const highlightChanges = usePlayer((s) => s.settings.highlightChanges)
+  const views = usePlayer((s) => s.views)
+  const updateSettings = usePlayer((s) => s.updateSettings)
+  const revealLine = usePlayer((s) => s.revealLine)
+  const setView = usePlayer((s) => s.setView)
+  return (
+    <StatePane
+      state={state}
+      languageId={languageId}
+      pointers={pointers}
+      settings={{ showInternals, showUnreachable, highlightChanges }}
+      views={views}
+      onShowInternals={() => updateSettings({ showInternals: true })}
+      onFrameLine={revealLine}
+      onView={setView}
+      onShowRange={onShowRange}
+    />
+  )
+}
+
 function SettingsBox({ language, header }: { language: LanguageInfo; header: TraceHeader }) {
   const settings = usePlayer((s) => s.settings)
   const updateSettings = usePlayer((s) => s.updateSettings)
@@ -309,7 +343,7 @@ function Shell({
   onClose,
   onStartAt,
   onRaiseLimit,
-  statePane,
+  onShowRange,
   share,
   banner,
 }: Omit<PlayerProps, 'source' | 'expected'> & { trace: LoadedTrace }) {
@@ -341,7 +375,13 @@ function Shell({
           <ControlsBox trace={trace} />
         </div>
         <Divider split={split} onSplit={setSplit} />
-        <div className="min-h-0 overflow-auto">{statePane}</div>
+        <div className="min-h-0 overflow-auto">
+          <StateBox
+            languageId={header.language.id}
+            pointers={language.visualize.capabilities.pointers}
+            onShowRange={onShowRange}
+          />
+        </div>
         <StdinPanel stdin={stdin} />
         <OutputBox trace={trace} />
       </div>

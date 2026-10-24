@@ -2,6 +2,7 @@ import { proxy } from 'comlink'
 import { useEffect, useEffectEvent, useState } from 'react'
 import type { Print } from './compare.ts'
 import type { Ending } from './ending.ts'
+import { same, type StepState } from './engine.ts'
 import type { TraceHeader, TraceSource } from './load.ts'
 import type { Jump } from './search.ts'
 import { spawnEngine } from './spawn-engine.ts'
@@ -20,6 +21,22 @@ export type LoadedTrace = {
 
 type Session =
   { status: 'loading' } | ({ status: 'ready' } & LoadedTrace) | { status: 'failed'; error: unknown }
+
+// worker sends a fresh copy => keep unchanged objects, so memoized cards and frames skip them
+function reuse(prev: StepState | null, next: StepState): StepState {
+  if (prev === null) return next
+  const heap: StepState['heap'] = {}
+  for (const [id, o] of Object.entries(next.heap)) {
+    const old = prev.heap[id]
+    heap[id] = old !== undefined && same(old, o) ? old : o
+  }
+  const frames = new Map(prev.stack.map((f) => [f.id, f]))
+  const stack = next.stack.map((f) => {
+    const old = frames.get(f.id)
+    return old !== undefined && same(old, f) ? old : f
+  })
+  return { ...next, heap, stack }
+}
 
 export function useSession(source: TraceSource, expected: string): Session {
   const [session, setSession] = useState<Session>({ status: 'loading' })
@@ -49,7 +66,7 @@ export function useSession(source: TraceSource, expected: string): Session {
       remote.step(k).then((state) => {
         busy = false
         if (!alive) return
-        usePlayer.setState({ current: state })
+        usePlayer.setState(({ current }) => ({ current: reuse(current, state) }))
         if (usePlayer.getState().step !== k) show()
       }, fail)
     }
@@ -73,6 +90,7 @@ export function useSession(source: TraceSource, expected: string): Session {
         jumpChange: '',
         jumpCall: null,
         notice: null,
+        revealed: null,
       })
       ready = true
       setSession({ status: 'ready', ...opened, find: (from, jump) => remote.find(from, jump) })
