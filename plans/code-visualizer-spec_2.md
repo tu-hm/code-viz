@@ -97,6 +97,7 @@
 | v1.5 | 2026-10-23 | **G1: the production sandbox is nsjail (D10), not gVisor (D9).** Spike S1b: gVisor runs GDB, but a 1,000-step trace takes 7–9 s on its default platform (target 3 s) and `personality(ADDR_NO_RANDOMIZE)` fails, so traces aren't deterministic (§7.12). nsjail: 1.5 s, 4–8 ms starts, ASLR off. Worker pods run privileged on the runner node pool. Report: `plans/spikes/s1b-sandbox.md`. |
 | v1.7 | 2026-10-24 | **Object storage is SeaweedFS on the server's own disk** (D4), because our infrastructure may have no managed S3. The M1 beta runs `vizd --role=all` and SeaweedFS on one server. Presigned URLs stay (D7). SeaweedFS only partly supports lifecycle rules, so the nightly cleanup deletes expired chunks with their rows (§7.5, §7.8). **API rules (BE-06):** `wait` without `since` returns at once; a detached visualization reads `canceled`; a repeated `Idempotency-Key` returns the same visualization in its current state; a cache hit inherits the trace's expiry; only the caller that created a visualization can delete it, while its ID stays the read key (§8.2, §8.3, §8.5, §12). `POST` bodies must be `application/json`, and an anonymous caller's quota counts per IPv4 address or IPv6 /64 (§11, §12). |
 | v1.6 | 2026-10-24 | **Python tracer contract (BE-03).** The Python build step is a check (`tracer.py --check`): syntax errors become `compile_error` with diagnostics, blocked imports `unsupported_module` (§7.11.1, §10.2). The trace runs with `python3 -s -P` and `PYTHONHASHSEED=0` instead of `-I`, which ignored the seed, so set order changed between runs (§7.12). Wire `exit` carries the tracer's `lineHits`. A tracer sends one step past `maxSteps` to mark that the program went on, and the core keeps reading for the untraced tail instead of killing (§10.1, D25). §11 says what the heap-object and size limits do to a Python trace. |
+| v1.8 | 2026-10-24 | **C++ build (BE-07) and spike S7.** A request can switch the C++ safety checks off with `options.safetyChecks: false`, which is part of the cache key; a language without checks rejects `false` (§8.2). The manifest gets `build.safetyFlags` and `build.env` (§10.2). The runner image is GCC 13.5 and GDB 14.2 with one precompiled header per check mode. GCC diagnostics in system headers point at the user line that led to them, and §8.3's `raw` now shows GCC's real output (§7.11.2). `viz-shim` forwards fd 1/2 output written before a wire line ahead of it, so C++ output lands on the right step (§10.1). **S7 (input for G5, not decided):** `_GLIBCXX_DEBUG` makes heap operations, `lower_bound` and pb_ds trees check the whole container on every call. 3 of 10 CP solutions didn't finish in 60 s (0.1–0.4 s unchecked), and 6 of 9 measured ran over 3×. `-D_GLIBCXX_ASSERTIONS -fsanitize=undefined -fno-sanitize=null,alignment,pointer-overflow` stays within 3× on every program measured, but drops iterator checks; D21 stays as it is until G5. `build.cmd` adds `--param ggc-min-heapsize=32768 --param ggc-min-expand=30`: GCC sized its heap from the host's RAM, so checked builds that skip the precompiled header were OOM-killed at 256 MB. Builds take 0.3–0.8 s with the header. Report: `plans/spikes/s7-safety-checks.md`. |
 
 ---
 
@@ -821,9 +822,9 @@ Database load stays small. Each job costs about 4 row writes, 3 queue writes (in
 
 #### 7.11.2 C++17 (GCC 13)
 
-- **Build:** `g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer main.cpp /opt/viz/flush_init.cpp -o main`
-- **Safety checks and coverage (default, D21):** the build also adds `-D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all --coverage -Wall -Wextra -Wshadow`, with a matching precompiled header (§19.6).
-- **Precompiled header:** the runner image ships `bits/stdc++.h.gch`, built with the **same** flags. GCC uses it automatically for `#include <bits/stdc++.h>`, which cuts about 1–2 s from typical competitive-programming code. Spike S1 measures the real gain.
+- **Build:** `g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 main.cpp /opt/viz/flush_init.cpp -o main`. `--coverage` gives line hits (§19.9.3), the warnings feed the warnings panel (§19.6), plain output keeps `raw` to one diagnostic per line, and the `ggc` params make GCC collect garbage early: it sizes its heap from the host's RAM, not the box's 256 MB (spike S7).
+- **Safety checks (default, D21):** the build also adds `-D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all` (manifest `build.safetyFlags`) unless the request sets `options.safetyChecks: false` (§8.2, §19.6). Spike S7 found `_GLIBCXX_DEBUG` too slow for CP code and proposes lighter flags for G5 (§0.3 v1.8).
+- **Precompiled headers:** the runner image ships a `bits/stdc++.h.gch/` directory with two headers, one built with the build flags and one with the safety flags added. GCC tries both and uses the one whose `_GLIBCXX_DEBUG` matches the build. Each must be built with exactly its build's flags: GCC doesn't check most flags, and a header built with a different `-fsanitize` can crash it. With the header, a typical CP build takes 0.3–0.8 s (S7); a source with a `#pragma` or another `#include` before `<bits/stdc++.h>` builds without it.
 - **Forced flushing:** `flush_init.cpp` sets stdout to unbuffered and turns on `std::unitbuf` before `main()` runs. Output then appears at the step that printed it, even when the user calls `ios::sync_with_stdio(false)`:
 
   ```cpp
@@ -1307,11 +1308,15 @@ This keeps adapters small and makes every language behave the same way.
 id: cpp17-gcc
 displayName: "C++17 (GCC 13)"
 editorMode: c_cpp
-image: registry.internal/viz-runner-cpp:13.2-gdb14-1
+image: registry.internal/viz-runner-cpp:13.5-gdb14-1
 sourceFile: main.cpp
 build:
   cmd: ["g++", "-std=gnu++17", "-O0", "-g3", "-fno-omit-frame-pointer",
+        "--coverage", "-Wall", "-Wextra", "-Wshadow", "-fdiagnostics-plain-output",
+        "--param", "ggc-min-heapsize=32768", "--param", "ggc-min-expand=30",
         "main.cpp", "/opt/viz/flush_init.cpp", "-o", "main"]
+  safetyFlags: ["-D_GLIBCXX_DEBUG", "-fsanitize=undefined", "-fno-sanitize-recover=all"]
+  env: { TMPDIR: /work }    # g++ writes temp files; only /work is writable
   timeoutMs: 10000
 trace:
   cmd: ["gdb", "-q", "-nx", "-batch", "-x", "/opt/viz/trace.py", "--args", "./main"]
@@ -1328,6 +1333,8 @@ typeMap: /opt/viz/typemap.yaml
 enabled: true
 rollout: { percent: 100 }
 ```
+
+`build.safetyFlags` go after `build.cmd` unless the request sets `options.safetyChecks: false` (§8.2); a manifest without them rejects `false`. `build.env` is added to the build's environment.
 
 The Python manifest is the same apart from the build, a check instead of a compiler (`build.cmd: ["python3", "-I", "/opt/viz/tracer.py", "--check", "main.py"]`, with `build.unsupportedModuleExit: 3` naming the exit code that means `unsupported_module`), `trace.cmd: ["python3", "-s", "-P", "/opt/viz/tracer.py", "main.py"]` with `PYTHONHASHSEED: "0"` in `trace.env` (§7.11.1), `capabilities.pointers: false`, and a `modules.allow` list. The worker passes `modules.allow` to the build as `VIZ_MODULES_ALLOW` (comma-separated) and `options.maxSteps` to the trace as `VIZ_MAX_STEPS`.
 
