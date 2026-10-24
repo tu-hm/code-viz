@@ -1013,11 +1013,14 @@ A visualization lives until its trace expires. A cache hit on an older trace inh
     "maxSteps": 1000,
     "startAtLines": [],
     "captureRanges": { "depth": [[0, 50]] },
-    "showInternals": false
+    "showInternals": false,
+    "safetyChecks": true
   },
   "context": { "problemCode": null, "client": "ide-web/4.12.0" }
 }
 ```
+
+`safetyChecks` is optional and on unless it is `false` (D21, §19.6). `false` builds without the language's safety checks, which is a different trace, so it's part of the cache key; `true` and leaving it out build the same program. A language without safety checks (Python) rejects `false` with `400 invalid_request`.
 
 A successful request always returns **`201 Created`**, with `Location` and the same body as `GET` (§8.3). If an identical trace is already completed, `status` is `completed` immediately (a cache hit).
 
@@ -1103,7 +1106,7 @@ A failed build:
     "diagnostics": [
       { "line": 6, "column": 14, "severity": "error", "message": "expected ';' before 'return'" }
     ],
-    "raw": "main.cpp:6:14: error: expected ';' before 'return'"
+    "raw": "main.cpp: In function 'int main()':\nmain.cpp:6:14: error: expected ';' before 'return'\n"
   }
 }
 ```
@@ -1285,7 +1288,7 @@ The tracer writes NDJSON (one JSON message per line) to **file descriptor 3**. T
 | `exit` | `kind`, `code`, `signal`, `message`, `lineHits?` | Must be the last message. `lineHits` (`{"<line>": count}`, the tracer's own counter over the whole run) is copied to `summary.lineHits` with `lineHitsSource: "counter"` (§19.9.3). |
 | `log` | `level`, `message` | Adapter debug output. Kept in internal logs, never shown to users. |
 
-- **Output belongs to the next step.** Output that arrives between step k−1 and step k, in `out` messages or on fd 1/2 by arrival order, was printed while step k's `prevLine` ran, so it goes to step k. Output after the last step goes to the last step, or to the untraced tail when the trace stopped at the step limit.
+- **Output belongs to the next step.** Output that arrives between step k−1 and step k, in `out` messages or on fd 1/2 (`viz-shim` forwards everything the program wrote there before the tracer began a wire line ahead of that line), was printed while step k's `prevLine` ran, so it goes to step k. Output after the last step goes to the last step, or to the untraced tail when the trace stopped at the step limit.
 - **Step limit (D25).** The core passes `VIZ_MAX_STEPS` in the tracer's environment. A tracer sends at most `maxSteps + 1` steps; the extra one only marks that the program went on. The core drops it and any later step, records `truncation.step_limit`, and keeps reading `out` and `exit` to fill `summary.untracedTail` (§19.9.5). This is not a kill.
 
 Adapters always send full snapshots. The core then:
