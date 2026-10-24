@@ -80,6 +80,30 @@ Everything listens on 127.0.0.1 only.
 | 13306 | MySQL (user `viz`, password `viz`, database `viz`). Not 3306, so it doesn't clash with a local MySQL. |
 | 8333 | SeaweedFS S3 API, with no auth |
 
+## Look at the data
+
+**MySQL.** Connect to `127.0.0.1:13306` as `viz` with password `viz`, database `viz`. GUI clients such as TablePlus or DBeaver fill in port 3306, so change it. Without a local client, use the one in the container:
+
+```sh
+docker compose exec mysql mysql -uviz -pviz viz
+```
+
+With a local client (`brew install mysql-client`), pass `-h 127.0.0.1`, not `localhost`. With `localhost` the client uses a Unix socket and ignores `-P`:
+
+```sh
+mysql -h 127.0.0.1 -P 13306 -uviz -pviz viz
+```
+
+**SeaweedFS.** Trace chunks are gzipped JSON files in the `viz-traces` bucket. On OrbStack, the filer has a web file browser at <http://seaweedfs.code-viz.orb.local:8888/buckets/viz-traces/>. Compose doesn't publish port 8888, but OrbStack gives each container a `.orb.local` name. With any Docker, use the AWS CLI against the S3 API. Auth is off, so any keys work, but the CLI needs some to sign with:
+
+```sh
+export AWS_ACCESS_KEY_ID=viz AWS_SECRET_ACCESS_KEY=viz AWS_REGION=us-east-1
+aws --endpoint-url http://127.0.0.1:8333 s3 ls s3://viz-traces --recursive
+aws --endpoint-url http://127.0.0.1:8333 s3 cp s3://viz-traces/<key> - | gunzip
+```
+
+Name the bucket: `aws s3 ls` without one prints nothing. A desktop S3 client such as Cyberduck works too: server `127.0.0.1`, port 8333, plain HTTP, path `/viz-traces`.
+
 ## Settings
 
 `make` reads `.env.example`, then `.env` if you created one, and exports both to vizd. To change a setting, copy `.env.example` to `.env` and edit the copy. `.env` is git-ignored.
@@ -119,5 +143,7 @@ Everything listens on 127.0.0.1 only.
 ```sh
 export DOCKER_HOST=$(docker context inspect --format '{{.Endpoints.docker.Host}}')
 ```
+
+**`Access denied for user 'viz'`.** Check the port first. Port 3306 may belong to another MySQL or MariaDB on your machine, and the `viz` user only exists on 13306. If 13306 refuses it too, the `mysql` volume is older than your change to `MYSQL_USER` or `MYSQL_PASSWORD` in `compose.yaml`. MySQL applies them only when it creates an empty data directory. `make reset` deletes the data so the next `make dev` creates the user again.
 
 **MySQL won't become healthy.** If `docker compose logs mysql` shows a broken data directory, run `make reset` to start from empty volumes.
