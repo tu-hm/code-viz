@@ -13,68 +13,68 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 
 ## 1. `@viz/player` skeleton (M0-15 · 1 d · week 2)
 
-- [ ] `loadTrace(source)`: header + chunk list from a file (fixtures) or an API response (§8.3)
-- [ ] Fetch chunks in order, gunzip if not done by the browser, **verify `sha256`** before use (§8.4)
-- [ ] Unknown fields ignored; unknown `kind` → `opaque`, unknown `t` → plain text (§9.7)
-- [ ] Refresh expired chunk URLs: if `urlsExpireAt` has passed, re-`GET /visualizations/{id}` before fetching (§8.4)
-- [ ] Typed errors: checksum mismatch, network, schema version too new
-- [ ] **Done:** loads every fixture
+- [x] `loadTrace(source)`: header + chunk list from a file (fixtures) or an API response (§8.3) — `@viz/player` `load.ts`; the API source takes the manifest plus a `refresh` callback the host wires to its client (FE-04)
+- [x] Fetch chunks in order, gunzip if not done by the browser, **verify `sha256`** before use (§8.4) — hash over the bytes as received; against `make dev` every chunk fails it, because the backend hashes the gzip object it serves with `Content-Encoding: gzip` (open, backend side)
+- [x] Unknown fields ignored; unknown `kind` → `opaque`, unknown `t` → plain text (§9.7)
+- [x] Refresh expired chunk URLs: if `urlsExpireAt` has passed, re-`GET /visualizations/{id}` before fetching (§8.4) — checked before every chunk; seen against the real API
+- [x] Typed errors: checksum mismatch, network, schema version too new — `ChecksumError`, `NetworkError`, `VersionError` by `name`, so they survive Comlink
+- [x] **Done:** loads every fixture — and the eight real Python traces in `backend/fixtures/python`
 
 ## 2. Trace engine in a Web Worker (M0-16 · 3 d · weeks 2–3)
 
-- [ ] Worker via Comlink; main thread only receives materialized steps
-- [ ] Rebuild step `k`: nearest keyframe ≤ `k`, then apply deltas (frames/objects replaced whole, `removedObjects` dropped, `stack` from step `k`) (§9.6)
-- [ ] 200-step LRU of materialized states
-- [ ] Prefetch neighbours (k ± 2) so Next/Prev hit the cache
-- [ ] Apply v1.1 sparse `patch` onto sparse sequences (§19.9.1) — fixtures until BE-09
-- [ ] Per-step derived data the views need: changed values vs previous step, new objects, stdout up to step `k`
-- [ ] Unit tests: random-access equals sequential replay on every fixture
-- [ ] **Done:** ≤ 16 ms per step on the 1,000-step fixture (mid-range laptop profile)
+- [x] Worker via Comlink; main thread only receives materialized steps — the worker also fetches and parses the chunks
+- [x] Rebuild step `k`: nearest keyframe ≤ `k`, then apply deltas (frames/objects replaced whole, `removedObjects` dropped, `stack` from step `k`) (§9.6) — starts from a cached step `k − 1` when there is one
+- [x] 200-step LRU of materialized states
+- [x] Prefetch neighbours (k ± 2) so Next/Prev hit the cache
+- [x] Apply v1.1 sparse `patch` onto sparse sequences (§19.9.1) — fixtures until BE-09
+- [x] Per-step derived data the views need: changed values vs previous step, new objects, stdout up to step `k` — `StepState.changed` (locals by frame, cells by object), `newObjects`, `output` segments with the current step marked
+- [x] Unit tests: random-access equals sequential replay on every fixture
+- [x] **Done:** ≤ 16 ms per step on the 1,000-step fixture (mid-range laptop profile) — worst step 1.4 ms (engine + copy out, median of 3 cold runs); keydown to DOM in Chrome p50 0.4 ms, max 2 ms
 
 ## 3. Controls, slider, keyboard (M0-18 · 1.5 d · week 3)
 
-- [ ] Step counter "Step N of M · <event> <detail>"
-- [ ] Start `|◀`, Prev, Next, End `▶|`, slider (scrub, throttled to animation frames)
-- [ ] Shortcuts (§5.9): `←` `→` `Home` `End` `Esc`; `Shift+→` / `Shift+↑` wired once FE-10 lands
-- [ ] Shortcuts disabled while typing in inputs
-- [ ] Current step in Zustand; URL `?step=` kept in sync (used by FE-12)
-- [ ] **Done:** all §5.9 shortcuts work
+- [x] Step counter "Step N of M · <event> <detail>"
+- [x] Start `|◀`, Prev, Next, End `▶|`, slider (scrub, throttled to animation frames)
+- [ ] Shortcuts (§5.9): `←` `→` `Home` `End` `Esc`; `Shift+→` / `Shift+↑` wired once FE-10 lands — all but the Shift pair; plain arrows ignore modified keys, so FE-10 adds two cases in `keys.ts`
+- [x] Shortcuts disabled while typing in inputs — also inside dialogs, and for the keys a focused slider, divider or button uses itself
+- [x] Current step in Zustand; URL `?step=` kept in sync (used by FE-12) — 1-based, as shown; written 300 ms after stepping stops (Safari's `replaceState` limit)
+- [ ] **Done:** all §5.9 shortcuts work — all but step over and step out (FE-10)
 
 ## 4. Visualizer shell & settings (new · 2 d · M1 weeks 4–6)
 
 **Layout (§5.2, §19.3)**
-- [ ] Header: language, file name, "Safety checks: on/off" (C++), Settings, Share (slot for FE-12), Open in new tab, Close (`Esc`)
-- [ ] Left: code pane (FE-03) + controls; right: state pane (FE-06 / FE-08 / FE-11 slots)
-- [ ] Bottom row: STDIN (read-only) and STDOUT/STDERR **up to the current step**, stderr in red, current step's text highlighted
-- [ ] Status bar: exit status, step count, banner slot (FE-05)
-- [ ] Draggable divider, width saved in `localStorage`
+- [ ] Header: language, file name, "Safety checks: on/off" (C++), Settings, Share (slot for FE-12), Open in new tab, Close (`Esc`) — all in; Share is a `share` slot and Open in new tab shows once FE-12 passes a `permalink`
+- [ ] Left: code pane (FE-03) + controls; right: state pane (FE-06 / FE-08 / FE-11 slots) — `codePane` and `statePane` slots wait on those tasks
+- [x] Bottom row: STDIN (read-only) and STDOUT/STDERR **up to the current step**, stderr in red, current step's text highlighted
+- [ ] Status bar: exit status, step count, banner slot (FE-05) — `banner` slot waits on FE-05
+- [x] Draggable divider, width saved in `localStorage` — also ← / → when focused
 
 **Settings (§5.7, §19.3 display options)**
-- [ ] Max steps, autoplay speed, draw arrows, highlight changes, show unreachable objects, matrix view, show memory addresses, show compiler internals, safety checks (C++)
-- [ ] Display: density (Compact / Comfortable), font size S/M/L, theme light/dark/system
-- [ ] Hide settings the language can't support, from manifest `capabilities` (FR-24)
-- [ ] Persist in `localStorage` (anonymous); profile storage hook for signed-in users
-- [ ] "Max steps" and "safety checks" apply on the next run (say so in the UI)
+- [x] Max steps, autoplay speed, draw arrows, highlight changes, show unreachable objects, matrix view, show memory addresses, show compiler internals, safety checks (C++)
+- [x] Display: density (Compact / Comfortable), font size S/M/L, theme light/dark/system
+- [x] Hide settings the language can't support, from manifest `capabilities` (FR-24) — memory addresses follow `pointers`; the manifest has no safety-checks capability, so that setting shows when the trace's `options.safetyChecks` is set
+- [ ] Persist in `localStorage` (anonymous); profile storage hook for signed-in users — `localStorage` done, each field validated on load; profile storage waits on the API auth decision (`usePlayer.persist.setOptions({ storage })` is where it plugs in)
+- [x] "Max steps" and "safety checks" apply on the next run (say so in the UI)
 
-- [ ] **Done:** the §5.3 layout renders around the fixture views; settings survive a reload
+- [ ] **Done:** the §5.3 layout renders around the fixture views; settings survive a reload — settings survive; the views come with FE-03 and FE-06. `?fixture=<name>` under `pnpm dev` shows the shell
 
 ## 5. Autoplay (M3-F06 · 1.5 d)
 
-- [ ] Play/pause button and `Space`
-- [ ] Speeds 0.5×, 1×, 2×, 4× (1× = 2 steps/s)
-- [ ] Stops at error steps and at breakpoints (FE-03 gutter)
-- [ ] Stops at the last step; any manual navigation pauses
-- [ ] Respects `prefers-reduced-motion` for highlight fades only (stepping still works)
-- [ ] **Done:** §5.9 rules pass as unit tests
+- [x] Play/pause button and `Space`
+- [x] Speeds 0.5×, 1×, 2×, 4× (1× = 2 steps/s)
+- [ ] Stops at error steps and at breakpoints (FE-03 gutter) — error steps done; it also stops at `usePlayer` `breakpoints`, which waits on the FE-03 gutter to fill it
+- [x] Stops at the last step; any manual navigation pauses — Play on the last step starts over
+- [x] Respects `prefers-reduced-motion` for highlight fades only (stepping still works)
+- [x] **Done:** §5.9 rules pass as unit tests
 
 ## 6. Performance (M3-F12 · 2 d)
 
-- [ ] Profile on the 5,000-step fixture with 500 heap objects
-- [ ] Memory under 300 MB (heap snapshot in CI perf job)
-- [ ] Virtualize long heap columns / containers (TanStack Virtual)
-- [ ] No layout shift between steps (§19.10)
-- [ ] Perf budget test in CI: fail if stepping on the 1,000-step fixture goes over 16 ms
-- [ ] **Done:** §13 step-navigation target met on 5,000 steps
+- [x] Profile on the 5,000-step fixture with 500 heap objects — rebuild 0.08 ms on average; the copy to the main thread (175 KB, 1.6 ms) is the cost; p99 4.5 ms
+- [x] Memory under 300 MB (heap snapshot in CI perf job) — a forced-GC heap check in `pnpm test`: 53 MB for the trace plus a full cache; the main thread used 75 MB in Chrome
+- [ ] Virtualize long heap columns / containers (TanStack Virtual) — needs the heap view (FE-06)
+- [x] No layout shift between steps (§19.10) — for the shell: no box moved over 325 steps in Chrome; the views bring their own (FE-06)
+- [x] Perf budget test in CI: fail if stepping on the 1,000-step fixture goes over 16 ms — `engine.perf.test.ts`
+- [ ] **Done:** §13 step-navigation target met on 5,000 steps — met for the engine and shell (keydown to DOM max 6.1 ms in Chrome); not measured with the views, which don't exist yet
 
 ## Done when
 
