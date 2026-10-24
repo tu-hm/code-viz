@@ -60,11 +60,11 @@ Hand-written until real traces arrive (C++ from S1 on Fri 6 Nov, Python on Fri 4
 **Config**
 - [x] `VITE_API_BASE_URL` (default `http://localhost:8080/api/v1`) and `VITE_USE_MSW=true|false`; `.env.example` in `apps/ide`
 - [x] MSW handlers built from the OpenAPI `examples` (§8), with a scenario switch (completed, failed build, busy, slow tracing) — `?scenario=`
-- [ ] `pnpm dev` works with MSW only (no backend) and against `make dev` (BE-13 §1) — MSW half done (the default under `pnpm dev`); the `make dev` half waits on the API (BE-06)
+- [x] `pnpm dev` works with MSW only (no backend) and against `make dev` (BE-13 §1) — MSW is the default under `pnpm dev`; `VITE_USE_MSW=false pnpm dev` visualizes Python and C++ from the real API (FE-04, 24 Oct)
 
 **Against the local stack**
 - [ ] Load seeded traces from `make seed` (Python + C++) without running jobs
-- [ ] Verify CORS for the API and for presigned SeaweedFS chunk URLs (`S3_PUBLIC_ENDPOINT`, BE-06 §3) from the Vite dev origin
+- [x] Verify CORS for the API and for presigned SeaweedFS chunk URLs (`S3_PUBLIC_ENDPOINT`, BE-06 §3) from the Vite dev origin — in Chrome from `http://localhost:5173`: the preflighted POST with `Idempotency-Key`, the long-poll, DELETE and the chunk downloads (24 Oct)
 - [x] Note common problems in the web README (CORS origin missing, MSW still on, Docker not running)
 
 **App plumbing**
