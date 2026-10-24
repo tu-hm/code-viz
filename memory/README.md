@@ -49,4 +49,5 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 
 - [Lease rules](backend/lease-rules.md): what keeps a stale worker from writing, and the gap the lease leaves in object storage
 - [Share links](backend/share-links.md): a link is its own row, never found by "owned" lookups, expiring with the owner's row; `t7/` stays until the cleanup
+- [Seed through the queue](backend/seed-through-the-queue.md): `vizd seed` uses Create, Claim and Complete, never seed-only SQL
 - [Telemetry off by default](backend/telemetry-off-by-default.md): `/metrics` needs `VIZ_METRICS=true`, spans need `OTEL_EXPORTER_OTLP_ENDPOINT`, Jaeger is a compose profile

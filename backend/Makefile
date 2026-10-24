@@ -72,6 +72,7 @@ seed:
 		--data-binary "<CORSConfiguration><CORSRule>$$origins<AllowedMethod>GET</AllowedMethod><ExposeHeader>Content-Length</ExposeHeader><ExposeHeader>ETag</ExposeHeader></CORSRule></CORSConfiguration>" \
 		"$(S3_ENDPOINT)/$(S3_BUCKET)?cors") && \
 	test "$$code" = 200 || { echo "seed: set CORS on $(S3_BUCKET): HTTP $$code" >&2; exit 1; }
+	go run ./cmd/vizd seed fixtures
 
 lint:
 	$(GOLANGCI_LINT) run ./...

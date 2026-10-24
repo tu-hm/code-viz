@@ -83,6 +83,8 @@ func run() (err error) {
 	switch flag.Arg(0) {
 	case "migrate":
 		return mysql.Migrate(ctx, db, flag.Arg(1))
+	case "seed":
+		return seed(ctx, db, cfg.Env, flag.Arg(1))
 	}
 
 	if *role != "api" && *role != "worker" && *role != "all" {
