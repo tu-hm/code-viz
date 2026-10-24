@@ -5,7 +5,7 @@
   },
   "id": "trc_0",
   "language": {
-    "adapter": "cpp-gdb/0.3.0",
+    "adapter": "cpp-gdb/0.4.0",
     "id": "cpp17-gcc",
     "runtime": "GCC 13.5.0"
   },
@@ -909,9 +909,13 @@
     },
     {
       "error": {
+        "kind": "recursion_too_deep",
         "line": 6,
         "message": "Segmentation fault",
-        "type": "SIGSEGV"
+        "type": "SIGSEGV",
+        "values": {
+          "depth": 8
+        }
       },
       "event": "exception",
       "frames": {},

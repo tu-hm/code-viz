@@ -1,0 +1,11 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    queue<int> q;
+    q.push(1);
+    q.pop();
+    int first = q.front();
+    cout << first << "\n";
+    return 0;
+}

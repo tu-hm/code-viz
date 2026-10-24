@@ -1,0 +1,178 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.4.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 9
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "s",
+              "value": {
+                "t": "uninit",
+                "type": "std::string"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 5,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "s",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "code"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 1,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "s",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "code"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "5"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": {
+        "kind": "index_out_of_range",
+        "line": 7,
+        "message": "Assertion '__pos <= size()' failed.",
+        "type": "libstdc++",
+        "values": {
+          "index": "5",
+          "name": "s",
+          "size": 4,
+          "type": "std::string"
+        }
+      },
+      "event": "exception",
+      "frames": {},
+      "heap": {},
+      "i": 3,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "/usr/local/include/c++/13.5.0/bits/basic_string.h:1258: std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::reference std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::operator[](size_type) [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>; reference = char&; size_type = long unsigned int]: Assertion '__pos <= size()' failed.\n",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": null,
+      "kind": "signal",
+      "message": null,
+      "signal": "SIGABRT"
+    },
+    "stepCount": 4,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.2"
+}

@@ -1,0 +1,584 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "py-settrace/0.2.0",
+    "id": "python3",
+    "runtime": "CPython 3.12.15"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 6
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 1,
+          "locals": [],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 1,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 2,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "id": "o2",
+              "t": "ref"
+            },
+            {
+              "id": "o3",
+              "t": "ref"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "list"
+        },
+        "o2": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "list"
+        },
+        "o3": {
+          "items": [
+            {
+              "t": "int",
+              "v": "3"
+            },
+            {
+              "t": "int",
+              "v": "4"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 2,
+      "prevLine": 1,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 3,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 3,
+      "prevLine": 2,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 4,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 3,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 3,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 5,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 4,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 4,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 5,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 4,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 5,
+          "locals": [
+            {
+              "name": "grid",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": {
+        "kind": "index_out_of_range",
+        "line": 5,
+        "message": "list index out of range",
+        "type": "IndexError",
+        "values": {
+          "index": "2",
+          "name": "grid[r]",
+          "size": 2,
+          "type": "list"
+        }
+      },
+      "event": "exception",
+      "frames": {},
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 1,
+      "kind": "exception",
+      "message": "IndexError: list index out of range",
+      "signal": null
+    },
+    "lineHits": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 3,
+      "5": 3
+    },
+    "lineHitsSource": "counter",
+    "stepCount": 10,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.2"
+}

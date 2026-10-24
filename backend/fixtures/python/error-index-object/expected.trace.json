@@ -1,0 +1,539 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "py-settrace/0.2.0",
+    "id": "python3",
+    "runtime": "CPython 3.12.15"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 9
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 1,
+          "locals": [],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 1,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 1,
+          "locals": [],
+          "name": "Slot",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 1,
+      "keyframe": false,
+      "line": 1,
+      "parentCallId": 0,
+      "prevLine": 1,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 2,
+          "locals": [
+            {
+              "name": "__module__",
+              "value": {
+                "t": "str",
+                "v": "__main__"
+              }
+            },
+            {
+              "name": "__qualname__",
+              "value": {
+                "t": "str",
+                "v": "Slot"
+              }
+            }
+          ],
+          "name": "Slot",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 2,
+      "prevLine": 1,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 2,
+          "locals": [
+            {
+              "name": "__module__",
+              "value": {
+                "t": "str",
+                "v": "__main__"
+              }
+            },
+            {
+              "name": "__qualname__",
+              "value": {
+                "t": "str",
+                "v": "Slot"
+              }
+            },
+            {
+              "name": "__index__",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "Slot",
+          "returnValue": {
+            "t": "none"
+          }
+        }
+      },
+      "heap": {
+        "o1": {
+          "kind": "function",
+          "name": "__index__",
+          "signature": "__index__(self)"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 2,
+      "prevLine": 2,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 7,
+          "locals": [
+            {
+              "name": "Slot",
+              "value": {
+                "id": "o2",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "kind": "class",
+          "name": "Slot"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 1,
+      "removedObjects": [
+        "o1"
+      ],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 8,
+          "locals": [
+            {
+              "name": "Slot",
+              "value": {
+                "id": "o2",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "row",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o3": {
+          "items": [
+            {
+              "t": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "v": "0"
+            },
+            {
+              "t": "int",
+              "v": "0"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "truncated": false,
+          "type": "list"
+        }
+      },
+      "i": 5,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 9,
+          "locals": [
+            {
+              "name": "Slot",
+              "value": {
+                "id": "o2",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "row",
+              "value": {
+                "id": "o3",
+                "t": "ref"
+              }
+            },
+            {
+              "name": "slot",
+              "value": {
+                "id": "o4",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o4": {
+          "fields": [],
+          "kind": "record",
+          "type": "Slot"
+        }
+      },
+      "i": 6,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "method",
+          "line": 3,
+          "locals": [
+            {
+              "name": "self",
+              "value": {
+                "id": "o4",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "__index__",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 3,
+      "parentCallId": 0,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "method",
+          "line": 4,
+          "locals": [
+            {
+              "name": "self",
+              "value": {
+                "id": "o4",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "__index__",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 3,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": "index read\n"
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "method",
+          "line": 4,
+          "locals": [
+            {
+              "name": "self",
+              "value": {
+                "id": "o4",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "__index__",
+          "returnValue": {
+            "t": "int",
+            "v": "7"
+          }
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": {
+        "kind": "index_out_of_range",
+        "line": 9,
+        "message": "list index out of range",
+        "type": "IndexError",
+        "values": {
+          "name": "row",
+          "size": 3,
+          "type": "list"
+        }
+      },
+      "event": "exception",
+      "frames": {},
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 1,
+      "kind": "exception",
+      "message": "IndexError: list index out of range",
+      "signal": null
+    },
+    "lineHits": {
+      "1": 2,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1
+    },
+    "lineHitsSource": "counter",
+    "stepCount": 11,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.2"
+}

@@ -5,7 +5,7 @@
   },
   "id": "trc_0",
   "language": {
-    "adapter": "py-settrace/0.1.0",
+    "adapter": "py-settrace/0.2.0",
     "id": "python3",
     "runtime": "CPython 3.12.15"
   },
@@ -10973,9 +10973,14 @@
     },
     {
       "error": {
+        "kind": "recursion_too_deep",
         "line": 7,
         "message": "maximum recursion depth exceeded",
-        "type": "RecursionError"
+        "type": "RecursionError",
+        "values": {
+          "depth": 97,
+          "limit": 100
+        }
       },
       "event": "exception",
       "frames": {},

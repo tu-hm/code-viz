@@ -104,7 +104,8 @@ var address = regexp.MustCompile(`0x[0-9a-f]+`)
 
 func mask(tr *trace.Trace) {
 	tr.ID = "trc_0"
-	for _, s := range tr.Steps {
+	for i, s := range tr.Steps {
+		tr.Steps[i].Stderr = address.ReplaceAllString(s.Stderr, "0xmasked")
 		for _, f := range s.Frames {
 			for i := range f.Locals {
 				maskAddr(&f.Locals[i].Value)
@@ -218,6 +219,53 @@ func TestTypeMapRowsHaveFixtures(t *testing.T) {
 		name := "std::" + strings.TrimPrefix(strings.TrimPrefix(row, "std::"), "basic_")
 		if !regexp.MustCompile(`"type": "` + regexp.QuoteMeta(name) + `[<"]`).Match(shown) {
 			t.Errorf("no fixtures/cpp/type-* golden shows a %s (typemap.json row %s)", name, row)
+		}
+	}
+}
+
+func TestErrorKindsHaveFixtures(t *testing.T) {
+	t.Chdir("../..")
+	raw, err := os.ReadFile(filepath.Join("schema", "trace.v1.schema.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var sch struct {
+		Defs struct {
+			ErrorKind struct {
+				Enum []trace.ErrorKind `json:"enum"`
+			} `json:"errorKind"`
+		} `json:"$defs"`
+	}
+	if err := json.Unmarshal(raw, &sch); err != nil {
+		t.Fatal(err)
+	}
+	goldens, err := filepath.Glob(filepath.Join("fixtures", "*", "*", "expected.trace.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	shown := map[trace.ErrorKind]bool{}
+	for _, golden := range goldens {
+		b, err := os.ReadFile(golden)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var tr trace.Trace
+		if err := json.Unmarshal(b, &tr); err != nil {
+			t.Fatal(err)
+		}
+		for _, s := range tr.Steps {
+			if s.Error != nil && s.Error.Kind != nil {
+				shown[*s.Error.Kind] = true
+			}
+		}
+	}
+
+	if len(sch.Defs.ErrorKind.Enum) == 0 {
+		t.Fatal("no errorKind enum in trace.v1.schema.json")
+	}
+	for _, kind := range sch.Defs.ErrorKind.Enum {
+		if !shown[kind] {
+			t.Errorf("no golden has an error step with kind %s", kind)
 		}
 	}
 }

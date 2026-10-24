@@ -1,0 +1,129 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.4.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 9
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "bit",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 5,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "bit",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "40"
+              }
+            },
+            {
+              "name": "mask",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 1,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": {
+        "line": 6,
+        "message": "shift out of bounds",
+        "type": "UBSan"
+      },
+      "event": "exception",
+      "frames": {},
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "main.cpp:6:18: runtime error: shift exponent 40 is too large for 32-bit type 'int'\n",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 1,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 3,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.2"
+}

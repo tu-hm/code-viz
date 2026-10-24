@@ -9,6 +9,7 @@ import io
 import itertools
 import json
 import opcode
+import operator
 import os
 import random
 import re
@@ -19,12 +20,13 @@ from typing import TYPE_CHECKING, Any, Literal, NoReturn, cast
 
 if TYPE_CHECKING:
     from _typeshed import TraceFunction
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Callable, Mapping, Sequence
     from collections.abc import Set as AbstractSet
-    from wire import Entry, Event, Exit, Frame, HeapObject, Local, Message, StdinPos, Step, StepError, Value
+    from wire import (Entry, ErrorValues, Event, Exit, Frame, HeapObject, Local, Message, StdinPos, Step, StepError,
+                      Value)
 
 LANGUAGE = "python3"
-ADAPTER = "py-settrace/0.1.0"
+ADAPTER = "py-settrace/0.2.0"
 SOURCE = "main.py"
 STDIN = "/work/stdin"
 MAX_ITEMS = 1000
@@ -40,6 +42,10 @@ RETURNS = {opcode.opmap["RETURN_VALUE"], opcode.opmap["RETURN_CONST"], opcode.op
 FUNCTIONS = (types.FunctionType, types.MethodType, types.BuiltinFunctionType,
              functools._lru_cache_wrapper)  # pyright: ignore[reportPrivateUsage]
 THREAD_START = threading.Thread.start.__code__
+INDEXABLE = (list, tuple, str, range, collections.deque)
+ARITHMETIC: dict[type[ast.operator], Callable[[int, int], int]] = {
+    ast.Add: int.__add__, ast.Sub: int.__sub__, ast.Mult: int.__mul__, ast.FloorDiv: int.__floordiv__,
+    ast.Mod: int.__mod__}
 
 wire: io.TextIOWrapper
 max_steps = 1000
@@ -60,6 +66,8 @@ stdin_size = 0
 stdin_read = 0
 token_ends: list[int] = []
 recursion_limit = sys.getrecursionlimit()
+source = b""
+spans: dict[tuple[int | None, int | None, int | None, int | None], ast.AST] | None = None
 set_recursion_limit = sys.setrecursionlimit
 
 
@@ -311,6 +319,72 @@ def on_call(frame: types.FrameType, event: str, arg: Any) -> TraceFunction | Non
     return on_event
 
 
+def failing_node(frame: types.FrameType) -> ast.AST | None:
+    global spans
+    if spans is None:
+        spans = {(node.lineno, node.end_lineno, node.col_offset, node.end_col_offset): node
+                 for node in ast.walk(ast.parse(source)) if isinstance(node, (ast.Subscript, ast.BinOp, ast.AugAssign))}
+    return spans.get(list(frame.f_code.co_positions())[frame.f_lasti // 2])
+
+
+def evaluate(node: ast.AST, frame: types.FrameType) -> object:
+    if isinstance(node, ast.Constant):
+        return node.value
+    if isinstance(node, ast.Name):
+        for scope in (frame.f_locals, frame.f_globals, vars(builtins)):
+            if node.id in scope:
+                return scope[node.id]
+    if isinstance(node, ast.Subscript):
+        container, key = evaluate(node.value, frame), evaluate(node.slice, frame)
+        # a key of another type can run __index__, __hash__ or __eq__
+        if (type(container) in INDEXABLE or type(container) is dict) and type(key) in (int, str):
+            return operator.getitem(cast(Any, container), key)
+    if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+        x = evaluate(node.operand, frame)
+        if type(x) is int:
+            return -x
+    if isinstance(node, ast.BinOp) and type(node.op) in ARITHMETIC:
+        a, b = evaluate(node.left, frame), evaluate(node.right, frame)
+        if type(a) is int and type(b) is int:
+            return ARITHMETIC[type(node.op)](a, b)
+    # anything else could run the program's code: a property, a __getitem__, a call
+    raise LookupError("not evaluated")
+
+
+def value_of(node: ast.AST, frame: types.FrameType) -> object:
+    try:
+        return evaluate(node, frame)
+    except (LookupError, TypeError, ArithmeticError):
+        return None
+
+
+def explain(error: StepError, frame: types.FrameType, exc: BaseException) -> None:
+    if isinstance(exc, RecursionError):
+        error["kind"] = "recursion_too_deep"
+        error["values"] = {"depth": len(stack_of(frame)), "limit": recursion_limit}
+        return
+    node = failing_node(frame)
+    if isinstance(exc, ZeroDivisionError):
+        error["kind"] = "division_by_zero"
+        if isinstance(node, ast.BinOp):
+            error["values"] = {"expr": ast.unparse(node), "divisor": ast.unparse(node.right)}
+        elif isinstance(node, ast.AugAssign):
+            error["values"] = {"expr": ast.unparse(node), "divisor": ast.unparse(node.value)}
+        return
+    # pop() on an empty list raises IndexError too: only a subscript is out of range
+    if not isinstance(exc, IndexError) or not isinstance(node, ast.Subscript):
+        return
+    values: ErrorValues = {"name": ast.unparse(node.value)}
+    container = value_of(node.value, frame)
+    if type(container) in INDEXABLE:
+        values["type"], values["size"] = type(container).__name__, len(cast("Sequence[object]", container))
+    index = value_of(node.slice, frame)
+    # a bigger one is no index at all, and str() raises past 4,300 digits
+    if type(index) is int and abs(index) < 1 << 63:
+        values["index"] = str(index)
+    error["kind"], error["values"] = "index_out_of_range", values
+
+
 def on_exception(frame: types.FrameType, exc: BaseException) -> None:
     global last_error
     raised[frame] = exc
@@ -322,7 +396,9 @@ def on_exception(frame: types.FrameType, exc: BaseException) -> None:
     if tail:
         return
     last_error = exc
-    step(frame, "exception", error={"type": type(exc).__name__, "message": str(exc), "line": frame.f_lineno})
+    error: StepError = {"type": type(exc).__name__, "message": str(exc), "line": frame.f_lineno}
+    explain(error, frame, exc)
+    step(frame, "exception", error=error)
 
 
 def on_return(frame: types.FrameType, value: object) -> None:
@@ -383,10 +459,11 @@ def describe(exc: BaseException) -> str:
 
 
 def trace(path: str) -> Exit:
-    global stdin, stdin_text, stdin_size, token_ends, max_steps
+    global stdin, stdin_text, stdin_size, token_ends, max_steps, source
     max_steps = int(os.environ.get("VIZ_MAX_STEPS", "1000"))
     with open(path, "rb") as f:
         src = f.read()
+    source = src
     try:
         with open(STDIN, "rb") as f:
             raw = f.read()

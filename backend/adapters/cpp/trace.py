@@ -14,7 +14,7 @@ import traceback
 import gdb
 
 LANGUAGE = "cpp17-gcc"
-ADAPTER = "cpp-gdb/0.3.0"
+ADAPTER = "cpp-gdb/0.4.0"
 SOURCE = "main.cpp"
 STDIN = "/work/stdin"
 WIRE_FD = 3
@@ -37,6 +37,20 @@ INT_FORMATS = {1: "b", 2: "h", 4: "i", 8: "q"}
 FLOAT_FORMATS = {4: "f", 8: "d"}
 # libstdc++ printers raise these on garbage memory, such as a dangling std::string
 UNREADABLE = (gdb.error, OverflowError, ValueError)
+CHECKS = ("^__ubsan_handle_", "^__gnu_debug::_Error_formatter::_M_error", "^std::__glibcxx_assert_fail")
+# vptr checks call it on every cache miss; it reports only when the dynamic type is wrong
+VPTR_CHECK = "__ubsan_handle_dynamic_type_cache_miss"
+# check functions have no debug info: arguments by calling convention
+ARGS = {"aarch64": ("x0", "x1", "x2", "x3"), "i386:x86-64": ("rdi", "rsi", "rdx", "rcx")}
+OVERFLOWS = {"add_overflow": "+", "sub_overflow": "-", "mul_overflow": "*", "negate_overflow": "-", "divrem_overflow": "/"}
+SUBSCRIPT = "attempt to subscript container with out-of-bounds index %2;, but container only holds %3; elements"
+EMPTY = "attempt to access an element in an empty container"
+DEREFERENCE = "attempt to dereference a %1.state; iterator"
+SUBSCRIPT_ASSERTION = re.compile(r"(\w+) <=? (?:this->)?size\(\)$")
+PLACEHOLDER = re.compile(r"%(\d+)(?:\.(\w+))?;")
+STATES = {"__singular": "singular", "__begin": "dereferenceable (start-of-sequence)", "__middle": "dereferenceable",
+          "__end": "past-the-end", "__before_begin": "before-begin", "__singular_value_init": "singular (value-initialized)"}
+STACK_SLACK = 64 << 10  # a fault this close to sp is the stack running out
 
 DW_LNS_COPY = 1
 DW_LNS_ADVANCE_PC = 2
@@ -85,7 +99,7 @@ def send(msg):
 
 
 def run(cmd):
-    gdb.execute(cmd, to_string=True)
+    return gdb.execute(cmd, to_string=True)
 
 
 def ours(symtab):
@@ -961,8 +975,182 @@ def returned(call, calls, globals_):
     return msgs + [msg]
 
 
-def crashed(name, calls, globals_, last):
+def check_functions():
+    found = {}
+    for pattern in CHECKS:
+        for row in run("info functions " + pattern).splitlines():
+            if row.startswith("0x") and "@plt" not in row and VPTR_CHECK not in row:
+                addr, name = row.split(None, 1)
+                found[int(addr, 16)] = name
+    return found
+
+
+def failed(name, frame, calls, globals_):
+    args = [int(frame.read_register(r)) & ((1 << 64) - 1) for r in ARGS[frame.architecture().name()]]
+    if name.startswith("__ubsan_handle_"):
+        return sanitizer(name, args)
+    user = calls[-1]["frame"]
+    called = frame
+    while called.older() != user:
+        called = called.older()
+    if name.startswith("std::__glibcxx_assert_fail"):
+        return assertion(c_string(args[3])["v"], called, user, globals_)
+    return debug_check(args[0], called, user, globals_)
+
+
+def sanitizer(name, args):
+    check = re.sub(r"_v\d+$", "", name.removeprefix("__ubsan_handle_").removesuffix("_abort"))
+    error = {"type": "UBSan", "message": check.replace("_", " ")}
+    if check != "out_of_bounds" and check not in OVERFLOWS:
+        return error
+    # args[0] points at {file, line, column, type descriptors}
+    types = gdb.selected_inferior().read_memory(args[0] + 16, 16 if check == "out_of_bounds" else 8)
+    if check == "out_of_bounds":
+        array, index_type = (descriptor(at) for at in struct.unpack("=2Q", types))
+        index = ubsan_value(index_type[0], args[1])
+        values = {"index": str(index), "type": array[1]}
+        size = re.search(r"\[(\d+)\]", array[1])
+        if size:
+            values["size"] = int(size.group(1))
+        return dict(error, message="index %d out of bounds for type '%s'" % (index, array[1]),
+                    kind="index_out_of_range", values=values)
+    info, type_ = descriptor(struct.unpack("=Q", types)[0])
+    operands = [ubsan_value(info, a) for a in (args[1:2] if check == "negate_overflow" else args[1:3])]
+    if check == "divrem_overflow" and operands[1] == 0:
+        return dict(error, message="division by zero", kind="division_by_zero")
+    if check == "negate_overflow":
+        message = "negation of %d cannot be represented in type '%s'" % (operands[0], type_)
+    elif check == "divrem_overflow":
+        message = "division of %d by -1 cannot be represented in type '%s'" % (operands[0], type_)
+    else:
+        message = "signed integer overflow: %d %s %d cannot be represented in type '%s'" % (
+            operands[0], OVERFLOWS[check], operands[1], type_)
+    width = 1 << (info >> 1)
+    values = {"op": OVERFLOWS[check], "operands": [str(x) for x in operands], "type": type_,
+              "max": str((1 << (width - 1)) - 1)}
+    return dict(error, message=message, kind="signed_overflow", values=values)
+
+
+def descriptor(at):
+    # {kind: u16, info: u16, name}; an integer's info is log2(bits) << 1 | signed
+    info = struct.unpack("=2H", gdb.selected_inferior().read_memory(at, 4))[1]
+    return info, c_string(at + 4)["v"].strip("'")
+
+
+def ubsan_value(info, handle):
+    width = 1 << (info >> 1)
+    # the value itself when it fits a pointer, else a pointer to it
+    if width > 64:
+        handle = int.from_bytes(gdb.selected_inferior().read_memory(handle, width // 8), "little")
+    value = handle & ((1 << width) - 1)
+    if info & 1 and value >= 1 << (width - 1):
+        value -= 1 << width
+    return value
+
+
+def assertion(condition, called, user, globals_):
+    error = {"type": "libstdc++", "message": "Assertion '%s' failed." % condition}
+    if condition == "!this->empty()":
+        return dict(error, kind="empty_container", values=emptied(called.read_var("this").dereference(), called, user,
+                                                                   globals_))
+    index = SUBSCRIPT_ASSERTION.match(condition)
+    if index is None:
+        return error
+    container = called.read_var("this").dereference()
+    n = int(called.read_var(index.group(1)))
+    # size_t index: v[i - 1] at i = 0 reads as -1, as the program wrote it
+    if n >= 1 << 63:
+        n -= 1 << 64
+    return dict(error, kind="index_out_of_range", values=subscripted(container, n, length(container), user, globals_))
+
+
+def debug_check(at, called, user, globals_):
+    formatter = gdb.Value(at).cast(gdb.lookup_type("__gnu_debug::_Error_formatter").pointer()).dereference()
+    params = [formatter["_M_parameters"][i] for i in range(int(formatter["_M_num_parameters"]))]
+    text = formatter["_M_text"].string()
+    error = {"type": "libstdc++",
+             "message": PLACEHOLDER.sub(lambda m: placeholder(params[int(m.group(1)) - 1], m.group(2)), text)}
+    if text == SUBSCRIPT:
+        index, size = (int(variant(p)["_M_value"]) for p in params[1:])
+        return dict(error, kind="index_out_of_range",
+                    values=subscripted(called.read_var("this").dereference(), index, size, user, globals_))
+    if text == EMPTY:
+        return dict(error, kind="empty_container", values=emptied(called.read_var("this").dereference(), called, user,
+                                                                   globals_))
+    if text != DEREFERENCE or not str(variant(params[0])["_M_state"]).endswith("::__end"):
+        return error
+    # *s.begin() on an empty set: past the end of a container with nothing in it
+    sequence = called.read_var("this").dereference().type.strip_typedefs().template_argument(1)
+    container = gdb.Value(int(variant(params[0])["_M_sequence"])).cast(sequence.pointer()).dereference()
+    if length(container):
+        return error
+    return dict(error, kind="empty_container", values=emptied(container, called, user, globals_))
+
+
+def variant(param):
+    kind = str(param["_M_kind"]).rsplit("::", 1)[1]
+    return param["_M_variant"]["_M_" + kind.lstrip("_")]
+
+
+def placeholder(param, field):
+    v = variant(param)
+    if field is None and str(param["_M_kind"]).endswith("::__integer"):
+        return str(int(v["_M_value"]))
+    if field == "state":
+        state = str(v["_M_state"]).rsplit("::", 1)[1]
+        return STATES.get(state, state.strip("_"))
+    return v["_M_name"].string()
+
+
+def length(container):
+    if row(container.type).get("kind") == "str":
+        return int(container["_M_string_length"])
+    return heap_object("length", container, new_snap(), 0)["length"]
+
+
+def subscripted(container, index, size, user, globals_):
+    values = {"index": str(index), "size": size, "type": type_name(container.type.unqualified())}
+    return dict(values, **named(container, user, globals_))
+
+
+def emptied(container, called, user, globals_):
+    values = {"call": called.name().rsplit("::", 1)[1], "type": type_name(container.type.unqualified())}
+    return dict(values, **named(container, user, globals_))
+
+
+def named(container, frame, globals_):
+    want = (address(container), str(container.type.strip_typedefs().unqualified()))
+    syms = []
+    block = frame.block()
+    while block is not None:
+        syms += [(s, frame) for s in block if s.is_variable or s.is_argument]
+        if block.function is not None:
+            break
+        block = block.superblock
+    for sym, where in syms + [(s, None) for s in globals_]:
+        try:
+            value = sym.value() if where is None else sym.value(where)
+            if value.type.strip_typedefs().code in (gdb.TYPE_CODE_REF, gdb.TYPE_CODE_RVALUE_REF):
+                value = value.referenced_value()
+        except UNREADABLE:
+            continue
+        # a struct and its first member share an address
+        if (address(value), str(value.type.strip_typedefs().unqualified())) == want:
+            return {"name": sym.name}
+    return {}
+
+
+def signalled(name, calls):
     error = {"type": name, "message": signal.strsignal(signal.Signals[name])}
+    if name != "SIGSEGV":
+        return error
+    fault = int(gdb.parse_and_eval("$_siginfo._sifields._sigfault.si_addr"))
+    if abs(fault - int(gdb.parse_and_eval("$sp"))) < STACK_SLACK:
+        error["kind"], error["values"] = "recursion_too_deep", {"depth": len(calls)}
+    return error
+
+
+def crashed(error, calls, globals_, last):
     while calls and not calls[-1]["frame"].is_valid():
         calls.pop()
     if not calls:
@@ -1031,7 +1219,7 @@ def trace():
         os.dup2(null, fd)
     os.close(null)
 
-    calls, last, sent = [], None, 0
+    calls, last, sent, checks = [], None, 0, {}
     while True:
         stop = stops[-1]
         stops.clear()
@@ -1039,13 +1227,17 @@ def trace():
             return finished(stop)
         if isinstance(stop, gdb.SignalEvent):
             if calls:
-                send_step(crashed(stop.stop_signal, calls, globals_, last))
+                send_step(crashed(signalled(stop.stop_signal, calls), calls, globals_, last))
             return finished(stop)
         frame = gdb.newest_frame()
         pc = frame.pc()
+        if pc in checks:
+            send_step(crashed(failed(checks[pc], frame, calls, globals_), calls, globals_, last))
+            return untraced(breaks, calls)
         if last is None:
             breaks.pop().delete()
-            breaks = [gdb.Breakpoint("*%#x" % at, internal=True) for at in lines]
+            checks = check_functions()
+            breaks = [gdb.Breakpoint("*%#x" % at, internal=True) for at in list(lines) + list(checks)]
             msgs = called(frame, pc, lines[pc][0], calls, globals_)
         else:
             msgs = []

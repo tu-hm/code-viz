@@ -1,0 +1,192 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.4.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 10
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "s",
+              "value": {
+                "t": "uninit",
+                "type": "std::set<int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 5,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "s",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            }
+          ],
+          "kind": "set",
+          "length": 1,
+          "ordered": true,
+          "truncated": false,
+          "type": "std::set<int>"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "s",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            },
+            {
+              "name": "smallest",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [],
+          "kind": "set",
+          "length": 0,
+          "ordered": true,
+          "truncated": false,
+          "type": "std::set<int>"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": {
+        "kind": "empty_container",
+        "line": 7,
+        "message": "attempt to dereference a past-the-end iterator",
+        "type": "libstdc++",
+        "values": {
+          "call": "operator*",
+          "name": "s",
+          "type": "std::set<int>"
+        }
+      },
+      "event": "exception",
+      "frames": {},
+      "heap": {},
+      "i": 3,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "/usr/local/include/c++/13.5.0/debug/safe_iterator.h:298:\nIn function:\n    gnu_debug::_Safe_iterator<_Iterator, _Sequence, _Category>::reference \n    gnu_debug::_Safe_iterator<_Iterator, _Sequence, _Category>::operator*() \n    const [with _Iterator = std::_Rb_tree_const_iterator<int>; _Sequence = \n    std::debug::set<int>; _Category = std::forward_iterator_tag; reference = \n    const int&]\n\nError: attempt to dereference a past-the-end iterator.\n\nObjects involved in the operation:\n    iterator \"this\" @ 0xmasked {\n      type = std::_Rb_tree_const_iterator<int> (constant iterator);\n      state = past-the-end;\n      references sequence with type 'std::debug::set<int, std::less<int>, std::allocator<int> >' @ 0xmasked\n    }\n",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": null,
+      "kind": "signal",
+      "message": null,
+      "signal": "SIGABRT"
+    },
+    "stepCount": 4,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.2"
+}
