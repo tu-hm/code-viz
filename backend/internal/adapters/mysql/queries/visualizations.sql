@@ -16,8 +16,8 @@ WHERE subject = sqlc.arg(subject) AND idempotency_key = sqlc.arg(idempotency_key
 INSERT INTO visualizations (id, trace_id, subject, idempotency_key, created_at, expires_at)
 VALUES (sqlc.arg(id), sqlc.arg(trace_id), sqlc.arg(subject), sqlc.arg(idempotency_key), sqlc.arg(now), sqlc.arg(expires_at));
 
--- name: VisualizationTrace :one
-SELECT trace_id FROM visualizations WHERE id = sqlc.arg(id);
+-- name: OwnedVisualizationTrace :one
+SELECT trace_id FROM visualizations WHERE id = sqlc.arg(id) AND subject = sqlc.arg(subject);
 
 -- name: DetachVisualization :exec
 UPDATE visualizations SET detached = TRUE WHERE id = sqlc.arg(id);

@@ -105,6 +105,22 @@ func (q *Queries) InsertVisualization(ctx context.Context, arg InsertVisualizati
 	return err
 }
 
+const ownedVisualizationTrace = `-- name: OwnedVisualizationTrace :one
+SELECT trace_id FROM visualizations WHERE id = ? AND subject = ?
+`
+
+type OwnedVisualizationTraceParams struct {
+	ID      string
+	Subject string
+}
+
+func (q *Queries) OwnedVisualizationTrace(ctx context.Context, arg OwnedVisualizationTraceParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, ownedVisualizationTrace, arg.ID, arg.Subject)
+	var trace_id string
+	err := row.Scan(&trace_id)
+	return trace_id, err
+}
+
 const readVisualization = `-- name: ReadVisualization :one
 SELECT v.id, v.trace_id, v.detached, v.created_at, v.expires_at,
   t.language, t.status, t.version, t.progress_steps, t.build, t.failure_stage, t.failure_kind,
@@ -187,15 +203,4 @@ func (q *Queries) RepeatedVisualization(ctx context.Context, arg RepeatedVisuali
 	var id string
 	err := row.Scan(&id)
 	return id, err
-}
-
-const visualizationTrace = `-- name: VisualizationTrace :one
-SELECT trace_id FROM visualizations WHERE id = ?
-`
-
-func (q *Queries) VisualizationTrace(ctx context.Context, id string) (string, error) {
-	row := q.db.QueryRowContext(ctx, visualizationTrace, id)
-	var trace_id string
-	err := row.Scan(&trace_id)
-	return trace_id, err
 }

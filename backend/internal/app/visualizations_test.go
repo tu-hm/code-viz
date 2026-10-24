@@ -332,9 +332,7 @@ func TestCreateResetsOnlyATraceThatCannotServeIt(t *testing.T) {
 		{"completed is attached to up to its expiry", complete, week, false, "completed", 0},
 		{"completed runs again past its expiry", complete, week + time.Microsecond, true, "queued", 1},
 		{"canceled runs again", func(t *testing.T, h *harness, v api.Visualization) {
-			if err := h.Delete(t.Context(), v.ID); err != nil {
-				t.Fatal(err)
-			}
+			h.delete(t, v.ID)
 		}, 0, true, "queued", 1},
 	}
 	for _, tt := range tests {
@@ -437,9 +435,7 @@ func TestGetShowsWhatEachStateHas(t *testing.T) {
 			name: "detached reads canceled while another caller waits on its trace",
 			prepare: func(t *testing.T, v api.Visualization, _ string) {
 				h.create(t, "ip:other", "detached reads canceled while another caller waits on its trace")
-				if err := h.Delete(ctx, v.ID); err != nil {
-					t.Fatal(err)
-				}
+				h.delete(t, v.ID)
 			},
 			want: api.Visualization{Status: "canceled"},
 		},
@@ -581,9 +577,7 @@ func TestGetWaitsOnlyWhileNothingNewerThanSinceIsFinal(t *testing.T) {
 			name: "a detached visualization returns at once",
 			prepare: func(t *testing.T, h *harness, v api.Visualization) {
 				h.create(t, "ip:other", "x")
-				if err := h.Delete(t.Context(), v.ID); err != nil {
-					t.Fatal(err)
-				}
+				h.delete(t, v.ID)
 			},
 			p:       api.GetVisualizationParams{Wait: ptr(20), Since: ptr(0)},
 			events:  moveOn,
@@ -627,7 +621,7 @@ func TestDeleteCancelsTheJobOnlyOnceNoOtherVisualizationWaits(t *testing.T) {
 	a, b := h.create(t, "ip:1", "x"), h.create(t, "ip:2", "x")
 	id := traceOf(t, h.db, a.ID)
 
-	if err := h.Delete(ctx, a.ID); err != nil {
+	if err := h.Delete(ctx, app.Caller{Subject: "ip:1"}, a.ID); err != nil {
 		t.Fatal(err)
 	}
 	want := map[string]api.VisualizationStatus{a.ID: "canceled", b.ID: "queued"}
@@ -638,7 +632,7 @@ func TestDeleteCancelsTheJobOnlyOnceNoOtherVisualizationWaits(t *testing.T) {
 		t.Errorf("job after the first delete is %s, want queued", got)
 	}
 
-	if err := h.Delete(ctx, b.ID); err != nil {
+	if err := h.Delete(ctx, app.Caller{Subject: "ip:2"}, b.ID); err != nil {
 		t.Fatal(err)
 	}
 	if got := readJob(t, h.db, id).Status; got != "canceled" {
@@ -647,11 +641,29 @@ func TestDeleteCancelsTheJobOnlyOnceNoOtherVisualizationWaits(t *testing.T) {
 	if got := readTrace(t, h.db, id).Status; got != "canceled" {
 		t.Errorf("trace after the last delete is %s, want canceled", got)
 	}
-	if err := h.Delete(ctx, b.ID); err != nil {
+	if err := h.Delete(ctx, app.Caller{Subject: "ip:2"}, b.ID); err != nil {
 		t.Errorf("deleting again: %v", err)
 	}
-	if err := h.Delete(ctx, "viz_0123"); !errors.Is(err, domain.ErrNotFound) {
+	if err := h.Delete(ctx, app.Caller{Subject: "ip:2"}, "viz_0123"); !errors.Is(err, domain.ErrNotFound) {
 		t.Errorf("unknown id: err = %v, want ErrNotFound", err)
+	}
+}
+
+func TestDeleteByAnotherCallerIsNotFoundAndChangesNothing(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+	h := newHarness(t, 100)
+	v := h.create(t, "ip:1", "x")
+	id := traceOf(t, h.db, v.ID)
+
+	if err := h.Delete(ctx, app.Caller{Subject: "ip:2"}, v.ID); !errors.Is(err, domain.ErrNotFound) {
+		t.Fatalf("err = %v, want ErrNotFound", err)
+	}
+	if got := h.statuses(t, v)[v.ID]; got != "queued" {
+		t.Errorf("visualization is %s, want queued", got)
+	}
+	if got := readJob(t, h.db, id).Status; got != "queued" {
+		t.Errorf("job is %s, want queued", got)
 	}
 }
 
@@ -838,6 +850,17 @@ func (h *harness) create(t *testing.T, subject, source string) api.Visualization
 		t.Fatalf("create: %v", err)
 	}
 	return v
+}
+
+func (h *harness) delete(t *testing.T, id string) {
+	t.Helper()
+	var subject string
+	if err := h.db.QueryRowContext(t.Context(), "SELECT subject FROM visualizations WHERE id = ?", id).Scan(&subject); err != nil {
+		t.Fatal(err)
+	}
+	if err := h.Delete(t.Context(), app.Caller{Subject: subject}, id); err != nil {
+		t.Fatalf("delete %s: %v", id, err)
+	}
 }
 
 func (h *harness) createWithKey(t *testing.T, c app.Caller, key string) api.Visualization {

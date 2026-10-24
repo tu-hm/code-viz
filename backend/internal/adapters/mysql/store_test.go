@@ -38,7 +38,7 @@ func TestStoreErrorsWrapErrInfraOnlyWhenMySQLIsUnreachable(t *testing.T) {
 			return err
 		}},
 		{"detach", func(ctx context.Context, s *mysql.Store) error {
-			return s.Detach(ctx, "viz_1", t0)
+			return s.Detach(ctx, "viz_1", "ip:1", t0)
 		}},
 		{"delete expired", func(ctx context.Context, s *mysql.Store) error {
 			_, err := s.DeleteExpired(ctx, t0)

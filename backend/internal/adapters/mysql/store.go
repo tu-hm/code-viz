@@ -252,12 +252,12 @@ func readVisualization(ctx context.Context, qs *sqlc.Queries, id string) (ports.
 	}, nil
 }
 
-func (s *Store) Detach(ctx context.Context, id string, now time.Time) error {
+func (s *Store) Detach(ctx context.Context, id, subject string, now time.Time) error {
 	err := InTx(ctx, s.db, func(tx *sql.Tx) error {
 		qs := sqlc.New(tx)
-		traceID, err := qs.VisualizationTrace(ctx, id)
+		traceID, err := qs.OwnedVisualizationTrace(ctx, sqlc.OwnedVisualizationTraceParams{ID: id, Subject: subject})
 		if errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("visualization %s: %w", id, domain.ErrNotFound)
+			return fmt.Errorf("visualization %s of %s: %w", id, subject, domain.ErrNotFound)
 		}
 		if err != nil {
 			return fmt.Errorf("read visualization %s: %w", id, err)

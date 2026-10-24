@@ -19,9 +19,9 @@ type MetaStore interface {
 	Create(ctx context.Context, v NewVisualization, now time.Time) (Visualization, error)
 	// Visualization returns the visualization with id, or domain.ErrNotFound.
 	Visualization(ctx context.Context, id string) (Visualization, error)
-	// Detach detaches the visualization with id and cancels its trace's queued job when no other visualization waits on it (§8.5).
-	// Returns domain.ErrNotFound when there is no such visualization.
-	Detach(ctx context.Context, id string, now time.Time) error
+	// Detach detaches the visualization with id that subject created, and cancels its trace's queued job when no other visualization
+	// waits on it (§8.5). Returns domain.ErrNotFound when subject created no visualization with id.
+	Detach(ctx context.Context, id, subject string, now time.Time) error
 	// DeleteExpired deletes every visualization that expired before now, then up to 1,000 expired traces with their jobs, and
 	// returns those traces. It is called until it returns none (§7.13.1).
 	DeleteExpired(ctx context.Context, now time.Time) ([]ExpiredTrace, error)

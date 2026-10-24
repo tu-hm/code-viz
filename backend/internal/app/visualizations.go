@@ -165,9 +165,10 @@ func (s *Visualizations) render(ctx context.Context, v ports.Visualization, now 
 	return out, nil
 }
 
-// Delete detaches the visualization with id (§8.5). It returns domain.ErrNotFound, or ErrInfra when MySQL is unreachable.
-func (s *Visualizations) Delete(ctx context.Context, id string) error {
-	return s.Store.Detach(ctx, id, s.Now())
+// Delete detaches the visualization with id when c created it (§8.5). Another caller gets domain.ErrNotFound, as for an
+// unknown id; it returns ErrInfra when MySQL is unreachable.
+func (s *Visualizations) Delete(ctx context.Context, c Caller, id string) error {
+	return s.Store.Detach(ctx, id, c.Subject, s.Now())
 }
 
 // Cleanup deletes the visualizations and traces that expired before now, then the chunks of those traces (§7.5).
