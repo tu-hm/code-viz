@@ -34,7 +34,7 @@ export function isScenario(name: string): name is Scenario {
 }
 
 const { paths, components: openapi } = parse(spec) as Spec
-const languages =
+export const languages =
   paths['/languages'].get.responses['200'].content['application/json'].examples.languages.value
 const examples = {
   tracing: openapi.examples.Tracing.value,

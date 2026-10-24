@@ -76,6 +76,8 @@ The handlers in [apps/ide/src/mocks](apps/ide/src/mocks/) answer every endpoint 
 
 The C++ sources start with `#include` and `using namespace std;`, so their line numbers sit 2 below the §19.3 mock's.
 
+To step through a fixture in the player, open `http://localhost:5173/?fixture=python-aliasing` under `pnpm dev`; add `&step=9` to open at a step. This works in the dev server only.
+
 The hand-written traces are plain JSON. Edit them directly. `fixtures.test.ts` checks each one against `trace.v1.schema.json`, and checks the rules the schema can't express: 250-step chunks that start with a keyframe, lines inside the source, call ids on calls and returns, and a replayed heap that holds exactly what the stack reaches. The synthetic traces are generated at load time and never committed.
 
 ## Generated code
