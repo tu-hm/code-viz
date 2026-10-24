@@ -312,7 +312,7 @@ func TestGetShowsEachStateAsTheContractSays(t *testing.T) {
 	}
 }
 
-func TestCallerIsAKeyedHashOfTheClientIP(t *testing.T) {
+func TestCallerIsAKeyedHashOfTheClientIPv4OrIPv6Slash64(t *testing.T) {
 	t.Parallel()
 	s := newStack(t, newDB(t), 100)
 	tests := []struct {
@@ -324,10 +324,12 @@ func TestCallerIsAKeyedHashOfTheClientIP(t *testing.T) {
 		{"proxied request is the rightmost forwarded hop", "127.0.0.1:41000", []string{"203.0.113.7, 198.51.100.2"}, "198.51.100.2"},
 		{"proxied request is the last hop of the last forwarded header", "127.0.0.1:41000", []string{"203.0.113.7", "198.51.100.3"}, "198.51.100.3"},
 		{"direct request is its peer despite a forged forwarded header", "192.0.2.10:41000", []string{"198.51.100.2"}, "192.0.2.10"},
-		{"request proxied over IPv6 loopback is its IPv6 hop", "[::1]:41000", []string{"2001:db8::7"}, "2001:db8::7"},
-		{"direct IPv6 request is its peer despite a forged forwarded header", "[2001:db8::1]:41000", []string{"198.51.100.2"}, "2001:db8::1"},
+		{"request proxied over IPv6 loopback is the /64 of its IPv6 hop", "[::1]:41000", []string{"2001:db8::7"}, "2001:db8::/64"},
+		{"direct IPv6 request is its /64 despite a forged forwarded header", "[2001:db8::1]:41000", []string{"198.51.100.2"}, "2001:db8::/64"},
+		{"IPv6 request from another /64 is that /64", "[2001:db8:0:1::5]:41000", nil, "2001:db8:0:1::/64"},
+		{"IPv4-mapped IPv6 peer is its IPv4 address", "[::ffff:192.0.2.10]:41000", nil, "192.0.2.10"},
 		{"local request without a forwarded header is the loopback peer", "127.0.0.1:41000", nil, "127.0.0.1"},
-		{"proxied request with an unparsable hop is the loopback peer", "[::1]:41000", []string{"unknown"}, "::1"},
+		{"proxied request with an unparsable hop is the /64 of the loopback peer", "[::1]:41000", []string{"unknown"}, "::/64"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

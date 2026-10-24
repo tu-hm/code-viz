@@ -31,9 +31,7 @@ func boundary(ipKey []byte, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := requestID(r)
 		w.Header().Set("X-Request-ID", id)
-		mac := hmac.New(sha256.New, ipKey)
-		mac.Write([]byte(clientIP(r).String()))
-		caller := app.Caller{Subject: "ip:" + hex.EncodeToString(mac.Sum(nil))}
+		caller := app.Caller{Subject: subject(ipKey, clientIP(r))}
 
 		r.Body = http.MaxBytesReader(w, r.Body, maxBody)
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), reqInfoKey{}, reqInfo{id: id, caller: caller})))
@@ -64,6 +62,18 @@ func clientIP(r *http.Request) netip.Addr {
 		return peer(r)
 	}
 	return ip
+}
+
+// one home or phone gets a whole IPv6 /64 => hash the /64, or rotating addresses dodges the quota
+func subject(key []byte, ip netip.Addr) string {
+	ip = ip.Unmap()
+	s := ip.String()
+	if ip.Is6() {
+		s = netip.PrefixFrom(ip, 64).Masked().String()
+	}
+	mac := hmac.New(sha256.New, key)
+	mac.Write([]byte(s))
+	return "ip:" + hex.EncodeToString(mac.Sum(nil))
 }
 
 // reverse proxy runs on this host (BE-13 §5)
