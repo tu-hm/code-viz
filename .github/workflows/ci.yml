@@ -67,19 +67,28 @@ jobs:
             go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('backend/go.sum') }}-
             go-build-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-
 
-      # ── runner image: same build as make runner-images, layers cached in gha ──
+      # ── runner images: same builds as make runner-images, layers cached in gha ──
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - id: runner
         run: |
-          echo "image=$(sed -n 's/^image: //p' adapters/python/manifest.yaml)" >> "$GITHUB_OUTPUT"
+          echo "python=$(sed -n 's/^image: //p' adapters/python/manifest.yaml)" >> "$GITHUB_OUTPUT"
+          echo "cpp=$(sed -n 's/^image: //p' adapters/cpp/manifest.yaml)" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: backend
           file: backend/adapters/python/Dockerfile
-          tags: ${{ steps.runner.outputs.image }}
+          tags: ${{ steps.runner.outputs.python }}
           load: true
           cache-from: type=gha,scope=runner-python-${{ runner.arch }}
           cache-to: type=gha,mode=max,scope=runner-python-${{ runner.arch }}
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: backend
+          file: backend/adapters/cpp/Dockerfile
+          tags: ${{ steps.runner.outputs.cpp }}
+          load: true
+          cache-from: type=gha,scope=runner-cpp-${{ runner.arch }}
+          cache-to: type=gha,mode=max,scope=runner-cpp-${{ runner.arch }}
 
       # ── tests: -short on PRs, full on push to main ──
       - name: test
@@ -121,15 +130,24 @@ jobs:
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - id: runner
         run: |
-          echo "image=$(sed -n 's/^image: //p' adapters/python/manifest.yaml)" >> "$GITHUB_OUTPUT"
+          echo "python=$(sed -n 's/^image: //p' adapters/python/manifest.yaml)" >> "$GITHUB_OUTPUT"
+          echo "cpp=$(sed -n 's/^image: //p' adapters/cpp/manifest.yaml)" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: backend
           file: backend/adapters/python/Dockerfile
-          tags: ${{ steps.runner.outputs.image }}
+          tags: ${{ steps.runner.outputs.python }}
           load: true
           cache-from: type=gha,scope=runner-python-${{ runner.arch }}
           cache-to: type=gha,mode=max,scope=runner-python-${{ runner.arch }}
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: backend
+          file: backend/adapters/cpp/Dockerfile
+          tags: ${{ steps.runner.outputs.cpp }}
+          load: true
+          cache-from: type=gha,scope=runner-cpp-${{ runner.arch }}
+          cache-to: type=gha,mode=max,scope=runner-cpp-${{ runner.arch }}
       - run: go test -count=1 -run Golden ./internal/tracecore ./cmd/vizctl
 
   web:
