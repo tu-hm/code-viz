@@ -103,6 +103,7 @@
 | v1.11 | 2026-10-24 | **Output order on fd 1/2.** C++ output sometimes landed one step early: `viz-shim` read a wire line, then drained fd 1/2, and by then GDB had resumed the program and it had printed again. `viz-shim` now counts the bytes waiting on fd 3, drains fd 1/2, and forwards only those bytes, and the C++ tracer resumes the program only once fd 3 is empty (§10.1). |
 | v1.12 | 2026-10-24 | **Friendly errors (BE-10), trace format v1.2.** A step's `error` may carry `kind`, the §19.6 row it matches (`index_out_of_range`, `signed_overflow`, `division_by_zero`, `empty_container`, `recursion_too_deep`), and `values`, what the error involves as far as the tracer can read it; an error without `kind` is shown by its message. Program values in `values` are decimal strings, as in `value.v` (§9.2, §9.7, §19.6). The C++ tracer stops on the check functions themselves (`__ubsan_handle_*` except the vptr cache miss, `__gnu_debug::_Error_formatter::_M_error`, `std::__glibcxx_assert_fail`), so a failed check is one `exception` step on the user's line before the program dies; its `type` is `UBSan` or `libstdc++` and its `message` the check's own words. A `SIGSEGV` within 64 KiB of the stack pointer is `recursion_too_deep`. The Python tracer reads the failing subscript or division from the source (`co_positions` and the AST), and the values from names, constants and integer arithmetic only, so reading them never runs the program's code. The exit stays what the process did: `SIGABRT` after a libstdc++ check, exit code 1 after UBSan. |
 | v1.13 | 2026-10-24 | **Whole-run data and trace options (BE-11).** C++ line hits come from gcov after a normal exit: the tracer reads the program's `.gcno` and `.gcda` itself, solves the arc counts the way gcov does, and gives each line the count of its busiest basic block, because gcov adds up the blocks that inlined library code splits a line into (`vector<int> a(n);` ran once, gcov says 2). Only lines a step can stop at are counted, closing braces excepted. The wire `exit` names its `lineHitsSource` (`counter` or `gcov`); an `exit` without `lineHits` (a crash, a kill, a sanitizer's report) makes the core count the recorded line and call steps, `lineHitsSource: "trace"` (§10.1, §19.9.3). The output after the last step is stored as `tail.txt.gz`, recorded in a `tail` column of `traces` and listed as `trace.tail {sizeBytes, sha256, url}` in `GET /visualizations/{id}`; a trace without steps keeps all its output there (§7.5, §8.3, §19.9.5). `startAtLines` and `captureRanges` reach the tracer as `VIZ_START_AT_LINES` and `VIZ_CAPTURE_RANGES`, and both languages support them (§10.2). A trace started at a line begins with a `line` step at the first listed line to run, with the whole stack; if none runs there are no steps (§5.6). `captureRanges` gives a variable one window, from its lowest start to its highest end, inclusive, when its sequence is too long to record whole: a Python list, tuple or deque over 1,000 items, a C++ array or `vector` past its 1,000-cell window, or a `vector` of non-scalars past 100 items. A range must not end before it starts, and the map is at most 4 KB as JSON (§11, FR-11). |
+| v1.14 | 2026-10-24 | **Share links (BE-12).** A share link is a new visualization ID of the same trace (`visualizations.shared`), not the visualization's own ID: since v1.7 that ID is the read key, so revoking it would lock out an owner whose IP changed, and sharing again would bring back a link that had leaked. `POST /visualizations/{id}/share` works only for the caller that created the visualization, and only once it is `completed`; anything else gets `400 invalid_request`. It copies the chunks and tail from `t7/` to `t90/`, sets `storage_prefix = 't90'`, and keeps the trace, the visualization and the link for 90 days from the share; calling it again returns the same link. `DELETE /visualizations/{id}/share` revokes it: the link answers `404` for everyone, the visualization keeps its 90 days, and sharing again makes a new link. The `t7/` copies stay until the cleanup deletes the trace, so URLs signed before the share keep working. `GET` sends `Cache-Control: public, max-age=60` for a share link, which reads the same for every caller, and `no-store` otherwise (§7.5, §7.8, §8.6, §12). |
 
 ---
 
@@ -678,7 +679,8 @@ erDiagram
     varchar id PK "viz_ random 128-bit"
     varchar trace_id FK
     varchar subject "user id or ip hash"
-    bool shared
+    bool shared "a share link"
+    varchar share_id "its share link"
     datetime created_at
     datetime expires_at
   }
@@ -698,7 +700,7 @@ erDiagram
 ```
 
 - **Object keys:** `{t7|t90}/{traceId}/chunk-0000.json.gz`, one chunk per 250 steps. Chunk boundaries line up with keyframes (250 = 5 × 50). `{t7|t90}/{traceId}/tail.txt.gz` holds the output after the last step (§19.9.5), when there is some.
-- **Retention:** new traces go under `t7/` and expire 7 days after they were created. Sharing does a server-side copy to `t90/` (90 days) and updates `storage_prefix`. A nightly cleanup deletes the rows past `expires_at`, then the chunks of the traces it deleted. *v1.7: SeaweedFS only partly supports lifecycle rules, so the cleanup deletes chunks, not the bucket.*
+- **Retention:** new traces go under `t7/` and expire 7 days after they were created. Sharing does a server-side copy to `t90/` (90 days) and updates `storage_prefix`; the `t7/` copies stay, so chunk URLs signed before the share keep working (§8.6). A nightly cleanup deletes the rows past `expires_at`, then the chunks of the traces it deleted, under both prefixes for a shared trace. *v1.7: SeaweedFS only partly supports lifecycle rules, so the cleanup deletes chunks, not the bucket.*
 - **Why a trace and a visualization are separate:** many users (visualizations) can share one trace (single-flight and cache). Ownership, sharing and quotas belong to the visualization, never to the trace.
 
 ### 7.6 Request lifecycle
@@ -762,10 +764,10 @@ stateDiagram-v2
 | A worker crashes mid-job | The lease expires and the rescuer re-queues the job (attempt + 1, §7.13.2). The node janitor kills orphaned sandboxes (by label and age). | A few seconds of extra wait |
 | A node is drained or preempted | `SIGTERM`: stop leasing; finish running jobs within 25 s; otherwise return them to the queue | Nothing, or a short delay |
 | MySQL is unavailable | `POST` returns `503 capacity`. Already-issued trace URLs keep working until they expire. Long-polls end and the client backs off. | "Visualizer is busy" with Retry |
-| Object storage is unavailable | Uploads retry 3 times with backoff, then fail as an infra error (one more attempt) | Delay, or "Something went wrong" |
+| Object storage is unavailable | Uploads retry 3 times with backoff, then fail as an infra error (one more attempt). A share's copy retries the same way, then the share returns `503 capacity` and makes no link | Delay, or "Something went wrong"; for a share, "try again" |
 | Queue is backed up | `POST` returns `503 capacity` with `Retry-After` once queued jobs exceed `slots × 10` | "Visualizer is busy" |
 | Tracer output is broken or malicious | Schema validation fails, and the job fails with `internal_error`. A redacted sample is logged. | "Something went wrong" plus a trace ID |
-| A permalink goes viral | Each view is one small JSON request (cached for 60 s), and chunks come from storage or CDN | Nothing |
+| A permalink goes viral | Each view is one small JSON request, which `GET` lets any cache keep for 60 s (`Cache-Control: public, max-age=60`), and chunks come from storage or CDN | Nothing; a revoked link can still open for up to 60 s |
 | The change poller's query fails | It retries on the next tick. Parked requests re-read their row when they time out, so no update is lost, at worst it's late. | At most one `wait` period of delay |
 | The nightly cleanup can't delete a trace's chunks | Its rows are already gone, so the chunks stay as orphans. The cleanup logs the trace ID and goes on. | Nothing |
 | Deadlock or lock-wait timeout (MySQL 1213, 1205) | The transaction is retried up to 3 times with jitter (§7.13.4) | Nothing, or a short delay |
@@ -968,7 +970,7 @@ CREATE TABLE jobs (
 - **Base:** `/api/v1`. All bodies are JSON, UTF-8.
 - **Auth:** optional; anonymous users get lower limits (§11).
 - **Errors:** every error uses the same envelope (§8.7).
-- **Endpoints:** five in all. Trace chunks are **not** served by the API; they come from signed URLs (§8.4).
+- **Endpoints:** six in all. Trace chunks are **not** served by the API; they come from signed URLs (§8.4).
 
 | Method and path | Purpose |
 |---|---|
@@ -977,6 +979,7 @@ CREATE TABLE jobs (
 | `GET /visualizations/{id}?wait=&since=` | Status, with long-polling; trace manifest once completed |
 | `DELETE /visualizations/{id}` | Cancel or detach |
 | `POST /visualizations/{id}/share` | Create a permalink and extend retention (P1) |
+| `DELETE /visualizations/{id}/share` | Revoke the permalink (P1) |
 
 ### 8.1 `GET /languages`
 
@@ -1152,7 +1155,15 @@ Returns `204`. The visualization is detached: from then on `GET` returns it with
 
 ### 8.6 `POST /visualizations/{id}/share` (P1)
 
-Returns `{"url": "https://ide.example.com/viz/viz_5f2c…", "expiresAt": "…"}`. The trace's chunks are copied from `t7/` to `t90/`. Calling it again returns the same link.
+Returns `200` with `{"url": "https://ide.example.com/viz/viz_c41e…", "expiresAt": "…"}`. The link is a **new visualization ID** of the same trace, which anyone can `GET`; the visualization's own ID stays as private as it was (v1.14).
+
+- Only the caller that created the visualization can share it; anyone else gets `404 not_found`, as for an unknown ID. A share link can't itself be shared.
+- Only a `completed` visualization can be shared. Queued, running, failed and canceled ones get `400 invalid_request`.
+- The trace's chunks and tail are copied from `t7/` to `t90/`, and the trace, the visualization and the link are kept for 90 days from the share (D17).
+- Calling it again returns the same link and `expiresAt`.
+- `GET` on the link sends `Cache-Control: public, max-age=60` (§7.8); every other `GET` sends `no-store`.
+
+`DELETE /visualizations/{id}/share` revokes the link and returns `204`, also when there was none. From then on the link's ID answers `404` for everyone, after at most the 60 s a cache may keep it. The visualization itself is unchanged and keeps its 90 days, and sharing it again makes a new link, so a revoked link never opens again. Only the caller that created the visualization can revoke; anyone else gets `404`.
 
 ### 8.7 Error envelope
 
@@ -1471,7 +1482,7 @@ All of these are configurable per language in the manifest, with global ceilings
 | Separation | Visualize runners are a separate pool from the judge and submission infrastructure. |
 | Credentials | Runner nodes hold only **scoped** credentials. The database role can lease jobs and update the trace it runs, and nothing else. The storage key is write-only to `t7/`. The API's storage key can read, sign and copy. |
 | Trace access | Chunks are only reachable through signed URLs that expire after 15 minutes. Buckets are private, and object keys use random `trc_` IDs. |
-| IDs | Visualization IDs are 128-bit random values. Cache keys (content hashes) are never exposed, so nobody can find someone else's code by hashing guesses. The ID is the read key: whoever has it can `GET` the visualization, so permalinks and an anonymous caller whose IP changed keep working. `DELETE` also checks that the caller created it (v1.7). |
+| IDs | Visualization IDs are 128-bit random values. Cache keys (content hashes) are never exposed, so nobody can find someone else's code by hashing guesses. The ID is the read key: whoever has it can `GET` the visualization, so permalinks and an anonymous caller whose IP changed keep working. `DELETE` also checks that the caller created it (v1.7). A share link is its own ID, so revoking it never touches the owner's (v1.14). |
 | Request bodies | `POST` bodies must be `application/json`; any other type gets `400 invalid_request`. A `text/plain` form post skips the browser's CORS preflight, so without this a foreign page could spend its visitors' quota (v1.7). |
 | Rendering | The UI renders every string from the trace as **text**, never as HTML. Control characters are escaped, and long lines wrap. |
 | Privacy | Traces are private to their owner until shared. Share links can be revoked. Anonymous traces are deleted after 7 days. |

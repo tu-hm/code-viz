@@ -1,6 +1,6 @@
 # API integration
 
-How the browser talks to the backend: five endpoints under `/api/v1`, plus trace chunks that the browser downloads straight from object storage. Read this before you write the API client (FE-04), the run states (FE-05) or permalink loading (FE-12).
+How the browser talks to the backend: six endpoints under `/api/v1`, plus trace chunks that the browser downloads straight from object storage. Read this before you write the API client (FE-04), the run states (FE-05) or permalink loading (FE-12).
 
 - **The contract is [`backend/api/openapi.yaml`](../../backend/api/openapi.yaml)**, with the trace format in [`backend/schema/trace.v1.schema.json`](../../backend/schema/trace.v1.schema.json). Where this doc and the contract disagree, the contract wins; fix this doc.
 - **Types are generated.** `pnpm gen` writes `apps/ide/src/gen/api.ts` (request and response types, `paths` and `components`) and `packages/player/src/gen/trace.ts` (the trace). Import them; never copy a contract type by hand (T3, D14).
@@ -27,7 +27,8 @@ Every response shown below was captured from a local `make dev` run on 24 Oct 20
 | `POST /visualizations` | Start a visualization, or attach to an identical trace | Yes |
 | `GET /visualizations/{id}?wait=&since=` | Status, with long-polling; the trace manifest once completed | Yes |
 | `DELETE /visualizations/{id}` | Cancel, or detach from a shared trace | Yes |
-| `POST /visualizations/{id}/share` | Permalink, and 90-day retention | No: `404` until BE-12 |
+| `POST /visualizations/{id}/share` | Share link, and 90-day retention | Yes |
+| `DELETE /visualizations/{id}/share` | Revoke the share link | Yes |
 
 Every body is JSON in UTF-8. There is no sign-in yet: every caller is anonymous and is told apart by its IP address (an IPv4 address, or an IPv6 /64).
 
@@ -285,7 +286,24 @@ Only the caller that created the visualization can delete it. Anyone else gets `
 
 ## `POST /visualizations/{id}/share`
 
-Not built: it returns `404 not_found` until BE-12. When it lands, it returns `{ "url": "…", "expiresAt": "…" }`, extends the trace's retention to 90 days, and returns the same link when called again (§8.6, FE-12).
+Makes a share link for a completed visualization and returns it with `200` (§8.6, FE-12):
+
+```json
+{ "expiresAt": "2027-01-22T15:52:21.488306Z", "url": "http://localhost:5173/viz/viz_21a175d332079a6197b48eef98aaf49c" }
+```
+
+- **The link is a new `viz_` ID**, not the one you shared. Anyone can `GET` it, signed in or not; the permalink page (`/viz/{id}`) loads it like any visualization. `url` starts with the IDE's origin, `VIZ_WEB_ORIGIN` on the server (`http://localhost:5173` under `make dev`).
+- **Calling it again returns the same link and `expiresAt`**, so the Share button can call it every time it opens the dialog.
+- **Retention becomes 90 days from the share**, for the link and for your own visualization: its `expiresAt` in `GET` moves too.
+- **`GET` on the link is cacheable for 60 s** (`Cache-Control: public, max-age=60`); every other `GET` is `no-store`. A link someone revoked can therefore still open for up to a minute.
+
+Errors: `400` (the visualization isn't `completed` yet, or was deleted), `404` (unknown ID, someone else's visualization, or a share link itself), `410` (past retention), `503` (object storage or the database down), `500`.
+
+## `DELETE /visualizations/{id}/share`
+
+Revokes the link of the visualization `{id}` (your own ID, not the link's) and returns `204`, also when there was no link. From then on the link answers `404 not_found` for everyone, the owner included; show FE-12's expired screen. Your visualization is unchanged and keeps its 90 days. Sharing it again makes a **new** link, so a revoked one never opens again.
+
+Only the caller that created the visualization can revoke; anyone else gets `404`.
 
 ## Errors
 
@@ -304,12 +322,12 @@ Every error has the same body (§8.7):
 
 | `code` | HTTP | When | Retry? | Show |
 |---|---|---|---|---|
-| `invalid_request` | 400 | Malformed JSON, wrong `Content-Type`, invalid options, bad `wait` or `since`, an `Idempotency-Key` that isn't a UUID | No | A client bug: log `message` |
+| `invalid_request` | 400 | Malformed JSON, wrong `Content-Type`, invalid options, bad `wait` or `since`, an `Idempotency-Key` that isn't a UUID, a share before the visualization is `completed` | No | A client bug: log `message` |
 | `payload_too_large` | 413 | Source or stdin over 64 KB | No | The limit. FE-04 checks sizes before sending, so this is rare |
 | `unsupported_language` | 422 | Unknown language, or visualize disabled for it | No | Hide **Visualize** for that language (FE-04) |
 | `rate_limited` | 429 | Daily quota used up: 100 a day per anonymous caller, reset at midnight UTC | After `Retry-After` | A message with the wait time (FE-05) |
 | `capacity` | 503 | Queue full, too many held long-polls, or the database down | After `Retry-After` (5 s), with backoff | "Visualizer is busy, try again in a few seconds" and **Retry** (§5.6) |
-| `not_found` | 404 | No such visualization, no such route, or deleting someone else's | No | The not-found state (FE-05); for a permalink, FE-12's expired screen |
+| `not_found` | 404 | No such visualization, no such route, deleting, sharing or revoking someone else's, or a revoked share link | No | The not-found state (FE-05); for a permalink, FE-12's expired screen |
 | `expired` | 410 | The trace is past its 7-day retention | No | The expired state (FE-05); for a permalink, FE-12's expired screen |
 | `internal_error` | 500 | The server failed | No | "Something went wrong on our side", the request ID and a Report link (§5.6) |
 
@@ -363,13 +381,12 @@ A runtime error doesn't fail the visualization: it ends with `exit.kind: "except
 | Active visualizations | 2 queued or running per caller | A third detaches the oldest queued one, which reads `canceled` |
 | Daily quota | 100 per anonymous caller per UTC day | `429 rate_limited` until midnight UTC |
 | Chunk URLs | 15 minutes | Storage refuses the URL; GET the visualization again |
-| Retention | 7 days | `410 expired` |
+| Retention | 7 days; 90 days from a share | `410 expired` |
 
 Spec §11 has the full list, including the ones only the trace shows (wall time, memory, items per container, string length).
 
 ## Not built yet
 
-- **Share links** (`POST …/share`, FE-12): `404` until BE-12.
 - **C++ through the API**: the tracer works, but the manifest is disabled, so `GET /languages` leaves it out and a POST gets `422`.
 - **Sign-in**: every caller is anonymous. The signed-in quota (1,000 a day) waits for it.
 - **The per-IP rate limit** (30 creates a minute, `429`) is a reverse proxy rule, not part of vizd, so you won't hit it locally.

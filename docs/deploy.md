@@ -149,6 +149,7 @@ AWS_SECRET_ACCESS_KEY=<api secret>
 CORS_ORIGINS=https://viz.example.com
 VIZ_IP_HASH_KEY=<openssl rand -hex 32>
 VIZ_SLOTS=1
+VIZ_WEB_ORIGIN=https://viz.example.com
 ```
 
 **`worker.env`.** The worker sits on the Compose network, so it reaches MySQL and SeaweedFS by service name:
@@ -181,6 +182,7 @@ What each variable does, from `backend/cmd/vizd/main.go`:
 | `CORS_ORIGINS` | api | Comma-separated origins allowed to call the API |
 | `VIZ_IP_HASH_KEY` | api, required | HMAC key for anonymous callers' IPs, 32 bytes or more. Keep it stable: a new key gives every caller a new identity, with a fresh quota and no delete rights on what they made before |
 | `VIZ_SLOTS` | api, required | Worker slots behind this API: one per worker container. `POST` returns `503 capacity` once `VIZ_SLOTS × 10` jobs are queued |
+| `VIZ_WEB_ORIGIN` | api, required | The IDE's origin. Share links are `VIZ_WEB_ORIGIN/viz/{id}` |
 
 The §11 limits are not env settings: each language manifest sets them.
 
@@ -406,7 +408,7 @@ What a real deployment needs and the repo doesn't have yet:
 - **Image registry and cosign signing** (BE-03, BE-07). Images are built on the server.
 - **A per-image seccomp allowlist** (BE-02 §5, before GA). The jail uses the C.9 denylist.
 - **The IDE calling the API** (FE-04). The deployed frontend is a placeholder.
-- **C++** (`enabled: false` in its manifest) and **share links** (BE-12, so no 90-day retention yet).
+- **C++** (`enabled: false` in its manifest).
 
 ## Cloud later
 

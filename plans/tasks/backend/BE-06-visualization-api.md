@@ -33,7 +33,7 @@ One migration per table, every table `utf8mb4_bin`, with foreign keys from `visu
 
 - [x] Port + S3 adapter (`aws-sdk-go-v2`): put, with 3 retries (§7.8)
 - [x] Presign GET (15 min)
-- [ ] Server-side copy (BE-12: a shared trace moves to `t90/`)
+- [x] Server-side copy (BE-12: a shared trace moves to `t90/`)
 - [x] Two endpoints: `S3_ENDPOINT` (used by vizd to put/copy) and `S3_PUBLIC_ENDPOINT` (used only to presign). The signature covers the host, so a URL signed for `seaweedfs:8333` can't be rewritten for the browser later
 - [x] Path-style addressing option (needed for SeaweedFS locally)
 - [x] Keys: `{t7|t90}/{traceId}/chunk-0000.json.gz`
@@ -42,7 +42,7 @@ One migration per table, every table `utf8mb4_bin`, with foreign keys from `visu
 - [x] Expiry: the nightly cleanup (§4) deletes a trace's chunks after its rows; SeaweedFS only partly supports lifecycle rules (spec v1.7)
 - [ ] **Done:** the browser downloads a chunk from a presigned URL locally and on staging; expired chunks are deleted
 
-**Status (24 Oct):** `ports.BlobStore` puts, signs and deletes through `internal/adapters/blobstore`, tested against SeaweedFS. URLs are signed for `S3_PUBLIC_ENDPOINT` by a second client, so the host in the signature is the one the browser calls. `make seed` creates the dev bucket and sets its CORS. Left: server-side copy (BE-12), and the Done check in a browser, locally and on staging; the download is tested from Go, through a proxy standing in for the public host.
+**Status (24 Oct):** `ports.BlobStore` puts, signs and deletes through `internal/adapters/blobstore`, tested against SeaweedFS. URLs are signed for `S3_PUBLIC_ENDPOINT` by a second client, so the host in the signature is the one the browser calls. `make seed` creates the dev bucket and sets its CORS. `Copy` came with BE-12. Left: the Done check in a browser, locally and on staging; the download is tested from Go, through a proxy standing in for the public host.
 
 ## 4. Endpoints (M1-09 · 3 d)
 
@@ -82,7 +82,7 @@ One migration per table, every table `utf8mb4_bin`, with foreign keys from `visu
 - [x] Cache key never leaves the server
 - [x] Nightly batched delete of expired rows (`LIMIT 1000` loops)
 
-**Status (24 Oct):** `vizd --role=api` (and `all`) serves the API under `/api/v1`. `app.Visualizations` holds the rules, `mysql.Store` runs create, read, delete and the expiry cleanup, and `mysql.Poller` wakes parked long-polls. The parked cap is the §0.2 default of 5,000 per pod until S5 measures one. Stdin is 64 KB for every language; no manifest raises it toward the 256 KB ceiling yet. `POST /share` answers `404` until BE-12. Left for Done: measuring that a status change reaches a real browser in ≤ 400 ms; `TestWaitReturnsWithin400msOfAVersionBump` covers the server side.
+**Status (24 Oct):** `vizd --role=api` (and `all`) serves the API under `/api/v1`. `app.Visualizations` holds the rules, `mysql.Store` runs create, read, delete and the expiry cleanup, and `mysql.Poller` wakes parked long-polls. The parked cap is the §0.2 default of 5,000 per pod until S5 measures one. Stdin is 64 KB for every language; no manifest raises it toward the 256 KB ceiling yet. Share and revoke came with BE-12. Left for Done: measuring that a status change reaches a real browser in ≤ 400 ms; `TestWaitReturnsWithin400msOfAVersionBump` covers the server side.
 
 ## 5. Tests
 

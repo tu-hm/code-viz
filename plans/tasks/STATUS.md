@@ -17,7 +17,8 @@
 - **Done except signing:** BE-03 (34/35). The Python tracer, its runner image and manifest, `vizctl trace`/`validate`, and eight golden fixtures traced from real code. Signing the image waits on a registry (BE-13). Spike S2 recommends `sys.monitoring` for G2 ([S2 report](../spikes/s2-python-hook.md)); the tracer uses `settrace` until G2 decides.
 - **In progress:** BE-04 (26/31). `tracecore` (§2) was built early, inside BE-03, so `vizctl` prints real traces. The S4 spike is done and the goldens run on both architectures in CI. Open: presenting the format at G3, and sparse arrays (§3).
 - **Done except one decision:** BE-05 (29/30). `vizd --role=worker` (and `all`) runs trace jobs end to end: claim, build, trace, upload the chunks, complete, with requeue on infra errors, a lease watcher, the 25 s drain and a periodic sandbox sweep. Checked against the local Compose stack. Cancel of a running job waits on your decision below.
-- **In progress:** BE-06 (48/52). `vizd` serves the visualization API: create with single-flight, quota, idempotency and the 2-active rule; get with long-poll; owner-only delete; the nightly cleanup of expired rows and chunks. Open: spike S5, server-side copy (BE-12) and the browser checks.
+- **Done:** BE-12 (10/10). `POST /visualizations/{id}/share` gives a completed visualization a share link: a new `viz_` ID of the same trace that anyone can read, kept with the trace for 90 days from the share and copied to `t90/`. Calling it again returns the same link; `DELETE …/share` revokes it, so it answers `404` for everyone while the owner's own ID still reads, and sharing again makes a new link. Anything not completed gets `400`. `GET` on a link is cacheable for 60 s. Checked against `make dev`'s stack.
+- **In progress:** BE-06 (49/52). `vizd` serves the visualization API: create with single-flight, quota, idempotency and the 2-active rule; get with long-poll; owner-only delete; the nightly cleanup of expired rows and chunks; server-side copy for BE-12. Open: spike S5 and the browser checks.
 - **Done except signing:** BE-07 (20/21). The C++ runner image is GCC 13.5 and GDB 14.2, with one precompiled header per safety-check mode; builds take 0.3–0.8 s. `options.safetyChecks: false` switches the checks off. GCC diagnostics point at the user's line, and the §8.3 example is reproduced. The manifest stays `enabled: false` (see BE-08). Spike S7 is in: `_GLIBCXX_DEBUG` fails the 3× run-time target, so G5 has a decision (below).
 - **Next, by the suggested order:** BE-13 §2–3. On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
@@ -26,7 +27,6 @@
 
 - [ ] G2 (Fri 13 Nov): keep `sys.settrace` (D12) or switch to `sys.monitoring`? S2 recommends `sys.monitoring`: tied on a 1,000-step trace, 1.5–3.4× faster after the step limit ([S2 report](../spikes/s2-python-hook.md)).
 - [ ] Mark the CI checks as required on `main` (BE-01 §2, BE-09 §4)? This blocks direct pushes to `main`, so every change would go through a PR.
-- [ ] API: what does `POST /visualizations/{id}/share` return before the visualization is completed?
 - [ ] API: auth scheme (`securitySchemes`) for signed-in callers.
 - [ ] API: should a failed response carry the trace ID (§5.6)?
 - [ ] Queue: cancel a running job? §7.7 and the §7.13.2 SQL cancel queued jobs only, which is what `JobQueue.Cancel` does; §7.13.2's prose and BE-05 §2–3 also stop a running one at its next lease check. Allowing it is one more status in `Cancel`'s `WHERE`, and the worker then sees `ErrLeaseLost`.
@@ -43,16 +43,16 @@
 | [BE-03](backend/BE-03-python-tracer.md) Python tracer | M0–M1 | 🟡 | 34/35 | Done except cosign signing (needs a registry, BE-13). S2 report in; G2 (Fri 13 Nov) open |
 | [BE-04](backend/BE-04-trace-processing.md) Trace processing | M0–M2 | 🟡 | 30/31 | §1–§3 done: sparse sequences and patches came with BE-09. Open: present the format at G3 (Fri 13 Nov) |
 | [BE-05](backend/BE-05-job-queue-worker.md) Job queue & worker | M1 | 🟡 | 29/30 | Queue and worker done: `vizd --role=worker` claims, builds, traces, uploads and completes, and drains on SIGTERM. Open: cancel while running (your decision, above) |
-| [BE-06](backend/BE-06-visualization-api.md) Visualization API | M0–M1 | 🟡 | 48/52 | The API runs under `vizd --role=api` and `all`, tested against MySQL and SeaweedFS. Open: §1 spike S5 (stretch), server-side copy (BE-12), the browser checks locally and on staging |
+| [BE-06](backend/BE-06-visualization-api.md) Visualization API | M0–M1 | 🟡 | 49/52 | The API runs under `vizd --role=api` and `all`, tested against MySQL and SeaweedFS. Open: §1 spike S5 (stretch), the browser checks locally and on staging |
 | [BE-07](backend/BE-07-cpp-build.md) C++ build | M2 | 🟡 | 20/21 | Done except cosign signing (needs a registry, BE-13). S7 report in; G5 (Fri 19 Feb) open |
 | [BE-08](backend/BE-08-cpp-tracer.md) C++ tracer ⚠ | M0, M2 | ✅ | 33/33 | Done: `adapters/cpp/trace.py` and 18 fixtures. The manifest stays `enabled: false` |
 | [BE-09](backend/BE-09-cpp-stl-big-arrays.md) C++ STL & big arrays | M2 | 🟡 | 23/24 | Done except "blocks merges": the conformance test runs in CI; required checks on `main` are your decision |
 | [BE-10](backend/BE-10-friendly-errors.md) Friendly errors | M3 | 🟡 | 13/14 | Done except the FE + DS sign-off on the payload (spec §19.6, trace format 1.2) |
 | [BE-11](backend/BE-11-whole-run-trace-options.md) Whole-run data & options | M3 (M5) | 🟡 | 19/22 | Done except the §5.6 dialog (FE-05) and §5, which only happens if spike S8 misses 95% |
-| [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/10 | BE-06 |
+| [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ✅ | 10/10 | Done: a share link is its own `viz_` ID, revocable, 90 days in `t90/` (spec v1.14) |
 | [BE-13](backend/BE-13-environments-launch.md) Environments & launch (single machine) | M1–M5 | 🟢 | 0/68 | §1 can start. Rewritten for single Linux server, no cloud/K8s |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | 🟢 | 0/10 | Can start: BE-07–09 are in |
-| **Total** | | | **338/450** | |
+| **Total** | | | **349/450** | |
 
 ### BE-01 open items
 
@@ -79,7 +79,7 @@
 | [FE-09](frontend/FE-09-narration-input-cursor.md) Narration & input cursor | M1, M3 | ⏳ | 0/18 | FE-02 §2, FE-08 §3 |
 | [FE-10](frontend/FE-10-goto-expected-output.md) Go to… & expected output | M1 | ⏳ | 0/20 | FE-02 §2, FE-03 |
 | [FE-11](frontend/FE-11-watch-timeline.md) Watch panel & timeline | M3, M5 | ⏳ | 0/12 | FE-08 §3, FE-10 §1 |
-| [FE-12](frontend/FE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/8 | BE-12, FE-02 §3 |
+| [FE-12](frontend/FE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/8 | FE-02 §3 (BE-12's share and revoke are in) |
 | [FE-13](frontend/FE-13-mobile-a11y-analytics.md) Mobile, a11y & analytics | M3 | ⏳ | 0/23 | FE-02 §4, FE-06, FE-07 |
 | [FE-14](frontend/FE-14-cp-data-views.md) CP data views | M5 | ⏳ | 0/32 | FE-06, FE-08, FE-10 |
 | **Total** | | | **59/347** | |
