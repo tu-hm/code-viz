@@ -141,11 +141,15 @@ func record(ctx context.Context, m domain.Manifest, src, stdin []byte, opts trac
 		Limits:   tracecore.DefaultLimits,
 		Validate: val.Wire,
 	})
+	env, err := app.TraceEnv(m, opts)
+	if err != nil {
+		return nil, err
+	}
 	traceCtx, cancelTrace := context.WithTimeout(ctx, wallTime)
 	defer cancelTrace()
 	exit, err := box.Run(traceCtx, ports.Command{
 		Args:   m.TraceCmd,
-		Env:    app.TraceEnv(m, opts),
+		Env:    env,
 		Stdout: rec.Stdout(),
 		Stderr: rec.Stderr(),
 		Wire:   rec.Wire(),

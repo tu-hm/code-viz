@@ -16,6 +16,7 @@ const (
 	MaxStdin        = 64 << 10
 	DefaultMaxSteps = 1000
 	MaxStepsCeiling = 5000
+	MaxCaptureJSON  = 4 << 10 // captureRanges reach the tracer as one environment variable
 )
 
 // CheckRequest checks a create request for the language of manifest m against §8.2 and §11.
@@ -43,10 +44,13 @@ func CheckRequest(m Manifest, source, stdin string, opts trace.Options) error {
 	}
 	for name, ranges := range opts.CaptureRanges {
 		for _, r := range ranges {
-			if len(r) != 2 || r[0] < 0 || r[1] < 0 {
-				return fmt.Errorf("captureRanges of %q must be pairs of indexes from 0: %w", name, ErrInvalidRequest)
+			if len(r) != 2 || r[0] < 0 || r[1] < r[0] {
+				return fmt.Errorf("captureRanges of %q must be pairs of indexes from 0, first to last: %w", name, ErrInvalidRequest)
 			}
 		}
+	}
+	if ranges, err := json.Marshal(opts.CaptureRanges); err != nil || len(ranges) > MaxCaptureJSON {
+		return fmt.Errorf("captureRanges must be at most %d KB as JSON: %w", MaxCaptureJSON>>10, ErrInvalidRequest)
 	}
 	if !SafetyChecks(opts) && (m.Build == nil || len(m.Build.SafetyFlags) == 0) {
 		return fmt.Errorf("%s has no safety checks to switch off: %w", m.ID, ErrInvalidRequest)

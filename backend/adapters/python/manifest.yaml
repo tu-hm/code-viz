@@ -15,7 +15,7 @@ capabilities:
   pointers: false
   exceptions: true
   startAtLines: true
-  captureRanges: false
+  captureRanges: true
 modules:
   allow:
     - __future__

@@ -17,6 +17,6 @@ capabilities:
   pointers: true
   exceptions: true
   startAtLines: true
-  captureRanges: false
+  captureRanges: true
 enabled: false
 rollout: { percent: 100 }

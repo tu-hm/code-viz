@@ -50,6 +50,8 @@ ARITHMETIC: dict[type[ast.operator], Callable[[int, int], int]] = {
 wire: io.TextIOWrapper
 max_steps = 1000
 start_lines: set[int] = set()
+capture: dict[str, tuple[int, int]] = {}  # variable name => (first index, count) to record of a long sequence (FR-11)
+windows: dict[int, tuple[int, int]] = {}  # id of a captured variable's value => its (first index, count), this step
 call_hook: TraceFunction
 sent = 0
 tail = False
@@ -159,9 +161,13 @@ def heap_object(x: object, seen: set[int], todo: list[object]) -> HeapObject:
     kind = type(x)
     if isinstance(x, (list, tuple, collections.deque)):
         seq = cast("Sequence[object]", x)
-        items = [encode(v, seen, todo) for v in itertools.islice(seq, MAX_ITEMS)]
+        start, count = (0, MAX_ITEMS) if len(seq) <= MAX_ITEMS else windows.get(id(seq), (0, MAX_ITEMS))
+        start = min(start, len(seq))
+        items = [encode(v, seen, todo) for v in itertools.islice(seq, start, start + min(count, MAX_ITEMS))]
         obj: HeapObject = {"kind": "sequence", "type": kind.__name__, "length": len(seq), "items": items,
-                           "truncated": len(seq) > MAX_ITEMS}
+                           "truncated": len(items) < len(seq)}
+        if len(items) < len(seq):
+            obj["window"] = {"start": start, "count": len(items)}
         if isinstance(x, tuple):
             obj["fixed"] = True
         return obj
@@ -199,6 +205,8 @@ def frame_object(frame: types.FrameType, seen: set[int], todo: list[object]) -> 
     kind = frame_kind(frame.f_code)
     locals_: list[Local] = []
     for name, value in frame.f_locals.items():
+        if name in capture:
+            windows[id(value)] = capture[name]
         local: Local = {"name": name, "value": encode(value, seen, todo)}
         if ((kind == "global" and name.startswith("__")) or name.startswith(".") or isinstance(value, types.ModuleType)
                 or (isinstance(value, FUNCTIONS) and not defined_here(value))):
@@ -232,6 +240,7 @@ def step(frame: types.FrameType, event: Event, error: StepError | None = None, r
     global sent, tail, call_hook
     frames = stack_of(frame)
     kept = frames if len(frames) <= MAX_FRAMES + 1 else frames[:1] + frames[-MAX_FRAMES:]
+    windows.clear()
     seen: set[int] = set()
     todo: list[object] = []
     stack = [frame_object(f, seen, todo) for f in kept]
@@ -493,6 +502,10 @@ def trace(path: str) -> Exit:
     global stdin, stdin_text, stdin_size, token_ends, max_steps, start_lines, call_hook, source
     max_steps = int(os.environ.get("VIZ_MAX_STEPS", "1000"))
     start_lines = {int(line) for line in os.environ.get("VIZ_START_AT_LINES", "").split(",") if line}
+    ranges = cast("dict[str, list[list[int]]]", json.loads(os.environ.get("VIZ_CAPTURE_RANGES", "{}")))
+    for name, pairs in ranges.items():
+        first = min(start for start, _ in pairs)
+        capture[name] = (first, max(end for _, end in pairs) - first + 1)
     with open(path, "rb") as f:
         src = f.read()
     source = src

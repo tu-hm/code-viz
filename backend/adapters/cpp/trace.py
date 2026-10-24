@@ -83,6 +83,7 @@ user_types = {}
 declarations = {}
 type_names = {}
 shown = {}  # key => sparse sequence as the core holds it after the last step message
+capture = {}  # variable name => (first index, count) to record of a sequence too long to record whole (FR-11)
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "typemap.json")) as f:
     TYPEMAP = json.load(f)
 # _GLIBCXX_DEBUG containers live in std::__debug, list and string in std::__cxx11
@@ -319,28 +320,34 @@ def checked_length(n):
     return n
 
 
-def sequence(items, length):
+def sequence(items, length, start=0):
     obj = {"kind": "sequence", "length": length, "items": items, "truncated": len(items) < length}
     if len(items) < length:
-        obj["window"] = {"start": 0, "count": len(items)}
+        obj["window"] = {"start": start, "count": len(items)}
     return obj
 
 
-def contiguous(base, addr, elem, length, head, snap, depth):
+def window(span, length, most):
+    start, count = span or (0, most)
+    start = min(start, length)
+    return start, min(count, most, length - start)
+
+
+def contiguous(base, addr, elem, length, head, span, snap, depth):
     t = elem.strip_typedefs()
     if addr is not None and length > SPARSE_MIN and unpack_format(t):
         size = t.sizeof
         whole = length * size <= MAX_ARRAY_BYTES and snap["read"] + length * size <= MAX_READ_BYTES
-        n = length if whole else min(length, WINDOW)
+        start, n = (0, length) if whole else window(span, length, WINDOW)
         snap["read"] += n * size
         # one read per array per step, diffed when the step is sent: 200k ints 0.1 ms (S6)
-        raw = gdb.selected_inferior().read_memory(addr, n * size).tobytes()
-        return dict(head, kind="sequence", length=length, read=(t, raw))
-    n = min(length, MAX_ITEMS)
-    items = scalars(addr, elem, n) if n else []
+        raw = gdb.selected_inferior().read_memory(addr + start * size, n * size).tobytes()
+        return dict(head, kind="sequence", length=length, read=(t, raw, start, span))
+    start, n = (0, length) if length <= MAX_ITEMS else window(span, length, MAX_ITEMS)
+    items = scalars(None if addr is None else addr + start * t.sizeof, elem, n) if n else []
     if items is None:
-        items = [item(base[i], snap, depth) for i in range(n)]
-    return dict(sequence(items, length), **head)
+        items = [item(base[i], snap, depth) for i in range(start, start + n)]
+    return dict(sequence(items, length, start), **head)
 
 
 def c_array(key, value, snap, depth):
@@ -352,7 +359,7 @@ def c_array(key, value, snap, depth):
     if addr is not None:
         e = elem.strip_typedefs()
         snap["arrays"].append((addr, length, e.sizeof, str(e.unqualified()), key))
-    return contiguous(value, addr, elem, length, {"fixed": True}, snap, depth)
+    return contiguous(value, addr, elem, length, {"fixed": True}, snap["spans"].get(key), snap, depth)
 
 
 def bits(addr, n):
@@ -402,7 +409,8 @@ def std_vector(key, value, r, snap, depth):
         return obj
     start = impl["_M_start"]
     head = {"meta": {"capacity": int(impl["_M_end_of_storage"] - start)}}
-    return contiguous(start, int(start), elem, checked_length(int(impl["_M_finish"] - start)), head, snap, depth)
+    length = checked_length(int(impl["_M_finish"] - start))
+    return contiguous(start, int(start), elem, length, head, snap["spans"].get(key), snap, depth)
 
 
 def std_array(key, value, r, snap, depth):
@@ -459,7 +467,7 @@ def unpack_format(t):
 
 
 def new_snap():
-    return {"heap": {}, "todo": collections.deque(), "arrays": [], "ptrs": [], "read": 0}
+    return {"heap": {}, "todo": collections.deque(), "arrays": [], "ptrs": [], "read": 0, "spans": {}}
 
 
 def send_step(msg):
@@ -486,7 +494,7 @@ def wire_object(key, obj, now):
 
 
 def sparse(obj, prev):
-    t, raw = obj["read"]
+    t, raw, first, span = obj["read"]
     head = {k: v for k, v in obj.items() if k != "read"}
     size, length = t.sizeof, obj["length"]
     pattern, real = "=" + INT_FORMATS[size], "=" + unpack_format(t)
@@ -502,20 +510,26 @@ def sparse(obj, prev):
             default, count = most_common(raw, size)
     else:
         default, count = most_common(raw, size)
-    window = None if count <= MAX_CELLS and len(raw) == length * size else min(length, WINDOW)
-    state = {"head": head, "raw": raw, "default": default, "count": count, "window": window}
+    whole = len(raw) == length * size
+    if whole and count <= MAX_CELLS:
+        shows = None
+    else:
+        shows = window(span, length, WINDOW) if whole else (first, len(raw) // size)
+    state = {"head": head, "raw": raw, "default": default, "count": count, "window": shows}
+    # cells numbered from the array's start; raw holds them from first
+    lo, hi = (first, first + len(raw) // size) if shows is None else (shows[0], shows[0] + shows[1])
 
     def cell(i):
-        return number(t, struct.unpack_from(real, raw, i * size)[0])
+        return number(t, struct.unpack_from(real, raw, (i - first) * size)[0])
 
-    if again and default == prev["default"] and window == prev["window"]:
+    if again and default == prev["default"] and shows == prev["window"]:
         return {"kind": "sequence", "type": obj["type"], "length": length,
-                "patch": {str(i): cell(i) for i in dirty if window is None or i < window}}, state
-    values = struct.unpack("=%d%s" % (len(raw) // size, INT_FORMATS[size]), raw)[:window]
+                "patch": {str(first + i): cell(first + i) for i in dirty if lo <= first + i < hi}}, state
+    values = struct.unpack("=%d%s" % (len(raw) // size, INT_FORMATS[size]), raw)
     out = dict(head, sparse={"default": number(t, struct.unpack(real, struct.pack(pattern, default))[0]),
-                             "items": {str(i): cell(i) for i, v in enumerate(values) if v != default}})
-    if window is not None:
-        out["truncated"], out["window"] = True, {"start": 0, "count": window}
+                             "items": {str(i): cell(i) for i in range(lo, hi) if values[i - first] != default}})
+    if shows is not None:
+        out["truncated"], out["window"] = True, {"start": shows[0], "count": shows[1]}
     return out, state
 
 
@@ -606,7 +620,10 @@ def variable(sym, frame, snap):
         value = sym.value() if frame is None else sym.value(frame)
     except UNREADABLE:
         return {"t": "unavailable", "reason": "unreadable", "type": type_name(sym.type)}
-    return encode(value, snap, 0)
+    out = encode(value, snap, 0)
+    if sym.name in capture and out["t"] == "ref":
+        snap["spans"][out["id"]] = capture[sym.name]
+    return out
 
 
 def global_symbols(symtab):
@@ -1337,6 +1354,9 @@ def open_stdin():
 def trace():
     max_steps = int(os.environ.get("VIZ_MAX_STEPS", "1000"))
     start_lines = {int(line) for line in os.environ.get("VIZ_START_AT_LINES", "").split(",") if line}
+    for name, ranges in json.loads(os.environ.get("VIZ_CAPTURE_RANGES", "{}")).items():
+        first = min(start for start, _ in ranges)
+        capture[name] = (first, max(end for _, end in ranges) - first + 1)
     for cmd in ("set pagination off", "set confirm off", "set suppress-cli-notifications on",
                 "set print inferior-events off", "set print thread-events off", "set startup-with-shell off",
                 "set disable-randomization on", "set backtrace past-main on",

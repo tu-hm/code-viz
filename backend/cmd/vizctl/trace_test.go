@@ -269,3 +269,81 @@ func TestErrorKindsHaveFixtures(t *testing.T) {
 		}
 	}
 }
+
+func TestCaptureRangesKeepTheSteps(t *testing.T) {
+	t.Chdir("../..")
+	paths, err := filepath.Glob(filepath.Join("fixtures", "*", "*", "options.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	type step struct {
+		Event          trace.Event
+		Line           int
+		Stdout, Stderr string
+	}
+	steps := func(tr trace.Trace) []step {
+		out := make([]step, len(tr.Steps))
+		for i, s := range tr.Steps {
+			out[i] = step{s.Event, s.Line, s.Stdout, s.Stderr}
+		}
+		return out
+	}
+
+	captured := 0
+	for _, path := range paths {
+		var opts map[string]json.RawMessage
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := json.Unmarshal(raw, &opts); err != nil {
+			t.Fatal(err)
+		}
+		if _, ok := opts["captureRanges"]; !ok {
+			continue
+		}
+		captured++
+		dir := filepath.Dir(path)
+		t.Run(filepath.Base(filepath.Dir(dir))+"/"+filepath.Base(dir), func(t *testing.T) {
+			m, err := manifest.Read(filepath.Join(adapterDir, filepath.Base(filepath.Dir(dir)), "manifest.yaml"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			delete(opts, "captureRanges")
+			plain, err := json.Marshal(opts)
+			if err != nil {
+				t.Fatal(err)
+			}
+			optsFile := filepath.Join(t.TempDir(), "options.json")
+			if err := os.WriteFile(optsFile, plain, 0o644); err != nil {
+				t.Fatal(err)
+			}
+			stdin, err := os.ReadFile(filepath.Join(dir, "stdin"))
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				t.Fatal(err)
+			}
+			var stdout, stderr bytes.Buffer
+			args := []string{"trace", "--lang", m.ID, "--options", optsFile, filepath.Join(dir, m.SourceFile)}
+			if code := run(t.Context(), args, bytes.NewReader(stdin), &stdout, &stderr); code != 0 {
+				t.Fatalf("vizctl trace exited %d:\n%s", code, stderr.String())
+			}
+			var got, want trace.Trace
+			if err := json.Unmarshal(stdout.Bytes(), &got); err != nil {
+				t.Fatal(err)
+			}
+			golden, err := os.ReadFile(filepath.Join(dir, "expected.trace.json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := json.Unmarshal(golden, &want); err != nil {
+				t.Fatal(err)
+			}
+			if diff := cmp.Diff(steps(want), steps(got)); diff != "" {
+				t.Errorf("steps with captureRanges (-golden +without):\n%s", diff)
+			}
+		})
+	}
+	if captured == 0 {
+		t.Fatal("no fixture's options.json has captureRanges")
+	}
+}

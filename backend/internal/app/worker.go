@@ -244,9 +244,13 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 	if err := w.Queue.Tracing(ctx, l, w.Now()); err != nil {
 		return fmt.Errorf("mark tracing: %w: %w", domain.ErrInfra, err)
 	}
+	env, err := TraceEnv(m, job.Options)
+	if err != nil {
+		return err
+	}
 	exit, err := box.Run(runCtx, ports.Command{
 		Args:   m.TraceCmd,
-		Env:    TraceEnv(m, job.Options),
+		Env:    env,
 		Stdout: rec.Stdout(),
 		Stderr: rec.Stderr(),
 		Wire:   rec.Wire(),
@@ -319,8 +323,9 @@ func (w *Worker) fail(ctx context.Context, l ports.Lease) {
 	}
 }
 
-// TraceEnv is the environment of m's trace command for opts (§10.2): the step limit and the start lines, then m's trace.env.
-func TraceEnv(m domain.Manifest, opts trace.Options) []string {
+// TraceEnv is the environment of m's trace command for opts (§10.2): the step limit, the start lines and the capture
+// ranges, then m's trace.env.
+func TraceEnv(m domain.Manifest, opts trace.Options) ([]string, error) {
 	env := []string{"VIZ_MAX_STEPS=" + strconv.Itoa(opts.MaxSteps)}
 	if len(opts.StartAtLines) > 0 {
 		lines := make([]string, len(opts.StartAtLines))
@@ -329,7 +334,14 @@ func TraceEnv(m domain.Manifest, opts trace.Options) []string {
 		}
 		env = append(env, "VIZ_START_AT_LINES="+strings.Join(lines, ","))
 	}
-	return append(env, m.TraceEnv...)
+	if len(opts.CaptureRanges) > 0 {
+		ranges, err := json.Marshal(opts.CaptureRanges)
+		if err != nil {
+			return nil, fmt.Errorf("encode captureRanges: %w", err)
+		}
+		env = append(env, "VIZ_CAPTURE_RANGES="+string(ranges))
+	}
+	return append(env, m.TraceEnv...), nil
 }
 
 func lineCount(src string) int {
