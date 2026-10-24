@@ -1,4 +1,4 @@
-.PHONY: gen gen-go test test-nsjail golden-update images runner-images dev down reset seed lint fmt vuln check check-static gen-check
+.PHONY: gen gen-go test test-nsjail golden-update images runner-images dev down reset seed lint fmt vuln typecheck check check-static gen-check
 
 include .env.example
 -include .env
@@ -9,6 +9,7 @@ GEN_PKG := github.com/tu-hm/code-viz/backend/internal/gen
 GOLANGCI_LINT := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
 GOVULNCHECK := go run golang.org/x/vuln/cmd/govulncheck@v1.9.0
 SQLC := go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1
+PYRIGHT := npx --yes pyright@1.1.414
 
 gen: gen-go
 	pnpm --dir ../web gen
@@ -81,6 +82,9 @@ fmt:
 vuln:
 	$(GOVULNCHECK) ./...
 
+typecheck:
+	$(PYRIGHT) -p adapters
+
 # check-static: lint + vuln + mod tidy in parallel (CI fast path)
 check-static:
 	@rc=0; \
@@ -98,6 +102,6 @@ gen-check:
 	@test -z "$$(git status --porcelain -- internal/gen adapters/wire.py)" || { git status --short -- internal/gen adapters/wire.py; echo "check: make gen changed generated code; commit it" >&2; exit 1; }
 
 # check: full local pre-push gate (sequential, includes everything)
-check: lint vuln test test-nsjail
+check: lint vuln typecheck test test-nsjail
 	go mod tidy -diff
 	@$(MAKE) --no-print-directory gen-check
