@@ -10,29 +10,20 @@ import (
 	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/goccy/go-yaml"
 	"github.com/google/go-cmp/cmp"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/blobstore"
 	"github.com/tu-hm/code-viz/backend/internal/domain"
 	"github.com/tu-hm/code-viz/backend/internal/ports"
 )
 
-const bucket = "viz-test"
-
 func TestPutStoresGzippedJSONUnderChunkKey(t *testing.T) {
-	endpoint := startSeaweedFS(t)
-	if resp := do(t, http.MethodPut, endpoint+"/"+bucket); resp.StatusCode != http.StatusOK {
-		t.Fatalf("create bucket: HTTP %d", resp.StatusCode)
-	}
+	bucket := createBucket(t)
 	var buf bytes.Buffer
 	zw := gzip.NewWriter(&buf)
 	if _, err := zw.Write([]byte(`[{"line":1}]`)); err != nil {
@@ -42,11 +33,11 @@ func TestPutStoresGzippedJSONUnderChunkKey(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := newBucket(t, endpoint).Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 3), buf.Bytes()); err != nil {
+	if err := newBucket(t, s3, bucket).Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 3), buf.Bytes()); err != nil {
 		t.Fatal(err)
 	}
 
-	resp := do(t, http.MethodGet, endpoint+"/"+bucket+"/t7/trc_0123/chunk-0003.json.gz")
+	resp := do(t, http.MethodGet, s3+"/"+bucket+"/t7/trc_0123/chunk-0003.json.gz")
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("get chunk: HTTP %d", resp.StatusCode)
 	}
@@ -76,7 +67,7 @@ func TestPutRetriesThreeTimesThenFailsAsInfraError(t *testing.T) {
 	}))
 	t.Cleanup(down.Close)
 
-	err := newBucket(t, down.URL).Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 0), []byte("x"))
+	err := newBucket(t, down.URL, "down").Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 0), []byte("x"))
 	if !errors.Is(err, domain.ErrInfra) {
 		t.Fatalf("err = %v, want ErrInfra", err)
 	}
@@ -96,18 +87,15 @@ func TestPutToUnreachableEndpointIsInfraError(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = newBucket(t, closed).Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 0), []byte("x"))
+	err = newBucket(t, closed, "down").Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 0), []byte("x"))
 	if !errors.Is(err, domain.ErrInfra) {
 		t.Fatalf("err = %v, want ErrInfra", err)
 	}
 }
 
 func TestSignedURLDownloadsFromThePublicEndpoint(t *testing.T) {
-	endpoint := startSeaweedFS(t)
-	if resp := do(t, http.MethodPut, endpoint+"/"+bucket); resp.StatusCode != http.StatusOK {
-		t.Fatalf("create bucket: HTTP %d", resp.StatusCode)
-	}
-	target, err := url.Parse(endpoint)
+	bucket := createBucket(t)
+	target, err := url.Parse(s3)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +105,7 @@ func TestSignedURLDownloadsFromThePublicEndpoint(t *testing.T) {
 	}})
 	t.Cleanup(public.Close)
 
-	b := newBucketWithPublic(t, endpoint, public.URL)
+	b := newBucketWithPublic(t, s3, public.URL, bucket)
 	key := domain.ChunkKey("t7", "trc_0123", 0)
 	if err := b.Put(t.Context(), key, []byte("chunk")); err != nil {
 		t.Fatal(err)
@@ -144,11 +132,8 @@ func TestSignedURLDownloadsFromThePublicEndpoint(t *testing.T) {
 }
 
 func TestDeleteRemovesTheKeysAndSkipsMissingOnes(t *testing.T) {
-	endpoint := startSeaweedFS(t)
-	if resp := do(t, http.MethodPut, endpoint+"/"+bucket); resp.StatusCode != http.StatusOK {
-		t.Fatalf("create bucket: HTTP %d", resp.StatusCode)
-	}
-	b := newBucket(t, endpoint)
+	bucket := createBucket(t)
+	b := newBucket(t, s3, bucket)
 	keys := []string{domain.ChunkKey("t7", "trc_a", 0), domain.ChunkKey("t7", "trc_a", 1), domain.ChunkKey("t7", "trc_b", 0)}
 	for _, key := range keys {
 		if err := b.Put(t.Context(), key, []byte("x")); err != nil {
@@ -162,7 +147,7 @@ func TestDeleteRemovesTheKeysAndSkipsMissingOnes(t *testing.T) {
 
 	got := map[string]int{}
 	for _, key := range keys {
-		got[key] = do(t, http.MethodGet, endpoint+"/"+bucket+"/"+key).StatusCode
+		got[key] = do(t, http.MethodGet, s3+"/"+bucket+"/"+key).StatusCode
 	}
 	want := map[string]int{keys[0]: http.StatusNotFound, keys[1]: http.StatusNotFound, keys[2]: http.StatusOK}
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -180,18 +165,18 @@ func TestDeleteOnUnreachableEndpointIsInfraError(t *testing.T) {
 	if err := ln.Close(); err != nil {
 		t.Fatal(err)
 	}
-	err = newBucket(t, closed).Delete(t.Context(), []string{domain.ChunkKey("t7", "trc_0123", 0)})
+	err = newBucket(t, closed, "down").Delete(t.Context(), []string{domain.ChunkKey("t7", "trc_0123", 0)})
 	if !errors.Is(err, domain.ErrInfra) {
 		t.Fatalf("err = %v, want ErrInfra", err)
 	}
 }
 
-func newBucket(t *testing.T, endpoint string) ports.BlobStore {
+func newBucket(t *testing.T, endpoint, bucket string) ports.BlobStore {
 	t.Helper()
-	return newBucketWithPublic(t, endpoint, "")
+	return newBucketWithPublic(t, endpoint, "", bucket)
 }
 
-func newBucketWithPublic(t *testing.T, endpoint, public string) ports.BlobStore {
+func newBucketWithPublic(t *testing.T, endpoint, public, bucket string) ports.BlobStore {
 	t.Helper()
 	t.Setenv("AWS_REGION", "us-east-1")
 	t.Setenv("AWS_ACCESS_KEY_ID", "viz")
@@ -201,43 +186,6 @@ func newBucketWithPublic(t *testing.T, endpoint, public string) ports.BlobStore 
 		t.Fatal(err)
 	}
 	return b
-}
-
-func startSeaweedFS(t *testing.T) string {
-	t.Helper()
-	raw, err := os.ReadFile("../../../compose.yaml")
-	if err != nil {
-		t.Fatal(err)
-	}
-	var compose struct {
-		Services map[string]struct {
-			Image   string   `yaml:"image"`
-			Command []string `yaml:"command"`
-		} `yaml:"services"`
-	}
-	if err := yaml.Unmarshal(raw, &compose); err != nil {
-		t.Fatal(err)
-	}
-	service := compose.Services["seaweedfs"]
-
-	c, err := testcontainers.GenericContainer(t.Context(), testcontainers.GenericContainerRequest{
-		ContainerRequest: testcontainers.ContainerRequest{
-			Image:        service.Image,
-			Cmd:          service.Command,
-			ExposedPorts: []string{"8333/tcp"},
-			WaitingFor:   wait.ForHTTP("/healthz").WithPort("8333/tcp"),
-		},
-		Started: true,
-	})
-	testcontainers.CleanupContainer(t, c, testcontainers.StopTimeout(0))
-	if err != nil {
-		t.Fatal(err)
-	}
-	endpoint, err := c.PortEndpoint(t.Context(), "8333/tcp", "http")
-	if err != nil {
-		t.Fatal(err)
-	}
-	return endpoint
 }
 
 type response struct {
