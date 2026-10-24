@@ -387,6 +387,5 @@ Spec §11 has the full list, including the ones only the trace shows (wall time,
 
 ## Not built yet
 
-- **C++ through the API**: the tracer works, but the manifest is disabled, so `GET /languages` leaves it out and a POST gets `422`.
 - **Sign-in**: every caller is anonymous. The signed-in quota (1,000 a day) waits for it.
 - **The per-IP rate limit** (30 creates a minute, `429`) is a reverse proxy rule, not part of vizd, so you won't hit it locally.
