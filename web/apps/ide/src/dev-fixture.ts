@@ -17,8 +17,8 @@ export async function devFixture(search: string): Promise<DevFixture | null> {
   if (!fixtureNames.includes(name)) {
     throw new Error(`?fixture=${name}: want one of ${fixtureNames.join(', ')}`)
   }
-  const { header, chunks, source, stdin } = loadFixture(name)
+  const { header, chunks, source, stdin, tail } = loadFixture(name)
   const language = languages.languages.find((l) => l.id === header.language.id)
   if (!language) throw new Error(`fixture ${name}: GET /languages has no ${header.language.id}`)
-  return { source: { header, chunks }, code: source, stdin, language }
+  return { source: { header, chunks, tail }, code: source, stdin, language }
 }

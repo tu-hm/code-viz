@@ -2,7 +2,7 @@
 import { setupServer } from 'msw/node'
 import { afterEach, describe, expect, test } from 'vitest'
 import type { components } from '../gen/api.ts'
-import { handlers, type Scenario } from './handlers.ts'
+import { handlers, scenarios, type Scenario } from './handlers.ts'
 
 type Visualization = components['schemas']['Visualization']
 
@@ -16,14 +16,15 @@ const final = ['completed', 'failed', 'canceled']
 async function visualize(scenario: Scenario) {
   server.use(...handlers(api, scenario))
   const created = await fetch(`${api}/visualizations`, { method: 'POST', body: '{}' })
-  if (created.status !== 201) return { created, history: [] }
+  if (created.status !== 201) return { created, history: [], refused: created }
   const history = [(await created.json()) as Visualization]
   while (!final.includes(history.at(-1)!.status)) {
     const { id, version } = history.at(-1)!
     const res = await fetch(`${api}/visualizations/${id}?wait=20&since=${version}`)
+    if (!res.ok) return { created, history, refused: res }
     history.push((await res.json()) as Visualization)
   }
-  return { created, history }
+  return { created, history, refused: null }
 }
 
 async function sha256(bytes: ArrayBuffer) {
@@ -31,41 +32,81 @@ async function sha256(bytes: ArrayBuffer) {
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+type Run = Awaited<ReturnType<typeof visualize>>
+const last = (run: Run) => run.history.at(-1)!
+const refusedWith =
+  (status: number, code: string, retryAfter: string | null) => async (run: Run) => {
+    expect(run.refused?.status).toBe(status)
+    expect(run.refused?.headers.get('Retry-After') ?? null).toBe(retryAfter)
+    expect(await run.refused!.json()).toMatchObject({ error: { code } })
+  }
+const completedWith = (check: (header: Visualization) => void) => (run: Run) => {
+  expect(last(run).status).toBe('completed')
+  check(last(run))
+}
+
+const want: Record<Scenario, (run: Run) => unknown> = {
+  completed: completedWith((v) => expect(v.trace!.header.summary.exit.kind).toBe('normal')),
+  'slow-tracing': (run) => {
+    expect(run.history.map((v) => v.status)).toEqual([
+      'queued',
+      'building',
+      'tracing',
+      'tracing',
+      'tracing',
+      'completed',
+    ])
+    const steps = run.history.flatMap((v) => (v.progress ? [v.progress.steps] : []))
+    expect(steps).toEqual([...steps].sort((a, b) => a - b))
+    const versions = run.history.map((v) => v.version)
+    expect(versions).toEqual([...new Set(versions)].sort((a, b) => a - b))
+  },
+  'failed-build': (run) =>
+    expect(last(run)).toMatchObject({ status: 'failed', failure: { kind: 'compile_error' } }),
+  'unsupported-module': (run) =>
+    expect(last(run)).toMatchObject({ status: 'failed', failure: { kind: 'unsupported_module' } }),
+  'internal-error': (run) =>
+    expect(last(run)).toMatchObject({ status: 'failed', failure: { kind: 'sandbox_error' } }),
+  canceled: (run) => expect(last(run).status).toBe('canceled'),
+  busy: refusedWith(503, 'capacity', '5'),
+  'rate-limited': refusedWith(429, 'rate_limited', '20'),
+  'server-error': refusedWith(500, 'internal_error', null),
+  expired: refusedWith(410, 'expired', null),
+  'not-found': refusedWith(404, 'not_found', null),
+  'runtime-error': completedWith((v) => expect(v.trace!.header.summary.exit.kind).toBe('signal')),
+  'step-limit': completedWith((v) => {
+    expect(v.trace!.header.summary.truncation?.reason).toBe('step_limit')
+    expect(v.trace!.tail).toBeDefined()
+  }),
+  timeout: completedWith((v) => expect(v.trace!.header.summary.exit.kind).toBe('timeout')),
+  'output-limit': completedWith((v) =>
+    expect(v.trace!.header.summary.exit.kind).toBe('output_limit'),
+  ),
+  'build-warnings': completedWith((v) =>
+    expect(v.build!.diagnostics.map((d) => d.severity)).toEqual(['warning', 'warning']),
+  ),
+  'nothing-traced': completedWith((v) => {
+    expect(v.trace!.header.summary.stepCount).toBe(0)
+    expect(v.trace!.chunks).toEqual([])
+  }),
+}
+
 describe('mock API', () => {
-  test('completed serves chunks whose size and sha256 match the manifest', async () => {
-    const { history } = await visualize('completed')
-    const trace = history.at(-1)!.trace!
-    expect(trace.chunks.length).toBeGreaterThan(0)
-    for (const chunk of trace.chunks) {
-      const bytes = await (await fetch(chunk.url)).arrayBuffer()
-      expect(bytes.byteLength).toBe(chunk.sizeBytes)
-      expect(await sha256(bytes)).toBe(chunk.sha256)
-    }
+  test.each(scenarios)('%s ends in the state it names', async (scenario) => {
+    await want[scenario](await visualize(scenario))
   })
 
-  test('failed-build ends failed with a compile error', async () => {
-    const { history } = await visualize('failed-build')
-    expect(history.at(-1)).toMatchObject({ status: 'failed', failure: { kind: 'compile_error' } })
-  })
-
-  test('busy answers 503 capacity with Retry-After', async () => {
-    const { created } = await visualize('busy')
-    expect(created.status).toBe(503)
-    expect(created.headers.get('Retry-After')).toBe('5')
-    expect(await created.json()).toMatchObject({ error: { code: 'capacity' } })
-  })
-
-  test('slow-tracing reports rising progress, then completes', async () => {
-    const { history } = await visualize('slow-tracing')
-    const tracing = history.filter((v) => v.status === 'tracing')
-    expect(tracing.length).toBeGreaterThan(1)
-    expect(history.map((v) => v.version)).toEqual(
-      [...history.map((v) => v.version)].sort((a, b) => a - b),
-    )
-    expect(new Set(history.map((v) => v.version)).size).toBe(history.length)
-    expect(tracing.map((v) => v.progress!.steps)).toEqual(
-      [...tracing.map((v) => v.progress!.steps)].sort((a, b) => a - b),
-    )
-    expect(history.at(-1)!.status).toBe('completed')
-  })
+  test.each(scenarios)(
+    '%s serves files whose size and sha256 match the manifest',
+    async (scenario) => {
+      const run = await visualize(scenario)
+      const trace = run.history.at(-1)?.trace
+      const files = [...(trace?.chunks ?? []), ...(trace?.tail ? [trace.tail] : [])]
+      for (const file of files) {
+        const bytes = await (await fetch(file.url)).arrayBuffer()
+        expect(bytes.byteLength).toBe(file.sizeBytes)
+        expect(await sha256(bytes)).toBe(file.sha256)
+      }
+    },
+  )
 })

@@ -41,9 +41,10 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 ## Frontend
 
 - [Code pane keyboard](frontend/code-pane-keyboard.md): the code pane takes focus for the caret and Enter, but ← → Home End Space Esc stay the player's
+- [Empty trace](frontend/empty-trace.md): a trace with no steps gets the IDE's own screen with the tail, never the player
 - [Go to… search rules](frontend/goto-search.md): "next change" reads the innermost frame that declares the name and follows refs, not pointers; a line jump skips return steps
 - [Run error banner](frontend/run-error-banner.md): the status bar explains only the error the program died of, found by walking back over its unwinding; a caught error gets no banner
-- [Visualize run](frontend/visualize-run.md): the create keeps its promise so Close can delete an unanswered run; the long-poll is one `queryFn` loop that resumes from the cached version; only unfinished runs are deleted
+- [Visualize run](frontend/visualize-run.md): the create keeps its promise so Close can delete an unanswered run; the long-poll is one `queryFn` loop that resumes from the cached version; only unfinished runs are deleted; Retry keeps the `Idempotency-Key`, a re-run gets a new one
 - [Vendored agent skills](frontend/vendored-agent-skills.md): React, composition and web design skills live as plain copies in `web/.claude/skills`; `web/AGENTS.md` wins over them
 
 ## Backend

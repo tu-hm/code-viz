@@ -86,6 +86,7 @@ const pairs: [fg: string, bgs: string[], min: number][] = [
   ['content-tertiary', ['bg-canvas', 'bg-surface'], mark],
   ['border-control', ['bg-canvas', 'bg-surface'], mark],
   ['border-focus', ['bg-canvas', 'bg-surface'], mark],
+  ['bg-fill-brand', ['bg-canvas', 'bg-surface'], mark],
   ['syntax-keyword', ['bg-surface', 'trace-executed-bg', 'trace-error-bg'], text],
   ['syntax-string', ['bg-surface', 'trace-executed-bg', 'trace-error-bg'], text],
   ['syntax-comment', ['bg-surface', 'trace-executed-bg', 'trace-error-bg'], text],

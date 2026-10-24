@@ -4,7 +4,7 @@ import { Button } from '@viz/ui'
 import { useEffect, useEffectEvent, useId, useState } from 'react'
 import { version } from '../package.json'
 import type { Language } from './api.ts'
-import { Editor } from './editor.tsx'
+import { Editor, type Cursor } from './editor.tsx'
 import { useFlag } from './flags.ts'
 import { starter, type Draft } from './starters.ts'
 import { languagesQuery, useRun } from './visualize.ts'
@@ -14,6 +14,7 @@ type IdeViewProps = {
   languages: Language[]
   language: Language
   draft: Draft
+  cursor: Cursor | null
   onLanguage: (id: string) => void
   onCode: (code: string) => void
   onStdin: (stdin: string) => void
@@ -28,6 +29,7 @@ function IdeView({
   languages,
   language,
   draft,
+  cursor,
   onLanguage,
   onCode,
   onStdin,
@@ -85,6 +87,7 @@ function IdeView({
           key={language.id}
           code={draft.code}
           editorMode={language.editorMode}
+          cursor={cursor}
           onChange={onCode}
         />
       </div>
@@ -115,7 +118,8 @@ export function Ide() {
   const languages = useQuery(languagesQuery)
   const [languageId, setLanguageId] = useState<string | null>(null)
   const [drafts, setDrafts] = useState<Record<string, Draft>>({})
-  const { run, created, error, start, close } = useRun()
+  const [cursor, setCursor] = useState<Cursor | null>(null)
+  const { run, created, error, start, retry, close } = useRun()
 
   if (languages.data === undefined) {
     if (languages.error === null) {
@@ -168,6 +172,7 @@ export function Ide() {
           languages={languages.data}
           language={language}
           draft={draft}
+          cursor={cursor}
           onLanguage={setLanguageId}
           onCode={(code) => edit({ code })}
           onStdin={(stdin) => edit({ stdin })}
@@ -175,7 +180,19 @@ export function Ide() {
         />
       </div>
       {run !== null && (
-        <Visualizer key={run.key} run={run} created={created} error={error} onClose={close} />
+        <Visualizer
+          key={run.key}
+          run={run}
+          created={created}
+          error={error}
+          onClose={close}
+          onRetry={retry}
+          onRerun={(request) => start(request, run.language)}
+          onGoToLine={(line, column) => {
+            close()
+            setCursor({ line, column })
+          }}
+        />
       )}
     </>
   )

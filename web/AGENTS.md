@@ -104,6 +104,7 @@ Code that looks right and isn't. When you hit a new one, add it here in the same
 - **openapi-fetch's response types turn tuples into arrays.** Its `Readable<T>` maps every array, so the trace's `captureRanges` pairs come back as `number[][]` and don't fit the player's `[number, number][]`. Check them back into pairs (`toManifest` in `visualizer.tsx`); `--array-length` in codegen doesn't help.
 - **TanStack Query keeps `isError` after a failed background refetch, with the old data.** A screen that checks `isError` first swaps a working page for an error when a refetch on focus fails, and unmounts what it held. Check `data === undefined` first (`Ide` in `ide.tsx`).
 - **A new fixture directory doesn't reach the tests.** Vitest keeps transformed modules in `node_modules/.vitest-cache` (`fsModuleCache`), keyed by the module's own source, so `fixtures/index.ts` keeps the `import.meta.glob` file list it had and `fixtureNames` misses the new trace while every test passes. Run `pnpm exec vitest --clearCache` after adding or removing a fixture.
+- **MSW's `delay()` barely waits in Node.** With no argument it waits 100–400 ms in the browser but 5 ms under Vitest, so `slow-tracing` runs its long-polls back to back and a test waiting for "Tracing…" can miss it. Prepend a handler that delays and falls through (`slowPolls` in `ide.test.tsx`).
 - **Prettier run inside a package ignores `web/.prettierignore`.** `prettier --write src` from `apps/ide` reformats `src/gen/`. Run it from `web/` (`pnpm fmt`).
 
 ## Before you hand back

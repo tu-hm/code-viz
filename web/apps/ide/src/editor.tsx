@@ -30,21 +30,25 @@ const theme = EditorView.theme({
   },
 })
 
+export type Cursor = { line: number; column: number }
+
 type EditorProps = {
   code: string
   editorMode: string
+  cursor: Cursor | null
   onChange: (code: string) => void
 }
 
-// Editor is uncontrolled: it reads code only when it creates its view.
-export function Editor({ code, editorMode, onChange }: EditorProps) {
+// Editor is uncontrolled: it reads code only when it creates its view, and moves the caret to each new cursor.
+export function Editor({ code, editorMode, cursor, onChange }: EditorProps) {
   const parent = useRef<HTMLDivElement>(null)
+  const view = useRef<EditorView | null>(null)
   const changed = useEffectEvent(onChange)
   const latestCode = useEffectEvent(() => code)
 
   useEffect(() => {
     const language = new Compartment()
-    const view = new EditorView({
+    const editor = new EditorView({
       parent: parent.current!,
       state: EditorState.create({
         doc: latestCode(),
@@ -64,18 +68,30 @@ export function Editor({ code, editorMode, onChange }: EditorProps) {
         ],
       }),
     })
+    view.current = editor
     let alive = true
     loadLanguage(editorMode).then(
       (extension) => {
-        if (alive) view.dispatch({ effects: language.reconfigure(extension) })
+        if (alive) editor.dispatch({ effects: language.reconfigure(extension) })
       },
       (e: unknown) => reportError(e),
     )
     return () => {
       alive = false
-      view.destroy()
+      view.current = null
+      editor.destroy()
     }
   }, [editorMode])
+
+  useEffect(() => {
+    const editor = view.current
+    if (cursor === null || editor === null) return
+    const { doc } = editor.state
+    const line = doc.line(Math.min(cursor.line, doc.lines))
+    const at = Math.min(line.from + cursor.column - 1, line.to)
+    editor.dispatch({ selection: { anchor: at }, scrollIntoView: true })
+    editor.focus()
+  }, [cursor])
 
   return <div ref={parent} className="h-full min-h-0 overflow-hidden bg-muted" />
 }

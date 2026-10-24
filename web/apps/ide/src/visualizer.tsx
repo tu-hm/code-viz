@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { Player, type Manifest } from '@viz/player'
-import { Button } from '@viz/ui'
-import { useMemo, type ReactNode } from 'react'
-import { getVisualization, isApiError, type Visualization } from './api.ts'
+import { loadTrace, Player, usePlayer, type Manifest } from '@viz/player'
+import { useMemo, useState } from 'react'
+import { getVisualization, type CreateRequest, type Visualization } from './api.ts'
+import { BuildWarnings, type GoToLine } from './diagnostics.tsx'
 import { PlayerErrorBoundary } from './error-boundary.tsx'
+import { ShowRangeDialog, StartAtDialog } from './rerun-dialogs.tsx'
+import { ApiErrorScreen, EndedScreen, LoadingScreen, NoStepsScreen } from './run-screens.tsx'
 import { isFinal, visualizationQuery, type Run } from './visualize.ts'
 
 type Props = {
@@ -11,119 +13,13 @@ type Props = {
   created: Visualization | undefined
   error: unknown
   onClose: () => void
-}
-
-function Screen({
-  language,
-  phase,
-  children,
-}: {
-  language: string
-  phase: string
-  children: ReactNode
-}) {
-  return (
-    <div className="flex h-dvh flex-col bg-background text-foreground">
-      <header className="px-(--pane-padding) py-2">
-        <h1 className="truncate font-medium">
-          Visualizer · {language} · {phase}
-        </h1>
-      </header>
-      <div className="flex flex-col items-start gap-3 p-6">{children}</div>
-    </div>
-  )
-}
-
-const statusText: Record<Visualization['status'], string> = {
-  queued: 'Queued',
-  building: 'Building',
-  tracing: 'Tracing',
-  completed: 'Ready',
-  failed: 'Failed',
-  canceled: 'Canceled',
-}
-
-function LoadingScreen({
-  language,
-  visualization,
-  onCancel,
-}: {
-  language: string
-  visualization: Visualization | null
-  onCancel: () => void
-}) {
-  const steps = visualization?.progress?.steps
-  return (
-    <Screen language={language} phase="preparing">
-      <p role="status">
-        {visualization === null ? 'Sending' : statusText[visualization.status]}
-        {steps !== undefined && ` (${steps.toLocaleString('en')} steps so far)`}…
-      </p>
-      <Button onClick={onCancel}>Cancel</Button>
-    </Screen>
-  )
-}
-
-function errorText(error: unknown) {
-  if (isApiError(error)) return error.message
-  if (error instanceof TypeError) return "Couldn't reach the visualizer. Check your connection."
-  return error instanceof Error ? error.message : String(error)
-}
-
-function ErrorScreen({
-  language,
-  error,
-  onClose,
-}: {
-  language: string
-  error: unknown
-  onClose: () => void
-}) {
-  return (
-    <Screen language={language} phase="error">
-      <div role="alert" className="flex flex-col gap-1">
-        <p>{errorText(error)}</p>
-        {isApiError(error) && error.requestId !== null && (
-          <p className="font-mono text-xs text-muted-foreground select-all">
-            Request ID: {error.requestId}
-          </p>
-        )}
-      </div>
-      <Button onClick={onClose}>Close</Button>
-    </Screen>
-  )
-}
-
-function EndedScreen({
-  language,
-  visualization,
-  onClose,
-}: {
-  language: string
-  visualization: Visualization
-  onClose: () => void
-}) {
-  const { failure, build } = visualization
-  return (
-    <Screen language={language} phase={failure?.stage === 'build' ? 'build error' : 'stopped'}>
-      <p role="alert">
-        {failure === undefined
-          ? 'This visualization was canceled.'
-          : failure.kind === 'compile_error'
-            ? 'Build failed. Fix the error and visualize again.'
-            : `The visualizer couldn't run this program (${failure.kind}).`}
-      </p>
-      {build?.raw !== undefined && (
-        <pre className="max-w-full overflow-auto rounded-xl bg-muted p-3 font-mono text-xs">
-          {build.raw}
-        </pre>
-      )}
-      <Button onClick={onClose}>Close</Button>
-    </Screen>
-  )
+  onRetry: () => void
+  onRerun: (request: CreateRequest) => void
+  onGoToLine: GoToLine
 }
 
 type ApiManifest = NonNullable<Visualization['trace']>
+type Options = CreateRequest['options']
 
 function pair(range: number[]): [number, number] {
   const [from, to] = range
@@ -148,32 +44,133 @@ async function freshManifest(id: string) {
   return toManifest(trace)
 }
 
+function StartAtBox({
+  open,
+  run,
+  lineCount,
+  onCancel,
+  onRerun,
+}: {
+  open: boolean
+  run: Run
+  lineCount: number
+  onCancel: () => void
+  onRerun: (options: Partial<Options>) => void
+}) {
+  const breakpoints = usePlayer((s) => s.breakpoints)
+  return (
+    <StartAtDialog
+      open={open}
+      lineCount={lineCount}
+      breakpoints={breakpoints}
+      maxSteps={run.request.options.maxSteps}
+      maxStepsCeiling={run.language.visualize.limits.maxStepsCeiling}
+      onCancel={onCancel}
+      onVisualize={onRerun}
+    />
+  )
+}
+
 function Completed({
   run,
-  id,
+  visualization,
   trace,
   onClose,
+  onRerun,
+  onGoToLine,
 }: {
   run: Run
-  id: string
+  visualization: Visualization
   trace: ApiManifest
   onClose: () => void
+  onRerun: (request: CreateRequest) => void
+  onGoToLine: GoToLine
 }) {
+  const { id, build } = visualization
   // useSession starts over on a new source object
   const source = useMemo(
     () => ({ manifest: toManifest(trace), refresh: () => freshManifest(id) }),
     [id, trace],
   )
-  return (
-    <PlayerErrorBoundary traceId={trace.header.id}>
-      <Player
-        source={source}
-        code={run.request.source}
-        stdin={run.request.stdin}
-        language={run.language}
-        onClose={onClose}
+  const empty = trace.header.summary.stepCount === 0
+  const tail = useQuery({
+    queryKey: ['tail', trace.header.id],
+    queryFn: async () => (await loadTrace(source)).tail,
+    enabled: empty,
+    staleTime: Infinity,
+  })
+  const [startAt, setStartAt] = useState(false)
+  const [rangeOf, setRangeOf] = useState<string | null>(null)
+  const { capabilities, limits } = run.language.visualize
+  const rerun = (options: Partial<Options>) =>
+    onRerun({ ...run.request, options: { ...run.request.options, ...options } })
+  const onStartAt = capabilities.startAtLines ? () => setStartAt(true) : undefined
+
+  const dialogs = (
+    <>
+      <StartAtBox
+        open={startAt}
+        run={run}
+        lineCount={trace.header.source.lineCount}
+        onCancel={() => setStartAt(false)}
+        onRerun={rerun}
       />
-    </PlayerErrorBoundary>
+      <ShowRangeDialog
+        variable={rangeOf}
+        onCancel={() => setRangeOf(null)}
+        onVisualize={(variable, indices) =>
+          rerun({ captureRanges: { ...run.request.options.captureRanges, [variable]: [indices] } })
+        }
+      />
+    </>
+  )
+
+  if (empty) {
+    return (
+      <>
+        <NoStepsScreen
+          language={run.language.displayName}
+          startAtLines={trace.header.options.startAtLines}
+          exit={trace.header.summary.exit}
+          output={
+            tail.error === null
+              ? (tail.data ?? null)
+              : `Couldn't load the output: ${tail.error.message}`
+          }
+          onStartAt={onStartAt}
+          onTraceFromStart={() => rerun({ startAtLines: [] })}
+          onClose={onClose}
+        />
+        {dialogs}
+      </>
+    )
+  }
+  return (
+    <>
+      <PlayerErrorBoundary traceId={trace.header.id}>
+        <Player
+          source={source}
+          code={run.request.source}
+          stdin={run.request.stdin}
+          language={run.language}
+          banner={
+            build && (
+              <BuildWarnings
+                build={build}
+                source={run.request.source}
+                file={trace.header.source.file}
+                onGoToLine={onGoToLine}
+              />
+            )
+          }
+          onClose={onClose}
+          onStartAt={onStartAt}
+          onRaiseLimit={() => rerun({ maxSteps: limits.maxStepsCeiling })}
+          onShowRange={capabilities.captureRanges ? setRangeOf : undefined}
+        />
+      </PlayerErrorBoundary>
+      {dialogs}
+    </>
   )
 }
 
@@ -181,34 +178,92 @@ function Polling({
   run,
   created,
   onClose,
+  onRerun,
+  onGoToLine,
 }: {
   run: Run
   created: Visualization
   onClose: () => void
+  onRerun: (request: CreateRequest) => void
+  onGoToLine: GoToLine
 }) {
-  const { data: visualization, error } = useQuery(visualizationQuery(created))
+  const { data: visualization, error, isFetching, refetch } = useQuery(visualizationQuery(created))
   const language = run.language.displayName
-  if (error !== null && !isFinal(visualization)) {
-    return <ErrorScreen language={language} error={error} onClose={onClose} />
+  if (error !== null && !isFetching && !isFinal(visualization)) {
+    return (
+      <ApiErrorScreen
+        language={language}
+        error={error}
+        onRetry={() => void refetch()}
+        onRerun={() => onRerun(run.request)}
+        onClose={onClose}
+      />
+    )
   }
   if (visualization.status === 'completed' && visualization.trace !== undefined) {
     return (
-      <Completed run={run} id={visualization.id} trace={visualization.trace} onClose={onClose} />
+      <Completed
+        run={run}
+        visualization={visualization}
+        trace={visualization.trace}
+        onClose={onClose}
+        onRerun={onRerun}
+        onGoToLine={onGoToLine}
+      />
     )
   }
   if (isFinal(visualization)) {
-    return <EndedScreen language={language} visualization={visualization} onClose={onClose} />
+    return (
+      <EndedScreen
+        language={language}
+        visualization={visualization}
+        source={run.request.source}
+        onGoToLine={onGoToLine}
+        onRerun={() => onRerun(run.request)}
+        onClose={onClose}
+      />
+    )
   }
-  return <LoadingScreen language={language} visualization={visualization} onCancel={onClose} />
+  return (
+    <LoadingScreen
+      language={language}
+      visualization={visualization}
+      maxSteps={run.request.options.maxSteps}
+      onCancel={onClose}
+    />
+  )
 }
 
-export function Visualizer({ run, created, error, onClose }: Props) {
+export function Visualizer({ run, created, error, onClose, onRetry, onRerun, onGoToLine }: Props) {
   const language = run.language.displayName
   if (error !== null && error !== undefined) {
-    return <ErrorScreen language={language} error={error} onClose={onClose} />
+    return (
+      <ApiErrorScreen
+        language={language}
+        error={error}
+        onRetry={onRetry}
+        onRerun={() => onRerun(run.request)}
+        onClose={onClose}
+      />
+    )
   }
   if (created === undefined) {
-    return <LoadingScreen language={language} visualization={null} onCancel={onClose} />
+    return (
+      <LoadingScreen
+        language={language}
+        visualization={null}
+        maxSteps={run.request.options.maxSteps}
+        onCancel={onClose}
+      />
+    )
   }
-  return <Polling run={run} created={created} onClose={onClose} />
+  return (
+    <Polling
+      run={run}
+      created={created}
+      onClose={onClose}
+      onRerun={onRerun}
+      onGoToLine={onGoToLine}
+    />
+  )
 }

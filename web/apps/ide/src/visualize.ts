@@ -93,6 +93,13 @@ export function useRun() {
       const created = create.mutateAsync(next).catch(() => null)
       setRun({ ...next, created })
     },
+    // same Idempotency-Key: if the refused create made a visualization after all, the API returns it
+    retry: () => {
+      if (run === null) return
+      const { key, request, language } = run
+      const created = create.mutateAsync({ key, request, language }).catch(() => null)
+      setRun({ ...run, created })
+    },
     close: () => {
       stop()
       create.reset()

@@ -55,12 +55,24 @@ pnpm check        # gen + drift check, lint, typecheck, test, build; CI runs thi
 
 The handlers in [apps/ide/src/mocks](apps/ide/src/mocks/) answer every endpoint from the examples in `backend/api/openapi.yaml`, so they move with the contract. Pick a case with a query parameter:
 
-| `?scenario=`          | What happens                                                                                                                                                                   |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `completed` (default) | `POST /visualizations` returns a completed visualization. Its chunks are the `cpp-binary-search` fixture, served at the manifest URLs with the right `sha256` and `sizeBytes`. |
-| `failed-build`        | The create call returns `failed` with a compile error.                                                                                                                         |
-| `busy`                | `503 capacity` with `Retry-After: 5`.                                                                                                                                          |
-| `slow-tracing`        | `tracing`, with progress and `version` rising on each long-poll, then `completed`.                                                                                             |
+| `?scenario=`           | What happens                                                                                                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `completed` (default)  | `POST /visualizations` returns a completed visualization. Its chunks are the `cpp-binary-search` fixture, served at the manifest URLs with the right `sha256` and `sizeBytes`. |
+| `slow-tracing`         | `queued`, `building`, then `tracing` with progress and `version` rising on each long-poll, then `completed`.                                                                   |
+| `failed-build`         | The create call returns `failed` with a compile error: the contract's §8.3 example.                                                                                            |
+| `unsupported-module`   | `failed` with `unsupported_module`: the `import numpy` diagnostic `make dev` gave.                                                                                             |
+| `internal-error`       | `failed` with `sandbox_error`.                                                                                                                                                 |
+| `canceled`             | The visualization reads `canceled`, as after a third POST.                                                                                                                     |
+| `busy`                 | `503 capacity` with `Retry-After: 5`, on every call.                                                                                                                           |
+| `rate-limited`         | `429 rate_limited` with `Retry-After: 20`: the contract's example.                                                                                                             |
+| `server-error`         | `500 internal_error` on the create.                                                                                                                                            |
+| `expired`, `not-found` | The create works; the first long-poll answers `410 expired` or `404 not_found`.                                                                                                |
+| `runtime-error`        | Completed with `cpp-check-index`: a friendly index-out-of-range error.                                                                                                         |
+| `step-limit`           | Completed with `python-step-limit`, whose untraced tail is served as `trace.tail`.                                                                                             |
+| `timeout`              | Completed with `python-timeout`.                                                                                                                                               |
+| `output-limit`         | Completed with `python-output-limit`.                                                                                                                                          |
+| `build-warnings`       | Completed with two compiler warnings in `build.diagnostics`, as `make dev` gave for a shadowed and an unused variable.                                                         |
+| `nothing-traced`       | Completed with no steps: `startAtLines: [3]` on a line that never runs (the backend's `start-never` golden); the output is in the tail.                                        |
 
 ## Fixtures
 
