@@ -1,0 +1,680 @@
+[
+  {
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 7,
+        "locals": [{ "name": "n", "value": { "t": "uninit", "type": "int" } }],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 0,
+    "keyframe": true,
+    "line": 7,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "t": "uninit", "type": "std::vector<std::pair<int, int>>" }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 1,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "t": "uninit", "type": "std::vector<Edge>" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [
+          { "id": "o2", "t": "ref" },
+          { "id": "o3", "t": "ref" },
+          { "id": "o4", "t": "ref" }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "meta": { "capacity": 3 },
+        "truncated": false,
+        "type": "std::vector<std::pair<int, int>>"
+      },
+      "o2": {
+        "fields": [
+          { "name": "first", "value": { "t": "int", "type": "int", "v": "0" } },
+          { "name": "second", "value": { "t": "int", "type": "int", "v": "1" } }
+        ],
+        "kind": "record",
+        "type": "std::pair<int, int>"
+      },
+      "o3": {
+        "fields": [
+          { "name": "first", "value": { "t": "int", "type": "int", "v": "1" } },
+          { "name": "second", "value": { "t": "int", "type": "int", "v": "2" } }
+        ],
+        "kind": "record",
+        "type": "std::pair<int, int>"
+      },
+      "o4": {
+        "fields": [
+          { "name": "first", "value": { "t": "int", "type": "int", "v": "2" } },
+          { "name": "second", "value": { "t": "int", "type": "int", "v": "3" } }
+        ],
+        "kind": "record",
+        "type": "std::pair<int, int>"
+      }
+    },
+    "i": 2,
+    "keyframe": false,
+    "line": 9,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o5": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "meta": { "capacity": 0 },
+        "truncated": false,
+        "type": "std::vector<Edge>"
+      }
+    },
+    "i": 3,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 9,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o5": {
+        "items": [{ "id": "o6", "t": "ref" }],
+        "kind": "sequence",
+        "length": 1,
+        "meta": { "capacity": 1 },
+        "truncated": false,
+        "type": "std::vector<Edge>"
+      },
+      "o6": {
+        "fields": [
+          { "name": "u", "value": { "t": "int", "type": "int", "v": "0" } },
+          { "name": "v", "value": { "t": "int", "type": "int", "v": "1" } },
+          { "name": "w", "value": { "t": "int", "type": "int", "v": "5" } }
+        ],
+        "kind": "record",
+        "type": "Edge"
+      }
+    },
+    "i": 4,
+    "keyframe": false,
+    "line": 11,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 12,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o5": {
+        "items": [
+          { "id": "o7", "t": "ref" },
+          { "id": "o8", "t": "ref" }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "meta": { "capacity": 2 },
+        "truncated": false,
+        "type": "std::vector<Edge>"
+      },
+      "o7": {
+        "fields": [
+          { "name": "u", "value": { "t": "int", "type": "int", "v": "0" } },
+          { "name": "v", "value": { "t": "int", "type": "int", "v": "1" } },
+          { "name": "w", "value": { "t": "int", "type": "int", "v": "5" } }
+        ],
+        "kind": "record",
+        "type": "Edge"
+      },
+      "o8": {
+        "fields": [
+          { "name": "u", "value": { "t": "int", "type": "int", "v": "1" } },
+          { "name": "v", "value": { "t": "int", "type": "int", "v": "2" } },
+          { "name": "w", "value": { "t": "int", "type": "int", "v": "3" } }
+        ],
+        "kind": "record",
+        "type": "Edge"
+      }
+    },
+    "i": 5,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 11,
+    "removedObjects": ["o6"],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 13,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o10": {
+        "fields": [
+          { "name": "u", "value": { "t": "int", "type": "int", "v": "1" } },
+          { "name": "v", "value": { "t": "int", "type": "int", "v": "2" } },
+          { "name": "w", "value": { "t": "int", "type": "int", "v": "3" } }
+        ],
+        "kind": "record",
+        "type": "Edge"
+      },
+      "o11": {
+        "fields": [
+          { "name": "u", "value": { "t": "int", "type": "int", "v": "0" } },
+          { "name": "v", "value": { "t": "int", "type": "int", "v": "3" } },
+          { "name": "w", "value": { "t": "int", "type": "int", "v": "9" } }
+        ],
+        "kind": "record",
+        "type": "Edge"
+      },
+      "o5": {
+        "items": [
+          { "id": "o9", "t": "ref" },
+          { "id": "o10", "t": "ref" },
+          { "id": "o11", "t": "ref" }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "meta": { "capacity": 4 },
+        "truncated": false,
+        "type": "std::vector<Edge>"
+      },
+      "o9": {
+        "fields": [
+          { "name": "u", "value": { "t": "int", "type": "int", "v": "0" } },
+          { "name": "v", "value": { "t": "int", "type": "int", "v": "1" } },
+          { "name": "w", "value": { "t": "int", "type": "int", "v": "5" } }
+        ],
+        "kind": "record",
+        "type": "Edge"
+      }
+    },
+    "i": 6,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": ["o7", "o8"],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 14,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } },
+          { "name": "total", "value": { "t": "uninit", "type": "long long" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [
+          { "id": "o12", "t": "ref" },
+          { "id": "o13", "t": "ref" },
+          { "id": "o14", "t": "ref" },
+          { "id": "o15", "t": "ref" }
+        ],
+        "kind": "sequence",
+        "length": 4,
+        "meta": { "capacity": 6 },
+        "truncated": false,
+        "type": "std::vector<std::pair<int, int>>"
+      },
+      "o12": {
+        "fields": [
+          { "name": "first", "value": { "t": "int", "type": "int", "v": "0" } },
+          { "name": "second", "value": { "t": "int", "type": "int", "v": "1" } }
+        ],
+        "kind": "record",
+        "type": "std::pair<int, int>"
+      },
+      "o13": {
+        "fields": [
+          { "name": "first", "value": { "t": "int", "type": "int", "v": "1" } },
+          { "name": "second", "value": { "t": "int", "type": "int", "v": "2" } }
+        ],
+        "kind": "record",
+        "type": "std::pair<int, int>"
+      },
+      "o14": {
+        "fields": [
+          { "name": "first", "value": { "t": "int", "type": "int", "v": "2" } },
+          { "name": "second", "value": { "t": "int", "type": "int", "v": "3" } }
+        ],
+        "kind": "record",
+        "type": "std::pair<int, int>"
+      },
+      "o15": {
+        "fields": [
+          { "name": "first", "value": { "t": "int", "type": "int", "v": "3" } },
+          { "name": "second", "value": { "t": "int", "type": "int", "v": "0" } }
+        ],
+        "kind": "record",
+        "type": "std::pair<int, int>"
+      }
+    },
+    "i": 7,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": ["o2", "o3", "o4"],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 15,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } },
+          { "name": "total", "value": { "t": "int", "type": "long long", "v": "0" } },
+          {
+            "internal": true,
+            "name": "__for_begin",
+            "value": { "id": "o16", "t": "ref", "type": "std::vector<Edge>::iterator" }
+          },
+          {
+            "internal": true,
+            "name": "__for_end",
+            "value": { "id": "o17", "t": "ref", "type": "std::vector<Edge>::iterator" }
+          },
+          {
+            "internal": true,
+            "name": "__for_range",
+            "value": { "id": "o18", "t": "ref", "type": "std::vector<Edge> &" }
+          },
+          { "name": "e", "value": { "t": "uninit", "type": "Edge &" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o16": {
+        "kind": "opaque",
+        "summary": "invalid iterator",
+        "type": "std::vector<Edge>::iterator"
+      },
+      "o17": {
+        "kind": "opaque",
+        "summary": "invalid iterator",
+        "type": "std::vector<Edge>::iterator"
+      },
+      "o18": { "kind": "opaque", "summary": "unreadable", "type": "std::vector<Edge>" }
+    },
+    "i": 8,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 15,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } },
+          { "name": "total", "value": { "t": "int", "type": "long long", "v": "5" } },
+          {
+            "internal": true,
+            "name": "__for_begin",
+            "value": { "id": "o16", "t": "ref", "type": "std::vector<Edge>::iterator" }
+          },
+          {
+            "internal": true,
+            "name": "__for_end",
+            "value": { "id": "o17", "t": "ref", "type": "std::vector<Edge>::iterator" }
+          },
+          {
+            "internal": true,
+            "name": "__for_range",
+            "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge> &" }
+          },
+          { "name": "e", "value": { "id": "o9", "t": "ref", "type": "Edge &" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o16": {
+        "kind": "opaque",
+        "summary": "{u = 1, v = 2, w = 3}",
+        "type": "std::vector<Edge>::iterator"
+      },
+      "o17": {
+        "kind": "opaque",
+        "summary": "{u = 0, v = 0, w = 0}",
+        "type": "std::vector<Edge>::iterator"
+      }
+    },
+    "i": 9,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 15,
+    "removedObjects": ["o18"],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 15,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } },
+          { "name": "total", "value": { "t": "int", "type": "long long", "v": "8" } },
+          {
+            "internal": true,
+            "name": "__for_begin",
+            "value": { "id": "o16", "t": "ref", "type": "std::vector<Edge>::iterator" }
+          },
+          {
+            "internal": true,
+            "name": "__for_end",
+            "value": { "id": "o17", "t": "ref", "type": "std::vector<Edge>::iterator" }
+          },
+          {
+            "internal": true,
+            "name": "__for_range",
+            "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge> &" }
+          },
+          { "name": "e", "value": { "id": "o10", "t": "ref", "type": "Edge &" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o16": {
+        "kind": "opaque",
+        "summary": "{u = 0, v = 3, w = 9}",
+        "type": "std::vector<Edge>::iterator"
+      }
+    },
+    "i": 10,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 16,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } },
+          { "name": "total", "value": { "t": "int", "type": "long long", "v": "17" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 11,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": ["o16", "o17"],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 17,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } },
+          { "name": "total", "value": { "t": "int", "type": "long long", "v": "17" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 12,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": "4 17\n"
+  },
+  {
+    "callId": 0,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 17,
+        "locals": [
+          { "name": "n", "value": { "t": "int", "type": "int", "v": "4" } },
+          {
+            "name": "edges",
+            "value": { "id": "o1", "t": "ref", "type": "std::vector<std::pair<int, int>>" }
+          },
+          { "name": "roads", "value": { "id": "o5", "t": "ref", "type": "std::vector<Edge>" } },
+          { "name": "total", "value": { "t": "int", "type": "long long", "v": "17" } }
+        ],
+        "name": "main",
+        "returnValue": { "t": "int", "type": "int", "v": "0" }
+      }
+    },
+    "heap": {},
+    "i": 13,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  }
+]

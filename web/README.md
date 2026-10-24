@@ -98,6 +98,8 @@ The handlers in [apps/ide/src/mocks](apps/ide/src/mocks/) answer every endpoint 
 | `cpp-check-empty`     | 5     | §19.6: `q.front()` on an empty `queue`                                                                |
 | `cpp-stack-overflow`  | 16    | §19.6: unbounded recursion ends in `SIGSEGV`, read as `recursion_too_deep`                            |
 | `cpp-segfault`        | 9     | §5.6: a write far past an array ends in `SIGSEGV`, with no `kind`                                     |
+| `cpp-pointers`        | 10    | §5.4: step 6 has `head` → `#o4` → `#o5` and a sparse `depth[200005]`                                  |
+| `cpp-edge-list`       | 14    | §19.4 edge lists: `vector<pair<int,int>>`, `vector<Edge>`; steps 9–11 have internals                  |
 | `synthetic-1000`      | 1,000 | Generated: every heap kind, sparse patches, calls, removed objects                                    |
 | `synthetic-5000`      | 5,000 | Generated: 500 heap objects, for FE-02 performance work                                               |
 
@@ -105,7 +107,7 @@ The C++ sources start with `#include` and `using namespace std;`, so their line 
 
 To step through a fixture in the player, open `http://localhost:5173/?fixture=python-aliasing` under `pnpm dev`; add `&step=9` to open at a step. This works in the dev server only.
 
-The first five traces are hand-written. The `cpp-check-*`, `cpp-stack-overflow`, `cpp-segfault`, `python-error-index` and `python-error-divide` traces are the backend's goldens (`backend/fixtures`) split into chunks; the other `python-*` ones were recorded from `make dev` on 24 Oct 2026. All are plain JSON; edit them directly. `fixtures.test.ts` checks each one against `trace.v1.schema.json`, and checks the rules the schema can't express: 250-step chunks that start with a keyframe, lines inside the source, call ids on calls and returns, and a replayed heap that holds exactly what the stack reaches. The synthetic traces are generated at load time and never committed.
+The first five traces are hand-written. The `cpp-check-*`, `cpp-stack-overflow`, `cpp-segfault`, `cpp-pointers`, `python-error-index` and `python-error-divide` traces are the backend's goldens (`backend/fixtures`) split into chunks; the other `python-*` ones, and `cpp-edge-list` with `showInternals` on, were recorded from `make dev` on 24 Oct 2026. All are plain JSON. Edit the hand-written ones directly; for the others, redo the copy rather than editing them by hand. `fixtures.test.ts` checks each one against `trace.v1.schema.json`, and checks the rules the schema can't express: 250-step chunks that start with a keyframe, lines inside the source, call ids on calls and returns, and a replayed heap that holds exactly what the stack reaches. The synthetic traces are generated at load time and never committed.
 
 ## Generated code
 
