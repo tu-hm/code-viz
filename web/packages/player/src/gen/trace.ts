@@ -63,6 +63,14 @@ export type HeapObject = {
   sparse?: Sparse;
   patch?: Cells1;
 };
+/**
+ * Friendly message key (§19.6); without one the UI shows the error's message.
+ *
+ * This interface was referenced by `Trace`'s JSON-Schema
+ * via the `definition` "errorKind".
+ */
+export type ErrorKind =
+  "index_out_of_range" | "signed_overflow" | "division_by_zero" | "empty_container" | "recursion_too_deep";
 
 /**
  * Trace format v1 (spec §9, v1.1 additions §19.9). Unknown fields are allowed (§9.7).
@@ -209,9 +217,17 @@ export interface Step {
   stdout: string;
   stderr: string;
   error: {
+    /**
+     * The runtime's name for the error: IndexError, SIGSEGV, UBSan, libstdc++.
+     */
     type: string;
+    /**
+     * The runtime's own words.
+     */
     message: string;
     line: number;
+    kind?: ErrorKind;
+    values?: ErrorValues;
   } | null;
   access?: Access[];
   stdinPos?: StdinPos;
@@ -301,6 +317,54 @@ export interface Cells {
  */
 export interface Cells1 {
   [k: string]: Value;
+}
+/**
+ * What the error involves, as far as the tracer can read it (§19.6). Program values are decimal strings, as in value.v; counts are integers.
+ *
+ * This interface was referenced by `Trace`'s JSON-Schema
+ * via the `definition` "errorValues".
+ */
+export interface ErrorValues {
+  /**
+   * The container: a C++ variable's name, or the Python expression's source text.
+   */
+  name?: string;
+  /**
+   * The container's type, or the type an overflow didn't fit in.
+   */
+  type?: string;
+  index?: string;
+  size?: number;
+  op?: string;
+  /**
+   * @minItems 1
+   * @maxItems 2
+   */
+  operands?: [string] | [string, string];
+  /**
+   * The largest value type holds.
+   */
+  max?: string;
+  /**
+   * Source text of the failing expression.
+   */
+  expr?: string;
+  /**
+   * Source text of the divisor.
+   */
+  divisor?: string;
+  /**
+   * The member function called on the empty container, e.g. front or operator*.
+   */
+  call?: string;
+  /**
+   * Calls on the stack.
+   */
+  depth?: number;
+  /**
+   * Python's recursion limit.
+   */
+  limit?: number;
 }
 /**
  * This interface was referenced by `Trace`'s JSON-Schema

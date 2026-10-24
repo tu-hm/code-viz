@@ -52,7 +52,9 @@
           "properties": {
             "type": { "type": "string", "minLength": 1 },
             "message": { "type": "string" },
-            "line": { "type": "integer", "minimum": 1 }
+            "line": { "type": "integer", "minimum": 1 },
+            "kind": { "$ref": "trace.v1.schema.json#/$defs/errorKind" },
+            "values": { "$ref": "trace.v1.schema.json#/$defs/errorValues" }
           }
         },
         "stdinPos": { "$ref": "trace.v1.schema.json#/$defs/stdinPos" },

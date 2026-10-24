@@ -41,6 +41,54 @@ type Entry struct {
 	Value Value `json:"value"`
 }
 
+type ErrorKind string
+
+const ErrorKindDivisionByZero ErrorKind = "division_by_zero"
+const ErrorKindEmptyContainer ErrorKind = "empty_container"
+const ErrorKindIndexOutOfRange ErrorKind = "index_out_of_range"
+const ErrorKindRecursionTooDeep ErrorKind = "recursion_too_deep"
+const ErrorKindSignedOverflow ErrorKind = "signed_overflow"
+
+// What the error involves, as far as the tracer can read it (§19.6). Program
+// values are decimal strings, as in value.v; counts are integers.
+type ErrorValues struct {
+	// The member function called on the empty container, e.g. front or operator*.
+	Call *string `json:"call,omitzero"`
+
+	// Calls on the stack.
+	Depth *int `json:"depth,omitzero"`
+
+	// Source text of the divisor.
+	Divisor *string `json:"divisor,omitzero"`
+
+	// Source text of the failing expression.
+	Expr *string `json:"expr,omitzero"`
+
+	// Index corresponds to the JSON schema field "index".
+	Index *string `json:"index,omitzero"`
+
+	// Python's recursion limit.
+	Limit *int `json:"limit,omitzero"`
+
+	// The largest value type holds.
+	Max *string `json:"max,omitzero"`
+
+	// The container: a C++ variable's name, or the Python expression's source text.
+	Name *string `json:"name,omitzero"`
+
+	// Op corresponds to the JSON schema field "op".
+	Op *string `json:"op,omitzero"`
+
+	// Operands corresponds to the JSON schema field "operands".
+	Operands []string `json:"operands,omitzero"`
+
+	// Size corresponds to the JSON schema field "size".
+	Size *int `json:"size,omitzero"`
+
+	// The container's type, or the type an overflow didn't fit in.
+	Type *string `json:"type,omitzero"`
+}
+
 type Event string
 
 const EventCall Event = "call"
@@ -334,14 +382,20 @@ type Step struct {
 }
 
 type StepError struct {
+	// Kind corresponds to the JSON schema field "kind".
+	Kind *ErrorKind `json:"kind,omitzero"`
+
 	// Line corresponds to the JSON schema field "line".
 	Line int `json:"line"`
 
-	// Message corresponds to the JSON schema field "message".
+	// The runtime's own words.
 	Message string `json:"message"`
 
-	// Type corresponds to the JSON schema field "type".
+	// The runtime's name for the error: IndexError, SIGSEGV, UBSan, libstdc++.
 	Type string `json:"type"`
+
+	// Values corresponds to the JSON schema field "values".
+	Values *ErrorValues `json:"values,omitzero"`
 }
 
 // Line just executed; null at i = 0.
@@ -473,6 +527,9 @@ type ValueT string
 const ValueTBool ValueT = "bool"
 const ValueTChar ValueT = "char"
 const ValueTFloat ValueT = "float"
+
+type FrameReturnValue_0 = Value
+
 const ValueTInt ValueT = "int"
 const ValueTNone ValueT = "none"
 const ValueTPtr ValueT = "ptr"
@@ -489,5 +546,3 @@ type Window struct {
 	// Start corresponds to the JSON schema field "start".
 	Start int `json:"start"`
 }
-
-type FrameReturnValue_0 = Value

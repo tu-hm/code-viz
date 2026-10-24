@@ -58,6 +58,7 @@ func TestWireSchemaRejects(t *testing.T) {
 		{"error without type", exceptionStep, "/error/type", unset},
 		{"error without message", exceptionStep, "/error/message", unset},
 		{"error without line", exceptionStep, "/error/line", unset},
+		{"error with an unknown kind", exceptionStep, "/error/kind", `"crash"`},
 		{"out without stream", out, "/stream", unset},
 		{"out without data", out, "/data", unset},
 		{"out to an unknown stream", out, "/stream", `"stdlog"`},

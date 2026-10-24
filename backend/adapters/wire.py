@@ -10,6 +10,21 @@ class Entry(TypedDict):
     value: Value
 
 
+class ErrorValues(TypedDict):
+    call: NotRequired[str]
+    depth: NotRequired[int]
+    divisor: NotRequired[str]
+    expr: NotRequired[str]
+    index: NotRequired[str]
+    limit: NotRequired[int]
+    max: NotRequired[str]
+    name: NotRequired[str]
+    op: NotRequired[str]
+    operands: NotRequired[list[str]]
+    size: NotRequired[int]
+    type: NotRequired[str]
+
+
 class Exit(TypedDict):
     code: int | None
     kind: Literal["normal", "exception", "signal", "timeout", "memory_limit", "step_limit", "output_limit", "internal_error"]
@@ -103,9 +118,11 @@ class Step(TypedDict):
 
 
 class StepError(TypedDict):
+    kind: NotRequired[ErrorKind]
     line: int
     message: str
     type: str
+    values: NotRequired[ErrorValues]
 
 
 class Value(TypedDict):
@@ -128,5 +145,6 @@ class Window(TypedDict):
 
 
 Cells: TypeAlias = dict[str, Value]
+ErrorKind: TypeAlias = Literal["index_out_of_range", "signed_overflow", "division_by_zero", "empty_container", "recursion_too_deep"]
 Event: TypeAlias = Literal["call", "line", "return", "exception", "exit"]
 Message: TypeAlias = Exit | Hello | Log | Out | Step

@@ -130,6 +130,9 @@ func TestTraceSchemaRejects(t *testing.T) {
 		{"null pointer target", f1 + "2/value/target", `null`},
 		{"unknown heap kind", heap + "o7/kind", `"module"`},
 		{"negative sparse index", heap + "o1/sparse/items", `{"-1": {"t": "int", "v": "1"}}`},
+		{"unknown error kind", "/steps/2/error/kind", `"crash"`},
+		{"number in an error index", "/steps/2/error/values/index", `5`},
+		{"error op that is not an operator", "/steps/2/error/values/op", `"<<"`},
 	}
 
 	for _, tc := range tests {
@@ -146,7 +149,7 @@ func TestTraceSchemaRejects(t *testing.T) {
 func TestTraceSchemaAllowsUnknownFields(t *testing.T) {
 	sch := compile(t, "trace.v1.schema.json")
 	objects := []string{
-		"", "/language", "/summary", "/summary/exit", "/steps/0", "/steps/2/error",
+		"", "/language", "/summary", "/summary/exit", "/steps/0", "/steps/2/error", "/steps/2/error/values",
 		"/steps/0/frames/f1", "/steps/0/frames/f1/locals/0", "/steps/0/frames/f1/locals/0/value",
 		"/steps/0/heap/o2", "/steps/0/heap/o1/window",
 	}

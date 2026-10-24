@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version    = "1.1" // trace format v1.1 (D24)
+	version    = "1.2" // trace format v1.2 (D24): error kinds and values (§19.6)
 	chunkSteps = 250   // D2; a multiple of keyframeInterval, so every chunk starts on a keyframe
 )
 

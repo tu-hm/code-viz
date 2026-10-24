@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "id": "trc_0f3a9c1e7b2d4a6890e1c5b7d3f2a4c6",
   "language": { "id": "cpp17-gcc", "runtime": "GCC 13.2", "adapter": "cpp-gdb/1.0.0" },
   "source": { "file": "main.cpp", "lineCount": 16 },
@@ -163,7 +163,16 @@
       "removedObjects": [],
       "stdout": "",
       "stderr": "",
-      "error": { "type": "SIGSEGV", "message": "Segmentation fault (invalid memory access)", "line": 14 },
+      "error": {
+        "type": "SIGSEGV",
+        "message": "Segmentation fault (invalid memory access)",
+        "line": 14,
+        "kind": "recursion_too_deep",
+        "values": {
+          "name": "a", "type": "std::vector<int>", "index": "-1", "size": 5, "op": "+", "operands": ["2147483000", "1000"],
+          "max": "2147483647", "expr": "x / y", "divisor": "y", "call": "front", "depth": 3, "limit": 1000
+        }
+      },
       "callId": 1
     }
   ]

@@ -135,6 +135,9 @@ type Step struct {
 }
 
 type StepError struct {
+	// Kind corresponds to the JSON schema field "kind".
+	Kind *trace.ErrorKind `json:"kind,omitzero"`
+
 	// Line corresponds to the JSON schema field "line".
 	Line int `json:"line"`
 
@@ -143,6 +146,9 @@ type StepError struct {
 
 	// Type corresponds to the JSON schema field "type".
 	Type string `json:"type"`
+
+	// Values corresponds to the JSON schema field "values".
+	Values *trace.ErrorValues `json:"values,omitzero"`
 }
 
 type StepPrevLine *int

@@ -145,9 +145,11 @@
           "type": ["object", "null"],
           "required": ["type", "message", "line"],
           "properties": {
-            "type": { "type": "string", "minLength": 1 },
-            "message": { "type": "string" },
-            "line": { "type": "integer", "minimum": 1 }
+            "type": { "description": "The runtime's name for the error: IndexError, SIGSEGV, UBSan, libstdc++.", "type": "string", "minLength": 1 },
+            "message": { "description": "The runtime's own words.", "type": "string" },
+            "line": { "type": "integer", "minimum": 1 },
+            "kind": { "$ref": "#/$defs/errorKind" },
+            "values": { "$ref": "#/$defs/errorValues" }
           }
         },
         "access": { "type": "array", "items": { "$ref": "#/$defs/access" } },
@@ -157,6 +159,28 @@
       }
     },
     "event": { "enum": ["call", "line", "return", "exception", "exit"] },
+    "errorKind": {
+      "description": "Friendly message key (§19.6); without one the UI shows the error's message.",
+      "enum": ["index_out_of_range", "signed_overflow", "division_by_zero", "empty_container", "recursion_too_deep"]
+    },
+    "errorValues": {
+      "description": "What the error involves, as far as the tracer can read it (§19.6). Program values are decimal strings, as in value.v; counts are integers.",
+      "type": "object",
+      "properties": {
+        "name": { "description": "The container: a C++ variable's name, or the Python expression's source text.", "type": "string", "minLength": 1 },
+        "type": { "description": "The container's type, or the type an overflow didn't fit in.", "type": "string", "minLength": 1 },
+        "index": { "type": "string", "pattern": "^-?[0-9]+$" },
+        "size": { "type": "integer", "minimum": 0 },
+        "op": { "type": "string", "pattern": "^[-+*/]$" },
+        "operands": { "type": "array", "items": { "type": "string", "pattern": "^-?[0-9]+$" }, "minItems": 1, "maxItems": 2 },
+        "max": { "description": "The largest value type holds.", "type": "string", "pattern": "^[0-9]+$" },
+        "expr": { "description": "Source text of the failing expression.", "type": "string", "minLength": 1 },
+        "divisor": { "description": "Source text of the divisor.", "type": "string", "minLength": 1 },
+        "call": { "description": "The member function called on the empty container, e.g. front or operator*.", "type": "string", "minLength": 1 },
+        "depth": { "description": "Calls on the stack.", "type": "integer", "minimum": 1 },
+        "limit": { "description": "Python's recursion limit.", "type": "integer", "minimum": 1 }
+      }
+    },
     "access": {
       "type": "object",
       "required": ["obj", "path", "mode"],
