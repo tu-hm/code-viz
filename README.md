@@ -18,6 +18,7 @@ web/            TypeScript: pnpm workspace for the browser app
   packages/     @viz/player, @viz/ui (design system)
   fixtures/     traces every view is built against
 docs/           backend architecture, guides and conventions; the frontend design system
+memory/         decisions made while building that the spec and code don't record
 plans/          spec, work plans, one file per backend and frontend task
 ```
 
@@ -58,6 +59,7 @@ The mock API, fixtures and configuration are in [web/README.md](web/README.md).
 | [AGENTS.md](AGENTS.md) | Backend rules: plain Go (S1 to S12), architecture, trust boundary, MySQL, errors and logs, git |
 | [web/AGENTS.md](web/AGENTS.md) | Frontend rules: plain TypeScript (T1 to T7), React with the compiler (R1 to R8), tests, dependencies, known traps |
 | [Docs](docs/README.md) | Index: backend architecture, guides and conventions, and the design system |
+| [Memory](memory/README.md) | Decisions made while building, frontend and backend, that the spec and code don't record |
 | [Comments cheat sheet](docs/backend/conventions/comments-cheat-sheet.md) | Default zero comments; the eight kinds that earn one |
 | [Testing cheat sheet](docs/backend/conventions/testing-cheat-sheet.md) | 11 rules for tests that catch regressions |
 | [Database migrations](docs/backend/guides/db-migrations.md) | goose on MySQL 8.4: online DDL, expand and contract, safe patterns |

@@ -2,7 +2,7 @@
 
 Code visualizer: run a user's Python or C++ program once in a sandbox, record each step as a trace, replay it in the browser. This file covers the backend: Go (`cmd/`, `internal/`), tracers (`adapters/`), contracts (`api/`, `schema/`) and SQL. The frontend rules are in [web/AGENTS.md](web/AGENTS.md).
 
-The spec is [plans/code-visualizer-spec_2.md](plans/code-visualizer-spec_2.md); every `§` and `D` number below points into it. Backend tasks: [plans/tasks/backend/](plans/tasks/backend/). Architecture, guides and conventions: [docs/](docs/README.md).
+The spec is [plans/code-visualizer-spec_2.md](plans/code-visualizer-spec_2.md); every `§` and `D` number below points into it. Backend tasks: [plans/tasks/backend/](plans/tasks/backend/). Architecture, guides and conventions: [docs/](docs/README.md). Decisions made while building that the spec and code don't record, frontend and backend: [memory/](memory/README.md).
 
 ## Commands
 
@@ -32,6 +32,7 @@ Format with `make fmt`. Fix lint findings in the code. A `//nolint` names the li
 The target is code a tired reviewer understands on first read, and that solves the real problem.
 
 - **Understand before you type.** Read the spec section and the code around the change. Know which invariant you are touching (lease, lock order, trust boundary, limit) before you edit.
+- **Read and write the memory.** Before a task, read the [memory/](memory/README.md) index for its side. A choice a later change could silently undo, with a reason the code doesn't show, gets an entry in the same commit.
 - **Fix the cause, not the symptom.** Reproduce the bug with a failing test, follow it to the line that is wrong, fix that line. A nil check where the caller should never pass nil, a retry around a flaky call, a `time.Sleep` around a race, a longer timeout: each hides the bug. If you cannot find the cause, say so and stop. Do not ship a guess.
 - **Design from the data and the failures.** Work out the states, the invariants and what happens on each §7.8 failure first. The code should follow from that. Between two designs that work, take the one with less code and fewer moving parts.
 - **Do the task and only the task.** No drive-by refactors, renames, extra flags or "while I'm here" fixes. Mention them in your reply.
