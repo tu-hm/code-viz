@@ -25,6 +25,7 @@ gen-go:
 	go tool oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
 	rm -rf internal/gen/sqlc
 	$(SQLC) generate --file internal/adapters/mysql/sqlc.yaml
+	go run ./cmd/pywire schema/wire.v1.schema.json adapters/wire.py
 
 test: runner-images
 	go test ./...
@@ -94,7 +95,7 @@ check-static:
 # gen-check: verify generated code is committed
 gen-check:
 	@$(MAKE) --no-print-directory gen-go
-	@test -z "$$(git status --porcelain -- internal/gen)" || { git status --short -- internal/gen; echo "check: make gen changed internal/gen; commit the regenerated code" >&2; exit 1; }
+	@test -z "$$(git status --porcelain -- internal/gen adapters/wire.py)" || { git status --short -- internal/gen adapters/wire.py; echo "check: make gen changed generated code; commit it" >&2; exit 1; }
 
 # check: full local pre-push gate (sequential, includes everything)
 check: lint vuln test test-nsjail
