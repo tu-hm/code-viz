@@ -188,6 +188,8 @@ What each variable does, from `backend/cmd/vizd/main.go`:
 | `VIZ_IP_HASH_KEY` | api, required | HMAC key for anonymous callers' IPs, 32 bytes or more. Keep it stable: a new key gives every caller a new identity, with a fresh quota and no delete rights on what they made before |
 | `VIZ_SLOTS` | api, required | Worker slots behind this API: one per worker container. `POST` returns `503 capacity` once `VIZ_SLOTS × 10` jobs are queued |
 | `VIZ_WEB_ORIGIN` | api, required | The IDE's origin. Share links are `VIZ_WEB_ORIGIN/viz/{id}` |
+| `VIZ_METRICS` | all | `true` serves Prometheus metrics at `GET /metrics` on `VIZ_HTTP_ADDR`. Off by default. Caddy doesn't proxy `/metrics`, so it stays on the host |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | all | Where to send OpenTelemetry spans over OTLP/HTTP, such as a collector on `http://127.0.0.1:4318`. Empty: no spans leave the process. The exporter reads the other `OTEL_EXPORTER_OTLP_*` variables too |
 
 The §11 limits are not env settings: each language manifest sets them.
 
@@ -202,6 +204,12 @@ services:
   mysql:
     image: mysql:8.4.13@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69
     restart: unless-stopped
+    command:   # §7.13, as in backend/compose.yaml
+      - --default-storage-engine=InnoDB
+      - --character-set-server=utf8mb4
+      - --default-time-zone=+00:00
+      - --binlog-format=ROW
+      - --sql-mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
     env_file: mysql.env
     ports: ["127.0.0.1:3306:3306"]
     volumes: ["/var/lib/viz/mysql:/var/lib/mysql"]
@@ -408,7 +416,7 @@ What a real deployment needs and the repo doesn't have yet:
 - **The ingress rate limit, 30 creates per minute per IP (§11).** Stock Caddy has no rate limiter; it needs a plugin build or nginx's `limit_req`. Until then only the daily quota in MySQL (100 per IP) applies.
 - **Separate MySQL users for the API and the worker** (§12, BE-13 §3). No grants are defined, so both use `viz` here.
 - **A sandbox self-check in `/readyz`** (TODO in `cmd/vizd/main.go`). Today `/readyz` checks MySQL only.
-- **Metrics, tracing and alerts** (BE-13 §2, §7). There are JSON logs and nothing else; nothing tells you vizd is down.
+- **Monitoring and alerts** (BE-13 §7). vizd can serve metrics and export spans (`VIZ_METRICS`, `OTEL_EXPORTER_OTLP_ENDPOINT`), but nothing here scrapes, stores or alerts on them yet; nothing tells you vizd is down.
 - **A tested restore** (BE-13 §8).
 - **Image registry and cosign signing** (BE-03, BE-07). Images are built on the server.
 - **A per-image seccomp allowlist** (BE-02 §5, before GA). The jail uses the C.9 denylist.

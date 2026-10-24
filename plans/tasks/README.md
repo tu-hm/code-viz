@@ -54,7 +54,7 @@ Record every gate result in the spec change log (§0.3).
 - [ ] **M0-04 · Lead** — Import tasks into the tracker; set Friday demos and gate meetings. *0.5 d*
 - [ ] **Lead** — Confirm MySQL version and hosting (8.4 LTS wanted; must have `SKIP LOCKED`). *Week 1*
 - [ ] **Lead** — Decide option A vs B (team size). *Before 16 Nov*
-- [ ] **Lead + BE** — One deploy path for the M1 beta: Kubernetes staging (recommended) vs the VMs option in spec §18.4; log it in §0.3. *Before M1 week 9* (BE-13 §3)
+- [x] **Lead + BE** — One deploy path for the M1 beta: Kubernetes staging (recommended) vs the VMs option in spec §18.4; log it in §0.3. *Before M1 week 9* (BE-13 §3) — decided 24 Oct: Docker Compose on one server (`docs/deploy.md`), spec v1.16
 - [ ] **M0-20 · DS** — Hi-fi designs: tokens (light/dark), layout v1.1, all §5.6 states, array markers, matrix. Tokens by 30 Oct, M1 handoff by 13 Nov. *8 d*
 - [ ] **M0-21 · DS** — Usability test plan; recruit 8 CP students for M5. *2 d*
 - [ ] **M0-22 · Lead** — Run G1–G3 and log results in spec §0.3. *1 d*

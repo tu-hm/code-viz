@@ -23,7 +23,8 @@
 - **Done:** BE-12 (10/10). `POST /visualizations/{id}/share` gives a completed visualization a share link: a new `viz_` ID of the same trace that anyone can read, kept with the trace for 90 days from the share and copied to `t90/`. Calling it again returns the same link; `DELETE …/share` revokes it, so it answers `404` for everyone while the owner's own ID still reads, and sharing again makes a new link. Anything not completed gets `400`. `GET` on a link is cacheable for 60 s. Checked against `make dev`'s stack.
 - **In progress:** BE-06 (49/52). `vizd` serves the visualization API: create with single-flight, quota, idempotency and the 2-active rule; get with long-poll; owner-only delete; the nightly cleanup of expired rows and chunks; server-side copy for BE-12. Open: spike S5 and the browser checks.
 - **Done except signing:** BE-07 (20/21). The C++ runner image is GCC 13.5 and GDB 14.2, with one precompiled header per safety-check mode; builds take 0.3–0.8 s. `options.safetyChecks: false` switches the checks off. GCC diagnostics point at the user's line, and the §8.3 example is reproduced. Spike S7 is in: `_GLIBCXX_DEBUG` fails the 3× run-time target, so G5 has a decision (below).
-- **Next, by the suggested order:** BE-13 §2–3. On FE: FE-07 §1 (spike S3) and FE-06 §1 (stack and heap), both built on the fixtures.
+- **In progress:** BE-13 (11/68). `make dev` builds the runner images, runs MySQL with the §7.13 settings, and `make seed` loads all 66 golden traces (Python and C++) as completed visualizations. vizd has Prometheus metrics (`VIZ_METRICS=true`) and OpenTelemetry tracing (`OTEL_EXPORTER_OTLP_ENDPOINT`), both off by default; a create request and its job share one trace through `jobs.traceparent`, seen end to end in the dev Jaeger. The beta deploys as Docker Compose on one server (spec v1.16).
+- **Next, by the suggested order:** BE-13 §3–§6. On FE: FE-07 §1 (spike S3) and FE-06 §1 (stack and heap), both built on the fixtures.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
 ## Decisions waiting on you
@@ -35,7 +36,7 @@
 - [ ] Queue: cancel a running job? §7.7 and the §7.13.2 SQL cancel queued jobs only, which is what `JobQueue.Cancel` does; §7.13.2's prose and BE-05 §2–3 also stop a running one at its next lease check. Allowing it is one more status in `Cancel`'s `WHERE`, and the worker then sees `ErrLeaseLost`.
 - [ ] G5 (Fri 19 Feb): keep `_GLIBCXX_DEBUG` (D21) or switch to `-D_GLIBCXX_ASSERTIONS` plus a narrower UBSan? S7: with `_GLIBCXX_DEBUG`, 3 of 10 CP solutions never finished in 60 s and 6 of 9 measured ran over 3×. The lighter flags stay within 3× but drop iterator checks ([S7 report](../spikes/s7-safety-checks.md)).
 - [ ] C++ build memory: the build shares the program's 256 MB box. Should it get its own limit (512 MB, the §11 ceiling), and should a build that runs out of memory say so instead of "Build timed out"? With the S7 flags the worst build has about 40 MB to spare.
-- [ ] Lead items (option A vs B before 16 Nov, MySQL hosting, deploy path): see [README.md](README.md#lead--design-tasks-not-in-the-befe-lists).
+- [ ] Lead items (option A vs B before 16 Nov, MySQL hosting): see [README.md](README.md#lead--design-tasks-not-in-the-befe-lists).
 
 ## Backend
 
@@ -53,9 +54,9 @@
 | [BE-10](backend/BE-10-friendly-errors.md) Friendly errors | M3 | 🟡 | 13/14 | Done except the FE + DS sign-off on the payload (spec §19.6, trace format 1.2) |
 | [BE-11](backend/BE-11-whole-run-trace-options.md) Whole-run data & options | M3 (M5) | 🟡 | 19/22 | Done except the §5.6 dialog (FE-05) and §5, which only happens if spike S8 misses 95% |
 | [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ✅ | 10/10 | Done: a share link is its own `viz_` ID, revocable, 90 days in `t90/` (spec v1.14) |
-| [BE-13](backend/BE-13-environments-launch.md) Environments & launch (single machine) | M1–M5 | 🟢 | 0/68 | §1 can start. Rewritten for single Linux server, no cloud/K8s |
+| [BE-13](backend/BE-13-environments-launch.md) Environments & launch (single machine) | M1–M5 | 🟡 | 11/68 | §1–§2 done except one `make dev` run after `make reset`. Next: §3–§6 as Docker Compose on one server (spec v1.16) |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | 🟢 | 0/10 | Can start: BE-07–09 are in |
-| **Total** | | | **349/450** | |
+| **Total** | | | **360/450** | |
 
 ### BE-01 open items
 
@@ -65,7 +66,7 @@
 | §2 Done: a PR shows every check | The first PR |
 | §6 sandbox tests on Linux runners | The first CI run with `make test-nsjail` (wired into `make check`) |
 | §6 multi-arch runner images | BE-03, BE-08 (`vizd` already builds for both) |
-| §6 Done: clone to completed local job | BE-02, BE-06, BE-13 §1 |
+| §6 Done: clone to completed local job | One `make dev` run after `make reset` (BE-13 §1) |
 
 ## Frontend
 
@@ -105,7 +106,7 @@
 | Real C++ traces (S1) | Fri 6 Nov | ✅ 24 Oct: `backend/fixtures/cpp/*/expected.trace.json`, from `vizctl trace` |
 | Format frozen | Fri 13 Nov | G3 |
 | OpenAPI | Tue 17 Nov | ✅ 23 Oct (`3ebd66b`) |
-| Local stack | Wed 18 Nov | 🟡 MySQL, SeaweedFS and migrations run; buckets, seed data and sandbox missing |
+| Local stack | Wed 18 Nov | 🟡 24 Oct: `make dev` runs MySQL, SeaweedFS, migrations, the bucket, 66 seeded traces and the Docker sandbox; one run from a clean checkout is left |
 | Real Python traces | Fri 4 Dec | ✅ 24 Oct: `backend/fixtures/python/*/expected.trace.json`, from `vizctl trace` |
 | Staging | Mon 28 Dec | Not started (BE-13 §3) |
 | C++ pointer values | M2 week 3 | ✅ 24 Oct: `ptr` with `target` and `index` in the `backend/fixtures/cpp/` goldens (`pointer`, `array-pointer`, `methods`, `segfault`, `stl`) |

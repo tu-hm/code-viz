@@ -16,25 +16,25 @@
 
 Same as before — runs on the developer's Mac/Linux via Docker Compose.
 
-- [ ] Docker Compose: MySQL 8.4 + SeaweedFS (S3 API)
-- [ ] Settings from §7.13: InnoDB, `utf8mb4`, UTC, `binlog_format=ROW`, strict mode
-- [ ] `vizd --role=all` runs api + worker in one process, with `VIZ_SANDBOX=docker` (BE-02 §2)
-- [ ] Runner images built for the host architecture (`make images`), so GDB works on arm64 Macs
-- [ ] Create buckets and bucket CORS on start (BE-06 §3)
-- [ ] Run migrations on start with `vizd migrate up`
-- [ ] Seed data: a few completed Python and C++ traces (`make seed`)
-- [ ] **Done:** `make dev` brings up the system from a clean checkout
+- [x] Docker Compose: MySQL 8.4 + SeaweedFS (S3 API)
+- [x] Settings from §7.13: InnoDB, `utf8mb4`, UTC, `binlog_format=ROW`, strict mode
+- [x] `vizd --role=all` runs api + worker in one process, with `VIZ_SANDBOX=docker` (BE-02 §2)
+- [x] Runner images built for the host architecture (`make images`), so GDB works on arm64 Macs
+- [x] Create buckets and bucket CORS on start (BE-06 §3)
+- [x] Run migrations on start with `vizd migrate up`
+- [x] Seed data: a few completed Python and C++ traces (`make seed`)
+- [ ] **Done:** `make dev` brings up the system from a clean checkout — every step checked against the running stack; one run after `make reset` is left, since it deletes the local data
 
 ## 2. Observability (1 d · may slip to M2 week 1)
 
-- [ ] `log/slog` JSON logs with request ID / trace ID
-- [ ] OpenTelemetry tracing: API → queue → worker → sandbox, one trace ID end to end
-- [ ] Prometheus metrics: request latency, queue depth, claim latency, job duration by stage, failures by kind
-- [ ] **Done:** one request traced end to end
+- [x] `log/slog` JSON logs with request ID / trace ID
+- [x] OpenTelemetry tracing: API → queue → worker → sandbox, one trace ID end to end (`jobs.traceparent`, spec v1.16); exported only when `OTEL_EXPORTER_OTLP_ENDPOINT` is set
+- [x] Prometheus metrics: request latency, queue depth, claim latency, job duration by stage, failures by kind; served at `/metrics` only with `VIZ_METRICS=true`
+- [x] **Done:** one request traced end to end: `POST /api/v1/visualizations` → `job` → `sandbox`, `build`, `trace`, `store` in the dev Jaeger (`--profile tracing`)
 
 ## 3. Server provisioning (2 d · M1 week 8)
 
-One Linux server (bare metal or VPS). All services run on this machine.
+One Linux server (bare metal or VPS). All services run on this machine. *Decided 24 Oct (spec v1.16): they run as Docker Compose containers per `docs/deploy.md`; read the native installs below in that light.*
 
 **OS and prerequisites**
 - [ ] Ubuntu 24.04 LTS (or Debian 13); unattended-upgrades for security patches

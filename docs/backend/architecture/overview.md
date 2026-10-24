@@ -6,7 +6,7 @@ The backend is one Go module, `backend/`. It holds two binaries and a shim, the 
 
 | Binary | Where | Job | Built so far |
 |---|---|---|---|
-| `vizd` | `cmd/vizd` | The service, with roles `api`, `worker` or `all` (D3) | Config, the sandbox choice check, the MySQL pool, `vizd migrate`, `/healthz` and `/readyz`, the visualization API under `api` and `all`, and the job worker under `worker` and `all` |
+| `vizd` | `cmd/vizd` | The service, with roles `api`, `worker` or `all` (D3) | Config, the sandbox choice check, the MySQL pool, `vizd migrate`, `vizd seed` (dev fixtures), `/healthz` and `/readyz`, optional `/metrics` and OTLP tracing, the visualization API under `api` and `all`, and the job worker under `worker` and `all` |
 | `vizctl` | `cmd/vizctl` | The developer CLI (§7.10) | `trace` runs one program end to end in the Docker dev sandbox; `validate` checks a trace file. `diff` isn't built |
 | `viz-shim` | `cmd/viz-shim` | Runs inside every runner image and carries fd 1, 2 and 3 out of the sandbox as one framed stream | Done |
 

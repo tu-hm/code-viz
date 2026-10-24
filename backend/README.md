@@ -18,14 +18,15 @@ The Go module for `vizd` (API and worker) and `vizctl`. Run every command below 
 make dev
 ```
 
-`make dev` does four things:
+`make dev` does five things:
 
-1. Starts MySQL 8.4 and SeaweedFS (S3 API) with Docker Compose and waits until both are healthy.
-2. Runs `vizd migrate up`.
-3. Runs `make seed`, which creates the `viz-traces` bucket in SeaweedFS.
-4. Starts `vizd --role=all` under [air](https://github.com/air-verse/air), which rebuilds and restarts it when a `.go` or `.sql` file changes.
+1. Builds the runner images for your machine (`make runner-images`), so jobs can run.
+2. Starts MySQL 8.4 and SeaweedFS (S3 API) with Docker Compose and waits until both are healthy. MySQL runs with the §7.13 settings: InnoDB, `utf8mb4`, UTC, `binlog_format=ROW` and strict mode.
+3. Runs `vizd migrate up`.
+4. Runs `make seed`: it creates the `viz-traces` bucket with its CORS rule, then loads every golden trace under `fixtures/` as a completed visualization (see Sample traces).
+5. Starts `vizd --role=all` under [air](https://github.com/air-verse/air), which rebuilds and restarts it when a `.go` or `.sql` file changes.
 
-The first run pulls images and downloads modules, which takes a few minutes. Then check vizd from another terminal:
+The first run pulls images, downloads modules and builds the C++ runner image, which compiles GDB: expect 10 minutes or more. Later runs reuse Docker's cache. Then check vizd from another terminal:
 
 ```sh
 curl -i http://127.0.0.1:8080/healthz   # 200: the process is up
@@ -43,7 +44,29 @@ curl -si -X POST http://127.0.0.1:8080/api/v1/visualizations -H 'Content-Type: a
 curl -s 'http://127.0.0.1:8080/api/v1/visualizations/<id>?wait=20&since=0'   # repeat with since=<version> until completed
 ```
 
-`make seed` loads no sample traces until BE-13 §1.
+## Sample traces
+
+`make seed` (part of `make dev`) loads every `fixtures/<language>/<case>/expected.trace.json`, Python and C++, as a completed visualization, without running anything. Each one goes through the same queue and completion path a real job takes, so the API serves it like any other, C++ included. The log prints one line per fixture with its ID:
+
+```sh
+make seed 2>&1 | jq -r 'select(.msg == "fixture seeded") | "\(.fixture) \(.visualization_id)"'
+curl -s http://127.0.0.1:8080/api/v1/visualizations/<id> | jq .
+```
+
+Seeding again within 24 hours returns the same visualizations; after that, new ones on the same traces. Seeded traces expire after 7 days like any other, and the next `make dev` loads them again. Goldens mask pointer addresses (`0xdeadbeef`), so seeded C++ traces show those. Run `make seed` with vizd stopped: a running worker may claim a fixture's job first, and seeding stops with an error.
+
+## Metrics and traces
+
+Both are off by default.
+
+- **Metrics.** With `VIZ_METRICS=true` in `.env`, vizd serves Prometheus metrics at `GET /metrics` on `VIZ_HTTP_ADDR`: `vizd_http_request_duration_seconds` by route and status, `vizd_jobs_queued` (api role), `vizd_job_claim_duration_seconds`, `vizd_job_stage_duration_seconds` by language and stage (`sandbox`, `build`, `trace`, `store`) and `vizd_jobs_total` by language, status and kind (worker role), plus Go and process metrics.
+- **Traces.** vizd sends OpenTelemetry spans over OTLP/HTTP only when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. A create request and the job it queued share one trace: the job row keeps the request's `traceparent`, and the worker's `job` span and its stage spans continue it. Log lines inside a span carry `otel_trace_id` and `otel_span_id`. To look at traces locally, start Jaeger and point vizd at it:
+
+  ```sh
+  docker compose --profile tracing up -d jaeger
+  echo OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318 >> .env
+  make dev   # then open http://127.0.0.1:16686, service vizd
+  ```
 
 ## Trace a program locally
 
@@ -80,6 +103,7 @@ Everything listens on 127.0.0.1 only.
 | 8080 | vizd |
 | 13306 | MySQL (user `viz`, password `viz`, database `viz`). Not 3306, so it doesn't clash with a local MySQL. |
 | 8333 | SeaweedFS S3 API, with no auth |
+| 4318, 16686 | Jaeger's OTLP/HTTP receiver and UI, only with `--profile tracing` |
 
 ## Look at the data
 
@@ -113,10 +137,10 @@ Name the bucket: `aws s3 ls` without one prints nothing. A desktop S3 client suc
 
 | Command | What it does |
 |---|---|
-| `make dev` | Starts the stack and runs vizd with hot reload |
+| `make dev` | Builds the runner images, starts the stack, seeds it and runs vizd with hot reload |
 | `make down` | Stops the containers and keeps their data |
 | `make reset` | Stops the containers and deletes their data |
-| `make seed` | Creates the trace bucket (`S3_BUCKET`) if it doesn't exist. Sample traces come with BE-13 §1 |
+| `make seed` | Creates the trace bucket (`S3_BUCKET`) if it doesn't exist and loads the fixtures as completed visualizations (`vizd seed fixtures`, refused unless `VIZ_ENV=dev`) |
 | `make test` | Builds the runner images, then runs `go test ./...`. Needs Docker, because some tests start MySQL with testcontainers, and the sandbox and fixture tests start containers. |
 | `make images` | Builds `vizd-api:dev`, `vizd-worker:dev` and the runner images for this machine's architecture |
 | `make runner-images` | Builds only the runner images, tagged with each manifest's `image` |
