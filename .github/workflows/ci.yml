@@ -14,36 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ── gate: skip jobs when only docs / unrelated files changed ──
-  changes:
-    runs-on: ubuntu-24.04
-    outputs:
-      backend: ${{ steps.filter.outputs.backend }}
-      web: ${{ steps.filter.outputs.web }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
-        id: filter
-        with:
-          filters: |
-            backend:
-              - 'backend/**/*.go'
-              - 'backend/go.mod'
-              - 'backend/go.sum'
-              - 'backend/Makefile'
-              - 'backend/Dockerfile'
-              - 'backend/adapters/**'
-              - 'backend/schema/**'
-              - 'backend/api/**'
-              - 'backend/scripts/**'
-            web:
-              - 'web/**'
-
   backend:
-    needs: changes
-    if: needs.changes.outputs.backend == 'true' || github.event_name == 'push'
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -84,8 +55,6 @@ jobs:
         run: make gen-check
 
   golden-arm64:
-    needs: changes
-    if: needs.changes.outputs.backend == 'true' || github.event_name == 'push'
     runs-on: ubuntu-24.04-arm
     defaults:
       run:
@@ -111,8 +80,6 @@ jobs:
       - run: go test -count=1 -run Golden ./internal/tracecore ./cmd/vizctl
 
   web:
-    needs: changes
-    if: needs.changes.outputs.web == 'true' || github.event_name == 'push'
     runs-on: ubuntu-24.04
     defaults:
       run:
