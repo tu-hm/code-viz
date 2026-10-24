@@ -35,10 +35,10 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 
 - [x] Step counter "Step N of M · <event> <detail>"
 - [x] Start `|◀`, Prev, Next, End `▶|`, slider (scrub, throttled to animation frames)
-- [ ] Shortcuts (§5.9): `←` `→` `Home` `End` `Esc`; `Shift+→` / `Shift+↑` wired once FE-10 lands — all but the Shift pair; plain arrows ignore modified keys, so FE-10 adds two cases in `keys.ts`
+- [x] Shortcuts (§5.9): `←` `→` `Home` `End` `Esc`; `Shift+→` / `Shift+↑` wired once FE-10 lands — the Shift pair came with FE-10's Go to…
 - [x] Shortcuts disabled while typing in inputs — also inside dialogs, and for the keys a focused slider, divider or button uses itself
 - [x] Current step in Zustand; URL `?step=` kept in sync (used by FE-12) — 1-based, as shown; written 300 ms after stepping stops (Safari's `replaceState` limit)
-- [ ] **Done:** all §5.9 shortcuts work — all but step over and step out (FE-10)
+- [x] **Done:** all §5.9 shortcuts work
 
 ## 4. Visualizer shell & settings (new · 2 d · M1 weeks 4–6)
 
