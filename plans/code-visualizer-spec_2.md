@@ -95,7 +95,7 @@
 | v1.3 | 2026-10-23 | **Frontend trimmed to the IDE.** The web app is there to show the backend's traces, not to be a production UI: no i18n files (strings written inline), no Playwright end-to-end or visual-snapshot tests. D20 changed; §13, §15 and §18 updated. |
 | v1.4 | 2026-10-23 | C++ locals are `uninit` on their declaration line until it runs (§7.11.2), instead of showing garbage. |
 | v1.5 | 2026-10-23 | **G1: the production sandbox is nsjail (D10), not gVisor (D9).** Spike S1b: gVisor runs GDB, but a 1,000-step trace takes 7–9 s on its default platform (target 3 s) and `personality(ADDR_NO_RANDOMIZE)` fails, so traces aren't deterministic (§7.12). nsjail: 1.5 s, 4–8 ms starts, ASLR off. Worker pods run privileged on the runner node pool. Report: `plans/spikes/s1b-sandbox.md`. |
-| v1.7 | 2026-10-24 | **Object storage is SeaweedFS on the server's own disk** (D4), because our infrastructure may have no managed S3. The M1 beta runs `vizd --role=all` and SeaweedFS on one server. Presigned URLs stay (D7). SeaweedFS only partly supports lifecycle rules, so the nightly cleanup deletes expired chunks with their rows (§7.5, §7.8). **API rules (BE-06):** `wait` without `since` returns at once; a detached visualization reads `canceled`; a repeated `Idempotency-Key` returns the same visualization in its current state; a cache hit inherits the trace's expiry (§8.2, §8.3, §8.5). |
+| v1.7 | 2026-10-24 | **Object storage is SeaweedFS on the server's own disk** (D4), because our infrastructure may have no managed S3. The M1 beta runs `vizd --role=all` and SeaweedFS on one server. Presigned URLs stay (D7). SeaweedFS only partly supports lifecycle rules, so the nightly cleanup deletes expired chunks with their rows (§7.5, §7.8). **API rules (BE-06):** `wait` without `since` returns at once; a detached visualization reads `canceled`; a repeated `Idempotency-Key` returns the same visualization in its current state; a cache hit inherits the trace's expiry; only the caller that created a visualization can delete it, while its ID stays the read key (§8.2, §8.3, §8.5, §12). |
 | v1.6 | 2026-10-24 | **Python tracer contract (BE-03).** The Python build step is a check (`tracer.py --check`): syntax errors become `compile_error` with diagnostics, blocked imports `unsupported_module` (§7.11.1, §10.2). The trace runs with `python3 -s -P` and `PYTHONHASHSEED=0` instead of `-I`, which ignored the seed, so set order changed between runs (§7.12). Wire `exit` carries the tracer's `lineHits`. A tracer sends one step past `maxSteps` to mark that the program went on, and the core keeps reading for the untraced tail instead of killing (§10.1, D25). §11 says what the heap-object and size limits do to a Python trace. |
 
 ---
@@ -1121,7 +1121,7 @@ A failed build:
 
 ### 8.5 `DELETE /visualizations/{id}`
 
-Returns `204`. The visualization is detached: from then on `GET` returns it with `status: canceled` until it expires. Its trace job is canceled only if no other visualization still waits on it (§7.7). A visualization detached because its caller started a third active one (§11) reads the same way.
+Returns `204`. The visualization is detached: from then on `GET` returns it with `status: canceled` until it expires. Its trace job is canceled only if no other visualization still waits on it (§7.7). A visualization detached because its caller started a third active one (§11) reads the same way. Only the caller that created the visualization can delete it; anyone else gets `404 not_found`, as for an unknown ID.
 
 ### 8.6 `POST /visualizations/{id}/share` (P1)
 
@@ -1432,7 +1432,7 @@ All of these are configurable per language in the manifest, with global ceilings
 | Separation | Visualize runners are a separate pool from the judge and submission infrastructure. |
 | Credentials | Runner nodes hold only **scoped** credentials. The database role can lease jobs and update the trace it runs, and nothing else. The storage key is write-only to `t7/`. The API's storage key can read, sign and copy. |
 | Trace access | Chunks are only reachable through signed URLs that expire after 15 minutes. Buckets are private, and object keys use random `trc_` IDs. |
-| IDs | Visualization IDs are 128-bit random values. Cache keys (content hashes) are never exposed, so nobody can find someone else's code by hashing guesses. |
+| IDs | Visualization IDs are 128-bit random values. Cache keys (content hashes) are never exposed, so nobody can find someone else's code by hashing guesses. The ID is the read key: whoever has it can `GET` the visualization, so permalinks and an anonymous caller whose IP changed keep working. `DELETE` also checks that the caller created it (v1.7). |
 | Rendering | The UI renders every string from the trace as **text**, never as HTML. Control characters are escaped, and long lines wrap. |
 | Privacy | Traces are private to their owner until shared. Share links can be revoked. Anonymous traces are deleted after 7 days. |
 | Abuse | Rate limits (§11) plus anomaly alerts, for example the same IP using its daily quota within minutes. |
