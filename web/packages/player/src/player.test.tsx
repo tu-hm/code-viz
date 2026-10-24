@@ -67,14 +67,14 @@ describe.each(fixtureNames)('%s', (name) => {
 })
 
 test('typing in an input leaves the shortcuts alone', async () => {
-  const { header, chunks } = loadFixture('python-aliasing')
+  const { header, chunks, source } = loadFixture('python-aliasing')
   const onClose = () => {
     throw new Error('closed while typing')
   }
   render(
     <>
       <input aria-label="Notes" />
-      <Player source={{ header, chunks }} stdin="" language={cpp} onClose={onClose} />
+      <Player source={{ header, chunks }} code={source} stdin="" language={cpp} onClose={onClose} />
     </>,
   )
   await counter(1, 19)

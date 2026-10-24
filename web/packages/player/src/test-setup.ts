@@ -33,3 +33,9 @@ if (typeof window !== 'undefined') {
       removeListener: () => {},
     })
 }
+
+// jsdom has no layout for ranges; CodeMirror measures text through them
+if (typeof Range !== 'undefined') {
+  Range.prototype.getClientRects = () => Object.assign([], { item: () => null })
+  Range.prototype.getBoundingClientRect = () => new DOMRect()
+}

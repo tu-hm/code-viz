@@ -1,6 +1,11 @@
 import type { FileSource, LanguageInfo } from '@viz/player'
 
-export type DevFixture = { source: FileSource; stdin: string; language: LanguageInfo }
+export type DevFixture = {
+  source: FileSource
+  code: string
+  stdin: string
+  language: LanguageInfo
+}
 
 export async function devFixture(search: string): Promise<DevFixture | null> {
   const name = new URLSearchParams(search).get('fixture')
@@ -12,8 +17,8 @@ export async function devFixture(search: string): Promise<DevFixture | null> {
   if (!fixtureNames.includes(name)) {
     throw new Error(`?fixture=${name}: want one of ${fixtureNames.join(', ')}`)
   }
-  const { header, chunks, stdin } = loadFixture(name)
+  const { header, chunks, source, stdin } = loadFixture(name)
   const language = languages.languages.find((l) => l.id === header.language.id)
   if (!language) throw new Error(`fixture ${name}: GET /languages has no ${header.language.id}`)
-  return { source: { header, chunks }, stdin, language }
+  return { source: { header, chunks }, code: source, stdin, language }
 }

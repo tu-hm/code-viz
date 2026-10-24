@@ -1,6 +1,7 @@
 import { Button } from '@viz/ui'
 import { useEffect, useRef, type ReactNode } from 'react'
 import { togglePlay, useAutoplay } from './autoplay.ts'
+import { CodePane } from './code-pane.tsx'
 import { Controls } from './controls.tsx'
 import { useDisplayOptions } from './display.ts'
 import { Divider } from './divider.tsx'
@@ -17,11 +18,11 @@ import { usePlayer } from './store.ts'
 
 export type LanguageInfo = {
   displayName: string
+  editorMode: string
   visualize: { capabilities: { pointers: boolean }; limits: { maxStepsCeiling: number } }
 }
 
 type Slots = {
-  codePane?: ReactNode
   statePane?: ReactNode
   share?: ReactNode
   banner?: ReactNode
@@ -29,6 +30,7 @@ type Slots = {
 
 type PlayerProps = Slots & {
   source: TraceSource
+  code: string
   stdin: string
   language: LanguageInfo
   permalink?: string
@@ -74,6 +76,33 @@ function ControlsBox({ stepCount }: { stepCount: number }) {
   )
 }
 
+function CodeBox({
+  code,
+  editorMode,
+  header,
+}: {
+  code: string
+  editorMode: string
+  header: TraceHeader
+}) {
+  const state = usePlayer((s) => s.current)
+  const breakpoints = usePlayer((s) => s.breakpoints)
+  const fontSize = usePlayer((s) => s.settings.fontSize)
+  const toggleBreakpoint = usePlayer((s) => s.toggleBreakpoint)
+  return (
+    <CodePane
+      code={code}
+      editorMode={editorMode}
+      state={state}
+      breakpoints={breakpoints}
+      lineHits={header.summary.lineHits}
+      lineHitsSource={header.summary.lineHitsSource}
+      fontSize={fontSize}
+      onToggleBreakpoint={toggleBreakpoint}
+    />
+  )
+}
+
 function OutputBox() {
   const output = usePlayer((s) => s.current?.output ?? noOutput)
   return <OutputPanel output={output} />
@@ -110,11 +139,11 @@ function failureText(error: unknown) {
 function Shell({
   header,
   stepCount,
+  code,
   stdin,
   language,
   permalink,
   onClose,
-  codePane,
   statePane,
   share,
   banner,
@@ -141,7 +170,7 @@ function Shell({
         style={{ gridTemplateColumns: `minmax(0, ${split}fr) auto minmax(0, ${1 - split}fr)` }}
       >
         <div className="flex min-h-0 flex-col">
-          <div className="min-h-0 flex-1 overflow-auto">{codePane}</div>
+          <CodeBox code={code} editorMode={language.editorMode} header={header} />
           <ControlsBox stepCount={stepCount} />
         </div>
         <Divider split={split} onSplit={setSplit} />

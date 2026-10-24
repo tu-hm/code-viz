@@ -6,7 +6,7 @@ The browser half of the code visualizer: the IDE app, the `@viz/player` package 
 
 ```text
 apps/ide/          IDE app: Vite 8, React 19.3 with React Compiler, Tailwind v4
-packages/player/   @viz/player: trace types (generated), loader, engine in a Web Worker, the player shell and controls
+packages/player/   @viz/player: trace types (generated), loader, engine in a Web Worker, the player shell, code pane and controls
 packages/ui/       @viz/ui: design tokens, Tailwind theme, fonts, primitives such as Button
 fixtures/          @viz/fixtures: traces in the API's shape (header + chunks), their loader and a synthetic generator
 scripts/           setup check, codegen

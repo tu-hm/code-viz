@@ -52,6 +52,7 @@ export function useSession(source: TraceSource): Session {
         step: stepFromUrl(location.search, stepCount),
         current: null,
         playing: false,
+        breakpoints: [],
       })
       ready = true
       setSession({ status: 'ready', header, stepCount })

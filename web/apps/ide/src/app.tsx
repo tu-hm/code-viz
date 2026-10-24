@@ -10,6 +10,7 @@ export function App({ fixture }: { fixture: DevFixture | null }) {
       <PlayerErrorBoundary traceId={fixture.source.header.id}>
         <Player
           source={fixture.source}
+          code={fixture.code}
           stdin={fixture.stdin}
           language={fixture.language}
           onClose={() => location.assign(location.pathname)}

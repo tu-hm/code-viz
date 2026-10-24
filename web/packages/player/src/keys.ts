@@ -6,8 +6,9 @@ const ownsArrows = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '
 
 function ownsKey(target: EventTarget | null, key: string) {
   if (!(target instanceof Element)) return false
-  if (target.closest('[role="dialog"], [contenteditable]:not([contenteditable="false"])'))
-    return true
+  const typing =
+    '[role="dialog"], [contenteditable]:not([contenteditable="false"]):not([aria-readonly="true"])'
+  if (target.closest(typing)) return true
   if (target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true
   if (target instanceof HTMLInputElement) {
     if (target.type === 'range') return ownsArrows.has(key)

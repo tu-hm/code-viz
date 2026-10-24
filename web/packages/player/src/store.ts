@@ -34,6 +34,7 @@ type PlayerState = {
   setPlaying: (playing: boolean) => void
   updateSettings: (patch: Partial<Settings>) => void
   setSplit: (split: number) => void
+  toggleBreakpoint: (line: number) => void
 }
 
 export const defaultSettings: Settings = {
@@ -106,6 +107,12 @@ export const usePlayer = create<PlayerState>()(
       setPlaying: (playing) => set({ playing }),
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
       setSplit: (split) => set({ split }),
+      toggleBreakpoint: (line) =>
+        set(({ breakpoints }) => ({
+          breakpoints: breakpoints.includes(line)
+            ? breakpoints.filter((b) => b !== line)
+            : [...breakpoints, line].sort((a, b) => a - b),
+        })),
     }),
     {
       name: 'viz-player',

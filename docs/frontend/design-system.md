@@ -72,6 +72,14 @@ The generic names follow shadcn/ui, so a component added with `shadcn add` rende
 | Reference arrow / highlighted | `stroke-trace-arrow`, `stroke-trace-arrow-active` | `●──▶` | slate 9, brand | slate dark 9, brand |
 | Hit-count heat | `bg-trace-heat/15` … `/40` | `×n` | `#c28500` | `#e69f00` |
 
+**Syntax** colours stay off the trace hues the code pane already uses (blue, amber, red). Keywords, strings and comments get a colour; everything else is `text-foreground`.
+
+| Meaning | Utility | Light | Dark |
+|---|---|---|---|
+| Keyword, also `#include`, `int`, `True`, `None`, `nullptr` | `text-syntax-keyword` | `#8d4b70` | `#cc79a7` |
+| String, with its escapes | `text-syntax-string` | `#006c4f` | `#1fae84` |
+| Comment | `text-syntax-comment` | slate 11 | slate dark 11 |
+
 **Contrast is tested.** [tokens.test.ts](../../web/packages/ui/src/tokens.test.ts) resolves every token in both themes and asserts the pairs: 4.5:1 for text, 3:1 for marks, outlines and form controls (WCAG 2.2 AA, 1.4.3 and 1.4.11). Change a value, run `pnpm test`. When a pair fails, change the value. Don't drop the pair.
 
 ## 4. Typography
@@ -144,6 +152,8 @@ Shadows only for things that lift: `shadow-raised` for a card on hover, `shadow-
 - Icon-only buttons need an `aria-label`.
 
 **Stack frames** are tables ruled by row, with no filled header. The header row takes `border-border-strong` and body rows `border-border`. The active frame gets a 2px brand outline as well as being last in the stack.
+
+**Code pane** (`code-view.ts`, CodeMirror 6) sits on `bg-muted`. Gutters, left to right: the step mark (`▶ ▷ !`), the breakpoint `●` with the line number, and `×n` hits. The line just run gets `bg-trace-executed`, the next line `outline-trace-next`, the error line `bg-trace-error`. A `×n` cell is tinted `bg-trace-heat/15`, `/25` or `/40` by where its count sits between the run's lowest and highest, and its text turns `text-foreground` on a tint; when every line ran equally often, nothing is tinted. A marked line starts with a screen-reader label such as "Line 9, just ran:".
 
 **Heap cards** sit on `bg-card` with no border, `rounded-xl`. The title is `#id kind · len n` in mono.
 
