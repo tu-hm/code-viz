@@ -159,7 +159,7 @@ sequenceDiagram
 | Rule | Detail |
 |---|---|
 | Order | `hello` first, `exit` last, `step` and `out` in between. `log` may come anywhere, even after `exit`; any other message after `exit` is malformed |
-| Snapshots | Every `step` is a full snapshot: the whole stack (capped, below) and every object reachable from it. The core computes deltas |
+| Snapshots | Every `step` is a full snapshot: the whole stack (capped, below) and every object reachable from it. The one exception is a sparse sequence that was in the previous step: it may come as `{kind, type, length, patch}` with only its changed cells (§19.9.1). The core computes deltas |
 | IDs | Frame `id` is the call's `callId` as a string. Call 0 is Python's module frame and C++'s `main`; the C++ globals frame is `globals`. Heap ids are `str(id(obj))` in Python and `<addr>:<type>` in C++ (`tmpN:<type>` for a value with no address). The core maps both to `f0…` and `o1…` in order of first appearance |
 | Calls | Call steps carry `callId` and `parentCallId` (the next frame out on the stack). Return steps carry `callId` (§19.9.6) |
 | Output | The Python tracer captures stdout and stderr itself and sends `out` messages of at most 16,384 characters (64 KiB as UTF-8). The C++ program writes its own fd 1 and 2. `viz-shim` forwards what it wrote before a wire line ahead of that line, and the tracer doesn't resume the program until `viz-shim` has read the line, so nothing written later overtakes it (§10.1). Output between step k−1 and step k belongs to step k: it was printed while step k's `prevLine` ran. Output after the last step goes to the last step |
@@ -249,15 +249,17 @@ An exception in the tracer's own code sends `log` (level `error`, at most 200 ch
 | `float` | `float`, the shortest decimal that reads back as the same 32-bit float: `0.1f` is `0.1`, not `0.10000000149011612` |
 | `long double` | `float`, GDB's text. Python's `float()` would round it to a double |
 | `T&`, `T&&` | The referenced value; `type` keeps the reference type |
-| `std::string` | `str`: its first 1,000 bytes, decoded as UTF-8 (a bad byte becomes U+FFFD). A longer one has `len`, its size in bytes, and `truncated: true` |
-| Another type whose pretty printer has children | `sequence`, or `mapping` (`ordered: true`) when the printer says map, with the printer's text in `meta.summary` |
+| `std::string`, `std::string_view` | `str`: its first 1,000 bytes, decoded as UTF-8 (a bad byte becomes U+FFFD). A longer one has `len`, its size in bytes, and `truncated: true` |
+| `const char*` to readable memory | `str` up to its NUL, at most 1,000 bytes, read in chunks that end on 4 KiB pages; `truncated: true` past that, with no `len`. A null or unreadable one is a `ptr`, and so is every `char*` |
+| A library template in `typemap.json` | Its row's kind (below) |
 | `T[N]` | `sequence` with `fixed` (below) |
-| `struct`, `class` or `union` without a printer | `record` with its own fields |
+| A `struct`, `class` or `union` declared in `main.cpp`, or one without a name (a lambda's closure) | `record`: the fields of user base classes first, flattened, then its own. A name that repeats becomes `Base::x`. Static members and `_vptr` are left out. A library base class is one field named by its type |
 | `T*` | `ptr` (below) |
-| Anything else | `opaque` with GDB's text |
+| Anything else | `opaque` with GDB's text, pretty printer included, cut to 200 characters |
 | Optimized out | `unavailable`, reason `optimized_out` |
 | Any other read error | `unavailable`, reason `unreadable` |
 
+- **Type names** are GDB's, through libstdc++'s type printers, which `whatis` applies: `std::vector<int>`, not `std::vector<int, std::allocator<int> >`. `std::__debug::` and `std::__cxx11::` are taken out, and `std::string` written short inside template arguments, so a type reads the same with safety checks on or off. Names without `std::` are GDB's plain text: `whatis` reads a VLA's bound outside its frame and gets garbage.
 - **Garbage doesn't stop the trace.** The libstdc++ printers raise `gdb.error`, `OverflowError` or `ValueError` on garbage memory, such as a `std::string` in a deleted struct. Those make the value `unavailable` with reason `unreadable`, and a heap object whose printer fails is `opaque` with summary `unreadable`. Any other exception is a bug in the tracer and ends the run (below).
 - **Locals come in declaration order.** The function's own block keeps GDB's order. Nested blocks follow, outermost first, each sorted by `(line, name)`, because GDB returns their symbols in hash order. A local declared after the current line is left out. On its declaration line it is `uninit` until that line has run in the current entry of its block (§7.11.2, v1.4); a one-line loop's line has run once the loop jumps back.
 - **Globals** are the variables in `main.cpp`'s global and static blocks, sorted by `(line, name)`, in a frame with id `globals`.
@@ -269,14 +271,36 @@ An exception in the tracer's own code sends `log` (level `error`, at most 200 ch
 
 - `addr` is the address in hex, and `0x0` is `nullptr`.
 - A pointer to a `struct`, `class` or `union` declared in `main.cpp` is followed: the pointee is recorded as a `record` and `target` names it. `this` is one of these. A pointer whose pointee can't be read has no `target`.
-- Any other pointer gets `target` and `index` when it points at an element boundary of a C array recorded in the same step with the same element type. `index` counts over the whole array, so it can be past the 100-item window. The match runs after the whole step is encoded, so the array can come later in the step than the pointer: a global pointer into a local array works.
-- Every other pointer has no `target`: one past the end of an array, into `new[]` memory or a container, or a `char*` string.
+- Any other pointer gets `target` and `index` when it points at an element boundary of a C array or `std::array` recorded in the same step with the same element type. `index` counts over the whole array, so it can be past a window. The match runs after the whole step is encoded, so the array can come later in the step than the pointer: a global pointer into a local array works.
+- Every other pointer has no `target`: one past the end of an array, into `new[]` memory or a `vector`, or a `char*`.
 
-### C arrays and containers
+### The type map
 
-- A C array records its first 100 items and its real `length`. When it's cut, it also has `truncated` and `window {start: 0, count: 100}`. An array of integers, `char`, `bool`, `float` or `double` is read with one `read_memory` per step: 0.02 ms for 100 ints, against 0.13 ms one `gdb.Value` at a time. Its items carry no `type`; the sequence's `type` already says it, and on a big array that's about half the bytes.
-- A container read through its pretty printer records its first 100 items, or 100 entries for a map.
-- Why 100, not §11's 1,000: at 1,000 items, one global `int[200005]` cost about 34 KB of wire and about 3 ms in the core per step, 4.5 s per 1,000 steps. 100 stays until BE-09's sparse arrays (§19.9.1).
+`adapters/cpp/typemap.json` sits next to `trace.py` in the image. It is JSON because GDB's Python has no YAML parser and the tracer uses the standard library only. A struct's tag, with `std::__debug::`, `std::__cxx11::` and `std::__cxx1998::` taken out, gives the template name (`std::vector`) that picks a row. A row names the kind and the reader; `length` is the field path a printer-read container keeps its size in.
+
+| Row | Kind | How it's read |
+|---|---|---|
+| `basic_string`, `basic_string_view` | `str` | The pretty printer's string |
+| `array` | `sequence`, `fixed` | Its `_M_elems` as a C array. `array<T, 0>` holds no array |
+| `vector` | `sequence`, `meta.capacity` | `[_M_start, _M_finish)` as one memory block. `vector<bool>` reads its bit words |
+| `deque` | `sequence` | Length from the iterators, items from the printer |
+| `list`, `set`, `multiset`, `unordered_set`, `unordered_multiset` | `sequence` or `set` with `ordered` | Length from the container's size field, items from the printer |
+| `map`, `multimap`, `unordered_map`, `unordered_multimap` | `mapping` with `ordered` | The same, entries from the printer |
+| `pair`, `tuple` | `record` | `first` and `second`; `0`, `1`… |
+| `stack`, `queue`, `priority_queue` | Its container's kind | Its `c` member, with `meta.adapter` |
+| `bitset` | `sequence` of `bool`, `fixed` | One read of its words |
+
+A length outside `[0, 2^32)` comes from garbage memory and makes the object `opaque` with summary `unreadable`. Items and entries carry no `type`; the container's `type` already says it, and on a big container that's about a third of the bytes. Every other library type, iterators and smart pointers among them, is `opaque`.
+
+### Arrays and containers
+
+- **Arrays of scalars longer than 64** (`T[N]`, `std::array`, a `vector` of integers, `char`, `bool`, `float` or `double`) are sparse sequences (§19.9.1). Each is read with one `read_memory` per step: whole when it is at most 4 MB and the step's whole reads stay within 16 MB, else only its first 1,000 cells. The bytes are kept until the step is sent.
+- **Patches are made when a step is sent, not when it's taken.** A snapshot taken at a closing brace can be dropped, and a return step reuses the returning frame's objects from its last stop, so the previous snapshot isn't always what the core has. `send_step` compares each array with what the previous step message sent and sends a `patch` of the cells that changed, or the whole sparse form when the array is new, or its default, length, capacity or window changed. The bytes are dropped once the step is sent, so a deep recursion's frames don't each keep a copy of a global array. A return step that reuses an array the previous message had sends an empty `patch`.
+- **The diff** compares 4 KB blocks, then 64-byte chunks of a dirty block, then cells: 0.02 ms for one changed cell in 200,005 ints. When most blocks changed (a `sort` or `fill`), it unpacks both arrays and compares them whole instead, 6 ms against 22 ms (S6).
+- **The default** is the most common value when the array is first seen (0 without counting when every byte is zero). The tracer keeps the count of non-default cells up to date from the dirty cells, and picks the default again, once, when the count passes min(10,000, length/2): after `memset(dist, 0x3f, sizeof dist)` the default is 1061109567 and no cell is non-default. Cells are compared as raw bit patterns, so a `NaN` equals itself.
+- **More than 10,000 non-default cells** keep only the first 1,000, with `truncated` and `window`, while the tracer still reads and counts the whole array.
+- `vector<bool>`, arrays of enums and arrays of anything but scalars stay dense.
+- **Dense containers** record their first 100 items and their real `length`. A cut one has `truncated`, and a cut sequence `window {start: 0, count: 100}`. Why 100, not §11's 1,000: a 1,000-entry `map` at 1,000 items took 13.5 s per 1,000 steps, about 10 µs per tree node inside the printers. A small array of scalars is read with one `read_memory` per step: 0.02 ms for 100 ints, against 0.13 ms one `gdb.Value` at a time.
 
 ### Signals and deep recursion
 
@@ -306,7 +330,9 @@ An exception in the tracer's own code sends `log` (level `error`) and `exit {kin
 - A frame an exception unwinds through can show one step at a cleanup's line before it disappears.
 - On aarch64, GCC's debug info for a named return value (an NRVO local) can show garbage.
 - The `__for_*` internals show stale values on the `for` line. They're hidden by default.
-- BE-09's type map isn't in yet: records skip base-class fields, `const char*` stays a pointer, and a container's `length` is the number of items read, with no `truncated`.
+- Containers read through the pretty printers, and arrays of non-scalars, keep 100 items.
+- A `vector` that changes length or capacity is sent whole on that step, all its non-default cells included.
+- A step that changes most of a 200,005-int array (a `sort`) costs about 6 ms to diff, against 0.1 ms for a few cells.
 
 ### Numbers
 
@@ -321,7 +347,7 @@ GDB 14.2 and GCC 13.5 on arm64, in the runner image with one CPU, GDB time per r
 | `for (int i = 0; i < 100000; i++) s += i;` on one line | 50 s, 2 steps | 0.4 s, 1,000 steps then the untraced tail |
 | `for (...) cin >> a[i];` on one line, 5,000 numbers | 16 s, 2 steps of the loop | 0.4 s, 1,000 steps then the untraced tail |
 
-Through `vizctl`, with the build and the container start, 1,000 steps with a global `int[200005]` take 1–2 s.
+Through `vizctl`, with the build and the container start, 1,000 steps with a global `int[200005]` take 1–2 s. A 1,000-step DFS that writes two global `int[200005]` (BE-09) takes 1.6–2.4 s through `vizctl`, about 0.9–1.5 s of it tracing, with the machine's load average at 14–19. Its trace is 885 KB of steps, 32 KB gzipped, and every array change in a delta is a one-cell `patch`.
 
 ## Inside the trace core
 
@@ -343,8 +369,9 @@ Through `vizctl`, with the build and the container start, 1,000 steps with a glo
 | Internals | `internal` locals are dropped unless `options.showInternals` |
 | Heap budget | At most `Limits.HeapObjects` (500) objects per step. A `ref` past the budget becomes `unavailable` with reason `object_limit`; a `ptr` loses its `target` (§11) |
 | Strings and containers | Strings are cut at `Limits.StringChars` runes, with `len` and `truncated`. Items and entries are cut at `Limits.Items`, with `truncated` |
+| Sparse sequences | The core keeps each sparse sequence's non-default cells as the last step message left them, keyed by native id. A full sparse form replaces them; a `patch` changes them, and must have a sparse form under the same id in the previous step message, the same `type` and `length`, keys under `length` and inside the window, scalar cells and no other field, or the run is malformed. Over `Limits.Cells` (10,000) cells the stored object keeps only the cells of a `Limits.Items` window, with `truncated` |
 | Keyframes | Every step where `i % 50 == 0` carries every frame and every object (D2) |
-| Deltas | The other steps carry each frame and object whose JSON differs from the previous step, whole, plus `removedObjects`: ids reachable in the previous step and not in this one. `stack` is always complete |
+| Deltas | The other steps carry each frame and object whose JSON differs from the previous step, whole, plus `removedObjects`: ids reachable in the previous step and not in this one. `stack` is always complete. A sparse sequence is compared without its cells: when the rest is unchanged, the delta is `{kind, type, length, patch}` with the cells that changed, or nothing. Keyframes are built from the core's copy, never from the tracer's patches |
 
 Malformed input fails the run with `ErrMalformed`. That covers a schema failure, a message out of order, and a ref to an id missing from the step's heap. The error message names the line number and the schema rule that failed, never the line's content, so the job runner can log it (§7.8).
 
@@ -358,6 +385,8 @@ Malformed input fails the run with `ErrMalformed`. That covers a schema failure,
 | Wall time | 15 s | The caller's context deadline; the sandbox kills | Yes | `truncation time_limit` unless the step limit came first, `exit.kind = timeout` |
 | Memory | 256 MB | The sandbox | Yes | `exit.kind = memory_limit` |
 | Heap objects, frames, strings, items | 500 / 100 / 1,000 / 1,000 | Per step, in the transform | No | Cut in place (above) |
+| Non-default cells per sparse sequence | 10,000 | The stored object | No | `truncated`, the first 1,000 cells' window |
+| Non-default cells per step message | 100,000 | Applying the step's sparse forms and patches; bounds the core's copy | Yes | `truncation size_limit`, `exit.kind = step_limit` |
 
 ### Finishing
 
@@ -383,8 +412,8 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | What | Where |
 |---|---|
 | G2: keep `settrace` or move to `sys.monitoring` | Gate on Fri 13 Nov; S2 recommends `sys.monitoring` |
-| The C++ type map: base-class fields, `const char*` as `str`, `std::array`, sets, pairs and container adapters as §10.3 says, a container's real `length` and `truncated` | BE-09 §1 |
-| Sparse arrays and dirty cells; until then C arrays and containers record a window of 100 items | BE-09 §2, BE-04 §3 |
+| Sparse Python lists (§19.9.1's last bullet); Python lists stay dense, cut at 1,000 items | No task yet |
+| `target` and `index` for a pointer into a `vector`'s buffer | No task yet |
 | C++ line hits from gcov (the C++ `exit` has no `lineHits`) | BE-11 §1 |
 | C++ errors in words: a UBSan or debug-container failure on the user's line, with the values involved (today only signals become error steps) | BE-10 |
 | Offering C++ through the API: the manifest stays `enabled: false` | A separate decision |

@@ -60,10 +60,12 @@ Built early, inside the BE-03 run, so `vizctl trace` prints real traces. `tracec
 
 ## 3. Sparse arrays (M2-B08 · 1 d, after BE-09)
 
-- [ ] Accept sparse sequences and dirty-cell patches from the C++ tracer
-- [ ] Keyframe: `sparse.default` + non-default cells (≤ 10,000), else `truncated` + window only
-- [ ] Delta: `patch` with changed cells only
-- [ ] Golden tests updated
+- [x] Accept sparse sequences and dirty-cell patches from the C++ tracer
+- [x] Keyframe: `sparse.default` + non-default cells (≤ 10,000), else `truncated` + window only
+- [x] Delta: `patch` with changed cells only
+- [x] Golden tests updated
+
+**Result:** built with BE-09 §2 (`internal/tracecore/sparse.go`). A wire `patch` is checked and applied to the core's own copy of the sequence; keyframes come from that copy and delta patches are computed by the core, so no stored step depends on the tracer's patches. Over 10,000 non-default cells the stored object keeps the first 1,000 cells' window; over 100,000 cells in one step message the trace ends with `size_limit`. A 1,000-step trace over a 200k array is 54 KB gzipped in `TestBigArrayDFSFitsTheSizeTarget` (32 KB from the real tracer). Golden `cpp-sparse`, the replay property with sparse arrays, and `FuzzWire` seeded with it.
 
 ## Done when
 
