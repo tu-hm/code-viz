@@ -599,7 +599,7 @@ components:
           type: integer
           minimum: 0
         sha256:
-          description: Checked by the client before it uses the chunk.
+          description: Hex SHA-256 of the chunk's JSON after gzip is removed, because browsers undo Content-Encoding before the client sees the bytes. Checked by the client before it uses the chunk.
           type: string
           pattern: '^[0-9a-f]{64}$'
         url:

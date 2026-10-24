@@ -51,7 +51,7 @@ type Chunk struct {
 	FromStep int
 	ToStep   int    // inclusive
 	Gzip     []byte // a JSON array of steps; its length is the manifest's sizeBytes
-	SHA256   string // hex, of Gzip
+	SHA256   string // hex, of the JSON inside Gzip: browsers undo Content-Encoding: gzip before the client can hash
 }
 
 // Finish builds the trace after Box.Run returns, from Run's outcome and error. Run's error is expected when a writer stopped the run at a limit; any other error is returned as is.
@@ -189,7 +189,7 @@ func (res *Result) Chunks() ([]Chunk, error) {
 		if err := zw.Close(); err != nil {
 			return nil, err
 		}
-		sum := sha256.Sum256(buf.Bytes())
+		sum := sha256.Sum256(raw)
 		chunks = append(chunks, Chunk{
 			Index:    len(chunks),
 			FromStep: from,

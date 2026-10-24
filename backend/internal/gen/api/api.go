@@ -169,7 +169,7 @@ type Chunk struct {
 	FromStep int `json:"fromStep"`
 	Index    int `json:"index"`
 
-	// Sha256 Checked by the client before it uses the chunk.
+	// Sha256 Hex SHA-256 of the chunk's JSON after gzip is removed, because browsers undo Content-Encoding before the client sees the bytes. Checked by the client before it uses the chunk.
 	Sha256    string `json:"sha256"`
 	SizeBytes int    `json:"sizeBytes"`
 	ToStep    int    `json:"toStep"`

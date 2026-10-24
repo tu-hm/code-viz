@@ -810,16 +810,20 @@ func chunkSteps(t *testing.T, b bucket, id string, chunks []ports.Chunk) []trace
 		if resp.StatusCode != http.StatusOK {
 			t.Fatalf("get chunk %d: HTTP %d", c.Index, resp.StatusCode)
 		}
-		sum := sha256.Sum256(resp.body)
-		if hex.EncodeToString(sum[:]) != c.SHA256 || len(resp.body) != c.SizeBytes {
-			t.Errorf("chunk %d is %d bytes with sha256 %x, the trace lists %d bytes and %s", c.Index, len(resp.body), sum, c.SizeBytes, c.SHA256)
-		}
 		zr, err := gzip.NewReader(bytes.NewReader(resp.body))
 		if err != nil {
 			t.Fatal(err)
 		}
+		raw, err := io.ReadAll(zr)
+		if err != nil {
+			t.Fatal(err)
+		}
+		sum := sha256.Sum256(raw)
+		if hex.EncodeToString(sum[:]) != c.SHA256 || len(resp.body) != c.SizeBytes {
+			t.Errorf("chunk %d is %d bytes with unzipped sha256 %x, the trace lists %d bytes and %s", c.Index, len(resp.body), sum, c.SizeBytes, c.SHA256)
+		}
 		var part []trace.Step
-		if err := json.NewDecoder(zr).Decode(&part); err != nil {
+		if err := json.Unmarshal(raw, &part); err != nil {
 			t.Fatal(err)
 		}
 		steps = append(steps, part...)

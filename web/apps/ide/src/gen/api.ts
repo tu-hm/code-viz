@@ -197,7 +197,7 @@ export interface components {
             fromStep: number;
             toStep: number;
             sizeBytes: number;
-            /** @description Checked by the client before it uses the chunk. */
+            /** @description Hex SHA-256 of the chunk's JSON after gzip is removed, because browsers undo Content-Encoding before the client sees the bytes. Checked by the client before it uses the chunk. */
             sha256: string;
             /**
              * Format: uri

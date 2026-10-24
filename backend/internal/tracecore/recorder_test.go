@@ -642,9 +642,6 @@ func TestChunks(t *testing.T) {
 		if c.Index != i {
 			t.Errorf("chunk %d has index %d", i, c.Index)
 		}
-		if sum := sha256.Sum256(c.Gzip); hex.EncodeToString(sum[:]) != c.SHA256 {
-			t.Errorf("chunk %d: sha256 does not match its bytes", i)
-		}
 		zr, err := gzip.NewReader(bytes.NewReader(c.Gzip))
 		if err != nil {
 			t.Fatal(err)
@@ -652,6 +649,9 @@ func TestChunks(t *testing.T) {
 		raw, err := io.ReadAll(zr)
 		if err != nil {
 			t.Fatal(err)
+		}
+		if sum := sha256.Sum256(raw); hex.EncodeToString(sum[:]) != c.SHA256 {
+			t.Errorf("chunk %d: sha256 does not match its unzipped JSON", i)
 		}
 		var got []trace.Step
 		if err := json.Unmarshal(raw, &got); err != nil {
