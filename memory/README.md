@@ -44,4 +44,4 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 
 ## Backend
 
-None yet.
+- [Lease rules](backend/lease-rules.md): what keeps a stale worker from writing, and the gap the lease leaves in object storage
