@@ -181,7 +181,9 @@ type HeapObject struct {
 	// Ordered corresponds to the JSON schema field "ordered".
 	Ordered *bool `json:"ordered,omitzero"`
 
-	// Delta only: changed cells of a sparse sequence.
+	// Changed cells of a sparse sequence since the previous step; a cell back at the
+	// default carries the default. A delta step, or a wire step against the adapter's
+	// previous one.
 	Patch map[string]Value `json:"patch,omitzero"`
 
 	// Signature corresponds to the JSON schema field "signature".

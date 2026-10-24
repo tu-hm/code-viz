@@ -28,7 +28,16 @@ func TestDeltasReplayToFullSteps(t *testing.T) {
 		snaps := randomRun(r, 130)
 		lines := []string{helloLine}
 		for i, s := range snaps {
-			lines = append(lines, stepLine(i+1, s.stack, s.heap))
+			heap := maps.Clone(s.heap)
+			for id, o := range heap {
+				if i == 0 || o.Sparse == nil || r.IntN(2) == 0 {
+					continue
+				}
+				if prev, ok := snaps[i-1].heap[id]; ok {
+					heap[id] = patchSeq(*o.Length, cellDiff(prev.Sparse.Items, o.Sparse.Items))
+				}
+			}
+			lines = append(lines, stepLine(i+1, s.stack, heap))
 		}
 		res := mustRecord(t, config(t, 1000, tracecore.DefaultLimits), tracecore.Outcome{}, wireLines(append(lines, exitLine("normal", 0))...))
 
@@ -39,7 +48,12 @@ func TestDeltasReplayToFullSteps(t *testing.T) {
 				frames, heap = maps.Clone(st.Frames), maps.Clone(st.Heap)
 			} else {
 				maps.Copy(frames, st.Frames)
-				maps.Copy(heap, st.Heap)
+				for id, o := range st.Heap {
+					if o.Patch != nil {
+						o = applyPatch(t, heap[id], o.Patch)
+					}
+					heap[id] = o
+				}
 				for _, id := range st.RemovedObjects {
 					delete(heap, id)
 				}
@@ -59,6 +73,38 @@ func TestDeltasReplayToFullSteps(t *testing.T) {
 			}
 		}
 	}
+}
+
+func cellDiff(old, cur map[string]trace.Value) map[string]string {
+	out := map[string]string{}
+	for k := range old {
+		if _, ok := cur[k]; !ok {
+			out[k] = "0"
+		}
+	}
+	for k, v := range cur {
+		if o, ok := old[k]; !ok || *o.V != *v.V {
+			out[k] = *v.V
+		}
+	}
+	return out
+}
+
+func applyPatch(t *testing.T, base trace.HeapObject, patch map[string]trace.Value) trace.HeapObject {
+	t.Helper()
+	if base.Sparse == nil {
+		t.Fatalf("patch for an object with no sparse base")
+	}
+	items := maps.Clone(base.Sparse.Items)
+	for k, v := range patch {
+		if *v.V == *base.Sparse.Default.V {
+			delete(items, k)
+		} else {
+			items[k] = v
+		}
+	}
+	base.Sparse = &trace.Sparse{Default: base.Sparse.Default, Items: items}
+	return base
 }
 
 func canonical(t *testing.T, s snapshot) (string, int) {
@@ -121,13 +167,19 @@ func canonical(t *testing.T, s snapshot) (string, int) {
 }
 
 func randomRun(r *rand.Rand, steps int) []snapshot {
-	type obj struct{ items []trace.Value }
+	type obj struct {
+		items []trace.Value
+		cells map[string]string
+	}
 	objects := map[string]*obj{}
 	nextObj, nextFrame := 0, 0
 	newObject := func() string {
 		nextObj++
 		id := strconv.Itoa(1000 + nextObj)
 		objects[id] = &obj{}
+		if r.IntN(4) == 0 {
+			objects[id].cells = map[string]string{}
+		}
 		return id
 	}
 	pickObject := func() string {
@@ -178,7 +230,15 @@ func randomRun(r *rand.Rand, steps int) []snapshot {
 			}
 		case 5:
 			o := objects[pickObject()]
-			o.items = append(o.items, randomValue())
+			k, v := strconv.Itoa(r.IntN(100)), strconv.Itoa(r.IntN(3))
+			switch {
+			case o.cells == nil:
+				o.items = append(o.items, randomValue())
+			case v == "0":
+				delete(o.cells, k)
+			default:
+				o.cells[k] = v
+			}
 		case 6:
 			stack[r.IntN(len(stack))].Line = 1 + r.IntN(9)
 		}
@@ -190,6 +250,9 @@ func randomRun(r *rand.Rand, steps int) []snapshot {
 		}
 		for id, o := range objects {
 			snap.heap[id] = list(append([]trace.Value{}, o.items...)...)
+			if o.cells != nil {
+				snap.heap[id] = sparseSeq(100, "0", maps.Clone(o.cells))
+			}
 		}
 		out = append(out, snap)
 	}

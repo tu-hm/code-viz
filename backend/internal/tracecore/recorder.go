@@ -29,6 +29,8 @@ type Limits struct {
 	Frames      int // innermost frames kept besides the global frame
 	StringChars int
 	Items       int // per container
+	Cells       int // non-default cells per sparse sequence; more => window only (§19.9.1)
+	StepCells   int // non-default cells across one step message's sparse sequences
 }
 
 // DefaultLimits are the §11 defaults (D16).
@@ -39,6 +41,8 @@ var DefaultLimits = Limits{
 	Frames:      100,
 	StringChars: 1000,
 	Items:       1000,
+	Cells:       10_000,
+	StepCells:   100_000,
 }
 
 const maxLogBytes = 64 << 10 // adapter log messages kept per run
@@ -65,6 +69,7 @@ type Recorder struct {
 
 	frameIDs  map[string]string // wire frame id => fN
 	objectIDs map[string]string // native object id => oN
+	seqs      map[string]*seq   // native object id => sparse sequence in the last step message
 	prev      snapshotJSON
 	steps     []trace.Step
 	stepCount atomic.Int64 // len(steps), for StepCount on other goroutines

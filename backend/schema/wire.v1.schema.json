@@ -28,7 +28,7 @@
       }
     },
     "step": {
-      "description": "A full snapshot. Frame and object ids are the adapter's own, e.g. Python id() or C++ address:type.",
+      "description": "A full snapshot, except that a sparse sequence in the previous step under the same id may come as a patch of its changed cells (§19.9.1). Frame and object ids are the adapter's own, e.g. Python id() or C++ address:type.",
       "type": "object",
       "required": ["event", "line", "prevLine", "stack", "heap", "error"],
       "properties": {

@@ -15,7 +15,11 @@ func FuzzWire(f *testing.F) {
 	if err != nil {
 		f.Fatal(err)
 	}
-	for _, path := range append(paths, "testdata/wire/python-aliasing.ndjson") {
+	own, err := filepath.Glob("testdata/wire/*.ndjson")
+	if err != nil {
+		f.Fatal(err)
+	}
+	for _, path := range append(paths, own...) {
 		raw, err := os.ReadFile(path)
 		if err != nil {
 			f.Fatal(err)
@@ -26,6 +30,7 @@ func FuzzWire(f *testing.F) {
 
 	lim := tracecore.DefaultLimits
 	lim.TraceBytes, lim.OutputBytes, lim.HeapObjects, lim.Frames, lim.StringChars, lim.Items = 64<<10, 64, 3, 2, 4, 2
+	lim.Cells, lim.StepCells = 2, 4
 	cfg := config(f, 4, lim)
 	val := validator(f)
 

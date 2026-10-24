@@ -102,8 +102,9 @@ type OutStream string
 const OutStreamStderr OutStream = "stderr"
 const OutStreamStdout OutStream = "stdout"
 
-// A full snapshot. Frame and object ids are the adapter's own, e.g. Python id() or
-// C++ address:type.
+// A full snapshot, except that a sparse sequence in the previous step under the
+// same id may come as a patch of its changed cells (§19.9.1). Frame and object ids
+// are the adapter's own, e.g. Python id() or C++ address:type.
 type Step struct {
 	// CallID corresponds to the JSON schema field "callId".
 	CallID *int `json:"callId,omitzero"`

@@ -245,7 +245,7 @@
         "signature": { "type": "string" },
         "summary": { "type": "string" },
         "sparse": { "$ref": "#/$defs/sparse" },
-        "patch": { "description": "Delta only: changed cells of a sparse sequence.", "$ref": "#/$defs/cells" }
+        "patch": { "description": "Changed cells of a sparse sequence since the previous step; a cell back at the default carries the default. A delta step, or a wire step against the adapter's previous one.", "$ref": "#/$defs/cells" }
       },
       "allOf": [
         {

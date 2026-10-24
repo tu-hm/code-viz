@@ -3,7 +3,6 @@ package tracecore
 import (
 	"bytes"
 	"encoding/json"
-	"maps"
 	"slices"
 	"strconv"
 	"strings"
@@ -32,20 +31,29 @@ func (r *Recorder) step(s wire.Step) error {
 		return nil
 	}
 
+	if err := r.inflate(s.Heap); err != nil {
+		return err
+	}
 	m := mapper{r: r, heap: s.Heap, seen: map[string]string{}}
 	frames, err := m.frames(s.Stack)
 	if err != nil {
 		return err
 	}
 	heap := map[string]trace.HeapObject{}
+	seqs := map[string]*seq{}
 	for len(m.queue) > 0 {
 		native := m.queue[0]
 		m.queue = m.queue[1:]
+		id := m.seen[native]
+		if sq, ok := r.seqs[native]; ok {
+			heap[id], seqs[id] = sq.view(r.cfg.Limits), sq
+			continue
+		}
 		obj, err := m.object(s.Heap[native])
 		if err != nil {
 			return err
 		}
-		heap[m.seen[native]] = obj
+		heap[id] = obj
 	}
 
 	i := len(r.steps)
@@ -79,13 +87,21 @@ func (r *Recorder) step(s wire.Step) error {
 		}
 	}
 	for _, id := range m.order {
-		b, err := json.Marshal(heap[id])
+		obj := heap[id]
+		b, err := json.Marshal(header(obj))
 		if err != nil {
 			return err
 		}
 		next.heap[id] = b
-		if st.Keyframe || !bytes.Equal(b, r.prev.heap[id]) {
-			st.Heap[id] = heap[id]
+		prev, had := r.prev.heap[id]
+		switch {
+		case st.Keyframe || !had || !bytes.Equal(b, prev):
+			st.Heap[id] = owned(obj)
+		case seqs[id] != nil:
+			// same header => the previous step showed this native's last message, which changed is relative to
+			if p := seqs[id].patch(obj); len(p) > 0 {
+				st.Heap[id] = trace.HeapObject{Kind: obj.Kind, Type: obj.Type, Length: obj.Length, Patch: p}
+			}
 		}
 	}
 	if !st.Keyframe {
@@ -274,24 +290,5 @@ func (m *mapper) object(o trace.HeapObject) (trace.HeapObject, error) {
 			return o, err
 		}
 	}
-	if o.Sparse != nil {
-		if o.Sparse.Default, err = m.value(o.Sparse.Default); err != nil {
-			return o, err
-		}
-		if err := m.cells(o.Sparse.Items); err != nil {
-			return o, err
-		}
-	}
-	return o, m.cells(o.Patch)
-}
-
-func (m *mapper) cells(cells map[string]trace.Value) error {
-	for _, k := range slices.Sorted(maps.Keys(cells)) {
-		v, err := m.value(cells[k])
-		if err != nil {
-			return err
-		}
-		cells[k] = v
-	}
-	return nil
+	return o, nil
 }
