@@ -3,7 +3,7 @@
   "id": "trc_0f3a9c1e7b2d4a6890e1c5b7d3f2a4c6",
   "language": { "id": "cpp17-gcc", "runtime": "GCC 13.2", "adapter": "cpp-gdb/1.0.0" },
   "source": { "file": "main.cpp", "lineCount": 16 },
-  "options": { "maxSteps": 1000, "startAtLines": [8], "captureRanges": { "depth": [[0, 50]] }, "showInternals": true },
+  "options": { "maxSteps": 1000, "startAtLines": [8], "captureRanges": { "depth": [[0, 50]] }, "showInternals": true, "safetyChecks": false },
   "summary": {
     "stepCount": 3,
     "truncated": true,

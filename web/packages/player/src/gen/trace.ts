@@ -108,6 +108,10 @@ export interface Options {
     [k: string]: [number, number][];
   };
   showInternals?: boolean;
+  /**
+   * Build with the language's safety checks (C++: _GLIBCXX_DEBUG, UBSan); on unless false (§19.6).
+   */
+  safetyChecks?: boolean;
 }
 /**
  * This interface was referenced by `Trace`'s JSON-Schema

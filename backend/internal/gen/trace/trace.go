@@ -242,6 +242,10 @@ type Options struct {
 	// MaxSteps corresponds to the JSON schema field "maxSteps".
 	MaxSteps int `json:"maxSteps"`
 
+	// Build with the language's safety checks (C++: _GLIBCXX_DEBUG, UBSan); on unless
+	// false (§19.6).
+	SafetyChecks *bool `json:"safetyChecks,omitzero"`
+
 	// ShowInternals corresponds to the JSON schema field "showInternals".
 	ShowInternals *bool `json:"showInternals,omitzero"`
 

@@ -230,6 +230,8 @@ export interface components {
                 [key: string]: number[][];
             };
             showInternals?: boolean;
+            /** @description Build with the language's safety checks (C++: _GLIBCXX_DEBUG, UBSan); on unless false (§19.6). */
+            safetyChecks?: boolean;
         };
         version: string;
         id: string;
