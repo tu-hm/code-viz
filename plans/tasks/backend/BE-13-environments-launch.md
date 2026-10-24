@@ -1,95 +1,137 @@
-# BE-13 · Environments & launch readiness
+# BE-13 · Environments & launch readiness (single machine)
 
 | | |
 |---|---|
 | **Milestone** | M1 → M5 (spread out) |
-| **Estimate** | 19.5 days |
+| **Estimate** | 14 days |
 | **Depends on** | BE-01 §6 (images), BE-02, BE-05, BE-06 |
 | **Blocks** | Launch |
 | **Covers** | M1-02, M1-11, M1-12, M3-B07, M3-B09, M3-B10, M5-B02, M5-B03 |
 | **Spec** | §7.8, §7.9, §13, §18.2, §18.4 |
+| **Infra** | One Linux server (Ubuntu/Debian), no cloud, no Kubernetes |
 
-🔁 **Handoffs to FE:** local stack by **Wed 18 Nov** · staging by **Mon 28 Dec**.
+🔁 **Handoffs to FE:** local stack by **Wed 18 Nov** · production by **Mon 28 Dec**.
 
-## 1. Local dev stack (M1-02 · 1.5 d · M1 week 4)
+## 1. Local dev stack (1.5 d · M1 week 4)
+
+Same as before — runs on the developer's Mac/Linux via Docker Compose.
 
 - [ ] Docker Compose: MySQL 8.4 + SeaweedFS (S3 API)
 - [ ] Settings from §7.13: InnoDB, `utf8mb4`, UTC, `binlog_format=ROW`, strict mode
 - [ ] `vizd --role=all` runs api + worker in one process, with `VIZ_SANDBOX=docker` (BE-02 §2)
 - [ ] Runner images built for the host architecture (`make images`), so GDB works on arm64 Macs
 - [ ] Create buckets and bucket CORS on start (BE-06 §3)
-- [ ] Run migrations on start with `vizd migrate up` (the same command production uses, §3)
-- [ ] Separate MySQL users and S3 keys for api and worker, with the §12 permissions, so permission bugs show up locally
-- [ ] Change poller and KEDA-style queries go to the primary, as in production
-- [ ] Seed data: a few completed Python and C++ traces (chunks in SeaweedFS + rows in MySQL), so FE can work against the local stack without running jobs (`make seed`)
-- [ ] Note in the dev README: expiry is the nightly cleanup, not lifecycle rules, because SeaweedFS only partly supports them (spec v1.7)
+- [ ] Run migrations on start with `vizd migrate up`
+- [ ] Seed data: a few completed Python and C++ traces (`make seed`)
 - [ ] **Done:** `make dev` brings up the system from a clean checkout
 
-## 2. Observability (M1-11 · 1 d · may slip to M2 week 1)
+## 2. Observability (1 d · may slip to M2 week 1)
 
 - [ ] `log/slog` JSON logs with request ID / trace ID
 - [ ] OpenTelemetry tracing: API → queue → worker → sandbox, one trace ID end to end
-- [ ] Prometheus metrics: request latency, queue depth, **claim latency**, job duration by stage, failures by kind, parked long-polls, poller query time
+- [ ] Prometheus metrics: request latency, queue depth, claim latency, job duration by stage, failures by kind
 - [ ] **Done:** one request traced end to end
 
-## 3. Staging (M1-12 · 4.5 d · M1 week 9)
+## 3. Server provisioning (2 d · M1 week 8)
 
-**Decide first (Lead + BE, before M1 week 9)**
-- [ ] One deploy path for the M1 beta: Kubernetes staging (recommended), **not** the "2–3 VMs with systemd + Docker + runsc" option in §18.4. Update §18.4 and add a change-log row (§0.3)
+One Linux server (bare metal or VPS). All services run on this machine.
 
-**Infrastructure (OpenTofu)**
-- [ ] Kubernetes cluster, managed MySQL 8.4, bucket with CORS. *v1.7: the M1 beta runs `vizd --role=all` and SeaweedFS on one server*
-- [ ] Dedicated runner node pool, set up the way G1 decided (BE-02 §1): gVisor or nsjail installed, the pod privileges and mounts it needs, no secrets on these nodes except the worker's scoped ones
-- [ ] Get runner images onto runner nodes: pre-pull them (DaemonSet), or unpack the rootfs to `/opt/viz/rootfs-*` for nsjail; pin by digest
-- [ ] Ingress with TLS and the per-IP rate limit (30/min on create)
+**OS and prerequisites**
+- [ ] Ubuntu 24.04 LTS (or Debian 13); unattended-upgrades for security patches
+- [ ] Firewall (ufw): allow 22 (SSH), 80, 443 only
+- [ ] Fail2ban for SSH brute-force protection
+- [ ] Non-root deploy user (`viz`) with sudo, SSH key auth only (disable password login)
+- [ ] Swap file (2–4 GB) as safety net
 
-**Kubernetes manifests (`deploy/k8s`, Kustomize or Helm)**
-- [ ] Base + overlays for `staging` and `prod`; config per environment from env vars (`.env.example`, BE-01 §6)
-- [ ] Deployments for `api` and `worker`, using the `vizd` images from BE-01 §6
-- [ ] Probes: `/healthz` (process alive) and `/readyz` (api: MySQL reachable; worker: MySQL reachable + sandbox self-check). `/readyz` fails as soon as `SIGTERM` arrives, so traffic stops before the 25 s drain
-- [ ] `terminationGracePeriodSeconds` > 25 s; `PodDisruptionBudget` for api
-- [ ] Migrations run as a Kubernetes `Job` (`vizd migrate up`) before each rollout; migrations must be backward compatible (expand, then contract) so old and new pods can run side by side
-- [ ] KEDA MySQL scaler on in-flight jobs (§7.9 query), 1 job per slot
-- [ ] HPA on CPU for API pods; cluster autoscaler for runner nodes
+**MySQL 8.4**
+- [ ] Install from the official MySQL APT repo (not distro packages)
+- [ ] §7.13 settings: InnoDB, `utf8mb4`, UTC, `binlog_format=ROW`, strict mode
+- [ ] Separate database users: `viz_api` (read + write visualizations/usage), `viz_worker` (lease jobs + write traces)
+- [ ] Nightly `mysqldump` to a local backup directory, rotated (keep 7 days)
+- [ ] Listen on `127.0.0.1:3306` only (not exposed externally)
 
-**Secrets and credentials (§12)**
-- [ ] Pick the delivery method: cloud identity (IRSA / Workload Identity) for S3, and External Secrets (or Kubernetes Secrets) for MySQL passwords
-- [ ] Worker DB role can lease jobs + update its trace only; worker storage key write-only to `t7/`; API key read/sign/copy; KEDA gets a read-only DB user
-- [ ] No secrets in images, manifests or CI logs
+**SeaweedFS**
+- [ ] Install SeaweedFS binary, run as a systemd service (`seaweedfs.service`)
+- [ ] `-s3` mode, data dir on a dedicated partition or directory (`/var/lib/seaweedfs`)
+- [ ] Listen on `127.0.0.1:8333` only
+- [ ] Create the `viz-traces` bucket and set CORS on first deploy
 
-**CI/CD**
-- [ ] CI builds, scans and signs images, then deploys `main` to staging (migration Job → rollout)
-- [ ] Rollback is one command (previous image digest)
+**nsjail**
+- [ ] Build nsjail from source (v3.6, pinned commit) or use the binary from the Docker build
+- [ ] Install dependencies: `libprotobuf`, `libnl-route-3`
+- [ ] Set up cgroups v2: create `/sys/fs/cgroup/viz` subtree for the worker
+- [ ] Runner images: unpack rootfs to `/opt/viz/rootfs-python/` (and later `rootfs-cpp/`)
 
-- [ ] **Done:** autoscales from 1 to 3 runner pods; a rolling deploy with jobs running fails none of them
+**Done:** a fresh server can be provisioned with a single script (`scripts/provision.sh`)
 
-## 4. Load test (M3-B07 · 3 d)
+## 4. Systemd services (1.5 d · M1 week 8)
+
+- [ ] `vizd-api.service`: `vizd --role=api`, runs as `viz` user, `Restart=on-failure`
+- [ ] `vizd-worker.service`: `vizd --role=worker`, runs as root (nsjail needs it), `Restart=on-failure`, `KillSignal=SIGTERM`, `TimeoutStopSec=30` (25 s drain + 5 s buffer)
+- [ ] Environment files: `/etc/viz/api.env`, `/etc/viz/worker.env` (different DB credentials, S3 keys)
+- [ ] `vizd-migrate.service` (oneshot): runs `vizd migrate up` before `vizd-api` starts (`Before=vizd-api.service`)
+- [ ] Log to journald; `journalctl -u vizd-api` for viewing
+- [ ] **Done:** `systemctl start vizd-api vizd-worker` runs the full system
+
+## 5. Reverse proxy and TLS (1 d · M1 week 9)
+
+- [ ] Caddy (or nginx) as reverse proxy: port 443 → `127.0.0.1:8080` (vizd-api)
+- [ ] Automatic TLS via Let's Encrypt (Caddy does this by default)
+- [ ] Rate limit: 30 req/min per IP on `POST /visualizations`
+- [ ] CORS headers for the frontend origin
+- [ ] Static file serving for SeaweedFS chunks (or proxy `GET /chunks/*` to SeaweedFS), so the frontend can fetch trace data
+- [ ] `X-Request-ID` header forwarded to vizd
+- [ ] **Done:** `https://your-domain.com/healthz` returns 200
+
+## 6. Deploy script and CI/CD (2 d · M1 week 9)
+
+**Deploy script (`scripts/deploy.sh`)**
+- [ ] Build `vizd` binary on the server (or cross-compile and `scp`)
+- [ ] Run `vizd migrate up`
+- [ ] Build runner images on the server (`make runner-images`), unpack rootfs for nsjail
+- [ ] Restart `vizd-worker`, then `vizd-api` (worker first so it drains before getting the new binary)
+- [ ] Smoke test: `curl -f https://localhost/healthz`
+
+**CI (GitHub Actions)**
+- [ ] Run `make check` on every push to `main`
+- [ ] On green: SSH into the server, pull `main`, run `scripts/deploy.sh`
+- [ ] Rollback: `git checkout <previous-commit> && scripts/deploy.sh`
+
+- [ ] **Done:** push to `main` → tests pass → auto-deploy to the server
+
+## 7. Monitoring and alerts (1.5 d · M3)
+
+- [ ] Prometheus on the server, scraping vizd metrics endpoint
+- [ ] Grafana (single instance) for dashboards: request latency, queue depth, job duration, error rate
+- [ ] Alertmanager or simple cron script for alerts:
+  - Error rate spike
+  - Queue wait p95 > 2 s
+  - MySQL CPU > 60%
+  - Disk usage > 80%
+  - vizd process not running
+- [ ] Alerts go to email, Slack webhook, or Telegram bot
+- [ ] **Done:** alerts fire when vizd is stopped
+
+## 8. Backups and disaster recovery (1 d · M3)
+
+- [ ] MySQL: nightly `mysqldump --single-transaction`, compressed, rotated 7 days
+- [ ] SeaweedFS data: nightly rsync or tar of `/var/lib/seaweedfs` to a backup disk or remote (optional)
+- [ ] Test restore: documented steps to restore from backup on a fresh server
+- [ ] **Done:** restore from backup tested once
+
+## 9. Load test (1.5 d · M3)
 
 - [ ] k6 script: create + long-poll + chunk download, mixed Python/C++
-- [ ] Run at 2× expected peak
-- [ ] Check §13 latency targets (Python ≤ 1.5 s / 4 s, C++ ≤ 3 s / 7 s time to first step)
-- [ ] Check queue wait, MySQL CPU, autoscaling response
-- [ ] Tune DB pool sizes, worker slots, KEDA thresholds
-- [ ] **Done:** §13 targets met under load
+- [ ] Run at expected peak (single machine, so target is more modest than §13 cloud targets)
+- [ ] Tune: MySQL pool sizes, worker slots, nsjail concurrency
+- [ ] Document the server's capacity ceiling (e.g., "handles N concurrent jobs")
+- [ ] **Done:** latency targets met under load
 
-## 5. Production, alerts, runbooks (M3-B09 · 3 d)
-
-- [ ] Production environment via OpenTofu (same as staging, sized per §7.9)
-- [ ] Alerts: error rate, queue wait p95 > 2 s, MySQL CPU > 60%, job failure spike, abuse (IP burns daily quota in minutes)
-- [ ] Runbook for each §7.8 failure case
-- [ ] Rolling deploy check: workers drain in 25 s, no failed jobs
-- [ ] Backup/PITR verified (RPO ≤ 5 min, RTO ≤ 30 min)
-- [ ] **Done:** on-call can follow the runbook for the §7.8 cases
-
-## 6. Launch support (M3-B10 · 1.5 d)
+## 10. Launch support (1 d · M3)
 
 - [ ] Buffer for launch-week fixes
-
-## 7. Post-launch (M5-B02, M5-B03 · 5 d)
-
-- [ ] Cost and performance tuning from production metrics (§7.9 triggers)
-- [ ] Support the usability-test environment (§19.11)
+- [ ] Runbook for common failures: vizd won't start, MySQL is full, disk full, nsjail errors
 
 ## Done when
 
-Staging autoscales, §13 latency targets pass under load, and on-call has runbooks.
+The server runs vizd (api + worker) behind TLS, auto-deploys from `main`, nightly backups run, and alerts fire on failure.

@@ -42,7 +42,7 @@
 | [BE-10](backend/BE-10-friendly-errors.md) Friendly errors | M3 | ⏳ | 0/14 | BE-03, BE-07, BE-08 |
 | [BE-11](backend/BE-11-whole-run-trace-options.md) Whole-run data & options | M3 (M5) | ⏳ | 0/22 | BE-03, BE-07–09 |
 | [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/10 | BE-06 |
-| [BE-13](backend/BE-13-environments-launch.md) Environments & launch | M1–M5 | 🟢 | 0/48 | §1 can start. BE-01 §6 already covers part of it (Compose with MySQL + SeaweedFS, `migrate up` on start); not ticked yet |
+| [BE-13](backend/BE-13-environments-launch.md) Environments & launch (single machine) | M1–M5 | 🟢 | 0/42 | §1 can start. Rewritten for single Linux server, no cloud/K8s |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | ⏳ | 0/10 | BE-07–09 |
 | **Total** | | | **185/427** | |
 
