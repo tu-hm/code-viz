@@ -6,7 +6,7 @@ The backend is one Go module, `backend/`. It holds two binaries and a shim, the 
 
 | Binary | Where | Job | Built so far |
 |---|---|---|---|
-| `vizd` | `cmd/vizd` | The service, with roles `api`, `worker` or `all` (D3) | Config, the sandbox choice check, the MySQL pool, `vizd migrate`, `/healthz` and `/readyz`, and the job worker under `worker` and `all`. The API is BE-06 |
+| `vizd` | `cmd/vizd` | The service, with roles `api`, `worker` or `all` (D3) | Config, the sandbox choice check, the MySQL pool, `vizd migrate`, `/healthz` and `/readyz`, the visualization API under `api` and `all`, and the job worker under `worker` and `all` |
 | `vizctl` | `cmd/vizctl` | The developer CLI (§7.10) | `trace` runs one program end to end in the Docker dev sandbox; `validate` checks a trace file. `diff` isn't built |
 | `viz-shim` | `cmd/viz-shim` | Runs inside every runner image and carries fd 1, 2 and 3 out of the sandbox as one framed stream | Done |
 
@@ -31,17 +31,17 @@ Dependencies point one way: `transport → app → domain`. `domain` and `tracec
 
 | Package | What it holds | Status |
 |---|---|---|
-| `internal/domain` | Sentinel errors (`ErrInfra`, `ErrNoJob`, `ErrLeaseLost`), the language `Manifest` and `ChunkKey`; later the job states, limits and IDs | Started |
+| `internal/domain` | Sentinel errors, the language `Manifest` and `ChunkKey`, request limits and checks, the cache key, `viz_` and `trc_` IDs, trace states, and the API's product rules: quota, retention, which traces rerun | Grows with each task |
 | `internal/tracecore` | Wire stream in, trace out: stable IDs, keyframes and deltas, limits, chunks | Done (BE-04 §2). See [tracing](tracing.md) |
-| `internal/app` | Use cases: create, get and wait, run a trace job | `Worker` runs trace jobs (BE-05); `Build`, the build step, is shared with `vizctl`. Create, get and wait are BE-06. See [the worker](#the-worker) |
-| `internal/ports` | `Sandbox` and its shared test suite `sandboxtest`, `JobQueue`, `BlobStore` and `Adapters`. Later `MetaStore`, `Events` | `Sandbox`, `JobQueue` and `Adapters` done; `BlobStore` puts only. See [sandbox](sandbox.md) |
+| `internal/app` | Use cases: create, get and wait, run a trace job | `Worker` runs trace jobs (BE-05); `Build`, the build step, is shared with `vizctl`. `Visualizations` creates, gets and waits, deletes and cleans up (BE-06). See [the worker](#the-worker) and [the API](#the-api) |
+| `internal/ports` | `Sandbox` and its shared test suite `sandboxtest`, `JobQueue`, `MetaStore`, `Events`, `BlobStore` and `Adapters` | All six done. See [sandbox](sandbox.md) |
 | `internal/adapters/nsjail` | The production sandbox (D10, G1) | Done |
 | `internal/adapters/dockersandbox` | The dev sandbox for laptops; not a security boundary | Done |
-| `internal/adapters/mysql` | The connection pool, goose migrations, sqlc query files, the transaction retry helper `InTx`, and the `JobQueue` adapter on the `jobs` table | Tables and queue done (BE-06 §2, BE-05 §1); the worker runs the queue |
-| `internal/adapters/blobstore` | `BlobStore` on any S3 API (aws-sdk-go-v2); SeaweedFS in dev | Put with 3 retries; presign and copy come with BE-06 |
-| `internal/adapters/manifest` | `Adapters`: every `*/manifest.yaml` in a directory, checked once at load | Done; `vizctl` and the worker use it, `GET /languages` will |
+| `internal/adapters/mysql` | The connection pool, goose migrations, sqlc query files, the transaction retry helper `InTx`, the `JobQueue` adapter on the `jobs` table, `Store` (`MetaStore`) and `Poller` (`Events`) | Done for BE-05 and BE-06 |
+| `internal/adapters/blobstore` | `BlobStore` on any S3 API (aws-sdk-go-v2); SeaweedFS in dev and on the beta server (D4) | Put with 3 retries, sign for `S3_PUBLIC_ENDPOINT`, delete in batches of 1,000; copy comes with BE-12 |
+| `internal/adapters/manifest` | `Adapters`: every `*/manifest.yaml` in a directory, checked once at load | Done; `vizctl`, the worker and `GET /languages` use it |
 | `internal/shim` | The `viz-shim` frame codec, shared by both sandboxes | Done |
-| `internal/transport/http` | HTTP handlers | Health probes only (BE-06) |
+| `internal/transport/http` | HTTP handlers: the probes, and the §8 API on the generated strict server | Done except share (BE-12) |
 | `internal/gen/{api,trace,wire,sqlc}` | Types generated from the contracts, and query code generated from the SQL, by `make gen`. Never edited | Generated |
 | `schema/` | `trace.v1` and `wire.v1` JSON Schemas, and the Go package that validates against them | Done |
 | `api/` | `openapi.yaml`, the HTTP contract | Done (BE-01) |
@@ -71,7 +71,7 @@ sequenceDiagram
   B->>O: fetch chunks
 ```
 
-Built today: everything from "lease the job" on. The worker claims jobs from MySQL, runs them through the sandbox and `tracecore`, puts the chunks in object storage and completes the trace. The API (BE-06) is next. The lifecycle is spec §7.6, the job states §7.7 and the queue §7.13.2.
+All of it is built. The API creates the trace and its job in one transaction; the worker claims jobs from MySQL, runs them through the sandbox and `tracecore`, puts the chunks in object storage and completes the trace; a parked `GET` wakes on the change and returns signed chunk URLs. The lifecycle is spec §7.6, the job states §7.7 and the queue §7.13.2.
 
 ## The worker
 
@@ -84,6 +84,19 @@ Built today: everything from "lease the job" on. The worker claims jobs from MyS
 - **Outcomes:** the program's own end, timeouts and limits included, completes the trace and is never retried. `domain.ErrInfra` (sandbox, storage, a status write, a language this worker can't run) requeues, and the queue fails the second attempt with `internal_error`. Malformed tracer output fails with `internal_error` and logs the core's redacted error.
 - **Drain:** on SIGTERM `/readyz` fails, the loop stops claiming, and the running job gets 25 s. Then its context is canceled and it is requeued with a context that outlives it. HTTP shuts down after the worker returns.
 - **Name:** `leased_by` is the hostname plus a random suffix, so a restarted process never writes under its predecessor's lease.
+
+## The API
+
+`app.Visualizations` serves spec §8 under `/api/v1`, in `vizd --role=api` or `all`. `transport/http` maps requests and domain errors onto the contract; the rules live in `app`, `domain` and `mysql.Store`.
+
+- **Caller:** an anonymous caller is `ip:` plus an HMAC of the client IP (`VIZ_IP_HASH_KEY`), one per IPv4 address or IPv6 /64. `X-Forwarded-For` and `X-Request-ID` count only from a loopback peer: the reverse proxy runs on the same host (BE-13 §5).
+- **Create**, in one transaction with the lock order `usage_daily → traces → visualizations → jobs`: take quota, then single-flight on `cache_key`. That attaches to the existing trace, inserts a new one, or resets one that can't serve the request (canceled, failed by infra, or expired). A new or reset trace gets a job unless `VIZ_SLOTS × 10` are queued. A third active visualization detaches the caller's oldest queued one. A repeated `Idempotency-Key` within 24 h returns the first visualization and takes no quota.
+- **Get and wait:** with `wait` and `since`, the request parks on `Events` until the trace's version passes `since`, the wait runs out or the pod shuts down, then reads its row again. `mysql.Poller` queries changed traces every 250 ms, only while a request is parked, and refuses a request past 5,000 parked. A completed trace comes with chunk URLs signed for 15 minutes.
+- **Delete:** only the creator can. It detaches the visualization and cancels the queued job when no other visualization waits on the trace; anyone else gets `404`.
+- **Cleanup:** at start and every 24 h, under `api` and `all` only, because the worker's credentials can't delete. Rows past `expires_at` go in batches of 1,000, then their chunks; chunks it can't delete are logged by trace ID.
+- **Errors:** domain errors map to the §8.7 envelope with a request ID, and `429` and `503` carry `Retry-After`. Unreachable MySQL is `503 capacity`. Only 5xx responses are logged.
+- **Browsers:** origins in `CORS_ORIGINS` get CORS headers. `POST` bodies must be `application/json`, because a `text/plain` form post skips the preflight, and at most 1 MiB.
+- **Drain:** under `all`, parked requests stay parked while the worker drains. When HTTP shuts down, the poller stops and wakes them with their current state.
 
 ## Shape of the code
 
