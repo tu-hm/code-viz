@@ -18,5 +18,5 @@ capabilities:
   exceptions: true
   startAtLines: true
   captureRanges: true
-enabled: false
+enabled: true
 rollout: { percent: 100 }
