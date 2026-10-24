@@ -8,7 +8,13 @@ import (
 	gomysql "github.com/go-sql-driver/mysql"
 )
 
-// Open returns a connection pool for dsn whose sessions run in READ COMMITTED and UTC (§7.13). It does not connect.
+const (
+	maxConns    = 32              // per process: api, worker and migrate on one server stay under MySQL's 151 (§7.13)
+	connMaxLife = 3 * time.Minute // go-sql-driver: close before MySQL, the OS or a proxy drops the connection
+)
+
+// Open returns a connection pool for dsn whose sessions run in READ COMMITTED and UTC (§7.13). The pool keeps up to
+// 32 connections, open and idle, and replaces each after 3 minutes. It does not connect.
 func Open(dsn string) (*sql.DB, error) {
 	cfg, err := gomysql.ParseDSN(dsn)
 	if err != nil {
@@ -26,5 +32,9 @@ func Open(dsn string) (*sql.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("new connector: %w", err)
 	}
-	return sql.OpenDB(connector), nil
+	db := sql.OpenDB(connector)
+	db.SetMaxOpenConns(maxConns)
+	db.SetMaxIdleConns(maxConns)
+	db.SetConnMaxLifetime(connMaxLife)
+	return db, nil
 }

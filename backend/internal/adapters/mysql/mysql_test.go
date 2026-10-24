@@ -1,6 +1,9 @@
 package mysql_test
 
 import (
+	"context"
+	"database/sql"
+	"errors"
 	"testing"
 	"time"
 
@@ -38,5 +41,40 @@ func TestOpenSessionsUseReadCommittedAndUTCWhateverTheDSNSays(t *testing.T) {
 	}
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("session (-want +got):\n%s", diff)
+	}
+}
+
+func TestOpenPoolsAtMost32ConnectionsAndKeepsThemIdle(t *testing.T) {
+	t.Parallel()
+	db := open(t, newDatabase(t))
+
+	held := make([]*sql.Conn, 32)
+	for i := range held {
+		c, err := db.Conn(t.Context())
+		if err != nil {
+			t.Fatal(err)
+		}
+		held[i] = c
+	}
+	ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
+	defer cancel()
+	if c, err := db.Conn(ctx); !errors.Is(err, context.DeadlineExceeded) {
+		if c != nil {
+			closeConn(t, c)
+		}
+		t.Fatalf("33rd connection: err %v, want it to wait for one of the 32", err)
+	}
+	for _, c := range held {
+		closeConn(t, c)
+	}
+	if got := db.Stats().Idle; got != 32 {
+		t.Errorf("idle connections after the 32 are released = %d, want 32", got)
+	}
+}
+
+func closeConn(t *testing.T, c *sql.Conn) {
+	t.Helper()
+	if err := c.Close(); err != nil {
+		t.Error(err)
 	}
 }
