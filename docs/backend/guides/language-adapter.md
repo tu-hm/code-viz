@@ -4,7 +4,7 @@ An adapter is everything specific to one language: a manifest, a runner image an
 
 ## Add a language
 
-1. **Create `backend/adapters/<dir>/`** with a `manifest.yaml`, a `Dockerfile` and the tracer. The Python adapter in `adapters/python/` is the complete example. `adapters/cpp/` is the second: its manifest, its runner image (below) and `trace.py`, the GDB tracer ([inside the C++ tracer](../architecture/tracing.md#inside-the-c-tracer)). The tracer is in, but the manifest stays `enabled: false`: turning C++ on is a separate decision. `vizctl` and the fixture test trace it anyway.
+1. **Create `backend/adapters/<dir>/`** with a `manifest.yaml`, a `Dockerfile` and the tracer. The Python adapter in `adapters/python/` is the complete example. `adapters/cpp/` is the second: its manifest, its runner image (below) and `trace.py`, the GDB tracer ([inside the C++ tracer](../architecture/tracing.md#inside-the-c-tracer)).
 2. **Write the manifest** (§10.2). `vizctl` and the worker load every `adapters/*/manifest.yaml` through `internal/adapters/manifest`, which checks them all at once: one bad manifest, or two with the same `id`, fails the load. They read:
 
    | Field | Meaning |

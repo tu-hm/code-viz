@@ -67,21 +67,26 @@ v=$(git rev-parse --short HEAD)
 docker build --target api --tag vizd-api:$v .
 docker build --target worker --tag vizd-worker:$v .
 docker build --file adapters/python/Dockerfile --tag "$(sed -n 's/^image: //p' adapters/python/manifest.yaml)" .
+docker build --file adapters/cpp/Dockerfile --tag "$(sed -n 's/^image: //p' adapters/cpp/manifest.yaml)" .
 ```
 
-The last line is the Python half of `make runner-images`. Skip the C++ runner image while `adapters/cpp/manifest.yaml` says `enabled: false`; its first build compiles GDB and is slow.
+The last two lines are `make runner-images`. The C++ image's first build compiles GDB and is slow.
 
-## 3. Unpack the runner image for nsjail
+## 3. Unpack the runner images for nsjail
 
 nsjail doesn't run Docker images. It chroots into an unpacked copy at `/opt/viz/rootfs/<manifest image>`, which needs empty `/work` and `/proc` directories and empty files to mount the host's devices on ([sandbox](backend/architecture/sandbox.md#the-nsjail-sandbox), `internal/adapters/nsjail/nsjail.go`). The `nsjail-test` stage of `backend/Dockerfile` does the same for its test image.
 
 ```sh
-img=$(sed -n 's/^image: //p' adapters/python/manifest.yaml)   # viz-runner-python:3.12.15-1
-sudo mkdir -p "/opt/viz/rootfs/$img"
-cid=$(docker create "$img")
-docker export "$cid" | sudo tar -x -C "/opt/viz/rootfs/$img"
-docker rm "$cid"
-cd "/opt/viz/rootfs/$img" && sudo mkdir -p work proc && sudo touch dev/null dev/zero dev/random dev/urandom
+for lang in python cpp; do
+  img=$(sed -n 's/^image: //p' adapters/$lang/manifest.yaml)   # viz-runner-python:3.12.15-1, viz-runner-cpp:13.5-gdb14-1
+  root=/opt/viz/rootfs/$img
+  sudo mkdir -p "$root"
+  cid=$(docker create "$img")
+  docker export "$cid" | sudo tar -x -C "$root"
+  docker rm "$cid"
+  sudo mkdir -p "$root/work" "$root/proc"
+  sudo touch "$root/dev/null" "$root/dev/zero" "$root/dev/random" "$root/dev/urandom"
+done
 ```
 
 Do this again whenever a manifest's `image` changes. Keep the old directory until no worker uses it.
@@ -398,7 +403,7 @@ The API restart drops new requests for a few seconds; with one API process there
 What a real deployment needs and the repo doesn't have yet:
 
 - **Production compose file, `scripts/provision.sh`, `scripts/deploy.sh`, systemd units, CI auto-deploy from `main`** (BE-13 §3, §4, §6). This guide's compose file is untested.
-- **nsjail with a real runner image.** `make test-nsjail` covers the adapter with a busybox root; a worker running Python jobs under nsjail on a server hasn't been run. Unpacking runner images onto the host has no script (BE-13 §3).
+- **nsjail with a real runner image.** `make test-nsjail` covers the adapter with a busybox root; a worker running Python or C++ jobs under nsjail on a server hasn't been run. Unpacking runner images onto the host has no script (BE-13 §3).
 - **SeaweedFS with S3 auth, behind a proxy.** Dev and the tests run with auth off. Signed chunk URLs through Caddy are designed for (BE-13 §5) but unchecked.
 - **The ingress rate limit, 30 creates per minute per IP (§11).** Stock Caddy has no rate limiter; it needs a plugin build or nginx's `limit_req`. Until then only the daily quota in MySQL (100 per IP) applies.
 - **Separate MySQL users for the API and the worker** (§12, BE-13 §3). No grants are defined, so both use `viz` here.
@@ -408,7 +413,6 @@ What a real deployment needs and the repo doesn't have yet:
 - **Image registry and cosign signing** (BE-03, BE-07). Images are built on the server.
 - **A per-image seccomp allowlist** (BE-02 §5, before GA). The jail uses the C.9 denylist.
 - **The IDE calling the API** (FE-04). The deployed frontend is a placeholder.
-- **C++** (`enabled: false` in its manifest).
 
 ## Cloud later
 

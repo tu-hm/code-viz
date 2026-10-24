@@ -43,7 +43,7 @@ curl -si -X POST http://127.0.0.1:8080/api/v1/visualizations -H 'Content-Type: a
 curl -s 'http://127.0.0.1:8080/api/v1/visualizations/<id>?wait=20&since=0'   # repeat with since=<version> until completed
 ```
 
-Not built yet: C++ through the API (the tracer is in, but its manifest says `enabled: false`, so the API refuses `cpp17-gcc`; `vizctl` traces it). `make seed` loads no sample traces until BE-13 §1.
+`make seed` loads no sample traces until BE-13 §1.
 
 ## Trace a program locally
 

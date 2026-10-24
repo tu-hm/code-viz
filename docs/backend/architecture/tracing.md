@@ -488,7 +488,6 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | G2: keep `settrace` or move to `sys.monitoring` | Gate on Fri 13 Nov; S2 recommends `sys.monitoring` |
 | Sparse Python lists (§19.9.1's last bullet); Python lists stay dense, cut at 1,000 items | No task yet |
 | `target` and `index` for a pointer into a `vector`'s buffer | No task yet |
-| Offering C++ through the API: the manifest stays `enabled: false` | A separate decision |
 | Signing the runner image | BE-03 §3, needs the registry (BE-13) |
 | A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | No task yet |
 | Exact access hints (`access[]`) from the tracers, only if FE spike S8's tree-sitter inference misses 95% | BE-11 §5 |

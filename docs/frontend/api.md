@@ -107,7 +107,7 @@ Content-Type: application/json
 | `visualize.limits.maxSteps` | Default for `options.maxSteps` |
 | `visualize.limits.maxStepsCeiling` | Highest `options.maxSteps` the server accepts |
 
-Only enabled languages are listed. C++ (`cpp17-gcc`) is in the contract's example but not in the response yet, because its manifest is disabled. Cache the list for 5 minutes, as `Cache-Control` says.
+Only enabled languages are listed: today `python3` and `cpp17-gcc`. Cache the list for 5 minutes, as `Cache-Control` says.
 
 ## `POST /visualizations`
 
