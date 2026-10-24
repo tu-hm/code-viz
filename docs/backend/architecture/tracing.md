@@ -171,6 +171,8 @@ sequenceDiagram
 
 `tracer.py` is flat functions over module-level state. It sees the program through three hooks: `sys.settrace` and `threading.settrace` for events, and a short-lived `sys.setprofile` for recovering from the recursion limit.
 
+It is typed and passes pyright in strict mode (`make typecheck`). Every message it sends is one of the TypedDicts that `make gen` writes to `adapters/wire.py` from `wire.v1.schema.json`, so a misspelled field, a number where the schema wants a string, or a missing required field fails the check before any run. The types catch the shape only; the core still validates every line (§12). `adapters/wire.py` isn't in the runner image: the tracer imports it under `TYPE_CHECKING` and leaves its annotations unevaluated. That `from __future__ import annotations` would leak into the user's program through `compile()`, so both `compile()` calls pass `dont_inherit=True`.
+
 ### Events and steps
 
 - **Only `main.py` produces steps.** The global hook returns `None` for any frame whose `co_filename` isn't `main.py`, so library and tracer frames never get a local hook. `input()`, `print()` and the output writers make no steps (§15 regression case).
@@ -392,3 +394,4 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | `startAtLines` and `captureRanges` in the tracer (both `false` in the manifest) | BE-11 |
 | A test that fake fd-3 messages from user code end as `internal_error` | BE-02 §5 |
 | `sys.stdin.buffer`, `open(0)` and `sys.stdout.buffer` (fd 0 is `/dev/null`; the writers are text only) | Not planned |
+| The C++ tracer under `make typecheck`, checked as Python 3.11 (GDB 14 embeds `libpython3.11`) with typeshed's `gdb` stubs | After BE-09's changes to `trace.py` land |

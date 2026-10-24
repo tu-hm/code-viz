@@ -14,7 +14,8 @@ What each test package covers, what it needs, and how to update goldens. How to 
 | Run | What it covers | Needs |
 |---|---|---|
 | `make test` | `go test ./...` after building the runner images | Docker |
-| `make check` | lint, govulncheck, `make test`, `make test-nsjail`, then fails on `go mod tidy` or `make gen` drift. Run it before pushing; CI runs the same | Docker that can run privileged containers |
+| `make check` | lint, govulncheck, `make typecheck`, `make test`, `make test-nsjail`, then fails on `go mod tidy` or `make gen` drift. Run it before pushing; CI runs the same | Docker that can run privileged containers, Node 24 |
+| `make typecheck` | pyright 1.1.414 in strict mode on `adapters/python/tracer.py` and `adapters/wire.py` (`adapters/pyrightconfig.json`): every wire message the tracer builds matches the schema's TypedDicts | Node 24 |
 | `go test ./api` | `openapi.yaml` is valid OpenAPI 3.1, its examples match their schemas, each visualization status has its fields | — |
 | `go test ./schema` | Both JSON Schemas accept the examples in `testdata/` and reject each broken field. The generated types round-trip. Validator errors never quote their input | — |
 | `go test ./internal/tracecore` | Unit tests at the seam: ID order, deltas, internals, each limit on both sides of its boundary, the step-limit marker and tail, output attribution, malformed and out-of-order input, lines split across writes, chunks. `TestGolden` turns the wire inputs in `testdata/wire/` and `schema/testdata/wire/` into `testdata/golden/*.trace.json`. `TestDeltasReplayToFullSteps` rebuilds every step from its keyframe and deltas | — |
@@ -75,6 +76,7 @@ Both sets must pass on amd64 and arm64. CI runs them on amd64 inside `make check
 | `long` | Over 1,000 steps: `step_limit`, the untraced tail with the full output, `lineHits` for the whole run |
 | `recursion-limit` | A `RecursionError` step, then the program catches it and finishes |
 | `thread-main` | The CP thread trick: the thread's frames on top of the module frame |
+| `annotations` | The program's annotations stay evaluated: the tracer's own `from __future__ import annotations` doesn't reach the user's code |
 
 | C++ fixture | What it pins |
 |---|---|

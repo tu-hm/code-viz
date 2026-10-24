@@ -73,7 +73,7 @@ Add `backend/fixtures/<dir>/<case>/` with the source file and an optional `stdin
 ## Change the wire contract
 
 1. Change `backend/schema/wire.v1.schema.json`. Keep it additive and optional when you can; anything stored traces or old tracers can't read is a breaking change (`!` in the commit).
-2. Run `make gen`. It regenerates `internal/gen/wire` and the web types.
+2. Run `make gen`. It regenerates `internal/gen/wire`, the web types and `adapters/wire.py`, then `make typecheck` shows each place a tracer builds a message the new schema refuses.
 3. Add accept and reject cases to `schema/wire_test.go`, and an example line to `schema/testdata/wire/`.
 4. Update spec §10.1 and the wire contract table in [tracing](../architecture/tracing.md#the-wire-contract).
 5. Change the tracers and `tracecore` in the same change, with the schema and the generated code (D14).

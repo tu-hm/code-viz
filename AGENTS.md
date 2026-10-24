@@ -6,13 +6,13 @@ The spec is [plans/code-visualizer-spec_2.md](plans/code-visualizer-spec_2.md); 
 
 ## Commands
 
-Run from `backend/`. Works on macOS and Linux; the prerequisites are Go, Docker with Compose v2, make and git. `make gen` also needs Node 24 and pnpm, for the TypeScript half (`web/`).
+Run from `backend/`. Works on macOS and Linux; the prerequisites are Go, Docker with Compose v2, make and git. `make gen` also needs Node 24 and pnpm, for the TypeScript half (`web/`), and `make typecheck` needs Node 24.
 
 ```bash
 scripts/setup.sh      # checks prerequisites, prints the install command for this OS
 make dev              # MySQL + SeaweedFS, migrate, seed, vizd --role=all with hot reload
 make down             # stop; make reset also drops volumes
-make gen              # Go + TS types from api/openapi.yaml and schema/*.json
+make gen              # Go + TS types from api/openapi.yaml and schema/*.json, Python TypedDicts in adapters/wire.py
 make test             # needs Docker: testcontainers starts MySQL
 make test-nsjail      # needs Docker: nsjail sandbox tests in a privileged container
 make golden-update    # rewrites expected.trace.json; read the diff before committing
@@ -20,7 +20,8 @@ go run ./cmd/vizctl trace --lang python3 main.py < input   # trace in the Docker
 make lint             # golangci-lint v2.15.0, pinned through go run
 make fmt              # goimports, then gofmt
 make vuln             # govulncheck v1.9.0, pinned
-make check            # lint, vuln, test, test-nsjail, go mod tidy and Go codegen drift; run before pushing
+make typecheck        # pyright 1.1.414 strict on the Python tracer, pinned
+make check            # lint, vuln, typecheck, test, test-nsjail, go mod tidy and Go codegen drift; run before pushing
 go test ./internal/tracecore -run TestName
 ```
 
@@ -138,6 +139,7 @@ These look like holes in review and are decisions:
 ## Tracers (`adapters/python`, `adapters/cpp`)
 
 - Standard library only. The tracer runs inside the user's interpreter, or inside GDB.
+- The Python tracer is typed and passes `make typecheck` (pyright strict). Wire messages are the TypedDicts in `adapters/wire.py`, which `make gen` writes from the schema; import them under `if TYPE_CHECKING:` only, since the file isn't in the runner image.
 - stdout and stderr belong to the user's program. The protocol goes to fd 3 and nowhere else.
 - The style rules above apply: flat functions, no class for a single use, zero comments by default.
 - How a run flows from manifest to trace, and the tracer ↔ core wire contract: [tracing](docs/backend/architecture/tracing.md).
