@@ -10,9 +10,6 @@ GOLANGCI_LINT := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v
 GOVULNCHECK := go run golang.org/x/vuln/cmd/govulncheck@v1.9.0
 SQLC := go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1
 
-# Extra flags forwarded to go test (e.g. GOTEST_FLAGS="-vet=off -short")
-GOTEST_FLAGS ?=
-
 gen: gen-go
 	pnpm --dir ../web gen
 
@@ -30,7 +27,7 @@ gen-go:
 	$(SQLC) generate --file internal/adapters/mysql/sqlc.yaml
 
 test: runner-images
-	go test $(GOTEST_FLAGS) ./...
+	go test ./...
 
 test-nsjail:
 	docker build --target nsjail-test --tag viz-nsjail-test:dev .
