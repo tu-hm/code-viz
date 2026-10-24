@@ -3,14 +3,20 @@
 FROM --platform=$BUILDPLATFORM golang:1.27.3-trixie@sha256:fbb7ae40b62ff8afe31662df570d39b4f5052ac32b90dae8e60d7657a20a74f4 AS build
 ARG TARGETOS TARGETARCH
 WORKDIR /src
+# Deps layer: cached until go.mod/go.sum change.
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 COPY . .
+# -s -w strips symbol table + DWARF: ~30-40% smaller binary, stack traces still work.
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -o /out/ ./cmd/vizd ./cmd/viz-shim
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /out/ ./cmd/vizd ./cmd/viz-shim
 
 FROM debian:trixie-slim@sha256:62bd423aeee912639ca8ee681c2b762cb3e25137e0a92b20be455898a9f034ad AS nsjail
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates git make g++ pkg-config bison flex protobuf-compiler libprotobuf-dev libnl-route-3-dev
+    ca-certificates git make g++ pkg-config bison flex protobuf-compiler libprotobuf-dev libnl-route-3-dev \
+    && rm -rf /var/lib/apt/lists/*
 RUN git clone --branch 3.6 https://github.com/google/nsjail /nsjail \
     && test "$(git -C /nsjail rev-parse HEAD)" = f78475530b46d0186111a9096b30725f816b55fe \
     && make -C /nsjail -j"$(nproc)"

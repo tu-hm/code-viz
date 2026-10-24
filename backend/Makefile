@@ -1,4 +1,4 @@
-.PHONY: gen gen-go test test-nsjail golden-update images runner-images dev down reset seed lint fmt vuln check
+.PHONY: gen gen-go test test-nsjail golden-update images runner-images dev down reset seed lint fmt vuln check check-static gen-check
 
 include .env.example
 -include .env
@@ -9,6 +9,9 @@ GEN_PKG := github.com/tu-hm/code-viz/backend/internal/gen
 GOLANGCI_LINT := go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
 GOVULNCHECK := go run golang.org/x/vuln/cmd/govulncheck@v1.9.0
 SQLC := go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1
+
+# Extra flags forwarded to go test (e.g. GOTEST_FLAGS="-vet=off -short")
+GOTEST_FLAGS ?=
 
 gen: gen-go
 	pnpm --dir ../web gen
@@ -27,7 +30,7 @@ gen-go:
 	$(SQLC) generate --file internal/adapters/mysql/sqlc.yaml
 
 test: runner-images
-	go test ./...
+	go test $(GOTEST_FLAGS) ./...
 
 test-nsjail:
 	docker build --target nsjail-test --tag viz-nsjail-test:dev .
@@ -79,7 +82,23 @@ fmt:
 vuln:
 	$(GOVULNCHECK) ./...
 
-check: lint vuln test test-nsjail
-	go mod tidy -diff
+# check-static: lint + vuln + mod tidy in parallel (CI fast path)
+check-static:
+	@rc=0; \
+	$(GOLANGCI_LINT) run ./... & pid_lint=$$!; \
+	$(GOVULNCHECK) ./... & pid_vuln=$$!; \
+	go mod tidy -diff & pid_tidy=$$!; \
+	wait $$pid_lint || rc=1; \
+	wait $$pid_vuln || rc=1; \
+	wait $$pid_tidy || rc=1; \
+	exit $$rc
+
+# gen-check: verify generated code is committed
+gen-check:
 	@$(MAKE) --no-print-directory gen-go
 	@test -z "$$(git status --porcelain -- internal/gen)" || { git status --short -- internal/gen; echo "check: make gen changed internal/gen; commit the regenerated code" >&2; exit 1; }
+
+# check: full local pre-push gate (sequential, includes everything)
+check: lint vuln test test-nsjail
+	go mod tidy -diff
+	@$(MAKE) --no-print-directory gen-check
