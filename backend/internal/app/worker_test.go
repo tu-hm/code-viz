@@ -17,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -437,11 +438,12 @@ func TestProgressIsWrittenOnTheLeaseCheckOnlyWhenStepsMoved(t *testing.T) {
 	t.Parallel()
 	db, b := newDB(t), newBucket(t)
 	wrote, next := make(chan struct{}), make(chan struct{})
+	closeWrote := sync.OnceFunc(func() { close(wrote) })
 	sb := newFakeSandbox(func(_ context.Context, cmd ports.Command) (ports.Exit, error) {
 		if err := play(cmd, fakeHello, fakeStep(1), fakeStep(2), fakeStep(3)); err != nil {
 			return ports.Exit{}, err
 		}
-		close(wrote)
+		closeWrote()
 		<-next
 		return ports.Exit{}, play(cmd, fakeStep(4), fakeStep(5), fakeExit)
 	})
