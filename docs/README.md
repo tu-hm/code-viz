@@ -9,6 +9,7 @@ docs/
     guides/         step by step for one task: add a language, run the tests, write a migration
     conventions/    rules for writing code and tests, cited by ID in review
   frontend/         the design system, and the API as the browser uses it
+  deploy.md         running it on one server, and the cloud later
 ```
 
 ## Backend
@@ -34,6 +35,10 @@ The backend's working rules (plain Go, S1–S12, the trust boundary, MySQL, git)
 | [API integration](frontend/api.md) | Each endpoint with real responses, long-polling, errors and retries, downloading and checking trace chunks, limits |
 
 The frontend's working rules are in [web/AGENTS.md](../web/AGENTS.md); running it is in the [web README](../web/README.md). The testing cheat sheet applies to the web code as well, with the changes web/AGENTS.md lists.
+
+## Deploying
+
+[Deploying](deploy.md) runs the whole stack on one Linux server: nsjail workers, MySQL, SeaweedFS, Caddy with TLS, backups and upgrades. It also maps each piece to a cloud setup. The production scripts it describes aren't built yet (BE-13).
 
 ## Where a new doc goes
 
