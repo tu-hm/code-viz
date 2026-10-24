@@ -1,0 +1,41 @@
+{
+  "version": "1.2",
+  "id": "trc_f7a443a9da35c5c94d516f027e4a7f54",
+  "language": {
+    "adapter": "cpp-gdb/0.5.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 16
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "summary": {
+    "exit": {
+      "code": null,
+      "kind": "signal",
+      "message": null,
+      "signal": "SIGSEGV"
+    },
+    "lineHits": {
+      "6": 2,
+      "7": 1,
+      "10": 1,
+      "11": 1,
+      "12": 1,
+      "13": 1
+    },
+    "lineHitsSource": "trace",
+    "stepCount": 9,
+    "truncated": false,
+    "truncation": null
+  },
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  }
+}

@@ -207,5 +207,5 @@ export function synthesize(stepCount: number, objectCount: number, seed: number)
   const source =
     Array.from({ length: lineCount }, (_, n) => `// synthetic line ${n + 1}`).join('\n') + '\n'
   const chunks: Step[][] = encode(snapshots)
-  return { header, chunks, source, stdin: '' }
+  return { header, chunks, source, stdin: '', tail: '' }
 }

@@ -103,6 +103,7 @@ Code that looks right and isn't. When you hit a new one, add it here in the same
 - **openapi-fetch keeps the `fetch` it was created with.** MSW in Node patches `globalThis.fetch` when `server.listen()` runs, which is after `api.ts` was imported, so the client's requests miss every handler. Create the client with `fetch: (request) => fetch(request)` (`api.ts`).
 - **openapi-fetch's response types turn tuples into arrays.** Its `Readable<T>` maps every array, so the trace's `captureRanges` pairs come back as `number[][]` and don't fit the player's `[number, number][]`. Check them back into pairs (`toManifest` in `visualizer.tsx`); `--array-length` in codegen doesn't help.
 - **TanStack Query keeps `isError` after a failed background refetch, with the old data.** A screen that checks `isError` first swaps a working page for an error when a refetch on focus fails, and unmounts what it held. Check `data === undefined` first (`Ide` in `ide.tsx`).
+- **A new fixture directory doesn't reach the tests.** Vitest keeps transformed modules in `node_modules/.vitest-cache` (`fsModuleCache`), keyed by the module's own source, so `fixtures/index.ts` keeps the `import.meta.glob` file list it had and `fixtureNames` misses the new trace while every test passes. Run `pnpm exec vitest --clearCache` after adding or removing a fixture.
 - **Prettier run inside a package ignores `web/.prettierignore`.** `prettier --write src` from `apps/ide` reformats `src/gen/`. Run it from `web/` (`pnpm fmt`).
 
 ## Before you hand back

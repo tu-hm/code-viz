@@ -1,0 +1,174 @@
+[
+  {
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 0,
+    "keyframe": true,
+    "line": 9,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "10"
+            }
+          },
+          {
+            "name": "count",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 1,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 9,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "10"
+            }
+          },
+          {
+            "name": "count",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 2,
+    "keyframe": false,
+    "line": 11,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "callId": 1,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "10"
+            }
+          },
+          {
+            "name": "count",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "average",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 3,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 0,
+    "prevLine": 11,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": {
+      "kind": "division_by_zero",
+      "line": 5,
+      "message": "division by zero",
+      "type": "UBSan"
+    },
+    "event": "exception",
+    "frames": {},
+    "heap": {},
+    "i": 4,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "main.cpp:5:18: runtime error: division by zero\n",
+    "stdout": ""
+  }
+]

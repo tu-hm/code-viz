@@ -6,6 +6,7 @@ export type Fixture = {
   chunks: Step[][]
   source: string
   stdin: string
+  tail: string
 }
 
 type Header = Fixture['header']
@@ -18,6 +19,12 @@ const sources = import.meta.glob<string>('./*/main.*', {
   import: 'default',
 })
 const stdins = import.meta.glob<string>('./*/stdin', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+})
+
+const tails = import.meta.glob<string>('./*/tail.txt', {
   eager: true,
   query: '?raw',
   import: 'default',
@@ -47,8 +54,9 @@ export function loadFixture(name: string): Fixture {
   if (header) {
     const [source] = inDir(sources, name)
     const [stdin] = inDir(stdins, name)
+    const [tail] = inDir(tails, name)
     if (source === undefined) throw new Error(`fixture ${name}: no main.* source file`)
-    return { header, chunks: inDir(chunkFiles, name), source, stdin: stdin ?? '' }
+    return { header, chunks: inDir(chunkFiles, name), source, stdin: stdin ?? '', tail: tail ?? '' }
   }
 
   const params = synthetic[name]

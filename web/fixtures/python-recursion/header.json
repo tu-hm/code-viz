@@ -1,0 +1,40 @@
+{
+  "version": "1.2",
+  "id": "trc_2d281c78415213dfb46689b7871755bd",
+  "language": {
+    "id": "python3",
+    "adapter": "py-settrace/0.3.0",
+    "runtime": "CPython 3.12.15"
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 10
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "summary": {
+    "exit": {
+      "code": 1,
+      "kind": "exception",
+      "signal": null,
+      "message": "RecursionError: maximum recursion depth exceeded"
+    },
+    "lineHits": {
+      "1": 1,
+      "3": 1,
+      "6": 1,
+      "7": 21,
+      "10": 1
+    },
+    "stepCount": 26,
+    "truncated": false,
+    "truncation": null,
+    "lineHitsSource": "counter"
+  },
+  "encoding": {
+    "mode": "delta",
+    "keyframeInterval": 50
+  }
+}

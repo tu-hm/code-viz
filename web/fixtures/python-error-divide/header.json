@@ -1,0 +1,38 @@
+{
+  "version": "1.2",
+  "id": "trc_2883c8a4f3e71df0c952c259b717e35f",
+  "language": {
+    "adapter": "py-settrace/0.3.0",
+    "id": "python3",
+    "runtime": "CPython 3.12.15"
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 5
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "summary": {
+    "exit": {
+      "code": 1,
+      "kind": "exception",
+      "message": "ZeroDivisionError: integer division or modulo by zero",
+      "signal": null
+    },
+    "lineHits": {
+      "1": 1,
+      "2": 1,
+      "5": 1
+    },
+    "lineHitsSource": "counter",
+    "stepCount": 4,
+    "truncated": false,
+    "truncation": null
+  },
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  }
+}
