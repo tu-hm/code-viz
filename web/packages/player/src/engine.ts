@@ -19,11 +19,11 @@ export type StepState = Pick<
   output: OutputSegment[]
 }
 
-type Base = { frames: Map<string, Frame>; heap: Map<string, HeapObject> }
+export type Base = { frames: Map<string, Frame>; heap: Map<string, HeapObject> }
 
 const cacheSize = 200 // §9.6
 
-function same(a: unknown, b: unknown): boolean {
+export function same(a: unknown, b: unknown): boolean {
   if (a === b) return true
   if (Array.isArray(a) || Array.isArray(b)) {
     return (
@@ -48,7 +48,7 @@ function patched(before: HeapObject | undefined, patch: Record<string, Value>, a
   return { ...before, sparse: { ...before.sparse, items } }
 }
 
-function apply(base: Base, step: Step) {
+export function apply(base: Base, step: Step) {
   for (const id of step.removedObjects) base.heap.delete(id)
   for (const [id, frame] of Object.entries(step.frames)) base.frames.set(id, frame)
   for (const [id, o] of Object.entries(step.heap)) {
@@ -183,5 +183,5 @@ export function createEngine(steps: Step[]) {
     return result
   }
 
-  return { stepCount: steps.length, state }
+  return { stepCount: steps.length, state, base }
 }

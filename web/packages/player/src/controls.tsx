@@ -1,4 +1,5 @@
 import { Button } from '@viz/ui'
+import type { ReactNode } from 'react'
 import type { StepState } from './engine.ts'
 import { stepDetail } from './step-label.ts'
 import type { Settings } from './store.ts'
@@ -9,7 +10,9 @@ type ControlsProps = {
   stepCount: number
   playing: boolean
   speed: Settings['autoplaySpeed']
+  goto: ReactNode
   onGo: (step: number) => void
+  onStepOver: () => void
   onScrub: (step: number) => void
   onTogglePlay: () => void
 }
@@ -20,7 +23,9 @@ export function Controls({
   stepCount,
   playing,
   speed,
+  goto,
   onGo,
+  onStepOver,
   onScrub,
   onTogglePlay,
 }: ControlsProps) {
@@ -61,7 +66,7 @@ export function Controls({
           variant="ghost"
           aria-label="Next step"
           disabled={step === last}
-          onClick={() => onGo(step + 1)}
+          onClick={(e) => (e.shiftKey ? onStepOver() : onGo(step + 1))}
         >
           Next <span aria-hidden>▶</span>
         </Button>
@@ -74,6 +79,7 @@ export function Controls({
         >
           <span aria-hidden>▶|</span>
         </Button>
+        {goto}
         <Button size="sm" aria-label={playing ? 'Pause' : 'Play'} onClick={onTogglePlay}>
           <span aria-hidden>{playing ? '❚❚' : '▶'}</span> {playing ? 'Pause' : 'Play'} {speed}×
         </Button>
@@ -88,6 +94,21 @@ export function Controls({
         onChange={(e) => onScrub(e.currentTarget.valueAsNumber - 1)}
         className="w-full accent-primary"
       />
+    </div>
+  )
+}
+
+export function Notice({ text }: { text: string | null }) {
+  return (
+    <div
+      role="status"
+      className="pointer-events-none absolute inset-x-0 bottom-full flex justify-center px-(--pane-padding) pb-2"
+    >
+      {text !== null && (
+        <p className="rounded-full bg-popover px-4 py-2 text-sm text-popover-foreground shadow-popover">
+          {text}
+        </p>
+      )}
     </div>
   )
 }

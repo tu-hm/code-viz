@@ -131,3 +131,43 @@ test('URLs that expire partway through are refreshed once, before the next chunk
     fresh.chunks[3]!.url,
   ])
 })
+
+describe('the untraced tail', () => {
+  const encode = (json: string) => new TextEncoder().encode(json)
+  const unused = () => Promise.reject(new Error('no refresh expected'))
+
+  async function withTail(text: string, served = text) {
+    const manifest = await serveChunks('cpp-binary-search', encode)
+    const url = 'https://chunks.example.com/cpp-binary-search/tail'
+    server.use(http.get(url, () => new HttpResponse(gzipSync(served))))
+    return { ...manifest, tail: { url, sha256: await sha256(encode(text)) } }
+  }
+
+  test('is fetched, unzipped and checked like a chunk', async () => {
+    const loaded = await loadTrace({ manifest: await withTail('7\n8\n'), refresh: unused })
+    expect(loaded.tail).toBe('7\n8\n')
+  })
+
+  test('a changed byte is a ChecksumError', async () => {
+    const manifest = await withTail('7\n8\n', '7\n9\n')
+    const failed: unknown = await loadTrace({ manifest, refresh: unused }).catch((e: unknown) => e)
+    expect(String(failed)).toMatch('ChecksumError: tail: ')
+  })
+
+  test('an expired URL is refreshed before the tail is fetched', async () => {
+    const manifest = await withTail('7\n')
+    const expiry = Date.parse(later)
+    const fetched: string[] = []
+    server.events.on('request:start', ({ request }) => fetched.push(request.url))
+    const fresh = { ...manifest, tail: { ...manifest.tail, url: `${manifest.tail.url}?fresh` } }
+    const refresh = vi.fn(() => Promise.resolve(fresh))
+    const clock = [expiry - 1, expiry]
+
+    const loaded = await loadTrace({ manifest, refresh }, () => clock.shift()!)
+    server.events.removeAllListeners()
+
+    expect(refresh).toHaveBeenCalledOnce()
+    expect(loaded.tail).toBe('7\n')
+    expect(fetched.at(-1)).toBe(fresh.tail.url)
+  })
+})

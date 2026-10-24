@@ -1,15 +1,21 @@
+import type { Print } from './compare.ts'
 import { createEngine } from './engine.ts'
+import type { Step } from './gen/trace.ts'
 import { loadTrace, type FileSource, type Manifest, type TraceSource } from './load.ts'
+import { calledFunctions, findStep, type Jump } from './search.ts'
 
 const prefetch = [1, -1, 2, -2]
 
 export function createWorkerApi() {
-  let engine: ReturnType<typeof createEngine> | null = null
+  let trace: { steps: Step[]; engine: ReturnType<typeof createEngine> } | null = null
 
   async function open(source: TraceSource) {
-    const { header, steps } = await loadTrace(source)
-    engine = createEngine(steps)
-    return { header, stepCount: steps.length }
+    const { header, steps, tail } = await loadTrace(source)
+    trace = { steps, engine: createEngine(steps) }
+    const prints = steps
+      .filter((s) => s.stdout !== '' || s.stderr !== '')
+      .map((s): Print => ({ i: s.i, line: s.prevLine, stdout: s.stdout, stderr: s.stderr }))
+    return { header, stepCount: steps.length, prints, tail, functions: calledFunctions(steps) }
   }
 
   return {
@@ -18,13 +24,17 @@ export function createWorkerApi() {
     openManifest: (manifest: Manifest, refresh: () => Promise<Manifest>) =>
       open({ manifest, refresh }),
     step(k: number) {
-      if (engine === null) throw new Error('step before open')
-      const { state, stepCount } = engine
+      if (trace === null) throw new Error('step before open')
+      const { state, stepCount } = trace.engine
       const result = state(k)
       setTimeout(() => {
         for (const d of prefetch) if (k + d >= 0 && k + d < stepCount) state(k + d)
       })
       return result
+    },
+    find(from: number, jump: Jump) {
+      if (trace === null) throw new Error('find before open')
+      return findStep(trace.steps, trace.engine.base, from, jump)
     },
   }
 }

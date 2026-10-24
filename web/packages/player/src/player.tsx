@@ -1,16 +1,26 @@
-import { Button } from '@viz/ui'
-import { useEffect, useRef, type ReactNode } from 'react'
+import { Button, Popover, PopoverContent, PopoverTrigger } from '@viz/ui'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { togglePlay, useAutoplay } from './autoplay.ts'
 import { CodePane } from './code-pane.tsx'
-import { Controls } from './controls.tsx'
+import { compareOutput, shownAt } from './compare.ts'
+import { Controls, Notice } from './controls.tsx'
 import { useDisplayOptions } from './display.ts'
 import { Divider } from './divider.tsx'
 import type { OutputSegment } from './engine.ts'
+import { GotoMenu } from './goto-menu.tsx'
+import { entries, locate, plan, runJump, type Entry } from './goto.ts'
 import { Header } from './header.tsx'
 import { useStepKeys } from './keys.ts'
 import { isTraceError, type TraceHeader, type TraceSource } from './load.ts'
-import { OutputPanel, StdinPanel } from './output.tsx'
-import { useSession } from './session.ts'
+import {
+  Check,
+  CompareResult,
+  ExpectedPanel,
+  OutputPanel,
+  StdinPanel,
+  type Mark,
+} from './output.tsx'
+import { useSession, type LoadedTrace } from './session.ts'
 import { SettingsDialog } from './settings.tsx'
 import { StatusBar } from './status-bar.tsx'
 import { useStepParam } from './step-param.ts'
@@ -34,10 +44,12 @@ type PlayerProps = Slots & {
   stdin: string
   language: LanguageInfo
   permalink?: string
+  expected?: string
   onClose: () => void
 }
 
 const noOutput: OutputSegment[] = []
+const noticeMs = 4000
 
 function useFrameThrottle(fn: (value: number) => void) {
   const pending = useRef<number | null>(null)
@@ -55,7 +67,94 @@ function useFrameThrottle(fn: (value: number) => void) {
   }
 }
 
-function ControlsBox({ stepCount }: { stepCount: number }) {
+function GotoPanel({ trace, onRun }: { trace: LoadedTrace; onRun: (entry: Entry) => void }) {
+  const step = usePlayer((s) => s.step)
+  const stack = usePlayer((s) => s.current?.stack)
+  const breakpoints = usePlayer((s) => s.breakpoints)
+  const jumpLine = usePlayer((s) => s.jumpLine)
+  const jumpChange = usePlayer((s) => s.jumpChange)
+  const jumpCall = usePlayer((s) => s.jumpCall)
+  const expected = usePlayer((s) => s.expected)
+  const exact = usePlayer((s) => s.exact)
+  const [found, setFound] = useState<Partial<Record<Entry, boolean>>>({})
+  const params = { breakpoints, jumpLine, jumpChange, jumpCall, expected, exact }
+
+  useEffect(() => {
+    let alive = true
+    const params = { breakpoints, jumpLine, jumpChange, jumpCall, expected, exact }
+    Promise.all(entries.map((e) => locate(plan(e, params, trace), step, trace))).then(
+      (targets) => {
+        if (alive) setFound(Object.fromEntries(entries.map((e, i) => [e, targets[i] !== null])))
+      },
+      (e: unknown) => {
+        const reason = e instanceof Error ? e.message : String(e)
+        if (alive) usePlayer.setState({ notice: `Couldn't search the trace: ${reason}` })
+      },
+    )
+    return () => {
+      alive = false
+    }
+  }, [step, breakpoints, jumpLine, jumpChange, jumpCall, expected, exact, trace])
+
+  const frames = [...(stack ?? [])].reverse()
+  const variables = frames.flatMap((f) => f.locals.filter((l) => !l.internal).map((l) => l.name))
+  return (
+    <GotoMenu
+      labels={
+        Object.fromEntries(entries.map((e) => [e, plan(e, params, trace).label])) as Record<
+          Entry,
+          string
+        >
+      }
+      found={found}
+      line={jumpLine}
+      change={jumpChange}
+      call={jumpCall}
+      breakpoints={breakpoints}
+      variables={[...new Set(variables)]}
+      functions={trace.functions}
+      onLine={(jumpLine) => usePlayer.setState({ jumpLine })}
+      onChange={(jumpChange) => usePlayer.setState({ jumpChange })}
+      onCall={(jumpCall) => usePlayer.setState({ jumpCall })}
+      onRun={onRun}
+    />
+  )
+}
+
+function GotoBox({ trace }: { trace: LoadedTrace }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="ghost">
+          Go to… <span aria-hidden>▾</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent label="Go to">
+        <GotoPanel
+          trace={trace}
+          onRun={(entry) => {
+            setOpen(false)
+            void runJump(entry, trace)
+          }}
+        />
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+function NoticeBox() {
+  const notice = usePlayer((s) => s.notice)
+  useEffect(() => {
+    if (notice === null) return
+    const timer = setTimeout(() => usePlayer.setState({ notice: null }), noticeMs)
+    return () => clearTimeout(timer)
+  }, [notice])
+  return <Notice text={notice} />
+}
+
+function ControlsBox({ trace }: { trace: LoadedTrace }) {
+  const { stepCount } = trace
   const state = usePlayer((s) => s.current)
   const step = usePlayer((s) => s.step)
   const playing = usePlayer((s) => s.playing)
@@ -63,16 +162,21 @@ function ControlsBox({ stepCount }: { stepCount: number }) {
   const go = usePlayer((s) => s.go)
   const scrub = useFrameThrottle(go)
   return (
-    <Controls
-      state={state}
-      step={step}
-      stepCount={stepCount}
-      playing={playing}
-      speed={speed}
-      onGo={go}
-      onScrub={scrub}
-      onTogglePlay={() => togglePlay(stepCount)}
-    />
+    <div className="relative">
+      <NoticeBox />
+      <Controls
+        state={state}
+        step={step}
+        stepCount={stepCount}
+        playing={playing}
+        speed={speed}
+        goto={<GotoBox trace={trace} />}
+        onGo={go}
+        onStepOver={() => void runJump('over', trace)}
+        onScrub={scrub}
+        onTogglePlay={() => togglePlay(stepCount)}
+      />
+    </div>
   )
 }
 
@@ -103,9 +207,55 @@ function CodeBox({
   )
 }
 
-function OutputBox() {
+function OutputBox({ trace }: { trace: LoadedTrace }) {
   const output = usePlayer((s) => s.current?.output ?? noOutput)
-  return <OutputPanel output={output} />
+  const shownStep = usePlayer((s) => s.current?.i ?? 0)
+  const comparing = usePlayer((s) => s.comparing)
+  const expected = usePlayer((s) => s.expected)
+  const exact = usePlayer((s) => s.exact)
+  const go = usePlayer((s) => s.go)
+  const toggle = (
+    <Check
+      label="Compare"
+      checked={comparing}
+      onChange={(comparing) => usePlayer.setState({ comparing })}
+    />
+  )
+  if (!comparing) return <OutputPanel output={output} action={toggle} />
+
+  const comparison =
+    expected === '' ? null : compareOutput(expected, exact, trace.prints, trace.tail)
+  let mark: Mark | undefined
+  if (
+    comparison?.kind === 'differ' &&
+    comparison.from !== null &&
+    comparison.from !== 'untraced' &&
+    comparison.from.step <= shownStep
+  ) {
+    mark = {
+      at: shownAt(trace.prints, comparison.from),
+      label: `differs at char ${comparison.char}`,
+    }
+  }
+  return (
+    <div className="grid min-h-0 grid-cols-2 grid-rows-[minmax(0,1fr)_auto]">
+      <OutputPanel output={output} mark={mark} action={toggle} />
+      <ExpectedPanel
+        expected={expected}
+        exact={exact}
+        onExpected={(expected) => usePlayer.setState({ expected })}
+        onExact={(exact) => usePlayer.setState({ exact })}
+      />
+      <div className="col-span-2">
+        <CompareResult
+          comparison={comparison}
+          exact={exact}
+          lastStep={trace.stepCount - 1}
+          onGo={go}
+        />
+      </div>
+    </div>
+  )
 }
 
 function SettingsBox({ language, header }: { language: LanguageInfo; header: TraceHeader }) {
@@ -137,8 +287,7 @@ function failureText(error: unknown) {
 }
 
 function Shell({
-  header,
-  stepCount,
+  trace,
   code,
   stdin,
   language,
@@ -147,8 +296,9 @@ function Shell({
   statePane,
   share,
   banner,
-}: Omit<PlayerProps, 'source'> & { header: TraceHeader; stepCount: number }) {
-  useStepKeys(stepCount, onClose)
+}: Omit<PlayerProps, 'source' | 'expected'> & { trace: LoadedTrace }) {
+  const { header, stepCount } = trace
+  useStepKeys(stepCount, onClose, (entry) => void runJump(entry, trace))
   useAutoplay(stepCount)
   useStepParam()
   const split = usePlayer((s) => s.split)
@@ -171,20 +321,20 @@ function Shell({
       >
         <div className="flex min-h-0 flex-col">
           <CodeBox code={code} editorMode={language.editorMode} header={header} />
-          <ControlsBox stepCount={stepCount} />
+          <ControlsBox trace={trace} />
         </div>
         <Divider split={split} onSplit={setSplit} />
         <div className="min-h-0 overflow-auto">{statePane}</div>
         <StdinPanel stdin={stdin} />
-        <OutputBox />
+        <OutputBox trace={trace} />
       </div>
       <StatusBar stepCount={stepCount} exit={header.summary.exit} banner={banner} />
     </div>
   )
 }
 
-export function Player({ source, ...props }: PlayerProps) {
-  const session = useSession(source)
+export function Player({ source, expected, ...props }: PlayerProps) {
+  const session = useSession(source, expected ?? '')
   useDisplayOptions()
 
   if (session.status === 'loading') {
@@ -202,5 +352,5 @@ export function Player({ source, ...props }: PlayerProps) {
       </div>
     )
   }
-  return <Shell {...props} header={session.header} stepCount={session.stepCount} />
+  return <Shell {...props} trace={session} />
 }

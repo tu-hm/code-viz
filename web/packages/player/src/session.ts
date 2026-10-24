@@ -1,17 +1,27 @@
 import { proxy } from 'comlink'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
+import type { Print } from './compare.ts'
 import type { TraceHeader, TraceSource } from './load.ts'
+import type { Jump } from './search.ts'
 import { spawnEngine } from './spawn-engine.ts'
 import { stepFromUrl } from './step-param.ts'
 import { usePlayer } from './store.ts'
 
-type Session =
-  | { status: 'loading' }
-  | { status: 'ready'; header: TraceHeader; stepCount: number }
-  | { status: 'failed'; error: unknown }
+export type LoadedTrace = {
+  header: TraceHeader
+  stepCount: number
+  prints: Print[]
+  tail: string
+  functions: string[]
+  find: (from: number, jump: Jump) => Promise<number | null>
+}
 
-export function useSession(source: TraceSource): Session {
+type Session =
+  { status: 'loading' } | ({ status: 'ready' } & LoadedTrace) | { status: 'failed'; error: unknown }
+
+export function useSession(source: TraceSource, expected: string): Session {
   const [session, setSession] = useState<Session>({ status: 'loading' })
+  const prefilled = useEffectEvent(() => expected)
 
   useEffect(() => {
     let alive = true
@@ -43,19 +53,27 @@ export function useSession(source: TraceSource): Session {
     }
 
     async function start() {
-      const { header, stepCount } = await ('manifest' in source
+      const opened = await ('manifest' in source
         ? remote.openManifest(source.manifest, proxy(source.refresh))
         : remote.openFile(source))
       replied = true
       if (!alive) return
+      const expected = prefilled()
       usePlayer.setState({
-        step: stepFromUrl(location.search, stepCount),
+        step: stepFromUrl(location.search, opened.stepCount),
         current: null,
         playing: false,
         breakpoints: [],
+        expected,
+        comparing: expected !== '',
+        exact: false,
+        jumpLine: '',
+        jumpChange: '',
+        jumpCall: null,
+        notice: null,
       })
       ready = true
-      setSession({ status: 'ready', header, stepCount })
+      setSession({ status: 'ready', ...opened, find: (from, jump) => remote.find(from, jump) })
       show()
     }
 

@@ -30,6 +30,13 @@ type PlayerState = {
   breakpoints: number[]
   settings: Settings
   split: number
+  expected: string
+  exact: boolean
+  comparing: boolean
+  jumpLine: string
+  jumpChange: string
+  jumpCall: string | null
+  notice: string | null
   go: (step: number) => void
   setPlaying: (playing: boolean) => void
   updateSettings: (patch: Partial<Settings>) => void
@@ -103,7 +110,14 @@ export const usePlayer = create<PlayerState>()(
       breakpoints: [],
       settings: defaultSettings,
       split: 0.5,
-      go: (step) => set({ step, playing: false }),
+      expected: '',
+      exact: false,
+      comparing: false,
+      jumpLine: '',
+      jumpChange: '',
+      jumpCall: null,
+      notice: null,
+      go: (step) => set({ step, playing: false, notice: null }),
       setPlaying: (playing) => set({ playing }),
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
       setSplit: (split) => set({ split }),

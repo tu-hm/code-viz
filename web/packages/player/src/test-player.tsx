@@ -18,11 +18,30 @@ export const python: LanguageInfo = {
 
 export function renderPlayer(
   name: string,
-  { language = cpp, header: edit }: { language?: LanguageInfo; header?: Partial<TraceHeader> } = {},
+  {
+    language = cpp,
+    header: edit,
+    tail,
+    expected,
+  }: {
+    language?: LanguageInfo
+    header?: Partial<TraceHeader>
+    tail?: string
+    expected?: string
+  } = {},
 ) {
   const { header, chunks, source: code, stdin } = loadFixture(name)
   const onClose = vi.fn<() => void>()
-  const source = { header: { ...header, ...edit }, chunks }
-  render(<Player source={source} code={code} stdin={stdin} language={language} onClose={onClose} />)
+  const source = { header: { ...header, ...edit }, chunks, tail }
+  render(
+    <Player
+      source={source}
+      code={code}
+      stdin={stdin}
+      language={language}
+      expected={expected}
+      onClose={onClose}
+    />,
+  )
   return { onClose, stepCount: chunks.flat().length, stdin }
 }

@@ -2,10 +2,12 @@ import type { HeapObject, Step, Trace } from './gen/trace.ts'
 import { isRecord } from './is-record.ts'
 
 export type TraceHeader = Omit<Trace, 'steps'>
-export type FileSource = { header: TraceHeader; chunks: Step[][] }
+export type FileSource = { header: TraceHeader; chunks: Step[][]; tail?: string }
+type Link = { sha256: string; url: string }
 export type Manifest = {
   header: TraceHeader
-  chunks: { sha256: string; url: string }[]
+  chunks: Link[]
+  tail?: Link
   urlsExpireAt: string
 }
 export type TraceSource = FileSource | { manifest: Manifest; refresh: () => Promise<Manifest> }
@@ -80,7 +82,7 @@ async function sha256(bytes: Uint8Array<ArrayBuffer>) {
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-async function unzip(bytes: Uint8Array<ArrayBuffer>, index: number) {
+async function unzip(bytes: Uint8Array<ArrayBuffer>, what: string) {
   const gzip = bytes[0] === 0x1f && bytes[1] === 0x8b
   if (!gzip) return bytes
   const unzipped = new Response(
@@ -91,34 +93,32 @@ async function unzip(bytes: Uint8Array<ArrayBuffer>, index: number) {
   } catch (e) {
     throw traceError(
       'ChecksumError',
-      `chunk ${index}: not valid gzip: ${e instanceof Error ? e.message : String(e)}`,
+      `${what}: not valid gzip: ${e instanceof Error ? e.message : String(e)}`,
     )
   }
 }
 
-async function download(url: string, index: number) {
+async function download(url: string, what: string) {
   try {
     const res = await fetch(url)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return new Uint8Array(await res.arrayBuffer())
   } catch (e) {
-    throw traceError(
-      'NetworkError',
-      `chunk ${index}: ${e instanceof Error ? e.message : String(e)}`,
-    )
+    throw traceError('NetworkError', `${what}: ${e instanceof Error ? e.message : String(e)}`)
   }
 }
 
-async function fetchChunk(link: Manifest['chunks'][number], index: number) {
-  const json = await unzip(await download(link.url, index), index)
-  const hash = await sha256(json)
+async function fetchText(link: Link, what: string) {
+  const bytes = await unzip(await download(link.url, what), what)
+  const hash = await sha256(bytes)
   if (hash !== link.sha256) {
-    throw traceError(
-      'ChecksumError',
-      `chunk ${index}: sha256 is ${hash}, manifest says ${link.sha256}`,
-    )
+    throw traceError('ChecksumError', `${what}: sha256 is ${hash}, manifest says ${link.sha256}`)
   }
-  const steps: unknown = JSON.parse(new TextDecoder().decode(json))
+  return new TextDecoder().decode(bytes)
+}
+
+async function fetchChunk(link: Link, index: number) {
+  const steps: unknown = JSON.parse(await fetchText(link, `chunk ${index}`))
   if (!Array.isArray(steps) || !steps.every(isStep)) {
     throw new Error(`chunk ${index}: not an array of trace steps`)
   }
@@ -128,10 +128,12 @@ async function fetchChunk(link: Manifest['chunks'][number], index: number) {
 export async function loadTrace(source: TraceSource, now = Date.now) {
   let header: TraceHeader
   let steps: Step[]
+  let tail = ''
   if ('chunks' in source) {
     header = source.header
     checkVersion(header.version)
     steps = source.chunks.flat()
+    tail = source.tail ?? ''
   } else {
     let manifest = source.manifest
     header = manifest.header
@@ -141,9 +143,14 @@ export async function loadTrace(source: TraceSource, now = Date.now) {
       if (now() >= Date.parse(manifest.urlsExpireAt)) manifest = await source.refresh()
       steps.push(...(await fetchChunk(manifest.chunks[index]!, index)))
     }
+    if (manifest.tail !== undefined) {
+      if (now() >= Date.parse(manifest.urlsExpireAt)) manifest = await source.refresh()
+      if (manifest.tail === undefined) throw new Error('the refreshed trace has no tail')
+      tail = await fetchText(manifest.tail, 'tail')
+    }
   }
   steps.forEach((s, k) => {
     if (s.i !== k) throw new Error(`step ${k} has i = ${s.i}; chunks out of order`)
   })
-  return { header, steps: steps.map(withKnownKinds) }
+  return { header, steps: steps.map(withKnownKinds), tail }
 }

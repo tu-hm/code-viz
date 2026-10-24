@@ -1,6 +1,18 @@
 import { useEffect, useEffectEvent } from 'react'
 import { togglePlay } from './autoplay.ts'
+import type { Entry } from './goto.ts'
 import { usePlayer } from './store.ts'
+
+const jumpKeys: Record<string, Entry> = {
+  l: 'line',
+  c: 'change',
+  f: 'call',
+  p: 'print',
+  d: 'diff',
+  e: 'error',
+}
+
+const shiftJumpKeys: Record<string, Entry> = { ArrowRight: 'over', ArrowUp: 'out' }
 
 const ownsArrows = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'])
 
@@ -22,10 +34,21 @@ function ownsKey(target: EventTarget | null, key: string) {
   return key === ' ' && target.closest('button, a[href], summary') !== null
 }
 
-export function useStepKeys(stepCount: number, onClose: () => void) {
+export function useStepKeys(
+  stepCount: number,
+  onClose: () => void,
+  onJump: (entry: Entry) => void,
+) {
   const onKey = useEffectEvent((e: KeyboardEvent) => {
-    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.defaultPrevented) return
+    if (e.altKey || e.ctrlKey || e.metaKey || e.defaultPrevented) return
     if (ownsKey(e.target, e.key)) return
+    const jump = e.shiftKey ? shiftJumpKeys[e.key] : jumpKeys[e.key.toLowerCase()]
+    if (jump !== undefined) {
+      e.preventDefault()
+      onJump(jump)
+      return
+    }
+    if (e.shiftKey) return
     const { step, go } = usePlayer.getState()
     const last = stepCount - 1
     switch (e.key) {
