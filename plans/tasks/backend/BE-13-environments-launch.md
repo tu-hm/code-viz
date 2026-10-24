@@ -78,8 +78,8 @@ One Linux server (bare metal or VPS). All services run on this machine.
 - [ ] Caddy (or nginx) as reverse proxy: port 443 → `127.0.0.1:8080` (vizd-api)
 - [ ] Automatic TLS via Let's Encrypt (Caddy does this by default)
 - [ ] Rate limit: 30 req/min per IP on `POST /visualizations`
-- [ ] CORS headers for the frontend origin
-- [ ] Static file serving for SeaweedFS chunks (or proxy `GET /chunks/*` to SeaweedFS), so the frontend can fetch trace data
+- [ ] No CORS headers here: vizd sets them for the API (`CORS_ORIGINS`, BE-06 §4) and the bucket for chunks (§3); a second set from Caddy would duplicate them
+- [ ] Proxy `/viz-traces/*` (the bucket's path) to `127.0.0.1:8333` unchanged, keeping the `Host` header (Caddy's default), and set `S3_PUBLIC_ENDPOINT=https://your-domain`. A presigned URL's signature covers its host and path, so stripping a prefix such as `/chunks` makes every chunk URL fail with 403
 - [ ] `X-Request-ID` header forwarded to vizd
 - [ ] **Done:** `https://your-domain.com/healthz` returns 200
 
