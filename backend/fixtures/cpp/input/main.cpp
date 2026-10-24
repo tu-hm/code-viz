@@ -1,18 +1,21 @@
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
+using namespace std;
 
 int main() {
     int n = 0;
-    std::cin >> n;
-    long long sum = 0;
+    cin >> n;
+    vector<string> names;
     for (int i = 0; i < n; i++) {
-        int x = 0;
-        std::cin >> x;
-        sum += x;
+        string name;
+        cin >> name;
+        names.push_back(name);
     }
-    std::cin.ignore();
-    std::string rest;
-    std::getline(std::cin, rest);
-    std::cout << sum << " " << rest << "\n";
+    int x = 0;
+    int y = 0;
+    cin >> x >> y;
+    cout << names.size() << " " << x + y << "\n";
+    for (int i = n - 1; i >= 0; i--) {
+        cout << names[i] << (i > 0 ? " " : "\n");
+    }
     return 0;
 }

@@ -15,7 +15,7 @@
   },
   "source": {
     "file": "main.cpp",
-    "lineCount": 26
+    "lineCount": 21
   },
   "steps": [
     {
@@ -26,13 +26,13 @@
         "f0": {
           "id": "f0",
           "kind": "function",
-          "line": 18,
+          "line": 9,
           "locals": [
             {
-              "name": "total",
+              "name": "a",
               "value": {
                 "t": "uninit",
-                "type": "int"
+                "type": "std::vector<int>"
               }
             }
           ],
@@ -43,8 +43,66 @@
       "heap": {},
       "i": 0,
       "keyframe": true,
-      "line": 18,
+      "line": 9,
       "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            },
+            {
+              "t": "int",
+              "v": "3"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "meta": {
+            "capacity": 3
+          },
+          "truncated": false,
+          "type": "std::vector<int>"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 9,
       "removedObjects": [],
       "stack": [
         "f0"
@@ -60,393 +118,35 @@
         "f1": {
           "id": "f1",
           "kind": "function",
-          "line": 12,
+          "line": 5,
           "locals": [
             {
-              "name": "x",
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "1"
-              }
-            },
-            {
-              "name": "tag",
-              "value": {
-                "t": "uninit",
-                "type": "std::string"
+                "v": "5"
               }
             }
           ],
-          "name": "deeper",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 1,
-      "keyframe": false,
-      "line": 12,
-      "parentCallId": 0,
-      "prevLine": 18,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f1": {
-          "id": "f1",
-          "kind": "function",
-          "line": 13,
-          "locals": [
-            {
-              "name": "x",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            },
-            {
-              "name": "tag",
-              "value": {
-                "t": "str",
-                "type": "std::string",
-                "v": "deeper"
-              }
-            },
-            {
-              "name": "y",
-              "value": {
-                "t": "uninit",
-                "type": "int"
-              }
-            }
-          ],
-          "name": "deeper",
+          "name": "get",
           "returnValue": null
         }
       },
       "heap": {},
       "i": 2,
       "keyframe": false,
-      "line": 13,
-      "prevLine": 12,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "callId": 2,
-      "error": null,
-      "event": "call",
-      "frames": {
-        "f2": {
-          "id": "f2",
-          "kind": "function",
-          "line": 5,
-          "locals": [
-            {
-              "name": "x",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            }
-          ],
-          "name": "check",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 3,
-      "keyframe": false,
       "line": 5,
-      "parentCallId": 1,
-      "prevLine": 13,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f2": {
-          "id": "f2",
-          "kind": "function",
-          "line": 8,
-          "locals": [
-            {
-              "name": "x",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            }
-          ],
-          "name": "check",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 4,
-      "keyframe": false,
-      "line": 8,
-      "prevLine": 5,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f2": {
-          "id": "f2",
-          "kind": "function",
-          "line": 9,
-          "locals": [
-            {
-              "name": "x",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            }
-          ],
-          "name": "check",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 5,
-      "keyframe": false,
-      "line": 9,
-      "prevLine": 8,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "callId": 2,
-      "error": null,
-      "event": "return",
-      "frames": {
-        "f2": {
-          "id": "f2",
-          "kind": "function",
-          "line": 9,
-          "locals": [
-            {
-              "name": "x",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            }
-          ],
-          "name": "check",
-          "returnValue": {
-            "t": "int",
-            "type": "int",
-            "v": "10"
-          }
-        }
-      },
-      "heap": {},
-      "i": 6,
-      "keyframe": false,
-      "line": 9,
-      "prevLine": 9,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f1": {
-          "id": "f1",
-          "kind": "function",
-          "line": 14,
-          "locals": [
-            {
-              "name": "x",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            },
-            {
-              "name": "tag",
-              "value": {
-                "t": "str",
-                "type": "std::string",
-                "v": "deeper"
-              }
-            },
-            {
-              "name": "y",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "10"
-              }
-            }
-          ],
-          "name": "deeper",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 7,
-      "keyframe": false,
-      "line": 14,
-      "prevLine": 13,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f1": {
-          "id": "f1",
-          "kind": "function",
-          "line": 15,
-          "locals": [
-            {
-              "name": "x",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            },
-            {
-              "name": "tag",
-              "value": {
-                "t": "str",
-                "type": "std::string",
-                "v": "deeper"
-              }
-            },
-            {
-              "name": "y",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "10"
-              }
-            }
-          ],
-          "name": "deeper",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 8,
-      "keyframe": false,
-      "line": 15,
-      "prevLine": 14,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "callId": 1,
-      "error": null,
-      "event": "return",
-      "frames": {
-        "f1": {
-          "id": "f1",
-          "kind": "function",
-          "line": 15,
-          "locals": [
-            {
-              "name": "x",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            },
-            {
-              "name": "tag",
-              "value": {
-                "t": "str",
-                "type": "std::string",
-                "v": "deeper"
-              }
-            },
-            {
-              "name": "y",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "10"
-              }
-            }
-          ],
-          "name": "deeper",
-          "returnValue": {
-            "t": "int",
-            "type": "int",
-            "v": "11"
-          }
-        }
-      },
-      "heap": {},
-      "i": 9,
-      "keyframe": false,
-      "line": 15,
-      "prevLine": 15,
+      "parentCallId": 0,
+      "prevLine": 11,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -462,14 +162,14 @@
         "f0": {
           "id": "f0",
           "kind": "function",
-          "line": 20,
+          "line": 12,
           "locals": [
             {
-              "name": "total",
+              "name": "a",
               "value": {
-                "t": "int",
-                "type": "int",
-                "v": "11"
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
               }
             }
           ],
@@ -478,10 +178,478 @@
         }
       },
       "heap": {},
+      "i": 3,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "e",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "const std::out_of_range &"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "kind": "opaque",
+          "summary": "<incomplete type>",
+          "type": "std::out_of_range"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "e",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "const std::out_of_range &"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "caught: vector::_M_range_check: __n (which is 5) >= this->size() (which is 3)\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 14,
+      "removedObjects": [
+        "o2"
+      ],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "get",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 5,
+      "parentCallId": 0,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "get",
+          "returnValue": null
+        }
+      },
+      "heap": {},
       "i": 10,
       "keyframe": false,
-      "line": 20,
-      "prevLine": 18,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "get",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "1"
+          }
+        }
+      },
+      "heap": {},
+      "i": 11,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 12,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 13,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 16,
       "removedObjects": [],
       "stack": [
         "f0"
@@ -497,34 +665,35 @@
         "f3": {
           "id": "f3",
           "kind": "function",
-          "line": 12,
+          "line": 5,
           "locals": [
             {
-              "name": "x",
+              "name": "a",
               "value": {
-                "t": "int",
-                "type": "int",
-                "v": "5"
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
               }
             },
             {
-              "name": "tag",
+              "name": "i",
               "value": {
-                "t": "uninit",
-                "type": "std::string"
+                "t": "int",
+                "type": "int",
+                "v": "1"
               }
             }
           ],
-          "name": "deeper",
+          "name": "get",
           "returnValue": null
         }
       },
       "heap": {},
-      "i": 11,
+      "i": 14,
       "keyframe": false,
-      "line": 12,
+      "line": 5,
       "parentCallId": 0,
-      "prevLine": 20,
+      "prevLine": 17,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -540,45 +709,186 @@
         "f3": {
           "id": "f3",
           "kind": "function",
-          "line": 13,
+          "line": 6,
           "locals": [
             {
-              "name": "x",
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "5"
-              }
-            },
-            {
-              "name": "tag",
-              "value": {
-                "t": "str",
-                "type": "std::string",
-                "v": "deeper"
-              }
-            },
-            {
-              "name": "y",
-              "value": {
-                "t": "uninit",
-                "type": "int"
+                "v": "1"
               }
             }
           ],
-          "name": "deeper",
+          "name": "get",
           "returnValue": null
         }
       },
       "heap": {},
-      "i": 12,
+      "i": 15,
       "keyframe": false,
-      "line": 13,
-      "prevLine": 12,
+      "line": 6,
+      "prevLine": 5,
       "removedObjects": [],
       "stack": [
         "f0",
         "f3"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 3,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "get",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "2"
+          }
+        }
+      },
+      "heap": {},
+      "i": 16,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f3"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 17,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 18,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0"
       ],
       "stderr": "",
       "stdout": ""
@@ -594,28 +904,35 @@
           "line": 5,
           "locals": [
             {
-              "name": "x",
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "5"
+                "v": "2"
               }
             }
           ],
-          "name": "check",
+          "name": "get",
           "returnValue": null
         }
       },
       "heap": {},
-      "i": 13,
+      "i": 19,
       "keyframe": false,
       "line": 5,
-      "parentCallId": 3,
-      "prevLine": 13,
+      "parentCallId": 0,
+      "prevLine": 17,
       "removedObjects": [],
       "stack": [
         "f0",
-        "f3",
         "f4"
       ],
       "stderr": "",
@@ -631,27 +948,82 @@
           "line": 6,
           "locals": [
             {
-              "name": "x",
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "5"
+                "v": "2"
               }
             }
           ],
-          "name": "check",
+          "name": "get",
           "returnValue": null
         }
       },
       "heap": {},
-      "i": 14,
+      "i": 20,
       "keyframe": false,
       "line": 6,
       "prevLine": 5,
       "removedObjects": [],
       "stack": [
         "f0",
-        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 4,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "get",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "3"
+          }
+        }
+      },
+      "heap": {},
+      "i": 21,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0",
         "f4"
       ],
       "stderr": "",
@@ -664,104 +1036,80 @@
         "f0": {
           "id": "f0",
           "kind": "function",
-          "line": 21,
+          "line": 16,
           "locals": [
             {
-              "name": "total",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "11"
-              }
-            }
-          ],
-          "name": "main",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 15,
-      "keyframe": false,
-      "line": 21,
-      "prevLine": 20,
-      "removedObjects": [],
-      "stack": [
-        "f0"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "function",
-          "line": 22,
-          "locals": [
-            {
-              "name": "total",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "11"
-              }
-            },
-            {
-              "name": "e",
+              "name": "a",
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "const std::exception &"
-              }
-            }
-          ],
-          "name": "main",
-          "returnValue": null
-        }
-      },
-      "heap": {
-        "o1": {
-          "kind": "opaque",
-          "summary": "<incomplete type>",
-          "type": "std::exception"
-        }
-      },
-      "i": 16,
-      "keyframe": false,
-      "line": 22,
-      "prevLine": 21,
-      "removedObjects": [],
-      "stack": [
-        "f0"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "function",
-          "line": 23,
-          "locals": [
-            {
-              "name": "total",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "-11"
+                "type": "std::vector<int>"
               }
             },
             {
-              "name": "e",
+              "name": "total",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 22,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "a",
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "const std::exception &"
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "total",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
               }
             }
           ],
@@ -770,10 +1118,10 @@
         }
       },
       "heap": {},
-      "i": 17,
+      "i": 23,
       "keyframe": false,
-      "line": 23,
-      "prevLine": 22,
+      "line": 17,
+      "prevLine": 16,
       "removedObjects": [],
       "stack": [
         "f0"
@@ -782,157 +1130,80 @@
       "stdout": ""
     },
     {
+      "callId": 5,
       "error": null,
-      "event": "line",
+      "event": "call",
       "frames": {
-        "f0": {
-          "id": "f0",
+        "f5": {
+          "id": "f5",
           "kind": "function",
-          "line": 24,
+          "line": 5,
           "locals": [
             {
-              "name": "total",
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "const std::vector<int> &"
+              }
+            },
+            {
+              "name": "i",
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "-11"
+                "v": "3"
               }
             }
           ],
-          "name": "main",
+          "name": "get",
           "returnValue": null
         }
       },
       "heap": {},
-      "i": 18,
+      "i": 24,
       "keyframe": false,
-      "line": 24,
-      "prevLine": 23,
-      "removedObjects": [
-        "o1"
-      ],
+      "line": 5,
+      "parentCallId": 0,
+      "prevLine": 17,
+      "removedObjects": [],
       "stack": [
-        "f0"
+        "f0",
+        "f5"
       ],
       "stderr": "",
       "stdout": ""
     },
     {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "function",
-          "line": 25,
-          "locals": [
-            {
-              "name": "total",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "-11"
-              }
-            }
-          ],
-          "name": "main",
-          "returnValue": null
-        }
+      "error": {
+        "line": 5,
+        "message": "Aborted",
+        "type": "SIGABRT"
       },
+      "event": "exception",
+      "frames": {},
       "heap": {},
-      "i": 19,
+      "i": 25,
       "keyframe": false,
-      "line": 25,
-      "prevLine": 24,
+      "line": 5,
+      "prevLine": 5,
       "removedObjects": [],
       "stack": [
-        "f0"
+        "f0",
+        "f5"
       ],
-      "stderr": "",
-      "stdout": "-11\n"
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "function",
-          "line": 26,
-          "locals": [
-            {
-              "name": "total",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "-11"
-              }
-            }
-          ],
-          "name": "main",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 20,
-      "keyframe": false,
-      "line": 26,
-      "prevLine": 25,
-      "removedObjects": [],
-      "stack": [
-        "f0"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "callId": 0,
-      "error": null,
-      "event": "return",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "function",
-          "line": 26,
-          "locals": [
-            {
-              "name": "total",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "-11"
-              }
-            }
-          ],
-          "name": "main",
-          "returnValue": {
-            "t": "int",
-            "type": "int",
-            "v": "0"
-          }
-        }
-      },
-      "heap": {},
-      "i": 21,
-      "keyframe": false,
-      "line": 26,
-      "prevLine": 26,
-      "removedObjects": [],
-      "stack": [
-        "f0"
-      ],
-      "stderr": "",
+      "stderr": "terminate called after throwing an instance of 'std::out_of_range'\n  what():  vector::_M_range_check: __n (which is 3) >= this->size() (which is 3)\n",
       "stdout": ""
     }
   ],
   "summary": {
     "exit": {
-      "code": 0,
-      "kind": "normal",
+      "code": null,
+      "kind": "signal",
       "message": null,
-      "signal": null
+      "signal": "SIGABRT"
     },
-    "stepCount": 22,
+    "stepCount": 26,
     "truncated": false,
     "truncation": null
   },
