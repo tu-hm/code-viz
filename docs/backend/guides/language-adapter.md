@@ -18,12 +18,12 @@ An adapter is everything specific to one language: a manifest, a runner image an
    | `build.safetyFlags` | Optional. Appended to `build.cmd` unless the request sets `options.safetyChecks: false` (D21, §19.6). A language without them rejects `false` with `invalid_request` |
    | `build.env` | Optional. Extra environment for the build, for example `TMPDIR: /work` for g++ |
    | `build.unsupportedModuleExit` | Optional. The exit code that means `unsupported_module` instead |
-   | `trace.cmd`, `trace.env` | The tracer command and its environment. The caller adds `VIZ_MAX_STEPS` |
+   | `trace.cmd`, `trace.env` | The tracer command and its environment. The caller adds `VIZ_MAX_STEPS`, and `VIZ_START_AT_LINES` and `VIZ_CAPTURE_RANGES` when the request sets them |
    | `modules.allow` | Optional. Passed to the build as `VIZ_MODULES_ALLOW`, comma-separated |
 
    Declare `capabilities` honestly; the UI hides what isn't supported (§10.4).
 3. **Build a runner image** that meets the requirements below. Add its `docker build` line to the `runner-images` target in `backend/Makefile`, tagged from the manifest's `image`.
-4. **Write the tracer** to the wire contract in [tracing](../architecture/tracing.md#the-wire-contract). It writes NDJSON to fd 3: `hello` first, full snapshots, `exit` last with the program's outcome. It reads stdin from `/work/stdin` (fd 0 is `/dev/null`), and it honors `VIZ_MAX_STEPS`: one marker step past the limit, then run to the end untraced (D25). Map the language's types to the §9.5 kinds, and use `opaque` for the rest.
+4. **Write the tracer** to the wire contract in [tracing](../architecture/tracing.md#the-wire-contract). It writes NDJSON to fd 3: `hello` first, full snapshots, `exit` last with the program's outcome. It reads stdin from `/work/stdin` (fd 0 is `/dev/null`), and it honors `VIZ_MAX_STEPS`: one marker step past the limit, then run to the end untraced (D25). It sends whole-run `lineHits` with their `lineHitsSource` in `exit` when it can count them; without them the core counts the recorded steps. With `capabilities.startAtLines` or `captureRanges`, it honors `VIZ_START_AT_LINES` and `VIZ_CAPTURE_RANGES` the way [tracing](../architecture/tracing.md#whole-run-data-and-trace-options-be-11) describes. Map the language's types to the §9.5 kinds, and use `opaque` for the rest.
 5. **Add fixtures** in `backend/fixtures/<dir>/<case>/`, where `<dir>` is the adapter's directory name: the source file, plus `stdin` if it reads input. Port the shared Python and C++ programs first; the conformance suite needs at least 30 (§10.4).
 6. **Run `make golden-update`** and read every new `expected.trace.json` step by step against its source. Then run `make check`.
 

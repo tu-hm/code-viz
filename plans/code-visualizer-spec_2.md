@@ -102,6 +102,7 @@
 | v1.10 | 2026-10-24 | **C++ type map and sparse arrays (BE-09, BE-04 §3).** The type map is `adapters/cpp/typemap.json`, not YAML, because GDB's Python has no YAML parser; it names each library template's kind and reader, and the manifest has no `typeMap` key (§10.2, §17). Type names are GDB's, through libstdc++'s type printers, with the safety-check namespaces taken out, so `std::vector<int>` reads the same with checks on or off. Only a readable `const char*` becomes a string. Sets, maps and their unordered forms carry `ordered`, `std::array` and `std::bitset` carry `fixed`, records flatten their base classes, and anything else is `opaque` with GDB's text cut to 200 characters (§10.3). A container read item by item through the pretty printers (`deque`, `list`, sets, maps) records 100 items with its real `length`: at 1,000 a 1,000-entry `map` took 13.5 s per 1,000 steps. An array of scalars longer than 64 (`T[N]`, `std::array`, `std::vector`) is a sparse sequence instead: one memory read per step, diffed in the tracer (S6: 0.1 ms per step at 200,005 ints), sent as a `patch` of its changed cells against the previous step (§10.1, §19.9.1). The core keeps each sparse sequence's cells, rejects a patch it cannot apply, and builds keyframes and delta patches from its own copy. Two §11 limits are new: 10,000 non-default cells per sequence (more keeps a window of the first 1,000) and 100,000 per step (`size_limit`). A 1,000-step DFS over two `int[200005]` stores 32 KB gzipped. Python lists (§19.9.1's last bullet) stay dense; no task owns them yet. |
 | v1.11 | 2026-10-24 | **Output order on fd 1/2.** C++ output sometimes landed one step early: `viz-shim` read a wire line, then drained fd 1/2, and by then GDB had resumed the program and it had printed again. `viz-shim` now counts the bytes waiting on fd 3, drains fd 1/2, and forwards only those bytes, and the C++ tracer resumes the program only once fd 3 is empty (§10.1). |
 | v1.12 | 2026-10-24 | **Friendly errors (BE-10), trace format v1.2.** A step's `error` may carry `kind`, the §19.6 row it matches (`index_out_of_range`, `signed_overflow`, `division_by_zero`, `empty_container`, `recursion_too_deep`), and `values`, what the error involves as far as the tracer can read it; an error without `kind` is shown by its message. Program values in `values` are decimal strings, as in `value.v` (§9.2, §9.7, §19.6). The C++ tracer stops on the check functions themselves (`__ubsan_handle_*` except the vptr cache miss, `__gnu_debug::_Error_formatter::_M_error`, `std::__glibcxx_assert_fail`), so a failed check is one `exception` step on the user's line before the program dies; its `type` is `UBSan` or `libstdc++` and its `message` the check's own words. A `SIGSEGV` within 64 KiB of the stack pointer is `recursion_too_deep`. The Python tracer reads the failing subscript or division from the source (`co_positions` and the AST), and the values from names, constants and integer arithmetic only, so reading them never runs the program's code. The exit stays what the process did: `SIGABRT` after a libstdc++ check, exit code 1 after UBSan. |
+| v1.13 | 2026-10-24 | **Whole-run data and trace options (BE-11).** C++ line hits come from gcov after a normal exit: the tracer reads the program's `.gcno` and `.gcda` itself, solves the arc counts the way gcov does, and gives each line the count of its busiest basic block, because gcov adds up the blocks that inlined library code splits a line into (`vector<int> a(n);` ran once, gcov says 2). Only lines a step can stop at are counted, closing braces excepted. The wire `exit` names its `lineHitsSource` (`counter` or `gcov`); an `exit` without `lineHits` (a crash, a kill, a sanitizer's report) makes the core count the recorded line and call steps, `lineHitsSource: "trace"` (§10.1, §19.9.3). The output after the last step is stored as `tail.txt.gz`, recorded in a `tail` column of `traces` and listed as `trace.tail {sizeBytes, sha256, url}` in `GET /visualizations/{id}`; a trace without steps keeps all its output there (§7.5, §8.3, §19.9.5). `startAtLines` and `captureRanges` reach the tracer as `VIZ_START_AT_LINES` and `VIZ_CAPTURE_RANGES`, and both languages support them (§10.2). A trace started at a line begins with a `line` step at the first listed line to run, with the whole stack; if none runs there are no steps (§5.6). `captureRanges` gives a variable one window, from its lowest start to its highest end, inclusive, when its sequence is too long to record whole: a Python list, tuple or deque over 1,000 items, a C++ array or `vector` past its 1,000-cell window, or a `vector` of non-scalars past 100 items. A range must not end before it starts, and the map is at most 4 KB as JSON (§11, FR-11). |
 
 ---
 
@@ -399,7 +400,7 @@ The divider between the left and right panes can be dragged. Its width is saved 
 └────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Start tracing from line…** (FR-15) skips the early, uninteresting steps. The tracer runs the program at full speed and records nothing until execution first reaches one of the chosen lines.
+**Start tracing from line…** (FR-15) skips the early, uninteresting steps. The tracer runs the program at full speed and records nothing until execution first reaches one of the chosen lines. *v1.13:* the first step is a `line` step at that line, with the whole stack and the output printed so far; hit counts still cover the whole run. If no chosen line runs, the trace has no steps, and its output is in the tail (§19.9.5).
 
 ```text
 ┌─ Start tracing from ──────────────────────────────────────────┐
@@ -667,6 +668,7 @@ erDiagram
     json options
     json header "trace §9.1 minus steps"
     int chunk_count
+    json tail "tail.txt.gz size and sha256"
     varchar storage_prefix "t7 or t90"
     varchar exit_kind
     datetime updated_at "indexed, for the change poller"
@@ -695,7 +697,7 @@ erDiagram
   }
 ```
 
-- **Object keys:** `{t7|t90}/{traceId}/chunk-0000.json.gz`, one chunk per 250 steps. Chunk boundaries line up with keyframes (250 = 5 × 50).
+- **Object keys:** `{t7|t90}/{traceId}/chunk-0000.json.gz`, one chunk per 250 steps. Chunk boundaries line up with keyframes (250 = 5 × 50). `{t7|t90}/{traceId}/tail.txt.gz` holds the output after the last step (§19.9.5), when there is some.
 - **Retention:** new traces go under `t7/` and expire 7 days after they were created. Sharing does a server-side copy to `t90/` (90 days) and updates `storage_prefix`. A nightly cleanup deletes the rows past `expires_at`, then the chunks of the traces it deleted. *v1.7: SeaweedFS only partly supports lifecycle rules, so the cleanup deletes chunks, not the bucket.*
 - **Why a trace and a visualization are separate:** many users (visualizations) can share one trace (single-flight and cache). Ownership, sharing and quotas belong to the visualization, never to the trace.
 
@@ -1132,6 +1134,7 @@ A failed build:
 }
 ```
 
+- `trace.tail` (`sizeBytes`, `sha256`, `url`) lists `tail.txt.gz` when the program printed after the last recorded step: past the step limit, or anything at all in a trace without steps (§19.9.5). It's fetched and checked like a chunk, and its URL expires with theirs.
 - `status` is one of `queued`, `building`, `tracing`, `completed`, `failed` or `canceled`.
 - `failure.kind` is one of `compile_error`, `unsupported_module`, `sandbox_error` or `internal_error`.
 - A runtime error in the user's program **does not** fail the job: the trace is complete, and the error is recorded in it.
@@ -1310,7 +1313,7 @@ The tracer writes NDJSON (one JSON message per line) to **file descriptor 3**. T
 | `hello` | `protocol: 1`, `language`, `runtime`, `adapter` | Must be the first message |
 | `step` | `event`, `line`, `prevLine`, `stack: [Frame]`, `heap: {nativeId: Object}`, `error?` | A **full** snapshot, except that a sparse sequence sent in the previous step may come as a `patch` (below). Object IDs are the adapter's own (Python `id()`, C++ `address:type`). |
 | `out` | `stream: "stdout" \| "stderr"`, `data` | Optional. Only needed if the adapter captures output itself instead of through fd 1/2. |
-| `exit` | `kind`, `code`, `signal`, `message`, `lineHits?` | Must be the last message. `lineHits` (`{"<line>": count}`, the tracer's own counter over the whole run) is copied to `summary.lineHits` with `lineHitsSource: "counter"` (§19.9.3). |
+| `exit` | `kind`, `code`, `signal`, `message`, `lineHits?`, `lineHitsSource?` | Must be the last message. `lineHits` (`{"<line>": count}` over the whole run) and `lineHitsSource` (`counter`, the tracer's own counter, or `gcov`) come together and are copied to `summary` (§19.9.3). Without them the core counts the recorded line and call steps, with `lineHitsSource: "trace"`. |
 | `log` | `level`, `message` | Adapter debug output. Kept in internal logs, never shown to users. |
 
 - **Output belongs to the next step.** Output that arrives between step k−1 and step k, in `out` messages or on fd 1/2 (`viz-shim` forwards everything the program wrote there before the tracer began a wire line ahead of that line; a tracer whose program writes fd 1/2 itself lets it run again only once fd 3 is empty, so later output can't overtake the line), was printed while step k's `prevLine` ran, so it goes to step k. Output after the last step goes to the last step, or to the untraced tail when the trace stopped at the step limit.
@@ -1359,7 +1362,7 @@ rollout: { percent: 100 }
 
 `build.safetyFlags` go after `build.cmd` unless the request sets `options.safetyChecks: false` (§8.2); a manifest without them rejects `false`. `build.env` is added to the build's environment.
 
-The Python manifest is the same apart from the build, a check instead of a compiler (`build.cmd: ["python3", "-I", "/opt/viz/tracer.py", "--check", "main.py"]`, with `build.unsupportedModuleExit: 3` naming the exit code that means `unsupported_module`), `trace.cmd: ["python3", "-s", "-P", "/opt/viz/tracer.py", "main.py"]` with `PYTHONHASHSEED: "0"` in `trace.env` (§7.11.1), `capabilities.pointers: false`, and a `modules.allow` list. The worker passes `modules.allow` to the build as `VIZ_MODULES_ALLOW` (comma-separated) and `options.maxSteps` to the trace as `VIZ_MAX_STEPS`.
+The Python manifest is the same apart from the build, a check instead of a compiler (`build.cmd: ["python3", "-I", "/opt/viz/tracer.py", "--check", "main.py"]`, with `build.unsupportedModuleExit: 3` naming the exit code that means `unsupported_module`), `trace.cmd: ["python3", "-s", "-P", "/opt/viz/tracer.py", "main.py"]` with `PYTHONHASHSEED: "0"` in `trace.env` (§7.11.1), `capabilities.pointers: false`, and a `modules.allow` list. The worker passes `modules.allow` to the build as `VIZ_MODULES_ALLOW` (comma-separated) and `options.maxSteps` to the trace as `VIZ_MAX_STEPS`. When they're set, `options.startAtLines` goes to the trace as `VIZ_START_AT_LINES` (comma-separated) and `options.captureRanges` as `VIZ_CAPTURE_RANGES` (its JSON).
 
 ### 10.3 Type mapping (v1)
 
@@ -1436,7 +1439,8 @@ All of these are configurable per language in the manifest, with global ceilings
 | Memory | 256 MB | 512 MB | `exit.kind = memory_limit` |
 | Build time (C++) | 10 s | 10 s | `compile_error` "Build timed out" |
 | Items recorded per container | 1,000 | 10,000 | `truncated: true`, `length` = real size. The C++ tracer records 100 per container it reads item by item (§7.11.2) |
-| Non-default cells per sparse sequence | 10,000 | — | `truncated: true`; only the cells of `window` (the first 1,000) are kept |
+| Non-default cells per sparse sequence | 10,000 | — | `truncated: true`; only the cells of `window` (the first 1,000, or the variable's `captureRanges` window) are kept |
+| `captureRanges` | 4 KB as JSON | — | `400 invalid_request`. It reaches the tracer as one environment variable (§10.2) |
 | Non-default cells per step message | 100,000 | — | `truncation.reason = size_limit`; bounds the core's copy of sparse sequences |
 | Items drawn before "show more" | 100 | — | UI only |
 | Heap objects per step | 500 | 2,000 | Pointers aren't followed further; `target: null`. A Python reference past the budget becomes `unavailable` with reason `object_limit` |
@@ -2130,6 +2134,8 @@ All additions are optional and backward compatible (§9.7). Older players ignore
 ```
 
 - **C++:** built with `--coverage`. After the program exits, the counts are read from gcov; they're exact when the program exits normally. After a crash, counts come from the recorded steps only, with `lineHitsSource: "trace"`.
+  - *v1.13:* the tracer reads `.gcno` and `.gcda` itself and gives each line its busiest basic block's count; gcov's own line count adds up the blocks that inlined library code splits a line into. Only lines a step can stop at are counted, closing braces excepted, and lines that never ran are left out, as in Python.
+  - *v1.13:* any `exit` without `lineHits` gets the recorded steps' counts: a crash, a sanitizer's report (it exits without writing `.gcda`), a kill at a limit.
 - **Python:** the tracer keeps a cheap line counter running after the step limit (no snapshots) until the program ends.
 
 #### 19.9.4 Input position
@@ -2161,6 +2167,7 @@ All additions are optional and backward compatible (§9.7). Older players ignore
 - **Python:** after the limit, the trace hook is replaced by the line counter only.
 - **Exit:** `summary.exit.kind` is `step_limit` (FR-14). The program's own exit is `untracedTail.exit`; `completed` is false when the tail ended at a limit (time, memory, output) instead of by itself.
 - **Storage:** output printed after the last traced step goes into a final object, `tail.txt.gz`, listed in the trace manifest.
+  - *v1.13:* listed as `trace.tail` with `sizeBytes`, `sha256` and a signed `url` (§8.3), only when there is output. A trace without steps (a start line that never ran, a crash before `main`) keeps all its output there, stdout then stderr, with no `untracedTail`.
 
 #### 19.9.6 Call identity
 

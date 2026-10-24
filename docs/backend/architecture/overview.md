@@ -31,7 +31,7 @@ Dependencies point one way: `transport → app → domain`. `domain` and `tracec
 
 | Package | What it holds | Status |
 |---|---|---|
-| `internal/domain` | Sentinel errors, the language `Manifest` and `ChunkKey`, request limits and checks, the cache key, `viz_` and `trc_` IDs, trace states, and the API's product rules: quota, retention, which traces rerun | Grows with each task |
+| `internal/domain` | Sentinel errors, the language `Manifest`, `ChunkKey` and `TailKey`, request limits and checks, the cache key, `viz_` and `trc_` IDs, trace states, and the API's product rules: quota, retention, which traces rerun | Grows with each task |
 | `internal/tracecore` | Wire stream in, trace out: stable IDs, keyframes and deltas, limits, chunks | Done (BE-04 §2). See [tracing](tracing.md) |
 | `internal/app` | Use cases: create, get and wait, run a trace job | `Worker` runs trace jobs (BE-05); `Build`, the build step, is shared with `vizctl`. `Visualizations` creates, gets and waits, deletes and cleans up (BE-06). See [the worker](#the-worker) and [the API](#the-api) |
 | `internal/ports` | `Sandbox` and its shared test suite `sandboxtest`, `JobQueue`, `MetaStore`, `Events`, `BlobStore` and `Adapters` | All six done. See [sandbox](sandbox.md) |

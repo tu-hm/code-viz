@@ -64,9 +64,10 @@ rec := tracecore.NewRecorder(tracecore.Config{
 	Limits:   tracecore.DefaultLimits,
 	Validate: val.Wire,
 })
+env, err := app.TraceEnv(m, opts) // VIZ_MAX_STEPS, VIZ_START_AT_LINES, VIZ_CAPTURE_RANGES, then trace.env
 exit, err := box.Run(traceCtx, ports.Command{
 	Args:   m.TraceCmd,
-	Env:    append([]string{"VIZ_MAX_STEPS=1000"}, m.TraceEnv...),
+	Env:    env,
 	Stdout: rec.Stdout(), Stderr: rec.Stderr(), Wire: rec.Wire(),
 })
 res, err := rec.Finish(tracecore.Outcome{
@@ -80,7 +81,7 @@ res, err := rec.Finish(tracecore.Outcome{
 3. **Build** under `build.timeoutMs`, if the manifest has a build: `build.cmd`, then `build.safetyFlags` unless `opts.SafetyChecks` is false. A non-zero exit fails the run before anything is traced: `unsupported_module` when the code equals `build.unsupportedModuleExit`, `compile_error` otherwise, with the build output as diagnostics.
 4. **Trace** under the wall-time deadline (15 s by default, §11), with the recorder's three writers. When a writer returns an error, the sandbox kills the box. That's how the core enforces its hard limits.
 5. **Finish**: pass `Run`'s outcome and error in. A kill caused by one of the core's own limits still gives a trace. Any other error (infra, cancel, malformed output) comes back as an error.
-6. **Use the result**: `res.Trace()` is the whole document (what `vizctl` prints), `res.Chunks()` the gzipped chunks to store (chunk `i` goes to `BlobStore.Put` under `domain.ChunkKey("t7", id, i)`, §7.5), `res.Tail` the output after the step limit (`tail.txt.gz`, §19.9.5), and `res.Logs` the adapter's `log` messages, for internal logs only.
+6. **Use the result**: `res.Trace()` is the whole document (what `vizctl` prints), `res.Chunks()` the gzipped chunks to store (chunk `i` goes to `BlobStore.Put` under `domain.ChunkKey("t7", id, i)`, §7.5), `res.Tail` the output no step holds (`res.TailGzip()` gives `tail.txt.gz` and its SHA-256; the worker stores it under `domain.TailKey`, §19.9.5), and `res.Logs` the adapter's `log` messages, for internal logs only.
 
 ### What the caller passes
 
@@ -89,6 +90,8 @@ res, err := rec.Finish(tracecore.Outcome{
 | `VIZ_MODULES_ALLOW` | Caller, on the build | `modules.allow` from the manifest, comma-separated |
 | `TMPDIR` | Manifest `build.env` (C++) | `/work`: g++ writes temp files, and `/tmp` is read-only |
 | `VIZ_MAX_STEPS` | Caller, on the trace | `options.maxSteps` (1,000 by default, 5,000 at most) |
+| `VIZ_START_AT_LINES` | Caller, on the trace, when set | `options.startAtLines`, comma-separated ([Start at a line](#start-at-a-line)) |
+| `VIZ_CAPTURE_RANGES` | Caller, on the trace, when set | `options.captureRanges` as JSON, at most 4 KB ([Capture ranges](#capture-ranges)) |
 | `VIZ_PROTOCOL_FD` | Manifest `trace.env` | `3` |
 | `PYTHONHASHSEED` | Manifest `trace.env` | `0`, so string hashes and set order are the same on every run (§7.12) |
 
@@ -153,7 +156,7 @@ sequenceDiagram
   T->>C: step N (one past maxSteps): marker, dropped
   Note over T: Python: swap the hook for the line counter<br/>C++: delete every breakpoint, continue
   T->>C: out … (untraced tail)
-  T->>C: exit {kind, code, message, lineHits}
+  T->>C: exit {kind, code, message, lineHits, lineHitsSource}
 ```
 
 | Rule | Detail |
@@ -164,7 +167,7 @@ sequenceDiagram
 | Calls | Call steps carry `callId` and `parentCallId` (the next frame out on the stack). Return steps carry `callId` (§19.9.6) |
 | Output | The Python tracer captures stdout and stderr itself and sends `out` messages of at most 16,384 characters (64 KiB as UTF-8). The C++ program writes its own fd 1 and 2. `viz-shim` forwards what it wrote before a wire line ahead of that line, and the tracer doesn't resume the program until `viz-shim` has read the line, so nothing written later overtakes it (§10.1). Output between step k−1 and step k belongs to step k: it was printed while step k's `prevLine` ran. Output after the last step goes to the last step |
 | Step limit | The tracer sends at most `maxSteps + 1` steps. The extra one is a marker that the program went on. The core drops it, records `truncation.step_limit`, and keeps reading `out` and `exit` for the untraced tail. Not a kill (D25) |
-| Line hits | `exit.lineHits` counts every line event in `main.py` over the whole run, untraced tail included. It becomes `summary.lineHits` with `lineHitsSource: "counter"` (§19.9.3). The C++ tracer sends none; C++ counts come from gcov (BE-11) |
+| Line hits | `exit.lineHits` and `exit.lineHitsSource` come together and become `summary.lineHits` and `summary.lineHitsSource` (§19.9.3). Python counts every line event in `main.py` over the whole run (`counter`); C++ reads gcov after a normal exit (`gcov`, [Line hits](#line-hits-from-gcov)). An `exit` without them gets the recorded steps' counts: every `line` and `call` step, `lineHitsSource: "trace"` |
 | Exceptions | Python: one `exception` step where the exception is raised in `main.py` (`line` is the raising line), not one per frame it unwinds through. Uncaught: `exit {kind: "exception", code: 1, message: "IndexError: …"}`. `SystemExit(n)`: `exit {kind: "normal", code: n}`. C++: a signal or a failed safety check gives one `exception` step with `error {type: "SIGSEGV", message, line}`, then the program's real exit. A caught C++ exception makes no step; an uncaught one ends in `abort()` and shows as `SIGABRT`. An error may carry `kind` and `values` ([Friendly errors](#friendly-errors-196)) |
 
 ## Friendly errors (§19.6)
@@ -182,6 +185,44 @@ From trace format v1.2 an error step's `error` may carry `kind`, the §19.6 mess
 - **`name`** is how the program names the container. In C++ it's the local, parameter (a reference is followed) or global whose address and type match the container's, so `s.v[2]` gets none: a struct and its first member share an address. In Python it's the subscripted expression's text, from `ast.unparse`, so `grid[r][c]` gives `grid[r]`.
 - **No source text in C++.** `a[i]` isn't known: UBSan reports a column that points at the operator or the `]`, and libstdc++ reports none.
 
+## Whole-run data and trace options (BE-11)
+
+### Line hits from gcov
+
+`summary.lineHits` is how often each line ran over the whole run, untraced tail included (§19.9.3). Python's tracer counts line events itself. C++ is built with `--coverage`, so at a normal exit the program's libgcov writes `main-main.gcda` next to the build's `main-main.gcno` (`g++ -o main main.cpp` names them `<output>-<source>`). The tracer reads both after the exit:
+
+- **Counts per block, not gcov's line count.** `.gcda` has a counter for each arc off GCC's spanning tree; the tracer solves the rest by flow conservation, as gcov does, and gets every basic block's count. A line's count is its busiest block's, summed over the functions it's in (a lambda on the line of its caller). gcov's own line count adds up the blocks a line is split into, and inlined library code (`std::allocator`'s constructor in `vector<int> a(n);`) splits lines that ran once into two. With the busiest block, the §19.3 mock's binary search gets the mock's numbers (`line-hits`).
+- **Only lines a step can stop at**, closing braces excepted: GCC puts an epilogue's block on the `}` in some functions only. A function's header line and compiler-generated functions (`.gcno` marks them artificial: implicit constructors, a lambda's destructor) don't count. Lines that never ran are left out, as in Python.
+- **No `.gcda`, no hits.** A signal, `_exit()` and a sanitizer's report exit without writing it, and a kill at a limit never reaches the exit. The `exit` then has no `lineHits`, and the core counts the recorded `line` and `call` steps instead, `lineHitsSource: "trace"`.
+- One implicit loop still shows: a `std::initializer_list` of non-trivial elements is destroyed in a loop on its line, so `map<string, int> d = {{"k", 1}};` shows 2.
+
+### Start at a line
+
+With `options.startAtLines` (§5.6, FR-15), the tracer runs the program untraced until the first time any listed line runs:
+
+- **Python** installs `wait_call` and `wait_line`, which only count lines and keep the recursion depth, like the hooks after the step limit. When a listed line's `line` event comes, `begin` gives every `main.py` frame on the stack a call id, outermost first, sets their `f_trace`, and installs the full hooks.
+- **C++** breaks only on the listed lines' rows, instead of `main`'s first one. At the first stop, `joined` makes a call record for each user frame on the stack and arms the innermost one's return, then puts in every breakpoint, as the first stop in `main` would.
+- **The first step** is a `line` step at that line, with the whole stack and `prevLine: null`. The output printed before it lands on it. A frame already running gets its later steps as usual; on aarch64 a struct it returns in memory shows as `unavailable` (`unknown_return`), since `x8` no longer holds the result's address.
+- **A line that never runs** gives a trace with no steps. Its exit is the program's, and its output goes to the tail.
+- The step limit counts from the first step; line hits still cover the whole run.
+
+### Capture ranges
+
+`options.captureRanges` (FR-11) maps a variable name to index ranges, each `[first, last]`. The tracer records one window per name, from the lowest first to the highest last, for a sequence too long to record whole; a shorter one stays whole. The name matches a local, a parameter or, in C++, a global:
+
+| Sequence | Recorded by default | With a range |
+|---|---|---|
+| Python `list`, `tuple`, `deque` over 1,000 items | The first 1,000, `window {start: 0}` | Up to 1,000 from the range's start |
+| C++ array, `std::array`, `vector` of scalars past one whole read (4 MB, or 16 MB per step) or over 10,000 non-default cells | The first 1,000 cells, sparse | Up to 1,000 cells from the range's start: one memory read of the window |
+| C++ `vector` or array of non-scalars over 100 items | The first 100 | Up to 100 from the range's start |
+| Containers read through the printers (`map`, `set`, `deque`, `list` …) | The first 100 | Unchanged |
+
+The core keeps an adapter's window as it is. Re-running with ranges gives the same steps as the run without them: Python seeds `random` and `PYTHONHASHSEED`, glibc's `rand()` needs no seed and ASLR is off (§7.12). `TestCaptureRangesKeepTheSteps` runs each fixture that has ranges without them and compares every step's event, line and output with the golden.
+
+### The tail object
+
+`tail.txt.gz` is the output no step holds: what the program printed after the step limit, or all of it in a trace without steps. The worker gzips it with `Result.TailGzip`, stores it under `{t7|t90}/{traceId}/tail.txt.gz` as `text/plain; charset=utf-8`, and records its size and the SHA-256 of the text in the `traces.tail` column. `GET /visualizations/{id}` lists it as `trace.tail` with a signed URL, and the nightly cleanup deletes it with the chunks. There is no tail object when there is no such output.
+
 ## Inside the Python tracer
 
 `tracer.py` is flat functions over module-level state. It sees the program through three hooks: `sys.settrace` and `threading.settrace` for events, and a short-lived `sys.setprofile` for recovering from the recursion limit.
@@ -194,7 +235,7 @@ It is typed and passes pyright in strict mode (`make typecheck`). Every message 
 - **A call step lands on the first body line.** settrace reports a call at the `def` line, so the frame waits in `pending` and becomes a `call` step at its first `line` event (§7.11.1).
 - **Step 0 is the module's call step**, at line 1 with `callId` 0. The program ends with the module's `return` step, so output from the last line has a step to land on.
 - **Return steps carry the value**, except while a frame is unwinding from an exception. 3.12 sends no exception event when `finally` or `with` re-raises, so the tracer reads the opcode at `f_lasti`. A return opcode means a real return.
-- **Values follow §10.3**: `int`, `float`, `bool`, `str` (1,000 characters, then `len` and `truncated`) and `None` inline. `list` and `deque` become `sequence`, and `tuple` a `fixed` sequence. `set` and `frozenset` become `set`; `dict` and its subclasses, `mapping`. An instance of a class from `main.py` becomes a `record`, from `__dict__` and `__slots__`. Functions, lambdas and methods become `function` with a signature, and classes `class`. Everything else is `opaque`, with `repr()` cut to 200 characters. Containers record at most 1,000 items, with the real `length`.
+- **Values follow §10.3**: `int`, `float`, `bool`, `str` (1,000 characters, then `len` and `truncated`) and `None` inline. `list` and `deque` become `sequence`, and `tuple` a `fixed` sequence. `set` and `frozenset` become `set`; `dict` and its subclasses, `mapping`. An instance of a class from `main.py` becomes a `record`, from `__dict__` and `__slots__`. Functions, lambdas and methods become `function` with a signature, and classes `class`. Everything else is `opaque`, with `repr()` cut to 200 characters. Containers record at most 1,000 items, with the real `length`; a longer `list`, `tuple` or `deque` gets a `window`, which [Capture ranges](#capture-ranges) can move.
 - **`internal`** marks module-level `__` names, imported modules, imported functions and comprehension iterators (`.0`).
 - **`stdinPos`** is exact: `StringIO.tell()` converted to a UTF-8 byte offset, plus the number of whitespace-separated tokens fully consumed (§19.9.4).
 - **The stack is capped** at the module frame plus the 100 innermost frames, the same cap the core applies (§11). Without it, a recursion 1,000 deep sent about 127 KB per step.
@@ -341,7 +382,7 @@ With the safety checks on (D21), a failed check reports and then ends the progra
 
 ### After the step limit
 
-The tracer reads `VIZ_MAX_STEPS` (1,000 if it's unset). Once it has sent the marker step, `maxSteps + 1`, it deletes every breakpoint, rows and finish, and runs `continue`. The program runs at full speed to its real exit with no steps after the marker. Its output goes to the untraced tail, and the `exit` message carries its real outcome. A one-line loop over 1,000 iterations gets there too: each iteration is a step. The wall-time deadline still holds: the sandbox kills the box, and the core records `untracedTail.completed: false` with exit `timeout`. There's no line counter; C++ line hits come from gcov (BE-11).
+The tracer reads `VIZ_MAX_STEPS` (1,000 if it's unset). Once it has sent the marker step, `maxSteps + 1`, it deletes every breakpoint, rows and finish, and runs `continue`. The program runs at full speed to its real exit with no steps after the marker. Its output goes to the untraced tail, and the `exit` message carries its real outcome. A one-line loop over 1,000 iterations gets there too: each iteration is a step. The wall-time deadline still holds: the sandbox kills the box, and the core records `untracedTail.completed: false` with exit `timeout`. There's no line counter: line hits come from gcov ([Line hits from gcov](#line-hits-from-gcov)).
 
 ### Stdin, output and determinism (§7.12)
 
@@ -361,7 +402,7 @@ An exception in the tracer's own code sends `log` (level `error`) and `exit {kin
 - A frame an exception unwinds through can show one step at a cleanup's line before it disappears.
 - On aarch64, GCC's debug info for a named return value (an NRVO local) can show garbage.
 - The `__for_*` internals show stale values on the `for` line. They're hidden by default.
-- Containers read through the pretty printers, and arrays of non-scalars, keep 100 items.
+- Containers read through the pretty printers, and arrays of non-scalars, keep 100 items. `captureRanges` moves the window of arrays and `vector`s only.
 - A `vector` that changes length or capacity is sent whole on that step, all its non-default cells included.
 - A step that changes most of a 200,005-int array (a `sort`) costs about 6 ms to diff, against 0.1 ms for a few cells.
 - A safety check that fails after the step limit, or before `main`, gives no error step: only the exit and the report on stderr. So does a failed vptr check.
@@ -418,16 +459,16 @@ Malformed input fails the run with `ErrMalformed`. That covers a schema failure,
 | Wall time | 15 s | The caller's context deadline; the sandbox kills | Yes | `truncation time_limit` unless the step limit came first, `exit.kind = timeout` |
 | Memory | 256 MB | The sandbox | Yes | `exit.kind = memory_limit` |
 | Heap objects, frames, strings, items | 500 / 100 / 1,000 / 1,000 | Per step, in the transform | No | Cut in place (above) |
-| Non-default cells per sparse sequence | 10,000 | The stored object | No | `truncated`, the first 1,000 cells' window |
+| Non-default cells per sparse sequence | 10,000 | The stored object | No | `truncated`, the adapter's window, or the first 1,000 cells |
 | Non-default cells per step message | 100,000 | Applying the step's sparse forms and patches; bounds the core's copy | Yes | `truncation size_limit`, `exit.kind = step_limit` |
 
 ### Finishing
 
 `Finish(outcome, runErr)` decides `summary.exit` in this order: an output-limit kill, a size-limit kill, the tracer's own `exit` message, a time limit, a memory limit, a signal (Linux names, because the sandbox is Linux even when `vizctl` runs on macOS), and otherwise `internal_error` with the box's exit code. A tracer that dies without `exit` and without hitting a limit is therefore an internal error, not the user's fault.
 
-After the step limit, `untracedTail.completed` is true when the tail ended by itself (normal, exception or signal), and false when a limit cut it. `stdoutBytes` counts stdout only. `Result.Tail` keeps stdout and stderr in arrival order.
+After the step limit, `untracedTail.completed` is true when the tail ended by itself (normal, exception or signal), and false when a limit cut it. `stdoutBytes` counts stdout only. `Result.Tail` keeps stdout and stderr in arrival order. A trace without steps has no `untracedTail`, and `Result.Tail` holds all its output, stdout then stderr. An `exit` without `lineHits` gets the recorded steps' counts ([Line hits from gcov](#line-hits-from-gcov)).
 
-`Chunks()` cuts the steps into chunks of 250. 250 is a multiple of the keyframe interval, so every chunk starts on a keyframe and the player can open any chunk alone. Each chunk is a gzipped JSON array of steps with its SHA-256. The version is `1.1`: v1 plus the §19.9 fields.
+`Chunks()` cuts the steps into chunks of 250. 250 is a multiple of the keyframe interval, so every chunk starts on a keyframe and the player can open any chunk alone. Each chunk is a gzipped JSON array of steps with its SHA-256. The version is `1.2`: v1 plus the §19.9 fields (1.1) and the §19.6 error fields (1.2).
 
 ## Trust boundary
 
@@ -447,12 +488,11 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | G2: keep `settrace` or move to `sys.monitoring` | Gate on Fri 13 Nov; S2 recommends `sys.monitoring` |
 | Sparse Python lists (§19.9.1's last bullet); Python lists stay dense, cut at 1,000 items | No task yet |
 | `target` and `index` for a pointer into a `vector`'s buffer | No task yet |
-| C++ line hits from gcov (the C++ `exit` has no `lineHits`) | BE-11 §1 |
 | Offering C++ through the API: the manifest stays `enabled: false` | A separate decision |
-| Storing `Result.Tail` as `tail.txt.gz` and listing it in the trace manifest (the worker stores chunks and header only) | BE-11 §2 |
 | Signing the runner image | BE-03 §3, needs the registry (BE-13) |
 | A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | No task yet |
-| `startAtLines` and `captureRanges` in the tracer (both `false` in the manifest) | BE-11 |
+| Exact access hints (`access[]`) from the tracers, only if FE spike S8's tree-sitter inference misses 95% | BE-11 §5 |
+| `captureRanges` for containers read through the printers, and by position in a `map` or `set` | No task yet |
 | A test that fake fd-3 messages from user code end as `internal_error` | BE-02 §5 |
 | `sys.stdin.buffer`, `open(0)` and `sys.stdout.buffer` (fd 0 is `/dev/null`; the writers are text only) | Not planned |
 | The C++ tracer under `make typecheck`, checked as Python 3.11 (GDB 14 embeds `libpython3.11`) with typeshed's `gdb` stubs | After BE-09's changes to `trace.py` land |
