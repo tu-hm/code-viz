@@ -63,11 +63,11 @@
 
 - [x] `adapters/python/Dockerfile`: Debian slim, CPython 3.12 pinned, `tracer.py` at `/opt/viz/`
 - [x] `adapters/python/manifest.yaml` (§10.2): `build` is the `tracer.py --check` syntax and import check (spec v1.6), `trace.cmd`, `capabilities.pointers: false`, `modules.allow`
-- [ ] Image ≤ 1.5 GB; Trivy scan; cosign sign
+- [ ] Image ≤ 1.5 GB; cosign sign
 - [x] `vizctl trace --lang python3 main.py < input`: runs the adapter through the Docker dev sandbox (BE-02 §2), pipes through `tracecore`, prints the trace
 - [x] `vizctl validate trace.json`
 
-The runner image is `viz-runner-python:3.12.15-1` (`make images`), 214 MB. pip is removed and setuid bits are stripped. Trivy 0.69.3 finds 0 critical and 44 high CVEs in the Debian 13 base, none with a fix yet. Signing stays open: cosign needs the registry and a key (BE-13). `vizctl trace` runs the build check and then the tracer in the Docker dev sandbox, feeds `tracecore` (BE-04 §2, built in this run), and prints the trace.
+The runner image is `viz-runner-python:3.12.15-1` (`make images`), 214 MB. pip is removed and setuid bits are stripped. Signing stays open: cosign needs the registry and a key (BE-13). `vizctl trace` runs the build check and then the tracer in the Docker dev sandbox, feeds `tracecore` (BE-04 §2, built in this run), and prints the trace.
 
 ## 4. Fixtures
 

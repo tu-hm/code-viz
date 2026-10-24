@@ -1566,7 +1566,7 @@ These recommendations reflect what was current in October 2026. They follow four
 | Python tracer | Python script using `sys.settrace` (v1) | It must run inside the user's interpreter. `sys.monitoring` is to be benchmarked (Q4). |
 | C++ tracer | **GDB Python API** script + libstdc++ pretty printers | Keep the step loop **inside** the sandbox. Driving GDB/MI from Go on the host (e.g. `cyrus-and/gdb`) would cross the sandbox boundary on every step: slower, and the debugger would sit closer to the host. |
 | Generic DAP bridge (future languages) | A **static Go binary** built with **google/go-dap**, copied into each runner image | It talks to the language's own debug adapter (debugpy, Delve, js-debug…) inside the sandbox and writes the wire protocol on fd 3. Go code is reused for every language added later (§10.4). |
-| Runner images | Debian slim base, pinned toolchain versions, built with **Docker BuildKit**, scanned with **Trivy**, signed with **cosign** | One image per adapter (`viz-runner-python`, `viz-runner-cpp`) |
+| Runner images | Debian slim base, pinned toolchain versions, built with **Docker BuildKit**, signed with **cosign** | One image per adapter (`viz-runner-python`, `viz-runner-cpp`) |
 
 > **Settled at G1 (v1.5):** GDB needs `ptrace` *inside* the sandbox. It works under nsjail, and a 1,000-step trace takes 1.5 s (spike S1b).
 

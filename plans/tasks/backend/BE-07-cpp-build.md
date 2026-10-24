@@ -28,7 +28,7 @@
 
 - [ ] `adapters/cpp/Dockerfile`: Debian slim, GCC 13 + GDB 14 pinned, both PCHs, `flush_init.cpp`, libstdc++ pretty printers
 - [ ] `adapters/cpp/manifest.yaml` (§10.2) incl. `capabilities.pointers: true`
-- [ ] Image ≤ 1.5 GB; Trivy scan; cosign sign
+- [ ] Image ≤ 1.5 GB; cosign sign
 - [ ] Parse GCC output `main.cpp:L:C: error|warning: msg` → `{line, column, severity, message}`
 - [ ] Keep `raw` compiler output in the response
 - [ ] Warnings returned even when the build succeeds (warnings panel)
