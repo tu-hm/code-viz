@@ -79,6 +79,7 @@ The [testing cheat sheet](../docs/backend/conventions/testing-cheat-sheet.md) ap
 Code that looks right and isn't. When you hit a new one, add it here in the same commit: symptom, cause, fix.
 
 - **A worker's `error` event doesn't mean the worker is dead.** It fires when the script fails to load, and the worker then never replies. It also fires for an uncaught error inside a running worker, which keeps serving. Through Comlink, a throw inside an exposed function rejects the call, but a worker that failed to load leaves every call pending. Clear loading state on every path, and treat only a worker that has never replied as dead.
+- **React Compiler fails the build on a default in a destructured parameter.** `function Button({ asChild = false })` stops `pnpm build` with `Todo: (BuildHIR::lowerAssignment)`, but only once the app imports the component. Drop the default (`undefined` is falsy) or set it in the body.
 - **A disabled button never opens its Radix tooltip.** Browsers send no pointer events to a disabled control, so `TooltipTrigger asChild` around `<Button disabled>` stays silent in exactly the state it should explain, such as Prev on the first step. Make a `<span className="inline-flex">` the trigger and put the button inside it.
 
 ## Before you hand back
