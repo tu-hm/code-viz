@@ -36,10 +36,11 @@ Go comes from the version in `backend/go.mod`. Any Go 1.21 or newer downloads it
 
 The local stack (MySQL 8.4 and SeaweedFS in Docker), `make dev`, and fixes for common problems are in [backend/README.md](backend/README.md).
 
-The web app needs Node 24 and pnpm 12. `make gen` needs them too, because it regenerates the TypeScript types, and `make typecheck` (part of `make check`) needs Node 24 for pyright:
+The web app needs Node 24 and pnpm 12. `make gen` needs them too, because it regenerates the TypeScript types, and `make typecheck` (part of `make check`) needs Node 24 for pyright. The web setup script checks them:
 
 ```bash
 cd web
+scripts/setup.sh
 pnpm install
 pnpm dev
 ```

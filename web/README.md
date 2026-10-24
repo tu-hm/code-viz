@@ -9,17 +9,18 @@ apps/ide/          IDE app: Vite 8, React 19.3 with React Compiler, Tailwind v4
 packages/player/   @viz/player: trace types (generated), loader, engine in a Web Worker, the player shell and controls
 packages/ui/       @viz/ui: design tokens, Tailwind theme, fonts, primitives such as Button
 fixtures/          @viz/fixtures: traces in the API's shape (header + chunks), their loader and a synthetic generator
-scripts/           codegen
+scripts/           setup check, codegen
 ```
 
 Packages export their TypeScript source directly. Nothing but `apps/ide` has a build step.
 
 ## Getting started
 
-You need Node 24 and pnpm 12 (`corepack enable`, or `brew install pnpm`).
+You need Node 24, pnpm 12 and git. The setup script checks each one, and that dependencies are installed, and prints what to run for anything missing:
 
 ```bash
 cd web
+scripts/setup.sh
 pnpm install
 pnpm dev        # http://localhost:5173 with the API mocked in the browser
 ```

@@ -9,6 +9,7 @@ The root [AGENTS.md](../AGENTS.md) applies here too: how to work, the S rules (n
 Run from `web/`.
 
 ```bash
+scripts/setup.sh                                # checks Node, pnpm, git and installed dependencies
 pnpm check                                      # before pushing: gen drift, lint, typecheck, test, build; CI runs it
 pnpm fmt                                        # Prettier, then ESLint --fix
 pnpm exec vitest run <file>                     # one test file
