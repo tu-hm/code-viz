@@ -1,0 +1,1403 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.2.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 16
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "t": "uninit",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 8,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "meta": {
+            "summary": "std::__debug::vector of length 3, capacity 3"
+          },
+          "type": "std::__debug::vector<int, std::allocator<int> >"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 9,
+      "parentCallId": 0,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "false"
+          }
+        }
+      },
+      "heap": {},
+      "i": 3,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 4,
+      "keyframe": false,
+      "line": 9,
+      "parentCallId": 0,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "false"
+          }
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 3,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 9,
+      "parentCallId": 0,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f3"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 3,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "false"
+          }
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f3"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 4,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 9,
+      "parentCallId": 0,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f4"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 4,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "false"
+          }
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f4"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 5,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f5": {
+          "id": "f5",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 9,
+      "parentCallId": 0,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f5"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 5,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f5": {
+          "id": "f5",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "true"
+          }
+        }
+      },
+      "heap": {},
+      "i": 11,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f5"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 6,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f6": {
+          "id": "f6",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "meta": {
+            "summary": "std::__debug::vector of length 3, capacity 3"
+          },
+          "type": "std::__debug::vector<int, std::allocator<int> >"
+        }
+      },
+      "i": 12,
+      "keyframe": false,
+      "line": 9,
+      "parentCallId": 0,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f6"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 6,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f6": {
+          "id": "f6",
+          "kind": "lambda",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "false"
+          }
+        }
+      },
+      "heap": {},
+      "i": 13,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f6"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 10,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            },
+            {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "meta": {
+            "summary": "std::__debug::vector of length 3, capacity 3"
+          },
+          "type": "std::__debug::vector<int, std::allocator<int> >"
+        }
+      },
+      "i": 14,
+      "keyframe": false,
+      "line": 10,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 15,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 10,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 7,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f7": {
+          "id": "f7",
+          "kind": "function",
+          "line": 4,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int &",
+                "v": "1"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "const int &",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "chmax<int>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 16,
+      "keyframe": false,
+      "line": 4,
+      "parentCallId": 0,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f7"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 7,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        },
+        "f7": {
+          "id": "f7",
+          "kind": "function",
+          "line": 4,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int &",
+                "v": "3"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "const int &",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "chmax<int>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "true"
+          }
+        }
+      },
+      "heap": {},
+      "i": 17,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f7"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 18,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 8,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f8": {
+          "id": "f8",
+          "kind": "function",
+          "line": 4,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int &",
+                "v": "3"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "const int &",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "chmax<int>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 19,
+      "keyframe": false,
+      "line": 4,
+      "parentCallId": 0,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f8"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 8,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f8": {
+          "id": "f8",
+          "kind": "function",
+          "line": 4,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "int &",
+                "v": "3"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "const int &",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "chmax<int>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "false"
+          }
+        }
+      },
+      "heap": {},
+      "i": 20,
+      "keyframe": false,
+      "line": 4,
+      "prevLine": 4,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f8"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 21,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 9,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f9": {
+          "id": "f9",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "x",
+              "value": {
+                "t": "int",
+                "type": "int &",
+                "v": "3"
+              }
+            },
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "10"
+              }
+            }
+          ],
+          "name": "add",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 22,
+      "keyframe": false,
+      "line": 5,
+      "parentCallId": 0,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f9"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 9,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "13"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        },
+        "f9": {
+          "id": "f9",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "x",
+              "value": {
+                "t": "int",
+                "type": "int &",
+                "v": "13"
+              }
+            },
+            {
+              "name": "v",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "10"
+              }
+            }
+          ],
+          "name": "add",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 23,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f9"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "13"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 24,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "13"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 25,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "13\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "13"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 26,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "best",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "13"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 27,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 28,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

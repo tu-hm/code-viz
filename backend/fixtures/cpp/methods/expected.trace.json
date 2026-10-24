@@ -1,0 +1,790 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.2.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 25
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 15,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "uninit",
+                "type": "Counter *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 1,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "method",
+          "line": 5,
+          "locals": [
+            {
+              "name": "this",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Counter * const"
+              }
+            },
+            {
+              "name": "start",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "5"
+              }
+            }
+          ],
+          "name": "Counter::Counter",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Counter"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 5,
+      "parentCallId": 0,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "5"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Counter"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 18,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Counter *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 4,
+      "keyframe": false,
+      "line": 18,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "method",
+          "line": 7,
+          "locals": [
+            {
+              "name": "this",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Counter * const"
+              }
+            },
+            {
+              "name": "by",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "Counter::bump",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 7,
+      "parentCallId": 0,
+      "prevLine": 18,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "method",
+          "line": 8,
+          "locals": [
+            {
+              "name": "this",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Counter * const"
+              }
+            },
+            {
+              "name": "by",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "name": "Counter::bump",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Counter"
+        }
+      },
+      "i": 6,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 2,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 20,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Counter *"
+              }
+            },
+            {
+              "name": "twice",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "struct {...}"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "fields": [],
+          "kind": "record",
+          "type": "struct {...}"
+        }
+      },
+      "i": 8,
+      "keyframe": false,
+      "line": 20,
+      "prevLine": 18,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 3,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "lambda",
+          "line": 19,
+          "locals": [
+            {
+              "name": "x",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 19,
+      "parentCallId": 0,
+      "prevLine": 20,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f3"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 3,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f3": {
+          "id": "f3",
+          "kind": "lambda",
+          "line": 19,
+          "locals": [
+            {
+              "name": "x",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "14"
+          }
+        }
+      },
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 19,
+      "prevLine": 19,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f3"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 21,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "14"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Counter *"
+              }
+            },
+            {
+              "name": "twice",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "struct {...}"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 11,
+      "keyframe": false,
+      "line": 21,
+      "prevLine": 20,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 4,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "method",
+          "line": 10,
+          "locals": [
+            {
+              "name": "this",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Counter * const"
+              }
+            }
+          ],
+          "name": "Counter::~Counter",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 12,
+      "keyframe": false,
+      "line": 10,
+      "parentCallId": 0,
+      "prevLine": 21,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f4"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "method",
+          "line": 11,
+          "locals": [
+            {
+              "name": "this",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Counter * const"
+              }
+            }
+          ],
+          "name": "Counter::~Counter",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 13,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 10,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f4"
+      ],
+      "stderr": "",
+      "stdout": "bye 7\n"
+    },
+    {
+      "callId": 4,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {},
+      "i": 14,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f4"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 23,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "14"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 15,
+      "keyframe": false,
+      "line": 23,
+      "prevLine": 21,
+      "removedObjects": [
+        "o1",
+        "o2"
+      ],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 24,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "14"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 16,
+      "keyframe": false,
+      "line": 24,
+      "prevLine": 23,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "14\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 25,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "14"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 17,
+      "keyframe": false,
+      "line": 25,
+      "prevLine": 24,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 25,
+          "locals": [
+            {
+              "name": "r",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "14"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 18,
+      "keyframe": false,
+      "line": 25,
+      "prevLine": 25,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 19,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

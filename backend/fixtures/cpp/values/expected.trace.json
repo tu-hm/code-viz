@@ -1,0 +1,1393 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.2.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 28
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "uninit",
+                "type": "float"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 17,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 18,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "uninit",
+                "type": "double"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 1,
+      "keyframe": false,
+      "line": 18,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 19,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "uninit",
+                "type": "char"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 19,
+      "prevLine": 18,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 20,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "uninit",
+                "type": "Color"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 3,
+      "keyframe": false,
+      "line": 20,
+      "prevLine": 19,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 21,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "uninit",
+                "type": "bool"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 4,
+      "keyframe": false,
+      "line": 21,
+      "prevLine": 20,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 22,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            },
+            {
+              "name": "big",
+              "value": {
+                "t": "uninit",
+                "type": "__int128"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 22,
+      "prevLine": 21,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 23,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            },
+            {
+              "name": "big",
+              "value": {
+                "t": "int",
+                "type": "__int128",
+                "v": "1267650600228229401496703205376"
+              }
+            },
+            {
+              "name": "word",
+              "value": {
+                "t": "uninit",
+                "type": "std::string"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 23,
+      "prevLine": 22,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 24,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            },
+            {
+              "name": "big",
+              "value": {
+                "t": "int",
+                "type": "__int128",
+                "v": "1267650600228229401496703205376"
+              }
+            },
+            {
+              "name": "word",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "text",
+              "value": {
+                "t": "uninit",
+                "type": "std::string"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 24,
+      "prevLine": 23,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 25,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            },
+            {
+              "name": "big",
+              "value": {
+                "t": "int",
+                "type": "__int128",
+                "v": "1267650600228229401496703205376"
+              }
+            },
+            {
+              "name": "word",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "text",
+              "value": {
+                "len": 1500,
+                "t": "str",
+                "truncated": true,
+                "type": "std::string",
+                "v": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "uninit",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 25,
+      "prevLine": 24,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "const std::string &",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "k",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "uninit",
+                "type": "long long"
+              }
+            }
+          ],
+          "name": "make",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 11,
+      "parentCallId": 0,
+      "prevLine": 25,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "const std::string &",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "k",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "8"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "t": "uninit",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "make",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "const std::string &",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "k",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "8"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "make",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "7"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "8"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "14"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Big"
+        }
+      },
+      "i": 11,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "const std::string &",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "k",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "8"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "make",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 12,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "const std::string &",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "k",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "8"
+              }
+            },
+            {
+              "name": "r",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "make",
+          "returnValue": {
+            "id": "o2",
+            "t": "ref",
+            "type": "Big"
+          }
+        }
+      },
+      "heap": {
+        "o2": {
+          "fields": [
+            {
+              "name": "a",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "7"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "8"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "int",
+                "type": "long long",
+                "v": "14"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Big"
+        }
+      },
+      "i": 13,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 26,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            },
+            {
+              "name": "big",
+              "value": {
+                "t": "int",
+                "type": "__int128",
+                "v": "1267650600228229401496703205376"
+              }
+            },
+            {
+              "name": "word",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "text",
+              "value": {
+                "len": 1500,
+                "t": "str",
+                "truncated": true,
+                "type": "std::string",
+                "v": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 14,
+      "keyframe": false,
+      "line": 26,
+      "prevLine": 25,
+      "removedObjects": [
+        "o2"
+      ],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 27,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            },
+            {
+              "name": "big",
+              "value": {
+                "t": "int",
+                "type": "__int128",
+                "v": "1267650600228229401496703205376"
+              }
+            },
+            {
+              "name": "word",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "text",
+              "value": {
+                "len": 1500,
+                "t": "str",
+                "truncated": true,
+                "type": "std::string",
+                "v": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 15,
+      "keyframe": false,
+      "line": 27,
+      "prevLine": 26,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "Nguyễn 29 10241x21500\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 28,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            },
+            {
+              "name": "big",
+              "value": {
+                "t": "int",
+                "type": "__int128",
+                "v": "1267650600228229401496703205376"
+              }
+            },
+            {
+              "name": "word",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "text",
+              "value": {
+                "len": 1500,
+                "t": "str",
+                "truncated": true,
+                "type": "std::string",
+                "v": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 16,
+      "keyframe": false,
+      "line": 28,
+      "prevLine": 27,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 28,
+          "locals": [
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "0.1"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "code": 120,
+                "t": "char",
+                "type": "char",
+                "v": "x"
+              }
+            },
+            {
+              "name": "color",
+              "value": {
+                "t": "int",
+                "type": "Color",
+                "v": "BLUE"
+              }
+            },
+            {
+              "name": "ok",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            },
+            {
+              "name": "big",
+              "value": {
+                "t": "int",
+                "type": "__int128",
+                "v": "1267650600228229401496703205376"
+              }
+            },
+            {
+              "name": "word",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "Nguyễn"
+              }
+            },
+            {
+              "name": "text",
+              "value": {
+                "len": 1500,
+                "t": "str",
+                "truncated": true,
+                "type": "std::string",
+                "v": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+              }
+            },
+            {
+              "name": "b",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Big"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 17,
+      "keyframe": false,
+      "line": 28,
+      "prevLine": 28,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 18,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

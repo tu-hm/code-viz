@@ -1,0 +1,788 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.2.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 18
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 10,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "t": "uninit",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 10,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [],
+          "kind": "sequence",
+          "length": 0,
+          "meta": {
+            "summary": "std::__debug::vector of length 0, capacity 0"
+          },
+          "type": "std::__debug::vector<Item, std::allocator<Item> >"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 10,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "id": "o2",
+              "t": "ref",
+              "type": "Item"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "meta": {
+            "summary": "std::__debug::vector of length 1, capacity 1"
+          },
+          "type": "std::__debug::vector<Item, std::allocator<Item> >"
+        },
+        "o2": {
+          "fields": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "pen"
+              }
+            },
+            {
+              "name": "weight",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Item"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "t": "uninit",
+                "type": "Item"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "items": [
+            {
+              "id": "o3",
+              "t": "ref",
+              "type": "Item"
+            },
+            {
+              "id": "o4",
+              "t": "ref",
+              "type": "Item"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "meta": {
+            "summary": "std::__debug::vector of length 2, capacity 2"
+          },
+          "type": "std::__debug::vector<Item, std::allocator<Item> >"
+        },
+        "o3": {
+          "fields": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "pen"
+              }
+            },
+            {
+              "name": "weight",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Item"
+        },
+        "o4": {
+          "fields": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "book"
+              }
+            },
+            {
+              "name": "weight",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "5"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Item"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 12,
+      "removedObjects": [
+        "o2"
+      ],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "Item"
+              }
+            },
+            {
+              "name": "heavier",
+              "value": {
+                "t": "uninit",
+                "type": "struct {...}"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o5": {
+          "fields": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "pen"
+              }
+            },
+            {
+              "name": "weight",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Item"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 15,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "Item"
+              }
+            },
+            {
+              "name": "heavier",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "struct {...}"
+              }
+            },
+            {
+              "name": "more",
+              "value": {
+                "t": "uninit",
+                "type": "bool"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o6": {
+          "fields": [
+            {
+              "name": "__first",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "Item"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "struct {...}"
+        },
+        "o7": {
+          "fields": [
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "pen"
+              }
+            },
+            {
+              "name": "weight",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Item"
+        }
+      },
+      "i": 5,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "lambda",
+          "line": 14,
+          "locals": [
+            {
+              "name": "x",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "const Item &"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "const Item"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 14,
+      "parentCallId": 0,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "lambda",
+          "line": 14,
+          "locals": [
+            {
+              "name": "x",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "const Item &"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "const Item"
+              }
+            }
+          ],
+          "name": "<lambda>",
+          "returnValue": {
+            "t": "bool",
+            "type": "bool",
+            "v": "true"
+          }
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "Item"
+              }
+            },
+            {
+              "name": "heavier",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "struct {...}"
+              }
+            },
+            {
+              "name": "more",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "Item"
+              }
+            },
+            {
+              "name": "heavier",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "struct {...}"
+              }
+            },
+            {
+              "name": "more",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "1\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 18,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "Item"
+              }
+            },
+            {
+              "name": "heavier",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "struct {...}"
+              }
+            },
+            {
+              "name": "more",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 18,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 18,
+          "locals": [
+            {
+              "name": "items",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+              }
+            },
+            {
+              "name": "first",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "Item"
+              }
+            },
+            {
+              "name": "heavier",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "struct {...}"
+              }
+            },
+            {
+              "name": "more",
+              "value": {
+                "t": "bool",
+                "type": "bool",
+                "v": "true"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 11,
+      "keyframe": false,
+      "line": 18,
+      "prevLine": 18,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 12,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

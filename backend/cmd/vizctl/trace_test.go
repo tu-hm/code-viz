@@ -99,16 +99,26 @@ var address = regexp.MustCompile(`0x[0-9a-f]+`)
 
 func mask(tr *trace.Trace) {
 	tr.ID = "trc_0"
-	maskedAddr := "0xdeadbeef"
 	for _, s := range tr.Steps {
 		for _, f := range s.Frames {
-			for i, l := range f.Locals {
-				if l.Value.T == trace.ValueTPtr {
-					f.Locals[i].Value.Addr = &maskedAddr
-				}
+			for i := range f.Locals {
+				maskAddr(&f.Locals[i].Value)
+			}
+			if f.ReturnValue != nil {
+				maskAddr((*trace.Value)(f.ReturnValue))
 			}
 		}
 		for id, obj := range s.Heap {
+			for i := range obj.Items {
+				maskAddr(&obj.Items[i])
+			}
+			for i := range obj.Fields {
+				maskAddr(&obj.Fields[i].Value)
+			}
+			for i := range obj.Entries {
+				maskAddr(&obj.Entries[i].Key)
+				maskAddr(&obj.Entries[i].Value)
+			}
 			if obj.Kind != trace.HeapObjectKindOpaque {
 				continue
 			}
@@ -117,6 +127,14 @@ func mask(tr *trace.Trace) {
 			s.Heap[id] = obj
 		}
 	}
+}
+
+func maskAddr(v *trace.Value) {
+	if v.T != trace.ValueTPtr || *v.Addr == "0x0" {
+		return
+	}
+	masked := "0xdeadbeef"
+	v.Addr = &masked
 }
 
 func TestTraceNamesBuildFailure(t *testing.T) {

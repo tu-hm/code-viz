@@ -5,7 +5,7 @@
   },
   "id": "trc_0",
   "language": {
-    "adapter": "cpp-gdb/0.1.0",
+    "adapter": "cpp-gdb/0.2.0",
     "id": "cpp17-gcc",
     "runtime": "GCC 13.5.0"
   },
@@ -19,7 +19,7 @@
   },
   "steps": [
     {
-      "callId": 1,
+      "callId": 0,
       "error": null,
       "event": "call",
       "frames": {
@@ -87,22 +87,18 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             }
           ],
@@ -116,22 +112,18 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             }
           ],
@@ -145,22 +137,18 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             }
           ],
@@ -847,6 +835,7 @@
               "value": {
                 "addr": "0xdeadbeef",
                 "t": "ptr",
+                "target": "o7",
                 "type": "Point *"
               }
             }
@@ -931,6 +920,7 @@
               "value": {
                 "addr": "0xdeadbeef",
                 "t": "ptr",
+                "target": "o7",
                 "type": "Point *"
               }
             }
@@ -945,22 +935,18 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "7"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "0"
             }
           ],
@@ -1045,6 +1031,7 @@
               "value": {
                 "addr": "0xdeadbeef",
                 "t": "ptr",
+                "target": "o7",
                 "type": "Point *"
               }
             }
@@ -1129,6 +1116,7 @@
               "value": {
                 "addr": "0xdeadbeef",
                 "t": "ptr",
+                "target": "o7",
                 "type": "Point *"
               }
             }
@@ -1149,6 +1137,79 @@
       ],
       "stderr": "",
       "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 23,
+          "locals": [
+            {
+              "name": "v",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::__debug::vector<int, std::allocator<int> >"
+              }
+            },
+            {
+              "name": "count",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+              }
+            },
+            {
+              "name": "name",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "viz"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "Point"
+              }
+            },
+            {
+              "name": "q",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o7",
+                "type": "Point *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 12,
+      "keyframe": false,
+      "line": 23,
+      "prevLine": 23,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
     }
   ],
   "summary": {
@@ -1158,7 +1219,7 @@
       "message": null,
       "signal": null
     },
-    "stepCount": 12,
+    "stepCount": 13,
     "truncated": false,
     "truncation": null
   },
