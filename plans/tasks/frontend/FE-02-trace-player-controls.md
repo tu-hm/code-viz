@@ -44,7 +44,7 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 
 **Layout (§5.2, §19.3)**
 - [ ] Header: language, file name, "Safety checks: on/off" (C++), Settings, Share (slot for FE-12), Open in new tab, Close (`Esc`) — all in; Share is a `share` slot and Open in new tab shows once FE-12 passes a `permalink`
-- [ ] Left: code pane (FE-03) + controls; right: state pane (FE-06 / FE-08 / FE-11 slots) — `codePane` and `statePane` slots wait on those tasks
+- [ ] Left: code pane (FE-03) + controls; right: state pane (FE-06 / FE-08 / FE-11 slots) — the code pane is in; the `statePane` slot waits on those tasks
 - [x] Bottom row: STDIN (read-only) and STDOUT/STDERR **up to the current step**, stderr in red, current step's text highlighted
 - [ ] Status bar: exit status, step count, banner slot (FE-05) — `banner` slot waits on FE-05
 - [x] Draggable divider, width saved in `localStorage` — also ← / → when focused
@@ -56,13 +56,13 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 - [ ] Persist in `localStorage` (anonymous); profile storage hook for signed-in users — `localStorage` done, each field validated on load; profile storage waits on the API auth decision (`usePlayer.persist.setOptions({ storage })` is where it plugs in)
 - [x] "Max steps" and "safety checks" apply on the next run (say so in the UI)
 
-- [ ] **Done:** the §5.3 layout renders around the fixture views; settings survive a reload — settings survive; the views come with FE-03 and FE-06. `?fixture=<name>` under `pnpm dev` shows the shell
+- [ ] **Done:** the §5.3 layout renders around the fixture views; settings survive a reload — settings survive and the code pane is in; the state views come with FE-06. `?fixture=<name>` under `pnpm dev` shows the shell
 
 ## 5. Autoplay (M3-F06 · 1.5 d)
 
 - [x] Play/pause button and `Space`
 - [x] Speeds 0.5×, 1×, 2×, 4× (1× = 2 steps/s)
-- [ ] Stops at error steps and at breakpoints (FE-03 gutter) — error steps done; it also stops at `usePlayer` `breakpoints`, which waits on the FE-03 gutter to fill it
+- [x] Stops at error steps and at breakpoints (FE-03 gutter) — the gutter fills `usePlayer` `breakpoints`
 - [x] Stops at the last step; any manual navigation pauses — Play on the last step starts over
 - [x] Respects `prefers-reduced-motion` for highlight fades only (stepping still works)
 - [x] **Done:** §5.9 rules pass as unit tests

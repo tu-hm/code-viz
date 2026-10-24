@@ -7,7 +7,8 @@
 ## Now
 
 - **In progress:** BE-01 (41/46). CI runs `make check` on every push and PR to `main`, and the first run is green. Every item left waits on another task or on a decision; see [BE-01 open items](#be-01-open-items).
-- **In progress:** FE-02 (33/43). `@viz/player` loads a trace in a Web Worker and steps it within the §13 budget (worst step 1.4 ms on 1,000 steps), inside the §5.2 shell with settings and autoplay; `?fixture=<name>` under `pnpm dev` shows it. Real Python traces from `make dev` load; what's left is slots for other tasks.
+- **In progress:** FE-02 (34/43). `@viz/player` loads a trace in a Web Worker and steps it within the §13 budget (worst step 1.4 ms on 1,000 steps), inside the §5.2 shell with settings and autoplay; `?fixture=<name>` under `pnpm dev` shows it. Real Python traces from `make dev` load; what's left is slots for other tasks.
+- **Done except stories:** FE-03 (14/15). The code pane is CodeMirror 6: `▶ ▷ !` with their bands, breakpoints from a line number or Enter that stop autoplay, and whole-run `×n` hit counts, tinted, with their share on hover or focus; Python and C++ highlighting loads on demand. It matches the §19.3 mock in Chrome, light and dark. Left: a story per fixture, with Storybook (FE-01 §4).
 - **In progress:** FE-01 (26/37). The web workspace, design system, codegen, fixtures and mock API are in `web/`. Storybook (§4) is planned for week 6. The frontend is trimmed to the IDE: no i18n, no Playwright end-to-end tests (spec v1.3).
 - **Done:** BE-08 (33/33). The GDB tracer gives calls and returns with values, locals in declaration order, pointers followed to records or into C arrays, signals as error steps, stdin, and the step limit with an untraced tail; a one-line loop gives one step per iteration. 18 golden fixtures under `backend/fixtures/cpp/`. Deep recursion with ordinary frames ends as `memory_limit`, and C arrays and containers record 100 items until sparse arrays (BE-09). The manifest stays `enabled: false`: turning C++ on is a separate decision.
 - **Done except one decision:** BE-09 (23/24). The C++ type map is `adapters/cpp/typemap.json`: every §10.3 row, with type names the same with safety checks on or off, one `type-*` fixture per row. Arrays of scalars longer than 64 are sparse sequences: the tracer reads each once per step, diffs it (S6: 0.1 ms at 200,005 ints) and sends a patch of the changed cells; the core (BE-04 §3) keeps the cells, checks every patch and builds keyframes and delta patches itself. A 1,000-step DFS over two `int[200005]` stores 32 KB gzipped. Python ports `aliasing`, `binary-search`, `exception`, `input` and `thread-main` and `TestPortsAgreeAcrossLanguages` check that the two languages agree. Left: the conformance test runs in CI but blocks merges only once checks are required on `main` (your decision below).
@@ -20,7 +21,7 @@
 - **Done:** BE-12 (10/10). `POST /visualizations/{id}/share` gives a completed visualization a share link: a new `viz_` ID of the same trace that anyone can read, kept with the trace for 90 days from the share and copied to `t90/`. Calling it again returns the same link; `DELETE …/share` revokes it, so it answers `404` for everyone while the owner's own ID still reads, and sharing again makes a new link. Anything not completed gets `400`. `GET` on a link is cacheable for 60 s. Checked against `make dev`'s stack.
 - **In progress:** BE-06 (49/52). `vizd` serves the visualization API: create with single-flight, quota, idempotency and the 2-active rule; get with long-poll; owner-only delete; the nightly cleanup of expired rows and chunks; server-side copy for BE-12. Open: spike S5 and the browser checks.
 - **Done except signing:** BE-07 (20/21). The C++ runner image is GCC 13.5 and GDB 14.2, with one precompiled header per safety-check mode; builds take 0.3–0.8 s. `options.safetyChecks: false` switches the checks off. GCC diagnostics point at the user's line, and the §8.3 example is reproduced. The manifest stays `enabled: false` (see BE-08). Spike S7 is in: `_GLIBCXX_DEBUG` fails the 3× run-time target, so G5 has a decision (below).
-- **Next, by the suggested order:** BE-13 §2–3. On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
+- **Next, by the suggested order:** BE-13 §2–3. On FE: FE-07 §1 (spike S3) and FE-06 §1 (stack and heap), both built on the fixtures.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
 ## Decisions waiting on you
@@ -69,15 +70,15 @@
 | Task | Milestone | Status | Done | Next step, or what it waits on |
 |---|---|---|---|---|
 | [FE-01](frontend/FE-01-foundation-fixtures.md) Foundation & fixtures | M0–M1 | 🟡 | 26/37 | §4 Storybook (week 6); §5 against `make dev` can start: the API is in (BE-06) |
-| [FE-02](frontend/FE-02-trace-player-controls.md) Trace player & controls | M0–M1, M3 | 🟡 | 33/43 | Loader, worker engine, controls, shell, settings, autoplay and the perf budget are in. Open: slots for FE-03/05/06/12, Shift shortcuts (FE-10), breakpoints from the gutter (FE-03), profile storage (auth) |
-| [FE-03](frontend/FE-03-code-pane.md) Code pane | M0, M3 | 🟢 | 0/15 | §1 can start; §2's hit counts are in every golden (BE-11 §1) |
+| [FE-02](frontend/FE-02-trace-player-controls.md) Trace player & controls | M0–M1, M3 | 🟡 | 34/43 | Loader, worker engine, controls, shell, settings, autoplay, the code pane and the perf budget are in. Open: slots for FE-05/06/12, Shift shortcuts (FE-10), profile storage (auth) |
+| [FE-03](frontend/FE-03-code-pane.md) Code pane | M0, M3 | 🟡 | 14/15 | Code pane, breakpoints and hit counts are in. Open: a story per fixture (FE-01 §4) |
 | [FE-04](frontend/FE-04-visualize-from-ide.md) Visualize from the IDE | M1 | 🟢 | 0/18 | Can start, against the mock API (FE-01 §5) or the real one under `make dev` (BE-06) |
 | [FE-05](frontend/FE-05-run-states-errors.md) Run states & errors | M1–M3 | ⏳ | 0/29 | FE-04 (BE-07 §2 diagnostics, BE-10's error payload, and BE-11's tail and start lines are in) |
 | [FE-06](frontend/FE-06-stack-heap-view.md) Stack & heap view | M0–M2, M4 | ⏳ | 0/34 | FE-02 §2 (BE-09 §1 is in) |
 | [FE-07](frontend/FE-07-reference-pointer-arrows.md) Reference & pointer arrows | M0–M2 | 🟢 | 0/21 | §1 spike S3 can start on the fixtures; §2 needs FE-06 §2 |
-| [FE-08](frontend/FE-08-array-matrix-views.md) Array & matrix views | M1–M2 | ⏳ | 0/37 | FE-03, FE-06 (BE-09 §2 is in) |
+| [FE-08](frontend/FE-08-array-matrix-views.md) Array & matrix views | M1–M2 | ⏳ | 0/37 | FE-06 (FE-03 and BE-09 §2 are in) |
 | [FE-09](frontend/FE-09-narration-input-cursor.md) Narration & input cursor | M1, M3 | ⏳ | 0/18 | FE-02 §2, FE-08 §3 |
-| [FE-10](frontend/FE-10-goto-expected-output.md) Go to… & expected output | M1 | ⏳ | 0/20 | FE-02 §2, FE-03 |
+| [FE-10](frontend/FE-10-goto-expected-output.md) Go to… & expected output | M1 | 🟢 | 0/20 | Can start: FE-02 §2 and FE-03 are in |
 | [FE-11](frontend/FE-11-watch-timeline.md) Watch panel & timeline | M3, M5 | ⏳ | 0/12 | FE-08 §3, FE-10 §1 |
 | [FE-12](frontend/FE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/8 | FE-02 §3 (BE-12's share and revoke are in) |
 | [FE-13](frontend/FE-13-mobile-a11y-analytics.md) Mobile, a11y & analytics | M3 | ⏳ | 0/23 | FE-02 §4, FE-06, FE-07 |
