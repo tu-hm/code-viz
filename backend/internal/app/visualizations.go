@@ -112,7 +112,6 @@ func (s *Visualizations) Get(ctx context.Context, id string, p api.GetVisualizat
 	return s.render(ctx, v, s.Now())
 }
 
-// read returns the visualization with id, or domain.ErrExpired once it is past its retention.
 func (s *Visualizations) read(ctx context.Context, id string) (ports.Visualization, error) {
 	v, err := s.Store.Visualization(ctx, id)
 	if err != nil {
@@ -124,8 +123,6 @@ func (s *Visualizations) read(ctx context.Context, id string) (ports.Visualizati
 	return v, nil
 }
 
-// render shows v as §8.3 does: a detached visualization is canceled, progress comes while tracing, the failure once failed,
-// and a completed one has its expiry and the trace with chunk URLs signed for 15 minutes.
 func (s *Visualizations) render(ctx context.Context, v ports.Visualization, now time.Time) (api.Visualization, error) {
 	out := api.Visualization{
 		ID:        v.ID,
