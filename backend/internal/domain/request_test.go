@@ -16,14 +16,6 @@ var (
 	incapable = domain.Manifest{ID: "python3", Image: "viz-runner-python:3.12.15-1"}
 )
 
-func options(change func(o *trace.Options)) trace.Options {
-	o := trace.Options{MaxSteps: 1000, StartAtLines: []int{}}
-	if change != nil {
-		change(&o)
-	}
-	return o
-}
-
 func TestCheckRequest(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -33,22 +25,23 @@ func TestCheckRequest(t *testing.T) {
 		opts   trace.Options
 		want   error
 	}{
-		{"source of 64 KB passes", incapable, strings.Repeat("x", 64<<10), "", options(nil), nil},
-		{"source over 64 KB is too large", incapable, strings.Repeat("x", 64<<10+1), "", options(nil), domain.ErrPayloadTooLarge},
-		{"stdin of 64 KB passes", incapable, "", strings.Repeat("x", 64<<10), options(nil), nil},
-		{"stdin over 64 KB is too large", incapable, "", strings.Repeat("x", 64<<10+1), options(nil), domain.ErrPayloadTooLarge},
-		{"maxSteps 1 passes", incapable, "", "", options(func(o *trace.Options) { o.MaxSteps = 1 }), nil},
-		{"maxSteps 0 is invalid", incapable, "", "", options(func(o *trace.Options) { o.MaxSteps = 0 }), domain.ErrInvalidRequest},
-		{"maxSteps 5000 passes", incapable, "", "", options(func(o *trace.Options) { o.MaxSteps = 5000 }), nil},
-		{"maxSteps 5001 is invalid", incapable, "", "", options(func(o *trace.Options) { o.MaxSteps = 5001 }), domain.ErrInvalidRequest},
-		{"start lines pass where the language supports them", capable, "", "", options(func(o *trace.Options) { o.StartAtLines = []int{1, 3} }), nil},
-		{"start lines are invalid where the language lacks them", incapable, "", "", options(func(o *trace.Options) { o.StartAtLines = []int{3} }), domain.ErrInvalidRequest},
-		{"start line 0 is invalid", capable, "", "", options(func(o *trace.Options) { o.StartAtLines = []int{0} }), domain.ErrInvalidRequest},
-		{"capture ranges pass where the language supports them", capable, "", "", options(func(o *trace.Options) { o.CaptureRanges = map[string][][]int{"dp": {{0, 50}}} }), nil},
-		{"capture ranges are invalid where the language lacks them", incapable, "", "", options(func(o *trace.Options) { o.CaptureRanges = map[string][][]int{"dp": {{0, 50}}} }), domain.ErrInvalidRequest},
-		{"a capture range of one index is invalid", capable, "", "", options(func(o *trace.Options) { o.CaptureRanges = map[string][][]int{"dp": {{0}}} }), domain.ErrInvalidRequest},
-		{"a capture range of three indexes is invalid", capable, "", "", options(func(o *trace.Options) { o.CaptureRanges = map[string][][]int{"dp": {{0, 1, 2}}} }), domain.ErrInvalidRequest},
-		{"a negative capture index is invalid", capable, "", "", options(func(o *trace.Options) { o.CaptureRanges = map[string][][]int{"dp": {{-1, 5}}} }), domain.ErrInvalidRequest},
+		{"source of 64 KB passes", incapable, strings.Repeat("x", 64<<10), "", trace.Options{MaxSteps: 1000}, nil},
+		{"source over 64 KB is too large", incapable, strings.Repeat("x", 64<<10+1), "", trace.Options{MaxSteps: 1000}, domain.ErrPayloadTooLarge},
+		{"stdin of 64 KB passes", incapable, "", strings.Repeat("x", 64<<10), trace.Options{MaxSteps: 1000}, nil},
+		{"stdin over 64 KB is too large", incapable, "", strings.Repeat("x", 64<<10+1), trace.Options{MaxSteps: 1000}, domain.ErrPayloadTooLarge},
+		{"maxSteps 1 passes", incapable, "", "", trace.Options{MaxSteps: 1}, nil},
+		{"maxSteps 0 is invalid", incapable, "", "", trace.Options{MaxSteps: 0}, domain.ErrInvalidRequest},
+		{"maxSteps 5000 passes", incapable, "", "", trace.Options{MaxSteps: 5000}, nil},
+		{"maxSteps 5001 is invalid", incapable, "", "", trace.Options{MaxSteps: 5001}, domain.ErrInvalidRequest},
+		{"start lines pass where the language supports them", capable, "", "", trace.Options{MaxSteps: 1000, StartAtLines: []int{1, 3}}, nil},
+		{"start lines are invalid where the language lacks them", incapable, "", "", trace.Options{MaxSteps: 1000, StartAtLines: []int{3}}, domain.ErrInvalidRequest},
+		{"no start lines pass where the language lacks them", incapable, "", "", trace.Options{MaxSteps: 1000, StartAtLines: []int{}}, nil},
+		{"start line 0 is invalid", capable, "", "", trace.Options{MaxSteps: 1000, StartAtLines: []int{0}}, domain.ErrInvalidRequest},
+		{"capture ranges pass where the language supports them", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0, 50}}}}, nil},
+		{"capture ranges are invalid where the language lacks them", incapable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0, 50}}}}, domain.ErrInvalidRequest},
+		{"a capture range of one index is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0}}}}, domain.ErrInvalidRequest},
+		{"a capture range of three indexes is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0, 1, 2}}}}, domain.ErrInvalidRequest},
+		{"a negative capture index is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{-1, 5}}}}, domain.ErrInvalidRequest},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -117,7 +110,7 @@ func TestCacheKey(t *testing.T) {
 		source, stdin string
 		opts          trace.Options
 	}
-	base := request{capable, "int main() {}", "1 2", options(func(o *trace.Options) { o.StartAtLines = []int{2, 4} })}
+	base := request{capable, "int main() {}", "1 2", trace.Options{MaxSteps: 1000, StartAtLines: []int{2, 4}}}
 	with := func(change func(r *request)) request {
 		r := base
 		change(&r)
