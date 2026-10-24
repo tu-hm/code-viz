@@ -20,13 +20,15 @@
 
 ## 2. Untraced tail for C++ (M3-B03 · 2 d)
 
-- [ ] After the step limit: delete all breakpoints and `continue` at full speed
-- [ ] Respect the wall-time limit while untraced
+- [x] After the step limit: delete all breakpoints and `continue` at full speed
+- [x] Respect the wall-time limit while untraced
 - [ ] Capture output after the last traced step → store as `tail.txt.gz`
 - [ ] Fill `summary.untracedTail` (`completed`, `exit`, `stdoutBytes`)
 - [ ] List `tail.txt.gz` in the trace manifest / API response
 - [ ] Python side (hook → counter only) already in BE-03; verify it fills the same fields
 - [ ] **Done:** a 2,000-iteration loop gives complete output
+
+The first two are done in BE-08. After the marker step, `trace.py` deletes every breakpoint and continues to the real exit; the `long` fixture shows the tail's exit and output. The untraced run stays inside the trace's wall-time deadline, so the sandbox kills it at the limit, and the core records `untracedTail.completed: false` with exit `timeout` (`TestUntracedTailAfterATimeLimit`).
 
 ## 3. Start tracing from line N (M3-B04 · 1.5 d)
 

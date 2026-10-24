@@ -1,6 +1,6 @@
 # Tracing
 
-How a program becomes a trace: the Python tracer, the wire protocol, the trace core and `vizctl`. The spec sections are §7.11.1 (Python tracer), §9 (trace format), §10 (adapters and wire protocol), §11 (limits) and §19.9 (v1.1 additions). The sandbox the tracer runs in has [its own guide](sandbox.md).
+How a program becomes a trace: the Python and C++ tracers, the wire protocol, the trace core and `vizctl`. The spec sections are §7.11.1 (Python tracer), §7.11.2 (C++ build and tracer), §9 (trace format), §10 (adapters and wire protocol), §11 (limits) and §19.9 (v1.1 additions). The sandbox the tracer runs in has [its own guide](sandbox.md).
 
 Read this before you change how the worker drives the core, add a language (BE-07, BE-08, BE-14), change the wire protocol, or move the Python tracer to `sys.monitoring` (G2). The steps for those changes are in [adding or changing a language adapter](../guides/language-adapter.md). The tests and golden fixtures are in [testing](../guides/testing.md).
 
@@ -24,17 +24,17 @@ flowchart LR
   R -->|"Finish"| O["Result: header, steps, chunks, tail"]
 ```
 
-A run has two halves with a hostile channel between them. Inside the sandbox, the tracer shares a process with the user's program and writes full snapshots. Outside, the core validates every message, enforces every limit and does the clever work: stable IDs, deltas, chunks. Adapters stay small, and every language gets the same limits and the same output (§10.1).
+A run has two halves with a hostile channel between them. Inside the sandbox, the tracer shares a process with the user's program (Python) or drives it from GDB (C++), and writes full snapshots. Outside, the core validates every message, enforces every limit and does the clever work: stable IDs, deltas, chunks. Adapters stay small, and every language gets the same limits and the same output (§10.1).
 
 | Piece | Where | What it does |
 |---|---|---|
-| Manifest | `backend/adapters/python/manifest.yaml` | Image, build and trace commands, env, capabilities, `modules.allow`. Languages are data: Go code never branches on a language name |
-| Tracer | `backend/adapters/python/tracer.py` | Runs the program under `sys.settrace` and writes the wire protocol to fd 3. Standard library only |
-| Runner image | `backend/adapters/python/Dockerfile` | CPython 3.12.15 (slim, pinned by digest), `tracer.py` and `viz-shim` in `/opt/viz/`. pip removed, setuid bits stripped |
+| Manifest | `backend/adapters/<language>/manifest.yaml` | Image, build and trace commands, env, capabilities, `modules.allow`. Languages are data: Go code never branches on a language name |
+| Tracer | `backend/adapters/python/tracer.py`, `backend/adapters/cpp/trace.py` | Python's runs the program under `sys.settrace`; C++'s drives GDB through its Python API. Both write the wire protocol to fd 3. Standard library only, plus GDB's `gdb` module for C++ |
+| Runner image | `backend/adapters/python/Dockerfile`, `backend/adapters/cpp/Dockerfile` | Python: CPython 3.12.15 (slim, pinned by digest), `tracer.py` and `viz-shim` in `/opt/viz/`, pip removed, setuid bits stripped. C++: GCC 13.5 and GDB 14.2 ([the C++ runner image](../guides/language-adapter.md#the-c-runner-image)) |
 | Schemas | `backend/schema/` | `wire.v1.schema.json` (fd 3), `trace.v1.schema.json` (output). The `schema` package compiles both and returns redacted errors |
 | Trace core | `backend/internal/tracecore` | Wire stream in, trace out. Standard library only, plus the generated types in `internal/gen` |
 | CLI | `backend/cmd/vizctl` | `trace` runs one program end to end in the Docker dev sandbox; `validate` checks a trace file |
-| Fixtures | `backend/fixtures/python/<case>/` | `main.py`, optional `stdin`, and `expected.trace.json` recorded from a real run |
+| Fixtures | `backend/fixtures/<language>/<case>/` | `main.py` or `main.cpp`, optional `stdin`, and `expected.trace.json` recorded from a real run |
 
 **Why validation is passed in.** §7.4 keeps `tracecore` free of anything outside the standard library. The JSON Schema library lives in the `schema` package, and the caller hands `Validator.Wire` to the recorder as a plain function.
 
@@ -151,7 +151,7 @@ sequenceDiagram
   T->>C: step 0 … step N-1
   Note over T,C: out messages between steps
   T->>C: step N (one past maxSteps): marker, dropped
-  Note over T: swap the hook for the line counter
+  Note over T: Python: swap the hook for the line counter<br/>C++: delete every breakpoint, continue
   T->>C: out … (untraced tail)
   T->>C: exit {kind, code, message, lineHits}
 ```
@@ -160,14 +160,14 @@ sequenceDiagram
 |---|---|
 | Order | `hello` first, `exit` last, `step` and `out` in between. `log` may come anywhere, even after `exit`; any other message after `exit` is malformed |
 | Snapshots | Every `step` is a full snapshot: the whole stack (capped, below) and every object reachable from it. The core computes deltas |
-| IDs | Frame `id` is the call's `callId` as a string; the module frame is call 0. Heap ids are `str(id(obj))`. The core maps both to `f0…` and `o1…` in order of first appearance |
+| IDs | Frame `id` is the call's `callId` as a string. Call 0 is Python's module frame and C++'s `main`; the C++ globals frame is `globals`. Heap ids are `str(id(obj))` in Python and `<addr>:<type>` in C++ (`tmpN:<type>` for a value with no address). The core maps both to `f0…` and `o1…` in order of first appearance |
 | Calls | Call steps carry `callId` and `parentCallId` (the next frame out on the stack). Return steps carry `callId` (§19.9.6) |
-| Output | The Python tracer captures stdout and stderr itself and sends `out` messages of at most 16,384 characters (64 KiB as UTF-8). Output between step k−1 and step k belongs to step k: it was printed while step k's `prevLine` ran. Output after the last step goes to the last step |
+| Output | The Python tracer captures stdout and stderr itself and sends `out` messages of at most 16,384 characters (64 KiB as UTF-8). The C++ program writes its own fd 1 and 2, and `viz-shim` forwards what it wrote before a wire line ahead of that line (§10.1). Output between step k−1 and step k belongs to step k: it was printed while step k's `prevLine` ran. Output after the last step goes to the last step |
 | Step limit | The tracer sends at most `maxSteps + 1` steps. The extra one is a marker that the program went on. The core drops it, records `truncation.step_limit`, and keeps reading `out` and `exit` for the untraced tail. Not a kill (D25) |
-| Line hits | `exit.lineHits` counts every line event in `main.py` over the whole run, untraced tail included. It becomes `summary.lineHits` with `lineHitsSource: "counter"` (§19.9.3) |
-| Exceptions | One `exception` step where the exception is raised in `main.py` (`line` is the raising line), not one per frame it unwinds through. Uncaught: `exit {kind: "exception", code: 1, message: "IndexError: …"}`. `SystemExit(n)`: `exit {kind: "normal", code: n}` |
+| Line hits | `exit.lineHits` counts every line event in `main.py` over the whole run, untraced tail included. It becomes `summary.lineHits` with `lineHitsSource: "counter"` (§19.9.3). The C++ tracer sends none; C++ counts come from gcov (BE-11) |
+| Exceptions | Python: one `exception` step where the exception is raised in `main.py` (`line` is the raising line), not one per frame it unwinds through. Uncaught: `exit {kind: "exception", code: 1, message: "IndexError: …"}`. `SystemExit(n)`: `exit {kind: "normal", code: n}`. C++: a signal gives one `exception` step with `error {type: "SIGSEGV", message, line}`, then `exit {kind: "signal"}`. A caught C++ exception makes no step; an uncaught one ends in `abort()` and shows as `SIGABRT` |
 
-## Inside the tracer
+## Inside the Python tracer
 
 `tracer.py` is flat functions over module-level state. It sees the program through three hooks: `sys.settrace` and `threading.settrace` for events, and a short-lived `sys.setprofile` for recovering from the recursion limit.
 
@@ -209,6 +209,117 @@ The user sees one exception step, line counts keep going, and the exit is right.
 ### Failure inside the tracer
 
 An exception in the tracer's own code sends `log` (level `error`, at most 200 characters, no user data) and `exit {kind: "internal_error"}`, then `os._exit(0)`. After a normal run the tracer also leaves with `os._exit`, so that `exit` really is the last message: atexit handlers and finalizers could still print.
+
+## Inside the C++ tracer
+
+`adapters/cpp/trace.py` runs inside GDB 14.2: `gdb -q -nx -batch -x /opt/viz/trace.py --args ./main`. Like `tracer.py`, it is flat functions over module-level state, with the standard library and GDB's `gdb` module. The libstdc++ pretty printers load from GDB's data directory ([the C++ runner image](../guides/language-adapter.md#the-c-runner-image)). The program is GDB's child process. The tracer never single-steps it: breakpoints make every stop, `continue` resumes, and every stop comes in through GDB's `stop` and `exited` events (§7.11.2).
+
+### Stepping
+
+- **A breakpoint on every statement row.** The tracer reads `main.cpp`'s rows from the binary's DWARF 5 line table (`.debug_line`) with its own parser. GDB's table can't be used: it drops a row whose line repeats with a new discriminator, and that row is often a one-line loop's back edge. Every `is_stmt` row of a `main.cpp` function gets an internal breakpoint, except the function's first row, its prologue. Library code has no breakpoints, so it always runs at full speed; a callback from it, such as a `sort` comparator, stops at its own rows.
+- **`set breakpoint always-inserted on`.** GDB otherwise removes and reinserts every breakpoint at each stop. With 700 of them, a 1,000-step trace took 1.8 s without it and 0.5 s with it.
+- **Breakpoints go in once `main` runs.** Before `run` there is one, on `main`'s first row; the others are added at that stop. Global constructors run untraced at full speed, and tracing starts at the first stop in `main`. When `main` returns, the tracer deletes every breakpoint and lets the program finish untraced, so static destructors and `atexit` handlers make no steps.
+- **When a stop is a step.** A stop in the innermost call's frame is a `line` step when its line differs from that call's last step. On the same line it is a step when the code jumped back (its pc isn't after the previous stop's), unless the call already showed this line past the jump's target since its last jump back. A one-line loop (`for (...) cin >> a[i];`) then gives one step per iteration, like Python's line events, and the step limit bounds it. A range-for written over several lines jumps back to its condition after its `++` step, so it still gives one step per iteration on that line.
+- **Closing braces.** GCC gives some code the position of the function's closing `}`: a VLA's stack save, and the setup of an aggregate temporary with a `std::string` member (`v.push_back({"b", 2})`). The closing position is that of the row holding the function's `ret`. Rows there before the first statement get no breakpoint, so the call step lands on the first statement. A later stop there takes a snapshot but sends nothing yet. If the frame's next stop is another statement, it was a temporary and the snapshot is dropped. If the frame returns, or calls a destructor, it was the epilogue: the `}` step goes out, and the return step's locals come from it. After the epilogue, a row of the `return` statement's line (its value moved after the destructors ran) makes no step.
+- **Compiler-generated functions get no breakpoints.** GDB 14 has no `Symbol.is_artificial`, but `ptype` leaves out every method DWARF marks `DW_AT_artificial`. A method whose name and parameter types aren't in `ptype/r` of its class is compiler-generated: implicit constructors, destructors and assignment operators, and a lambda's closure members besides its `operator()`. So are functions with reserved names: `__tcf_0`, `_GLOBAL__sub_I_main`, a lambda's `_FUN`. User-written ones keep their steps, even when they sit on the struct's own line. If GDB ever printed a parameter type differently in the class and in the definition, a user-written method would lose its steps; a user function with a reserved name does.
+
+### Calls and returns
+
+- **A stack of user calls.** The tracer keeps its own stack of the user calls it has seen; `main` is call 0. A stop in a `main.cpp` frame that isn't the innermost call is a new call: a `call` step with `callId`, `parentCallId` and the caller's line as `prevLine`. Since the prologue has no breakpoint, a call's first stop is its first statement. Library frames between two user calls don't show, so a comparator's frame sits right on top of the frame that called `sort`. The stack is capped like the core's: Globals plus the 100 innermost calls.
+- **One `gdb.FinishBreakpoint`, on the innermost call.** GDB unwinds to every finish breakpoint's frame on each stop. At depth 300, one breakpoint per call cost 3.3 s per 1,000 steps and one in all 0.6 s. A new call moves the breakpoint to itself, and a return moves it back to the caller.
+- **Inline callers.** A FinishBreakpoint never fires when the frame's caller is an inline frame, for example libstdc++'s inlined allocator code running a destructor. The tracer arms it on the outermost inline frame, which returns to the same address.
+- **`main`'s return needs `set backtrace past-main on`.** Without it GDB doesn't show `main`'s caller, where the breakpoint goes.
+- **Frames left without a return get no return step.** An exception, `exit()` or `longjmp` leaves frames without returning from them. At each stop the tracer drops every call whose frame GDB can no longer find, innermost first, and arms the call that's left.
+- **The return step** is the live stack plus the returning frame on top, with `returnValue`. The frame's locals, and the objects they refer to, come from its epilogue stop: after its last statement, before its destructors. A one-line function's epilogue makes no step but still gives that snapshot, so `void add(int &x, int v) { x += v; }` returns showing `x` after the `+=`. `line` and `prevLine` are the frame's last line. `returnValue` is `null` for `void`, `unavailable` with reason `unknown_return` when GDB can't compute it, and the value otherwise.
+- **A smashed return address.** A stack-smashing write can overwrite a frame's return address. When the address can't be read, no finish breakpoint goes there (GDB couldn't insert it), and the return faults: the program ends with a signal and its error step.
+- **arm64 results in memory.** A struct or union returned in memory goes to an address the caller passes in `x8`. The callee needn't keep `x8`, but GDB 14 reads it at the return anyway. So the tracer saves `x8` at the call when the function's prologue copies it, which GCC `-O0` does exactly when the result goes through memory, and reads the result from there.
+- **Names and kinds.** A frame's `name` is GDB's qualified name with any ABI tag cut off, along with the parameter list GDB 14 leaves after it: `make_str[abi:cxx11](int)` becomes `make_str`. `kind` is `method` for a function with `this`, constructors and destructors included; `lambda` for one with GCC's `__closure` parameter, named `<lambda>`; and `function` otherwise.
+
+### Values
+
+| C++ | Wire value |
+|---|---|
+| Integers | `int`, `v` in decimal. `__int128` takes GDB's text, because GDB 14's `int()` refuses it |
+| `bool` | `bool`, `"true"` or `"false"` |
+| `char`, `signed char`, `unsigned char` | `char` with `code` |
+| `enum` | `int` whose `v` is the enumerator name |
+| `double` | `float`, Python's `repr`: the shortest text that reads back as the same double |
+| `float` | `float`, the shortest decimal that reads back as the same 32-bit float: `0.1f` is `0.1`, not `0.10000000149011612` |
+| `long double` | `float`, GDB's text. Python's `float()` would round it to a double |
+| `T&`, `T&&` | The referenced value; `type` keeps the reference type |
+| `std::string` | `str`: its first 1,000 bytes, decoded as UTF-8 (a bad byte becomes U+FFFD). A longer one has `len`, its size in bytes, and `truncated: true` |
+| Another type whose pretty printer has children | `sequence`, or `mapping` (`ordered: true`) when the printer says map, with the printer's text in `meta.summary` |
+| `T[N]` | `sequence` with `fixed` (below) |
+| `struct`, `class` or `union` without a printer | `record` with its own fields |
+| `T*` | `ptr` (below) |
+| Anything else | `opaque` with GDB's text |
+| Optimized out | `unavailable`, reason `optimized_out` |
+| Any other read error | `unavailable`, reason `unreadable` |
+
+- **Garbage doesn't stop the trace.** The libstdc++ printers raise `gdb.error`, `OverflowError` or `ValueError` on garbage memory, such as a `std::string` in a deleted struct. Those make the value `unavailable` with reason `unreadable`, and a heap object whose printer fails is `opaque` with summary `unreadable`. Any other exception is a bug in the tracer and ends the run (below).
+- **Locals come in declaration order.** The function's own block keeps GDB's order. Nested blocks follow, outermost first, each sorted by `(line, name)`, because GDB returns their symbols in hash order. A local declared after the current line is left out. On its declaration line it is `uninit` until that line has run in the current entry of its block (§7.11.2, v1.4); a one-line loop's line has run once the loop jumps back.
+- **Globals** are the variables in `main.cpp`'s global and static blocks, sorted by `(line, name)`, in a frame with id `globals`.
+- **`internal`** marks names that start with `__`: GCC's `__for_range`, `__for_begin` and `__for_end`, and a lambda's `__closure`. `this` and lambda captures stay visible.
+- **Heap keys** are `<addr>:<type>`, the type without typedefs and `const`, so a struct and its first field don't share a key. A value with no address gets `tmpN:<type>`. An array's address is taken from its first element: asked for the address of an array that isn't in the program's memory, GDB 14 calls `malloc` in the program.
+- **Budgets.** At most 500 objects per step: past it, a `ref` becomes `unavailable` with reason `object_limit`, and a pointer has no `target`. Pointers are followed at most 32 hops from a local or global (§11).
+
+### Pointers
+
+- `addr` is the address in hex, and `0x0` is `nullptr`.
+- A pointer to a `struct`, `class` or `union` declared in `main.cpp` is followed: the pointee is recorded as a `record` and `target` names it. `this` is one of these. A pointer whose pointee can't be read has no `target`.
+- Any other pointer gets `target` and `index` when it points at an element boundary of a C array recorded in the same step with the same element type. `index` counts over the whole array, so it can be past the 100-item window. The match runs after the whole step is encoded, so the array can come later in the step than the pointer: a global pointer into a local array works.
+- Every other pointer has no `target`: one past the end of an array, into `new[]` memory or a container, or a `char*` string.
+
+### C arrays and containers
+
+- A C array records its first 100 items and its real `length`. When it's cut, it also has `truncated` and `window {start: 0, count: 100}`. An array of integers, `char`, `bool`, `float` or `double` is read with one `read_memory` per step: 0.02 ms for 100 ints, against 0.13 ms one `gdb.Value` at a time. Its items carry no `type`; the sequence's `type` already says it, and on a big array that's about half the bytes.
+- A container read through its pretty printer records its first 100 items, or 100 entries for a map.
+- Why 100, not §11's 1,000: at 1,000 items, one global `int[200005]` cost about 34 KB of wire and about 3 ms in the core per step, 4.5 s per 1,000 steps. 100 stays until BE-09's sparse arrays (§19.9.1).
+
+### Signals and deep recursion
+
+- **A signal ends the trace.** Any signal GDB stops on (`SIGSEGV`, `SIGFPE`, `SIGABRT`, …) gives one `exception` step at the innermost call's current line, with `error {type: "SIGSEGV", message: "Segmentation fault", line}` (`message` is `strsignal`'s text), then `exit {kind: "signal", signal: "SIGSEGV"}`. An uncaught C++ exception ends in `abort()`, so it shows as `SIGABRT`. A signal before `main` gives only the exit. When GDB can't find any call's frame any more, as after a return to a smashed address, the error step repeats the last step's stack and line.
+- **Deep recursion with small frames ends as `memory_limit`, not `SIGSEGV`.** Stack pages count toward the 256 MB memory limit (§11), so the out-of-memory kill comes before the stack overflows. A real `SIGSEGV` needs huge frames: the `stack-overflow` fixture uses 32 MiB ones.
+- **SIGKILL from outside.** When the program dies of SIGKILL, as it does in the out-of-memory kill, the tracer kills itself with SIGKILL too. The core then gets no `exit` message, takes the outcome from the sandbox and reports `memory_limit`. An `exit {kind: "signal"}` from the tracer would win over the sandbox's outcome ([Finishing](#finishing)).
+
+### After the step limit
+
+The tracer reads `VIZ_MAX_STEPS` (1,000 if it's unset). Once it has sent the marker step, `maxSteps + 1`, it deletes every breakpoint, rows and finish, and runs `continue`. The program runs at full speed to its real exit with no steps after the marker. Its output goes to the untraced tail, and the `exit` message carries its real outcome. A one-line loop over 1,000 iterations gets there too: each iteration is a step. The wall-time deadline still holds: the sandbox kills the box, and the core records `untracedTail.completed: false` with exit `timeout`. There's no line counter; C++ line hits come from gcov (BE-11).
+
+### Stdin, output and determinism (§7.12)
+
+- **Stdin.** Before `run`, the tracer opens `/work/stdin` and `dup2`s it onto GDB's fd 0, which the program inherits: `startup-with-shell off` starts it with no shell in between. A missing file is empty input.
+- **Output.** The program writes its own fd 1 and 2, which go to the core, and `flush_init.cpp` keeps stdout unbuffered (§7.11.2). Once the program runs, GDB's own fd 0, 1 and 2 point at `/dev/null`, and before that `suppress-cli-notifications` and the `print … off` settings keep GDB quiet. fd 3 isn't inheritable, so the program doesn't get it.
+- **Determinism.** Nothing is seeded. glibc's `rand()` without `srand` gives the same sequence on every run, and ASLR is off (`set disable-randomization on`, and the sandbox). Two runs of a fixture give byte-identical traces.
+
+### Failure inside the tracer
+
+An exception in the tracer's own code sends `log` (level `error`) and `exit {kind: "internal_error"}`. The log names the exception type and the `trace.py` lines in its traceback, innermost first: `KeyError at trace.py:626 < 786 < 807`. It never carries the exception's message, which can hold the user's identifiers or values.
+
+### Known limits
+
+- `longjmp` isn't followed.
+- Every signal GDB stops on is treated as fatal, even one the program has a handler for.
+- Code before `main` (global constructors) and after `main` returns runs untraced.
+- A frame an exception unwinds through can show one step at a cleanup's line before it disappears.
+- On aarch64, GCC's debug info for a named return value (an NRVO local) can show garbage.
+- The `__for_*` internals show stale values on the `for` line. They're hidden by default.
+- BE-09's type map isn't in yet: records skip base-class fields, `const char*` stays a pointer, and a container's `length` is the number of items read, with no `truncated`.
+
+### Numbers
+
+GDB 14.2 and GCC 13.5 on arm64, in the runner image with one CPU, GDB time per run:
+
+| Run | Before (`step`) | Now (breakpoints) |
+|---|---|---|
+| A 1,000-step loop (`long`) | 0.49 s | 0.27 s |
+| Recursion 300 deep, 1,000 steps | 3.2 s | 3.2 s, most of it reading the 100 capped frames on each step |
+| 1,000 steps of `vector`, `map`, `set` and `sort` lines | 2.4 s | 1.7 s |
+| 1,000 steps in a program with 700 breakpoints | 0.57 s | 0.55 s |
+| `for (int i = 0; i < 100000; i++) s += i;` on one line | 50 s, 2 steps | 0.4 s, 1,000 steps then the untraced tail |
+| `for (...) cin >> a[i];` on one line, 5,000 numbers | 16 s, 2 steps of the loop | 0.4 s, 1,000 steps then the untraced tail |
+
+Through `vizctl`, with the build and the container start, 1,000 steps with a global `int[200005]` take 1–2 s.
 
 ## Inside the trace core
 
@@ -256,7 +367,7 @@ After the step limit, `untracedTail.completed` is true when the tail ended by it
 
 ## Trust boundary
 
-The user's program runs in the tracer's process, so it can write anything to fd 3, replace `sys.settrace`, or kill the tracer. That is accepted: a user can only spoil their own trace (§12, and AGENTS.md "Intentional, do not flag"). The defenses are all on the core's side:
+The user's Python program runs in the tracer's process, so it can write anything to fd 3, replace `sys.settrace`, or kill the tracer. That is accepted: a user can only spoil their own trace (§12, and AGENTS.md "Intentional, do not flag"). A C++ program is GDB's child and doesn't inherit fd 3. Either way, the defenses are all on the core's side:
 
 - every fd-3 line is checked against the schema before it's used;
 - every limit is counted outside the sandbox, in the writers;
@@ -270,7 +381,11 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | What | Where |
 |---|---|
 | G2: keep `settrace` or move to `sys.monitoring` | Gate on Fri 13 Nov; S2 recommends `sys.monitoring` |
-| The C++ tracer reading `/work/stdin` and honoring `VIZ_MAX_STEPS` | BE-08 |
+| The C++ type map: base-class fields, `const char*` as `str`, `std::array`, sets, pairs and container adapters as §10.3 says, a container's real `length` and `truncated` | BE-09 §1 |
+| Sparse arrays and dirty cells; until then C arrays and containers record a window of 100 items | BE-09 §2, BE-04 §3 |
+| C++ line hits from gcov (the C++ `exit` has no `lineHits`) | BE-11 §1 |
+| C++ errors in words: a UBSan or debug-container failure on the user's line, with the values involved (today only signals become error steps) | BE-10 |
+| Offering C++ through the API: the manifest stays `enabled: false` | A separate decision |
 | Storing `Result.Tail` as `tail.txt.gz` and listing it in the trace manifest (the worker stores chunks and header only) | BE-11 §2 |
 | Signing the runner image | BE-03 §3, needs the registry (BE-13) |
 | A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | BE-10 |

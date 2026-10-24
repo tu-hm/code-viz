@@ -57,13 +57,13 @@ The dockersandbox tests build their image, `viz-sandboxtest:dev`, themselves: bu
 Two sets of goldens pin trace output (test 8):
 
 - **`internal/tracecore/testdata/golden/`:** wire inputs turned into traces by the core alone. No sandbox is involved.
-- **`fixtures/<language>/<case>/expected.trace.json`:** real programs traced end to end by `vizctl trace`. The language list comes from `adapters/*/manifest.yaml` and the cases from the directories, so a new fixture directory is picked up with no code change. The trace ID, `0x…` addresses inside opaque summaries and the `addr` of pointer locals (as `0xdeadbeef`) are masked.
+- **`fixtures/<language>/<case>/expected.trace.json`:** real programs traced end to end by `vizctl trace`. The language list comes from `adapters/*/manifest.yaml` and the cases from the directories, so a new fixture directory is picked up with no code change. The trace ID, `0x…` addresses inside opaque summaries, and every pointer's `addr` except `0x0` are masked. A pointer's `addr` becomes `0xdeadbeef` wherever it appears: in locals, return values, sequence items, record fields and map entries.
 
 `make golden-update` rewrites both from real runs. Read the diff before you commit it: a golden that changed is a behavior that changed.
 
-Both sets must pass on amd64 and arm64. CI runs them on amd64 inside `make check` and on arm64 in the `golden-arm64` job (`ubuntu-24.04-arm`). The core's goldens mask `0x…` addresses and `long double` values. In the fixture goldens, a pointer's `addr` is a real address (a stack one is `0xffff…` on arm64 and `0x7fff…` on amd64), so it's masked. Nothing else needs a mask, because heap ids become `o1, o2…`, and the Python fixtures and C++ wire sessions come out the same on both architectures. The C++ fixtures have only been traced on arm64 so far (GDB can't run under emulation), but GCC 13.5 gives their `main.cpp` the same line tables on amd64. A new fixture must stay away from what really differs between them: an address printed by the program, a C++ local shown before it's assigned (stack garbage), a `char` above 127 (signed on amd64, unsigned on arm64) and `long double` arithmetic (80-bit on amd64, 128-bit on arm64).
+Both sets must pass on amd64 and arm64. CI runs them on amd64 inside `make check` and on arm64 in the `golden-arm64` job (`ubuntu-24.04-arm`). The core's goldens mask `0x…` addresses and `long double` values. In the fixture goldens, a pointer's `addr` is a real address (a stack one is `0xffff…` on arm64 and `0x7fff…` on amd64), so it's masked. Nothing else needs a mask, because heap ids become `o1, o2…`, and the Python fixtures and C++ wire sessions come out the same on both architectures. The C++ fixtures have only been traced on arm64 so far (GDB can't run under emulation). What the C++ tracer stops on is each `main.cpp` row of the line table, so every C++ fixture's table was compared instead: built with the manifest's flags (`build.cmd` plus `build.safetyFlags`) on both architectures, the `main.cpp` rows in pc order have the same lines and `is_stmt` flags. Only the column order inside one line differs, in `sort(v.begin(), v.end())` for example, whose arguments GCC evaluates in the other order on amd64; stops that move forward on one line make no step. Check a new C++ fixture the same way: build it in `gcc:13.5.0` with `--platform linux/amd64` and natively, and compare the `main.cpp` rows of `objdump --dwarf=decodedline`. A fixture must also stay away from what really differs between them: an address printed by the program, a C++ local shown before it's assigned (stack garbage, a VLA's included), a `char` above 127 (signed on amd64, unsigned on arm64) and `long double` arithmetic (80-bit on amd64, 128-bit on arm64).
 
-`go test` caches the `vizctl` result and can't see changes to `tracer.py`, which lives in the runner image. After editing a tracer, run `make runner-images` and then `go test -count=1 ./cmd/vizctl`.
+`go test` caches the `vizctl` result and can't see changes to `tracer.py` or `trace.py`, which live in the runner images. After editing a tracer, run `make runner-images` and then `go test -count=1 ./cmd/vizctl`.
 
 | Python fixture | What it pins |
 |---|---|
@@ -78,11 +78,24 @@ Both sets must pass on amd64 and arm64. CI runs them on amd64 inside `make check
 
 | C++ fixture | What it pins |
 |---|---|
-| `loop` | A `for` loop: `sum` and `i` `uninit` on their declaration lines until they run, `i` gone after the loop |
-| `recursion` | `fib(4)`: 9 calls, each with its own frame and the right `parentCallId`, two of them from one line |
-| `stl` | The checked build (`std::__debug::vector`, `std::__debug::map`): a vector sorted in place, a `map<string, int>` growing, a `std::string`, a struct as a record, a pointer, a global `int[3][4]` in the globals frame. The first stop is line 12; the S1a wire session from GCC 15 stops at 11 first |
-
-The C++ goldens come from the S1a prototype tracer: no return values, no stdin and no step limit until BE-08.
+| `array-pointer` | A global `int*` walking a local `int[5]`: `target` and `index` into an array that comes later in the step than the pointer, and no `target` once the pointer is one past the end |
+| `exception` | A `runtime_error` thrown two calls deep and caught in `main`: the throwing call and its caller, which holds a `std::string`, end with no return step, and the next steps are `main`'s `catch` lines |
+| `fib` | The Python `fib` port: `fib(5)` inside a `cout` line, 15 calls with the right `parentCallId`, and each return step with its value |
+| `implicit` | A `struct` with a `std::string` member, pushed as `{"pen", 2}`, copied, and captured by value in a lambda: its implicit constructors and destructors and the closure's make no steps, and the aggregate temporaries make no step on `main`'s closing brace |
+| `input` | `cin >>` in a loop, then `getline`, reading `/work/stdin`. The loop-body local `x` is `uninit` again on each iteration's declaration line |
+| `long` | The Python `long` port, 2,000 iterations: 1,000 steps, `step_limit`, no step after the marker, and the untraced tail with the program's normal exit and all 8 bytes of its output |
+| `loop` | A `for` loop: `sum` and `i` `uninit` on their declaration lines until they run, `i` gone after the loop, and `main`'s return step with `0` |
+| `methods` | A constructor, a method and a destructor as `method` frames, with `this` followed to the `Counter` record and `returnValue: null`. The one-line constructor's return step shows `n` after its initializer ran. A lambda as a `<lambda>` frame of kind `lambda`, with its return value |
+| `one-line` | One-line functions: `chmax` (a template) and `add` return showing their reference parameters after the body ran, with `chmax`'s `true` and `false`. `sort` calls a one-line lambda comparator from library code: a call and a return step per comparison |
+| `pointer` | The §5.4 program: `MAXN` and the global `int[200005]` (100 items, `truncated`, `window`, the real `length`) in the globals frame, a `vector`, a `map<string, int>`, and two `Node` records linked through `head->next`. `sort` makes no steps |
+| `range-for` | A range-for over a vector: `__for_range`, `__for_begin` and `__for_end` hidden by default, `x` taking each element, one step per iteration on the `for` line |
+| `read-loop` | A VLA sized from stdin, then `for (...) cin >> a[i];` on one line over 1,200 numbers: the call step on `main`'s first statement, not its closing brace, one step per iteration, `step_limit` at 1,000 steps, and the untraced tail with the full output and the normal exit. It reads back to front, so the VLA's 100-item window stays zero and the golden stays small |
+| `recursion` | `fib(4)`: 9 calls, each with its own frame and the right `parentCallId`, two of them from one line, and each return step with its value |
+| `segfault` | `arr` pointing into the global `cnt` (`index` 0), then a write about 2 GB past it: the output printed before it, an `exception` step on the innermost call's line with `SIGSEGV` and "Segmentation fault", and `exit.kind = signal` |
+| `stack-overflow` | Recursion with 32 MiB frames: the eighth call overflows the stack before its first line, so the `SIGSEGV` step is on the seventh call's line, not a `memory_limit`. Each `pad` is a 100-item window of 8,388,608 |
+| `stl` | The checked build (`std::__debug::vector`, `std::__debug::map`): a vector sorted in place, a `map<string, int>` growing, a `std::string`, a struct as a record with a pointer to it, a global `int[3][4]` in the globals frame. The first stop is line 12; the S1a wire session from GCC 15 stops at 11 first |
+| `sync-stdio` | `ios::sync_with_stdio(false)` and `cin.tie(nullptr)` with no `endl`: each `cout` shows up on the step after the line that printed it |
+| `values` | `float`, `double`, `char`, an `enum`, `bool`, `__int128`, a UTF-8 `std::string`, a 1,500-byte one cut to 1,000 with `len` and `truncated`, a `const string&` parameter, and a 24-byte struct returned by value (on arm64 through the `x8` address) |
 
 ## Captured GCC output
 

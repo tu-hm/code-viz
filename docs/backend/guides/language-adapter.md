@@ -4,7 +4,7 @@ An adapter is everything specific to one language: a manifest, a runner image an
 
 ## Add a language
 
-1. **Create `backend/adapters/<dir>/`** with a `manifest.yaml`, a `Dockerfile` and the tracer. The Python adapter in `adapters/python/` is the complete example. `adapters/cpp/` has the C++ manifest, its runner image (below) and `trace.py`, the GDB prototype from spike S1a. The manifest says `enabled: false` until the BE-08 tracer lands; `vizctl` and the fixture test trace it anyway.
+1. **Create `backend/adapters/<dir>/`** with a `manifest.yaml`, a `Dockerfile` and the tracer. The Python adapter in `adapters/python/` is the complete example. `adapters/cpp/` is the second: its manifest, its runner image (below) and `trace.py`, the GDB tracer ([inside the C++ tracer](../architecture/tracing.md#inside-the-c-tracer)). The tracer is in, but the manifest stays `enabled: false`: turning C++ on is a separate decision. `vizctl` and the fixture test trace it anyway.
 2. **Write the manifest** (§10.2). `vizctl` and the worker load every `adapters/*/manifest.yaml` through `internal/adapters/manifest`, which checks them all at once: one bad manifest, or two with the same `id`, fails the load. They read:
 
    | Field | Meaning |
@@ -54,7 +54,7 @@ For nsjail, the image is unpacked into a directory on the node (for example with
 | GDB 14.2 | `/usr/local/bin/gdb` | Built from source in a stage on the `gcc` image, from the GNU tarball pinned by checksum, with Python and without debuginfod. Bookworm ships GDB 13 |
 | Pretty printers | `/usr/local/share/gdb/auto-load/usr/local/lib64/` | libstdc++ installs them next to the library, but GDB's default `auto-load safe-path` refuses `/usr/local/lib64`. Under GDB's data directory they load with `-nx` |
 | Precompiled headers | `bits/stdc++.h.gch/checks-off.gch` and `checks-on.gch` | GCC tries every file in a `.gch` directory and uses the first one built with compatible flags. `_GLIBCXX_DEBUG` is defined in one and not the other, so each build matches exactly one |
-| `flush_init.cpp`, `trace.py`, `viz-shim` | `/opt/viz/` | |
+| `flush_init.cpp`, `trace.py`, `viz-shim` | `/opt/viz/` | `flush_init.cpp` and `trace.py` are copied in the last layer, after the precompiled headers, so editing the tracer doesn't rebuild them |
 
 **The PCH flags must match the manifest's.** The `flags` line in the Dockerfile is `build.cmd` without its files and `-o`; `checks-on.gch` adds `build.safetyFlags`. GCC checks only two things when it picks a PCH: whether debug info is on, and macros the header tests, such as `_GLIBCXX_DEBUG`. A PCH built with another `-O`, `-f…`, `-W…` or `--coverage` is used without a word, so a flag changed on one side only goes unnoticed. After changing either side, check that each build still uses its own PCH: `-H` prints `!` before the PCH GCC used and `x` before one it rejected.
 

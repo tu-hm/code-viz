@@ -9,13 +9,13 @@
 - **In progress:** BE-01 (41/46). CI runs `make check` on every push and PR to `main`, and the first run is green. Every item left waits on another task or on a decision; see [BE-01 open items](#be-01-open-items).
 - **In progress:** FE-02 (33/43). `@viz/player` loads a trace in a Web Worker and steps it within the §13 budget (worst step 1.4 ms on 1,000 steps), inside the §5.2 shell with settings and autoplay; `?fixture=<name>` under `pnpm dev` shows it. Real Python traces from `make dev` load; what's left is slots for other tasks.
 - **In progress:** FE-01 (26/37). The web workspace, design system, codegen, fixtures and mock API are in `web/`. Storybook (§4) is planned for week 6. The frontend is trimmed to the IDE: no i18n, no Playwright end-to-end tests (spec v1.3).
-- **Done:** BE-08 §1 (4/4). The GDB prototype traces the loop, recursion and STL programs, its output validates against the wire schema, and it ran under both sandboxes for S1b.
+- **Done:** BE-08 (33/33). The GDB tracer gives calls and returns with values, locals in declaration order, pointers followed to records or into C arrays, signals as error steps, stdin, and the step limit with an untraced tail; a one-line loop gives one step per iteration. 18 golden fixtures under `backend/fixtures/cpp/`. Deep recursion with ordinary frames ends as `memory_limit`, and C arrays and containers record 100 items until sparse arrays (BE-09). The manifest stays `enabled: false`: turning C++ on is a separate decision.
 - **In progress:** BE-02 (48/54). G1 is decided: nsjail (spec v1.5, [S1b report](../spikes/s1b-sandbox.md)). The nsjail adapter passes `sandboxtest`, and `make check` runs the suite against both adapters. What's left waits on other tasks; see the task file.
 - **Done except signing:** BE-03 (34/35). The Python tracer, its runner image and manifest, `vizctl trace`/`validate`, and eight golden fixtures traced from real code. Signing the image waits on a registry (BE-13). Spike S2 recommends `sys.monitoring` for G2 ([S2 report](../spikes/s2-python-hook.md)); the tracer uses `settrace` until G2 decides.
 - **In progress:** BE-04 (26/31). `tracecore` (§2) was built early, inside BE-03, so `vizctl` prints real traces. The S4 spike is done and the goldens run on both architectures in CI. Open: presenting the format at G3, and sparse arrays (§3).
 - **Done except one decision:** BE-05 (29/30). `vizd --role=worker` (and `all`) runs trace jobs end to end: claim, build, trace, upload the chunks, complete, with requeue on infra errors, a lease watcher, the 25 s drain and a periodic sandbox sweep. Checked against the local Compose stack. Cancel of a running job waits on your decision below.
 - **In progress:** BE-06 (48/52). `vizd` serves the visualization API: create with single-flight, quota, idempotency and the 2-active rule; get with long-poll; owner-only delete; the nightly cleanup of expired rows and chunks. Open: spike S5, server-side copy (BE-12) and the browser checks.
-- **Done except signing:** BE-07 (20/21). The C++ runner image is GCC 13.5 and GDB 14.2, with one precompiled header per safety-check mode; builds take 0.3–0.8 s. `options.safetyChecks: false` switches the checks off. GCC diagnostics point at the user's line, and the §8.3 example is reproduced. The manifest is `enabled: false` until BE-08. Spike S7 is in: `_GLIBCXX_DEBUG` fails the 3× run-time target, so G5 has a decision (below).
+- **Done except signing:** BE-07 (20/21). The C++ runner image is GCC 13.5 and GDB 14.2, with one precompiled header per safety-check mode; builds take 0.3–0.8 s. `options.safetyChecks: false` switches the checks off. GCC diagnostics point at the user's line, and the §8.3 example is reproduced. The manifest stays `enabled: false` (see BE-08). Spike S7 is in: `_GLIBCXX_DEBUG` fails the 3× run-time target, so G5 has a decision (below).
 - **Next, by the suggested order:** BE-13 §2–3. On FE: FE-02 §1 (player skeleton) and FE-03 §1 (code pane), both built on the fixtures.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
@@ -42,14 +42,14 @@
 | [BE-05](backend/BE-05-job-queue-worker.md) Job queue & worker | M1 | 🟡 | 29/30 | Queue and worker done: `vizd --role=worker` claims, builds, traces, uploads and completes, and drains on SIGTERM. Open: cancel while running (your decision, above) |
 | [BE-06](backend/BE-06-visualization-api.md) Visualization API | M0–M1 | 🟡 | 48/52 | The API runs under `vizd --role=api` and `all`, tested against MySQL and SeaweedFS. Open: §1 spike S5 (stretch), server-side copy (BE-12), the browser checks locally and on staging |
 | [BE-07](backend/BE-07-cpp-build.md) C++ build | M2 | 🟡 | 20/21 | Done except cosign signing (needs a registry, BE-13). S7 report in; G5 (Fri 19 Feb) open |
-| [BE-08](backend/BE-08-cpp-tracer.md) C++ tracer ⚠ | M0, M2 | 🟡 | 4/33 | §1 done (prototype in `adapters/cpp/trace.py`, measured in S1b). §2+ can start: BE-07's image and build are in |
-| [BE-09](backend/BE-09-cpp-stl-big-arrays.md) C++ STL & big arrays | M2 | ⏳ | 0/24 | BE-08 |
-| [BE-10](backend/BE-10-friendly-errors.md) Friendly errors | M3 | ⏳ | 0/14 | BE-03, BE-07, BE-08 |
-| [BE-11](backend/BE-11-whole-run-trace-options.md) Whole-run data & options | M3 (M5) | ⏳ | 0/22 | BE-03, BE-07–09 |
+| [BE-08](backend/BE-08-cpp-tracer.md) C++ tracer ⚠ | M0, M2 | ✅ | 33/33 | Done: `adapters/cpp/trace.py` and 18 fixtures. The manifest stays `enabled: false` |
+| [BE-09](backend/BE-09-cpp-stl-big-arrays.md) C++ STL & big arrays | M2 | 🟢 | 0/24 | Can start: BE-08 is in |
+| [BE-10](backend/BE-10-friendly-errors.md) Friendly errors | M3 | 🟢 | 0/14 | Can start: BE-03, BE-07 and BE-08 are in |
+| [BE-11](backend/BE-11-whole-run-trace-options.md) Whole-run data & options | M3 (M5) | ⏳ | 2/22 | BE-09. The C++ run after the step limit (§2) came with BE-08 |
 | [BE-12](backend/BE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/10 | BE-06 |
 | [BE-13](backend/BE-13-environments-launch.md) Environments & launch (single machine) | M1–M5 | 🟢 | 0/68 | §1 can start. Rewritten for single Linux server, no cloud/K8s |
 | [BE-14](backend/BE-14-c-language.md) C language | M4 | ⏳ | 0/10 | BE-07–09 |
-| **Total** | | | **250/450** | |
+| **Total** | | | **281/450** | |
 
 ### BE-01 open items
 
@@ -96,13 +96,13 @@
 | Delivers | Due | Status |
 |---|---|---|
 | Trace schema | Wed 28 Oct | ✅ 23 Oct (`fb41bd7`) |
-| Real C++ traces (S1) | Fri 6 Nov | 🟡 Wire output from the prototype in `schema/testdata/wire/`; the trace format needs the core (BE-04) |
+| Real C++ traces (S1) | Fri 6 Nov | ✅ 24 Oct: `backend/fixtures/cpp/*/expected.trace.json`, from `vizctl trace` |
 | Format frozen | Fri 13 Nov | G3 |
 | OpenAPI | Tue 17 Nov | ✅ 23 Oct (`3ebd66b`) |
 | Local stack | Wed 18 Nov | 🟡 MySQL, SeaweedFS and migrations run; buckets, seed data and sandbox missing |
 | Real Python traces | Fri 4 Dec | ✅ 24 Oct: `backend/fixtures/python/*/expected.trace.json`, from `vizctl trace` |
 | Staging | Mon 28 Dec | Not started (BE-13 §3) |
-| C++ pointer values | M2 week 3 | Not started (BE-08 §3) |
+| C++ pointer values | M2 week 3 | ✅ 24 Oct: `ptr` with `target` and `index` in the `backend/fixtures/cpp/` goldens (`pointer`, `array-pointer`, `methods`, `segfault`, `stl`) |
 | Sparse arrays | End of M2 | Not started (BE-04 §3) |
 | Friendly errors, line hits, untraced tail | M3 week 2 | Not started (BE-10, BE-11) |
 
