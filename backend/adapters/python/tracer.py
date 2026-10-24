@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 import bisect
 import builtins
@@ -13,6 +15,13 @@ import re
 import sys
 import threading
 import types
+from typing import TYPE_CHECKING, Any, Literal, NoReturn, cast
+
+if TYPE_CHECKING:
+    from _typeshed import TraceFunction
+    from collections.abc import Mapping, Sequence
+    from collections.abc import Set as AbstractSet
+    from wire import Entry, Event, Exit, Frame, HeapObject, Local, Message, StdinPos, Step, StepError, Value
 
 LANGUAGE = "python3"
 ADAPTER = "py-settrace/0.1.0"
@@ -27,40 +36,42 @@ HEADROOM = 50  # frames kept free above the user's recursion limit for the hook 
 CO_VARARGS = 0x04
 CO_VARKEYWORDS = 0x08
 RETURNS = {opcode.opmap["RETURN_VALUE"], opcode.opmap["RETURN_CONST"], opcode.opmap["YIELD_VALUE"]}
-FUNCTIONS = (types.FunctionType, types.MethodType, types.BuiltinFunctionType, functools._lru_cache_wrapper)
+# functools has no public type for @cache and @lru_cache wrappers
+FUNCTIONS = (types.FunctionType, types.MethodType, types.BuiltinFunctionType,
+             functools._lru_cache_wrapper)  # pyright: ignore[reportPrivateUsage]
 THREAD_START = threading.Thread.start.__code__
 
-wire = None
+wire: io.TextIOWrapper
 max_steps = 1000
 sent = 0
 tail = False
 next_call = 0
-call_ids = {}
-pending = set()
-last_lines = {}
-raised = {}
-depths = {}
-starters = {}
-last_error = None
-hits = collections.Counter()
-stdin = None
+call_ids: dict[types.FrameType, int] = {}
+pending: set[types.FrameType] = set()
+last_lines: dict[types.FrameType, int] = {}
+raised: dict[types.FrameType, BaseException] = {}
+depths: dict[types.FrameType, int] = {}
+starters: dict[threading.Thread, list[types.FrameType]] = {}
+last_error: BaseException | None = None
+hits: collections.Counter[int] = collections.Counter()
+stdin: io.StringIO
 stdin_text = ""
 stdin_size = 0
 stdin_read = 0
-token_ends = []
+token_ends: list[int] = []
 recursion_limit = sys.getrecursionlimit()
 set_recursion_limit = sys.setrecursionlimit
 
 
-def send(msg):
+def send(msg: Message) -> None:
     wire.write(json.dumps(msg, separators=(",", ":")) + "\n")
 
 
 class Writer(io.TextIOBase):
-    def __init__(self, stream):
-        self.stream = stream
+    def __init__(self, stream: Literal["stdout", "stderr"]) -> None:
+        self.stream: Literal["stdout", "stderr"] = stream
 
-    def write(self, s):
+    def write(self, s: object) -> int:
         if not isinstance(s, str):
             raise TypeError("write() argument must be str, not %s" % type(s).__name__)
         for i in range(0, len(s), OUT_CHUNK):
@@ -68,16 +79,16 @@ class Writer(io.TextIOBase):
         return len(s)
 
 
-def code_of(fn):
+def code_of(fn: object) -> types.CodeType | None:
     return getattr(getattr(fn, "__wrapped__", fn), "__code__", None)
 
 
-def defined_here(fn):
+def defined_here(fn: Any) -> bool:
     code = code_of(fn)
     return code is not None and code.co_filename == SOURCE
 
 
-def signature(fn):
+def signature(fn: Any) -> str:
     code = code_of(fn)
     if code is None:
         return fn.__name__ + "(...)"
@@ -93,15 +104,15 @@ def signature(fn):
     return "%s(%s)" % (fn.__name__, ", ".join(names))
 
 
-def summary(x):
+def summary(x: object) -> str:
     try:
         return repr(x)[:MAX_SUMMARY]
     except Exception:
         return "<%s>" % type(x).__name__
 
 
-def fields(x):
-    out = list(getattr(x, "__dict__", {}).items())
+def fields(x: object) -> list[tuple[str, object]]:
+    out: list[tuple[str, object]] = list(getattr(x, "__dict__", {}).items())
     for cls in type(x).__mro__:
         slots = cls.__dict__.get("__slots__", ())
         if isinstance(slots, str):
@@ -112,7 +123,7 @@ def fields(x):
     return out
 
 
-def encode(x, heap, todo):
+def encode(x: object, seen: set[int], todo: list[object]) -> Value:
     if x is None:
         return {"t": "none"}
     if isinstance(x, bool):
@@ -128,42 +139,44 @@ def encode(x, heap, todo):
         if len(x) <= MAX_STR:
             return {"t": "str", "v": x}
         return {"t": "str", "v": x[:MAX_STR], "len": len(x), "truncated": True}
-    key = str(id(x))
-    if key not in heap:
-        heap[key] = None
+    if id(x) not in seen:
+        seen.add(id(x))
         todo.append(x)
-    return {"t": "ref", "id": key}
+    return {"t": "ref", "id": str(id(x))}
 
 
-def heap_object(x, heap, todo):
+def heap_object(x: object, seen: set[int], todo: list[object]) -> HeapObject:
     kind = type(x)
     if isinstance(x, (list, tuple, collections.deque)):
-        items = [encode(v, heap, todo) for v in itertools.islice(x, MAX_ITEMS)]
-        obj = {"kind": "sequence", "type": kind.__name__, "length": len(x), "items": items,
-               "truncated": len(x) > MAX_ITEMS}
+        seq = cast("Sequence[object]", x)
+        items = [encode(v, seen, todo) for v in itertools.islice(seq, MAX_ITEMS)]
+        obj: HeapObject = {"kind": "sequence", "type": kind.__name__, "length": len(seq), "items": items,
+                           "truncated": len(seq) > MAX_ITEMS}
         if isinstance(x, tuple):
             obj["fixed"] = True
         return obj
     if isinstance(x, (set, frozenset)):
-        items = [encode(v, heap, todo) for v in itertools.islice(x, MAX_ITEMS)]
-        return {"kind": "set", "type": kind.__name__, "length": len(x), "items": items, "ordered": False,
-                "truncated": len(x) > MAX_ITEMS}
+        members = cast("AbstractSet[object]", x)
+        items = [encode(v, seen, todo) for v in itertools.islice(members, MAX_ITEMS)]
+        return {"kind": "set", "type": kind.__name__, "length": len(members), "items": items, "ordered": False,
+                "truncated": len(members) > MAX_ITEMS}
     if isinstance(x, dict):
-        entries = [{"key": encode(k, heap, todo), "value": encode(v, heap, todo)}
-                   for k, v in itertools.islice(x.items(), MAX_ITEMS)]
-        return {"kind": "mapping", "type": kind.__name__, "length": len(x), "entries": entries, "ordered": True,
-                "truncated": len(x) > MAX_ITEMS}
+        mapping = cast("Mapping[object, object]", x)
+        entries: list[Entry] = [{"key": encode(k, seen, todo), "value": encode(v, seen, todo)}
+                                for k, v in itertools.islice(mapping.items(), MAX_ITEMS)]
+        return {"kind": "mapping", "type": kind.__name__, "length": len(mapping), "entries": entries, "ordered": True,
+                "truncated": len(mapping) > MAX_ITEMS}
     if isinstance(x, FUNCTIONS):
         return {"kind": "function", "name": x.__name__, "signature": signature(x)}
     if isinstance(x, type):
         return {"kind": "class", "name": x.__name__}
     if kind.__module__ == "__main__":
         return {"kind": "record", "type": kind.__name__,
-                "fields": [{"name": k, "value": encode(v, heap, todo)} for k, v in fields(x)]}
+                "fields": [{"name": k, "value": encode(v, seen, todo)} for k, v in fields(x)]}
     return {"kind": "opaque", "type": kind.__name__, "summary": summary(x)}
 
 
-def frame_kind(code):
+def frame_kind(code: types.CodeType) -> Literal["global", "function", "method", "lambda"]:
     if code.co_name == "<module>":
         return "global"
     if code.co_name == "<lambda>":
@@ -172,11 +185,11 @@ def frame_kind(code):
     return "method" if len(parts) > 1 and parts[-2] != "<locals>" else "function"
 
 
-def frame_object(frame, heap, todo):
+def frame_object(frame: types.FrameType, seen: set[int], todo: list[object]) -> Frame:
     kind = frame_kind(frame.f_code)
-    locals_ = []
+    locals_: list[Local] = []
     for name, value in frame.f_locals.items():
-        local = {"name": name, "value": encode(value, heap, todo)}
+        local: Local = {"name": name, "value": encode(value, seen, todo)}
         if ((kind == "global" and name.startswith("__")) or name.startswith(".") or isinstance(value, types.ModuleType)
                 or (isinstance(value, FUNCTIONS) and not defined_here(value))):
             local["internal"] = True
@@ -185,7 +198,7 @@ def frame_object(frame, heap, todo):
             "locals": locals_, "returnValue": None}
 
 
-def stdin_pos():
+def stdin_pos() -> StdinPos:
     global stdin_read
     # exit() and quit() close sys.stdin before raising SystemExit
     if not stdin.closed:
@@ -195,8 +208,8 @@ def stdin_pos():
     return {"bytes": n, "token": bisect.bisect_right(token_ends, n), "inferred": False}
 
 
-def stack_of(frame):
-    frames = []
+def stack_of(frame: types.FrameType | None) -> list[types.FrameType]:
+    frames: list[types.FrameType] = []
     while frame is not None:
         if frame.f_code.co_filename == SOURCE:
             frames.append(frame)
@@ -205,25 +218,27 @@ def stack_of(frame):
     return starters.get(threading.current_thread(), []) + frames
 
 
-def step(frame, event, error=None, returned=None):
+def step(frame: types.FrameType, event: Event, error: StepError | None = None, returned: object = None) -> None:
     global sent, tail
     frames = stack_of(frame)
     kept = frames if len(frames) <= MAX_FRAMES + 1 else frames[:1] + frames[-MAX_FRAMES:]
-    heap, todo = {}, []
-    stack = [frame_object(f, heap, todo) for f in kept]
+    seen: set[int] = set()
+    todo: list[object] = []
+    stack = [frame_object(f, seen, todo) for f in kept]
     if event == "return" and stack[-1]["kind"] != "global":
-        stack[-1]["returnValue"] = encode(returned, heap, todo)
+        stack[-1]["returnValue"] = encode(returned, seen, todo)
+    heap: dict[str, HeapObject] = {}
     while todo:
         x = todo.pop()
-        heap[str(id(x))] = heap_object(x, heap, todo)
+        heap[str(id(x))] = heap_object(x, seen, todo)
 
     line = frame.f_lineno
     if event == "call":
         prev = frames[-2].f_lineno if len(frames) > 1 else None
     else:
         prev = last_lines[frame]
-    msg = {"type": "step", "event": event, "line": line, "prevLine": prev, "stack": stack, "heap": heap,
-           "error": error, "stdinPos": stdin_pos()}
+    msg: Step = {"type": "step", "event": event, "line": line, "prevLine": prev, "stack": stack, "heap": heap,
+                 "error": error, "stdinPos": stdin_pos()}
     if event in ("call", "return"):
         msg["callId"] = call_ids[frame]
     if event == "call" and len(frames) > 1:
@@ -238,7 +253,7 @@ def step(frame, event, error=None, returned=None):
         threading.settrace(count_call)
 
 
-def depth(frame):
+def depth(frame: types.FrameType | None) -> int:
     n = 0
     while frame is not None:
         n += 1
@@ -246,23 +261,23 @@ def depth(frame):
     return n
 
 
-def setrecursionlimit(limit):
+def setrecursionlimit(limit: int) -> None:
     global recursion_limit
     set_recursion_limit(limit + HEADROOM)
     recursion_limit = limit
 
 
-def getrecursionlimit():
+def getrecursionlimit() -> int:
     return recursion_limit
 
 
-def rearm(frame, event, arg):
+def rearm(frame: types.FrameType, event: str, arg: Any) -> None:
     sys.setprofile(None)
     sys.settrace(count_call if tail else on_call)
 
 
-def check_depth(frame):
-    outer = depths.get(frame.f_back)
+def check_depth(frame: types.FrameType) -> None:
+    outer = depths.get(frame.f_back) if frame.f_back is not None else None
     n = depth(frame) if outer is None else outer + 1
     # hook can't start past the real limit and CPython drops a hook that raises: raise here, rearm on unwind
     if n > recursion_limit:
@@ -271,19 +286,19 @@ def check_depth(frame):
     depths[frame] = n
 
 
-def join_thread(frame, event, arg):
-    thread = frame.f_locals["self"]
+def join_thread(frame: types.FrameType, event: str, arg: Any) -> TraceFunction:
+    thread: threading.Thread = frame.f_locals["self"]
     if event == "return" and thread.is_alive():
         thread.join()
     return join_thread
 
 
-def on_call(frame, event, arg):
+def on_call(frame: types.FrameType, event: str, arg: Any) -> TraceFunction | None:
     global next_call
     if tail:
         return count_call(frame, event, arg)
     # a thread started from main.py runs to the end before start() returns: one stack, one call tree
-    if frame.f_code is THREAD_START and frame.f_back.f_code.co_filename == SOURCE:
+    if frame.f_code is THREAD_START and frame.f_back is not None and frame.f_back.f_code.co_filename == SOURCE:
         starters[frame.f_locals["self"]] = stack_of(frame.f_back)
         return join_thread
     if frame.f_code.co_filename != SOURCE:
@@ -296,7 +311,7 @@ def on_call(frame, event, arg):
     return on_event
 
 
-def on_exception(frame, exc):
+def on_exception(frame: types.FrameType, exc: BaseException) -> None:
     global last_error
     raised[frame] = exc
     # closing a suspended generator throws GeneratorExit into it; not the user's error
@@ -310,7 +325,7 @@ def on_exception(frame, exc):
     step(frame, "exception", error={"type": type(exc).__name__, "message": str(exc), "line": frame.f_lineno})
 
 
-def on_return(frame, value):
+def on_return(frame: types.FrameType, value: object) -> None:
     exc = raised.pop(frame, None)
     # 3.12 sends no exception event on RERAISE (finally, with); an unwinding frame stops on a non-return opcode
     returned = frame.f_code.co_code[frame.f_lasti] in RETURNS
@@ -325,7 +340,7 @@ def on_return(frame, value):
     last_lines.pop(frame, None)
 
 
-def on_event(frame, event, arg):
+def on_event(frame: types.FrameType, event: str, arg: Any) -> TraceFunction:
     if tail:
         return count_line(frame, event, arg)
     try:
@@ -341,14 +356,14 @@ def on_event(frame, event, arg):
     return count_line if tail else on_event
 
 
-def count_call(frame, event, arg):
+def count_call(frame: types.FrameType, event: str, arg: Any) -> TraceFunction | None:
     if frame.f_code.co_filename != SOURCE:
         return None
     check_depth(frame)
     return count_line
 
 
-def count_line(frame, event, arg):
+def count_line(frame: types.FrameType, event: str, arg: Any) -> TraceFunction:
     if event == "line":
         hits[frame.f_lineno] += 1
     elif event == "return":
@@ -356,18 +371,18 @@ def count_line(frame, event, arg):
     return count_line
 
 
-def wait_for_threads():
+def wait_for_threads() -> None:
     for thread in threading.enumerate():
         if thread is not threading.current_thread() and not thread.daemon:
             thread.join()
 
 
-def describe(exc):
+def describe(exc: BaseException) -> str:
     message = str(exc)
     return "%s: %s" % (type(exc).__name__, message) if message else type(exc).__name__
 
 
-def trace(path):
+def trace(path: str) -> Exit:
     global stdin, stdin_text, stdin_size, token_ends, max_steps
     max_steps = int(os.environ.get("VIZ_MAX_STEPS", "1000"))
     with open(path, "rb") as f:
@@ -391,12 +406,13 @@ def trace(path):
     sys.setrecursionlimit = setrecursionlimit
     sys.getrecursionlimit = getrecursionlimit
     module = types.ModuleType("__main__")
-    module.__builtins__ = builtins
+    module.__dict__["__builtins__"] = builtins
     sys.modules["__main__"] = module
 
     kind, code, message = "normal", 0, None
     try:
-        program = compile(src, path, "exec")
+        # dont_inherit: the user's program must not get this file's __future__ annotations
+        program = compile(src, path, "exec", dont_inherit=True)
         threading.settrace(on_call)
         sys.settrace(on_call)
         exec(program, module.__dict__)
@@ -415,13 +431,13 @@ def trace(path):
     return {"type": "exit", "kind": kind, "code": code, "signal": None, "message": message, "lineHits": line_hits}
 
 
-def crash(e):
+def crash(e: BaseException) -> NoReturn:
     send({"type": "log", "level": "error", "message": "%s: %s" % (type(e).__name__, str(e)[:200])})
     send({"type": "exit", "kind": "internal_error", "code": None, "signal": None, "message": None})
     os._exit(0)
 
 
-def run(path):
+def run(path: str) -> NoReturn:
     global wire
     wire = open(int(os.environ["VIZ_PROTOCOL_FD"]), "w", encoding="utf-8", buffering=1)
     send({"type": "hello", "protocol": 1, "language": LANGUAGE, "runtime": "CPython %d.%d.%d" % sys.version_info[:3],
@@ -434,25 +450,24 @@ def run(path):
     os._exit(0)
 
 
-def check(path):
+def check(path: str) -> int:
     with open(path, "rb") as f:
         src = f.read()
     try:
         tree = ast.parse(src, path)
-        compile(tree, path, "exec")
+        compile(tree, path, "exec", dont_inherit=True)
     except SyntaxError as e:
         print("%s:%d:%d: error: %s" % (path, e.lineno or 1, e.offset or 1, e.msg), file=sys.stderr)
         return 1
 
     allow = set(os.environ.get("VIZ_MODULES_ALLOW", "").split(","))
-    blocked = []
+    blocked: list[tuple[int, int, str]] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             names = [alias.name.split(".")[0] for alias in node.names]
-        elif isinstance(node, ast.ImportFrom) and node.level:
-            names = ["." * node.level + (node.module or node.names[0].name)]
         elif isinstance(node, ast.ImportFrom):
-            names = [node.module.split(".")[0]]
+            module = node.module or node.names[0].name
+            names = ["." * node.level + module] if node.level else [module.split(".")[0]]
         else:
             continue
         blocked += [(node.lineno, node.col_offset + 1, name) for name in names if name not in allow]

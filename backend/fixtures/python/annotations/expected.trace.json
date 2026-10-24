@@ -1,0 +1,274 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "py-settrace/0.1.0",
+    "id": "python3",
+    "runtime": "CPython 3.12.15"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 6
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 1,
+          "locals": [],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 1,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 5,
+          "locals": [
+            {
+              "name": "area",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "kind": "function",
+          "name": "area",
+          "signature": "area(w, h)"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 5,
+      "prevLine": 1,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 6,
+          "locals": [
+            {
+              "name": "area",
+              "value": {
+                "id": "o1",
+                "t": "ref"
+              }
+            }
+          ],
+          "name": "<module>",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 2,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": "{'w': <class 'int'>, 'h': <class 'int'>, 'return': <class 'int'>}\n"
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 2,
+          "locals": [
+            {
+              "name": "w",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "h",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            }
+          ],
+          "name": "area",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 3,
+      "keyframe": false,
+      "line": 2,
+      "parentCallId": 0,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 2,
+          "locals": [
+            {
+              "name": "w",
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "h",
+              "value": {
+                "t": "int",
+                "v": "4"
+              }
+            }
+          ],
+          "name": "area",
+          "returnValue": {
+            "t": "int",
+            "v": "12"
+          }
+        }
+      },
+      "heap": {},
+      "i": 4,
+      "keyframe": false,
+      "line": 2,
+      "prevLine": 2,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdinPos": {
+        "bytes": 0,
+        "inferred": false,
+        "token": 0
+      },
+      "stdout": "12\n"
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "lineHits": {
+      "1": 1,
+      "2": 1,
+      "5": 1,
+      "6": 1
+    },
+    "lineHitsSource": "counter",
+    "stepCount": 6,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}
