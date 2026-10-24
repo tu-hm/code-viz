@@ -546,7 +546,7 @@ enabled: false
 `,
 }
 
-func fakeAdapters(t *testing.T) ports.Adapters {
+func fakeAdapters(t testing.TB) ports.Adapters {
 	t.Helper()
 	dir := t.TempDir()
 	for name, m := range fakeManifests {
@@ -614,7 +614,7 @@ func traceSteps(n int) script {
 	}
 }
 
-func newWorker(t *testing.T, db *sql.DB, adapters ports.Adapters, sb ports.Sandbox, blobs ports.BlobStore) *app.Worker {
+func newWorker(t testing.TB, db *sql.DB, adapters ports.Adapters, sb ports.Sandbox, blobs ports.BlobStore) *app.Worker {
 	t.Helper()
 	val, err := schema.New()
 	if err != nil {
@@ -843,7 +843,7 @@ type response struct {
 	body []byte
 }
 
-func get(t *testing.T, method, url string) response {
+func get(t testing.TB, method, url string) response {
 	t.Helper()
 	req, err := http.NewRequestWithContext(t.Context(), method, url, nil)
 	if err != nil {

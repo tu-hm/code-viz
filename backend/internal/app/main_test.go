@@ -24,6 +24,9 @@ var (
 	rootDSN  string
 	s3       string
 	resource atomic.Int64
+
+	mysqlContainer testcontainers.Container
+	s3Container    testcontainers.Container
 )
 
 func TestMain(m *testing.M) {
@@ -40,6 +43,7 @@ func run(m *testing.M) int {
 	}
 
 	my, err := tcmysql.Run(ctx, "mysql:8.4.13", tcmysql.WithUsername("root"), tcmysql.WithPassword("test"))
+	mysqlContainer = my
 	defer terminate(my)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "start mysql: %v\n", err)
@@ -64,6 +68,7 @@ func run(m *testing.M) int {
 		},
 		Started: true,
 	})
+	s3Container = sw
 	defer terminate(sw)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "start seaweedfs: %v\n", err)
@@ -100,7 +105,7 @@ func seaweedFS() (image string, cmd []string, err error) {
 	return s.Image, s.Command, nil
 }
 
-func newDB(t *testing.T) *sql.DB {
+func newDB(t testing.TB) *sql.DB {
 	t.Helper()
 	root, err := mysql.Open(rootDSN)
 	if err != nil {
@@ -140,7 +145,7 @@ type bucket struct {
 	url string
 }
 
-func newBucket(t *testing.T) bucket {
+func newBucket(t testing.TB) bucket {
 	t.Helper()
 	name := fmt.Sprintf("test%d", resource.Add(1))
 	url := s3 + "/" + name
@@ -150,7 +155,7 @@ func newBucket(t *testing.T) bucket {
 	return bucket{BlobStore: blobStore(t, s3, name), url: url}
 }
 
-func blobStore(t *testing.T, endpoint, name string) ports.BlobStore {
+func blobStore(t testing.TB, endpoint, name string) ports.BlobStore {
 	t.Helper()
 	b, err := blobstore.New(t.Context(), blobstore.Config{Endpoint: endpoint, Bucket: name, PathStyle: true})
 	if err != nil {
