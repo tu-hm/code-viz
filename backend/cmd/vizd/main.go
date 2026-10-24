@@ -86,9 +86,12 @@ func run() (err error) {
 	// TODO(tu-hm): add the sandbox self-check to readyz for worker and all once BE-02 lands
 	httptransport.HandleProbes(mux, ctx.Done(), db.PingContext)
 
+	// poller outlives SIGTERM until http shuts down => long-polls keep parking while the worker drains
+	polling, stopPolling := context.WithCancel(context.WithoutCancel(ctx))
 	var background sync.WaitGroup
 	defer func() {
 		stop()
+		stopPolling()
 		background.Wait()
 	}()
 	if *role != "worker" {
@@ -96,7 +99,7 @@ func run() (err error) {
 		if err != nil {
 			return err
 		}
-		background.Go(func() { poller.Run(ctx) })
+		background.Go(func() { poller.Run(polling) })
 		// api role, not worker: worker's db user and s3 key can't delete (BE-13 §4, §12)
 		background.Go(func() { cleanDaily(ctx, viz) })
 	}
@@ -119,7 +122,7 @@ func run() (err error) {
 			w.Run(ctx)
 		}()
 	}
-	err = serve(ctx, cfg.HTTPAddr, mux, worked)
+	err = serve(ctx, cfg.HTTPAddr, mux, worked, stopPolling)
 	stop()
 	<-worked
 	return err
@@ -278,7 +281,8 @@ func pickSandbox(vizEnv, sandbox string) (string, error) {
 }
 
 // serve answers HTTP until ctx is done, and shuts down once worked is closed: probes keep answering while the worker drains.
-func serve(ctx context.Context, addr string, h http.Handler, worked <-chan struct{}) error {
+// Shutting down calls onShutdown.
+func serve(ctx context.Context, addr string, h http.Handler, worked <-chan struct{}, onShutdown func()) error {
 	var lc net.ListenConfig
 	ln, err := lc.Listen(ctx, "tcp", addr)
 	if err != nil {
@@ -290,6 +294,7 @@ func serve(ctx context.Context, addr string, h http.Handler, worked <-chan struc
 		ReadHeaderTimeout: 5 * time.Second,
 		WriteTimeout:      30 * time.Second, // long-poll GET holds up to 20 s (§8.3)
 	}
+	srv.RegisterOnShutdown(onShutdown)
 	errc := make(chan error, 1)
 	go func() { errc <- srv.Serve(ln) }()
 	slog.InfoContext(ctx, "http listening", "addr", ln.Addr().String())
