@@ -8,6 +8,7 @@ package sqlc
 import (
 	"context"
 	"database/sql"
+	"strings"
 	"time"
 )
 
@@ -29,6 +30,17 @@ func (q *Queries) CancelQueuedJob(ctx context.Context, arg CancelQueuedJobParams
 	return result.RowsAffected()
 }
 
+const countQueuedJobs = `-- name: CountQueuedJobs :one
+SELECT COUNT(*) FROM jobs WHERE queue = 'default' AND status = 'queued'
+`
+
+func (q *Queries) CountQueuedJobs(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countQueuedJobs)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const deleteFinishedJobs = `-- name: DeleteFinishedJobs :execrows
 DELETE FROM jobs
 WHERE status IN ('done', 'failed', 'canceled') AND updated_at < ?
@@ -41,6 +53,25 @@ func (q *Queries) DeleteFinishedJobs(ctx context.Context, before time.Time) (int
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+const deleteJobsOfTraces = `-- name: DeleteJobsOfTraces :exec
+DELETE FROM jobs WHERE trace_id IN (/*SLICE:trace_ids*/?)
+`
+
+func (q *Queries) DeleteJobsOfTraces(ctx context.Context, traceIds []string) error {
+	query := deleteJobsOfTraces
+	var queryParams []interface{}
+	if len(traceIds) > 0 {
+		for _, v := range traceIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:trace_ids*/?", strings.Repeat(",?", len(traceIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:trace_ids*/?", "NULL", 1)
+	}
+	_, err := q.db.ExecContext(ctx, query, queryParams...)
+	return err
 }
 
 const expiredLeases = `-- name: ExpiredLeases :many

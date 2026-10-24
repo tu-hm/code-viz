@@ -10,3 +10,8 @@ sql:
         overrides:
           - db_type: int
             go_type: int
+          # database/sql can't scan NULL into json.RawMessage
+          - db_type: json
+            nullable: true
+            go_type:
+              type: "[]byte"

@@ -46,3 +46,9 @@ WHERE trace_id = sqlc.arg(trace_id) AND status = 'queued';
 DELETE FROM jobs
 WHERE status IN ('done', 'failed', 'canceled') AND updated_at < sqlc.arg(before)
 LIMIT 1000;
+
+-- name: CountQueuedJobs :one
+SELECT COUNT(*) FROM jobs WHERE queue = 'default' AND status = 'queued';
+
+-- name: DeleteJobsOfTraces :exec
+DELETE FROM jobs WHERE trace_id IN (sqlc.slice(trace_ids));

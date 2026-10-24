@@ -8,6 +8,7 @@ package sqlc
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"time"
 )
 
@@ -20,12 +21,12 @@ WHERE id = ?
 `
 
 type CompleteTraceParams struct {
-	Header        json.RawMessage
-	Chunks        json.RawMessage
+	Header        []byte
+	Chunks        []byte
 	ChunkCount    int
 	ExitKind      string
 	StoragePrefix string
-	Build         json.RawMessage
+	Build         []byte
 	Now           time.Time
 	ID            string
 }
@@ -44,6 +45,25 @@ func (q *Queries) CompleteTrace(ctx context.Context, arg CompleteTraceParams) er
 	return err
 }
 
+const deleteTraces = `-- name: DeleteTraces :exec
+DELETE FROM traces WHERE id IN (/*SLICE:ids*/?)
+`
+
+func (q *Queries) DeleteTraces(ctx context.Context, ids []string) error {
+	query := deleteTraces
+	var queryParams []interface{}
+	if len(ids) > 0 {
+		for _, v := range ids {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:ids*/?", strings.Repeat(",?", len(ids))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:ids*/?", "NULL", 1)
+	}
+	_, err := q.db.ExecContext(ctx, query, queryParams...)
+	return err
+}
+
 const failTrace = `-- name: FailTrace :exec
 UPDATE traces
 SET status = 'failed', failure_stage = ?, failure_kind = ?, build = ?,
@@ -54,7 +74,7 @@ WHERE id = ?
 type FailTraceParams struct {
 	FailureStage string
 	FailureKind  string
-	Build        json.RawMessage
+	Build        []byte
 	Now          time.Time
 	ID           string
 }
@@ -70,6 +90,77 @@ func (q *Queries) FailTrace(ctx context.Context, arg FailTraceParams) error {
 	return err
 }
 
+const insertTrace = `-- name: InsertTrace :execrows
+INSERT INTO traces (id, cache_key, language, source, stdin, options, updated_at, expires_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE id = id
+`
+
+type InsertTraceParams struct {
+	ID        string
+	CacheKey  []byte
+	Language  string
+	Source    string
+	Stdin     string
+	Options   json.RawMessage
+	Now       time.Time
+	ExpiresAt time.Time
+}
+
+func (q *Queries) InsertTrace(ctx context.Context, arg InsertTraceParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, insertTrace,
+		arg.ID,
+		arg.CacheKey,
+		arg.Language,
+		arg.Source,
+		arg.Stdin,
+		arg.Options,
+		arg.Now,
+		arg.ExpiresAt,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const lockExpiredTraces = `-- name: LockExpiredTraces :many
+SELECT id, storage_prefix, chunk_count FROM traces
+WHERE expires_at < ?
+ORDER BY expires_at
+LIMIT 1000
+FOR UPDATE
+`
+
+type LockExpiredTracesRow struct {
+	ID            string
+	StoragePrefix string
+	ChunkCount    int
+}
+
+func (q *Queries) LockExpiredTraces(ctx context.Context, now time.Time) ([]LockExpiredTracesRow, error) {
+	rows, err := q.db.QueryContext(ctx, lockExpiredTraces, now)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []LockExpiredTracesRow
+	for rows.Next() {
+		var i LockExpiredTracesRow
+		if err := rows.Scan(&i.ID, &i.StoragePrefix, &i.ChunkCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const lockTrace = `-- name: LockTrace :one
 SELECT status FROM traces WHERE id = ? FOR UPDATE
 `
@@ -79,6 +170,29 @@ func (q *Queries) LockTrace(ctx context.Context, id string) (TracesStatus, error
 	var status TracesStatus
 	err := row.Scan(&status)
 	return status, err
+}
+
+const lockTraceByCacheKey = `-- name: LockTraceByCacheKey :one
+SELECT id, status, failure_kind, expires_at FROM traces WHERE cache_key = ? FOR UPDATE
+`
+
+type LockTraceByCacheKeyRow struct {
+	ID          string
+	Status      TracesStatus
+	FailureKind string
+	ExpiresAt   time.Time
+}
+
+func (q *Queries) LockTraceByCacheKey(ctx context.Context, cacheKey []byte) (LockTraceByCacheKeyRow, error) {
+	row := q.db.QueryRowContext(ctx, lockTraceByCacheKey, cacheKey)
+	var i LockTraceByCacheKeyRow
+	err := row.Scan(
+		&i.ID,
+		&i.Status,
+		&i.FailureKind,
+		&i.ExpiresAt,
+	)
+	return i, err
 }
 
 const requeueTrace = `-- name: RequeueTrace :exec
@@ -94,6 +208,25 @@ type RequeueTraceParams struct {
 
 func (q *Queries) RequeueTrace(ctx context.Context, arg RequeueTraceParams) error {
 	_, err := q.db.ExecContext(ctx, requeueTrace, arg.Now, arg.ID)
+	return err
+}
+
+const resetTrace = `-- name: ResetTrace :exec
+UPDATE traces
+SET status = 'queued', version = version + 1, progress_steps = 0, header = NULL, chunks = NULL, chunk_count = 0,
+  storage_prefix = '', exit_kind = '', build = NULL, failure_stage = '', failure_kind = '',
+  updated_at = ?, expires_at = ?
+WHERE id = ?
+`
+
+type ResetTraceParams struct {
+	Now       time.Time
+	ExpiresAt time.Time
+	ID        string
+}
+
+func (q *Queries) ResetTrace(ctx context.Context, arg ResetTraceParams) error {
+	_, err := q.db.ExecContext(ctx, resetTrace, arg.Now, arg.ExpiresAt, arg.ID)
 	return err
 }
 

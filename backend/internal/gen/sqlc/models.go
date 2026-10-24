@@ -132,12 +132,12 @@ type Trace struct {
 	Source        string
 	Stdin         string
 	Options       json.RawMessage
-	Header        json.RawMessage
-	Chunks        json.RawMessage
+	Header        []byte
+	Chunks        []byte
 	ChunkCount    int
 	StoragePrefix string
 	ExitKind      string
-	Build         json.RawMessage
+	Build         []byte
 	FailureStage  string
 	FailureKind   string
 	UpdatedAt     time.Time
@@ -151,10 +151,12 @@ type UsageDaily struct {
 }
 
 type Visualization struct {
-	ID        string
-	TraceID   string
-	Subject   string
-	Shared    bool
-	CreatedAt time.Time
-	ExpiresAt time.Time
+	ID             string
+	TraceID        string
+	Subject        string
+	Shared         bool
+	CreatedAt      time.Time
+	ExpiresAt      time.Time
+	Detached       bool
+	IdempotencyKey sql.NullString
 }
