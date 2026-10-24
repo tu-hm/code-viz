@@ -888,6 +888,7 @@ Database load stays small. Each job costs about 4 row writes, 3 queue writes (in
 - InnoDB, `utf8mb4`, UTC everywhere;
 - `binlog_format=ROW`, `sql_mode` including `STRICT_TRANS_TABLES`;
 - application sessions use `transaction_isolation = READ-COMMITTED`, which means fewer gap locks and fewer deadlocks than the default.
+- each vizd process pools at most 32 connections, keeps them open between uses and replaces each after 3 minutes. A burst waits for a free connection instead of opening one per request, and the api and worker on one server stay under MySQL's default `max_connections` (151). Without the cap, 32 clients made vizd open a connection every 1–3 requests until it ran out of ports (`plans/spikes/load-capacity.md`).
 
 #### 7.13.1 What replaces each PostgreSQL feature
 
