@@ -8,9 +8,13 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/http/httputil"
+	"net/url"
 	"os"
+	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/goccy/go-yaml"
 	"github.com/google/go-cmp/cmp"
@@ -98,12 +102,101 @@ func TestPutToUnreachableEndpointIsInfraError(t *testing.T) {
 	}
 }
 
+func TestSignedURLDownloadsFromThePublicEndpoint(t *testing.T) {
+	endpoint := startSeaweedFS(t)
+	if resp := do(t, http.MethodPut, endpoint+"/"+bucket); resp.StatusCode != http.StatusOK {
+		t.Fatalf("create bucket: HTTP %d", resp.StatusCode)
+	}
+	target, err := url.Parse(endpoint)
+	if err != nil {
+		t.Fatal(err)
+	}
+	public := httptest.NewServer(&httputil.ReverseProxy{Rewrite: func(r *httputil.ProxyRequest) {
+		r.SetURL(target)
+		r.Out.Host = r.In.Host
+	}})
+	t.Cleanup(public.Close)
+
+	b := newBucketWithPublic(t, endpoint, public.URL)
+	key := domain.ChunkKey("t7", "trc_0123", 0)
+	if err := b.Put(t.Context(), key, []byte("chunk")); err != nil {
+		t.Fatal(err)
+	}
+	signed, err := b.Sign(t.Context(), key, 15*time.Minute)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if want := public.URL + "/" + bucket + "/" + key + "?"; !strings.HasPrefix(signed, want) {
+		t.Errorf("url = %s, want prefix %s", signed, want)
+	}
+	u, err := url.Parse(signed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := u.Query().Get("X-Amz-Expires"); got != "900" {
+		t.Errorf("X-Amz-Expires = %q, want 900", got)
+	}
+	resp := do(t, http.MethodGet, signed)
+	if resp.StatusCode != http.StatusOK || string(resp.body) != "chunk" {
+		t.Errorf("get signed url: HTTP %d, body %q; want 200, \"chunk\"", resp.StatusCode, resp.body)
+	}
+}
+
+func TestDeleteRemovesTheKeysAndSkipsMissingOnes(t *testing.T) {
+	endpoint := startSeaweedFS(t)
+	if resp := do(t, http.MethodPut, endpoint+"/"+bucket); resp.StatusCode != http.StatusOK {
+		t.Fatalf("create bucket: HTTP %d", resp.StatusCode)
+	}
+	b := newBucket(t, endpoint)
+	keys := []string{domain.ChunkKey("t7", "trc_a", 0), domain.ChunkKey("t7", "trc_a", 1), domain.ChunkKey("t7", "trc_b", 0)}
+	for _, key := range keys {
+		if err := b.Put(t.Context(), key, []byte("x")); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := b.Delete(t.Context(), []string{keys[0], keys[1], domain.ChunkKey("t7", "trc_a", 2)}); err != nil {
+		t.Fatal(err)
+	}
+
+	got := map[string]int{}
+	for _, key := range keys {
+		got[key] = do(t, http.MethodGet, endpoint+"/"+bucket+"/"+key).StatusCode
+	}
+	want := map[string]int{keys[0]: http.StatusNotFound, keys[1]: http.StatusNotFound, keys[2]: http.StatusOK}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("GET status by key (-want +got):\n%s", diff)
+	}
+}
+
+func TestDeleteOnUnreachableEndpointIsInfraError(t *testing.T) {
+	var lc net.ListenConfig
+	ln, err := lc.Listen(t.Context(), "tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	closed := "http://" + ln.Addr().String()
+	if err := ln.Close(); err != nil {
+		t.Fatal(err)
+	}
+	err = newBucket(t, closed).Delete(t.Context(), []string{domain.ChunkKey("t7", "trc_0123", 0)})
+	if !errors.Is(err, domain.ErrInfra) {
+		t.Fatalf("err = %v, want ErrInfra", err)
+	}
+}
+
 func newBucket(t *testing.T, endpoint string) ports.BlobStore {
+	t.Helper()
+	return newBucketWithPublic(t, endpoint, "")
+}
+
+func newBucketWithPublic(t *testing.T, endpoint, public string) ports.BlobStore {
 	t.Helper()
 	t.Setenv("AWS_REGION", "us-east-1")
 	t.Setenv("AWS_ACCESS_KEY_ID", "viz")
 	t.Setenv("AWS_SECRET_ACCESS_KEY", "viz")
-	b, err := blobstore.New(t.Context(), blobstore.Config{Endpoint: endpoint, Bucket: bucket, PathStyle: true})
+	b, err := blobstore.New(t.Context(), blobstore.Config{Endpoint: endpoint, PublicEndpoint: public, Bucket: bucket, PathStyle: true})
 	if err != nil {
 		t.Fatal(err)
 	}
