@@ -1,0 +1,1286 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.3.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 11
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "small",
+              "value": {
+                "t": "uninit",
+                "type": "std::bitset<10>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 5,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "small",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::bitset<10>"
+              }
+            },
+            {
+              "name": "wide",
+              "value": {
+                "t": "uninit",
+                "type": "std::bitset<70>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "bool",
+              "v": "true"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "true"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            }
+          ],
+          "kind": "sequence",
+          "length": 10,
+          "truncated": false,
+          "type": "std::bitset<10>"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "small",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::bitset<10>"
+              }
+            },
+            {
+              "name": "wide",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::bitset<70>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            }
+          ],
+          "kind": "sequence",
+          "length": 70,
+          "truncated": false,
+          "type": "std::bitset<70>"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "small",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::bitset<10>"
+              }
+            },
+            {
+              "name": "wide",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::bitset<70>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "true"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            }
+          ],
+          "kind": "sequence",
+          "length": 70,
+          "truncated": false,
+          "type": "std::bitset<70>"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "small",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::bitset<10>"
+              }
+            },
+            {
+              "name": "wide",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::bitset<70>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "true"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "true"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            },
+            {
+              "t": "bool",
+              "v": "false"
+            }
+          ],
+          "kind": "sequence",
+          "length": 70,
+          "truncated": false,
+          "type": "std::bitset<70>"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 10,
+          "locals": [
+            {
+              "name": "small",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::bitset<10>"
+              }
+            },
+            {
+              "name": "wide",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::bitset<70>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 10,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "4\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "small",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::bitset<10>"
+              }
+            },
+            {
+              "name": "wide",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::bitset<70>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 10,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "small",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::bitset<10>"
+              }
+            },
+            {
+              "name": "wide",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::bitset<70>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 8,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

@@ -5,7 +5,7 @@
   },
   "id": "trc_0",
   "language": {
-    "adapter": "cpp-gdb/0.2.0",
+    "adapter": "cpp-gdb/0.3.0",
     "id": "cpp17-gcc",
     "runtime": "GCC 13.5.0"
   },
@@ -723,8 +723,8 @@
       },
       "heap": {
         "o1": {
-          "fields": [],
-          "kind": "record",
+          "kind": "opaque",
+          "summary": "<incomplete type>",
           "type": "std::exception"
         }
       },

@@ -47,4 +47,4 @@ RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/000-local-lib.conf \
     && g++ $flags -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all -o stdc++.h.gch/checks-on.gch \
     && rm stdc++.h.gch/*.gcno \
     && find / -xdev -perm /6000 -type f -exec chmod a-s {} +
-COPY adapters/cpp/flush_init.cpp adapters/cpp/trace.py /opt/viz/
+COPY adapters/cpp/flush_init.cpp adapters/cpp/trace.py adapters/cpp/typemap.json /opt/viz/

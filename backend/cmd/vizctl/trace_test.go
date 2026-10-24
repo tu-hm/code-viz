@@ -56,8 +56,13 @@ func TestGoldenTraces(t *testing.T) {
 				if err != nil && !errors.Is(err, fs.ErrNotExist) {
 					t.Fatal(err)
 				}
+				args := []string{"trace", "--lang", m.ID, src}
+				opts := filepath.Join(dir, "options.json")
+				if _, err := os.Stat(opts); err == nil {
+					args = []string{"trace", "--lang", m.ID, "--options", opts, src}
+				}
 				var stdout, stderr bytes.Buffer
-				if code := run(t.Context(), []string{"trace", "--lang", m.ID, src}, bytes.NewReader(stdin), &stdout, &stderr); code != 0 {
+				if code := run(t.Context(), args, bytes.NewReader(stdin), &stdout, &stderr); code != 0 {
 					t.Fatalf("vizctl trace exited %d:\n%s", code, stderr.String())
 				}
 				if err := val.Trace(stdout.Bytes()); err != nil {
@@ -183,5 +188,36 @@ func TestTraceNamesBuildFailure(t *testing.T) {
 				t.Errorf("stdout = %q, want nothing", stdout.String())
 			}
 		})
+	}
+}
+
+func TestTypeMapRowsHaveFixtures(t *testing.T) {
+	t.Chdir("../..")
+	raw, err := os.ReadFile(filepath.Join(adapterDir, "cpp", "typemap.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var rows map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &rows); err != nil {
+		t.Fatal(err)
+	}
+	goldens, err := filepath.Glob(filepath.Join("fixtures", "cpp", "type-*", "expected.trace.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var shown []byte
+	for _, golden := range goldens {
+		b, err := os.ReadFile(golden)
+		if err != nil {
+			t.Fatal(err)
+		}
+		shown = append(shown, b...)
+	}
+
+	for row := range rows {
+		name := "std::" + strings.TrimPrefix(strings.TrimPrefix(row, "std::"), "basic_")
+		if !regexp.MustCompile(`"type": "` + regexp.QuoteMeta(name) + `[<"]`).Match(shown) {
+			t.Errorf("no fixtures/cpp/type-* golden shows a %s (typemap.json row %s)", name, row)
+		}
 	}
 }

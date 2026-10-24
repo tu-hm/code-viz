@@ -37,8 +37,19 @@ func traceCommand(ctx context.Context, args []string, stdin io.Reader, stdout, s
 	fs := flag.NewFlagSet("trace", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	lang := fs.String("lang", "", "")
+	optsFile := fs.String("options", "", "")
 	if err := fs.Parse(args); err != nil || *lang == "" || fs.NArg() != 1 {
-		return errors.New("usage: vizctl trace --lang <id> <source file> < stdin")
+		return errors.New("usage: vizctl trace --lang <id> [--options <json file>] <source file> < stdin")
+	}
+	opts := trace.Options{MaxSteps: maxSteps, StartAtLines: []int{}}
+	if *optsFile != "" {
+		raw, err := os.ReadFile(*optsFile)
+		if err != nil {
+			return err
+		}
+		if err := json.Unmarshal(raw, &opts); err != nil {
+			return fmt.Errorf("read options: %w", err)
+		}
 	}
 
 	m, err := findManifest(*lang)
@@ -59,7 +70,7 @@ func traceCommand(ctx context.Context, args []string, stdin io.Reader, stdout, s
 		return err
 	}
 
-	res, err := record(ctx, m, src, in)
+	res, err := record(ctx, m, src, in, opts)
 	if err != nil {
 		return err
 	}
@@ -87,7 +98,7 @@ func readAtMost(r io.Reader, limit int, name string) ([]byte, error) {
 	return b, nil
 }
 
-func record(ctx context.Context, m domain.Manifest, src, stdin []byte) (res *tracecore.Result, err error) {
+func record(ctx context.Context, m domain.Manifest, src, stdin []byte, opts trace.Options) (res *tracecore.Result, err error) {
 	val, err := schema.New()
 	if err != nil {
 		return nil, err
@@ -110,7 +121,6 @@ func record(ctx context.Context, m domain.Manifest, src, stdin []byte) (res *tra
 	}
 	defer func() { err = errors.Join(err, box.Close(context.WithoutCancel(ctx))) }()
 
-	opts := trace.Options{MaxSteps: maxSteps, StartAtLines: []int{}}
 	if m.Build != nil {
 		b, kind, err := app.Build(ctx, box, m, opts)
 		if err != nil {
@@ -136,7 +146,7 @@ func record(ctx context.Context, m domain.Manifest, src, stdin []byte) (res *tra
 	defer cancelTrace()
 	exit, err := box.Run(traceCtx, ports.Command{
 		Args:   m.TraceCmd,
-		Env:    append([]string{"VIZ_MAX_STEPS=" + strconv.Itoa(maxSteps)}, m.TraceEnv...),
+		Env:    append([]string{"VIZ_MAX_STEPS=" + strconv.Itoa(opts.MaxSteps)}, m.TraceEnv...),
 		Stdout: rec.Stdout(),
 		Stderr: rec.Stderr(),
 		Wire:   rec.Wire(),

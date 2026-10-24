@@ -1,0 +1,554 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.3.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 11
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "p",
+              "value": {
+                "t": "uninit",
+                "type": "std::pair<int, std::string>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 5,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "p",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::pair<int, std::string>"
+              }
+            },
+            {
+              "name": "t",
+              "value": {
+                "t": "uninit",
+                "type": "std::tuple<int, double, std::string>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "first",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "second",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "one"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "std::pair<int, std::string>"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "p",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::pair<int, std::string>"
+              }
+            },
+            {
+              "name": "t",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::tuple<int, double, std::string>"
+              }
+            },
+            {
+              "name": "edges",
+              "value": {
+                "t": "uninit",
+                "type": "std::vector<std::pair<int, int>>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "fields": [
+            {
+              "name": "0",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "1",
+              "value": {
+                "t": "float",
+                "type": "double",
+                "v": "2.5"
+              }
+            },
+            {
+              "name": "2",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "two"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "std::tuple<int, double, std::string>"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "p",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::pair<int, std::string>"
+              }
+            },
+            {
+              "name": "t",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::tuple<int, double, std::string>"
+              }
+            },
+            {
+              "name": "edges",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::vector<std::pair<int, int>>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o3": {
+          "items": [
+            {
+              "id": "o4",
+              "t": "ref"
+            },
+            {
+              "id": "o5",
+              "t": "ref"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "meta": {
+            "capacity": 2
+          },
+          "truncated": false,
+          "type": "std::vector<std::pair<int, int>>"
+        },
+        "o4": {
+          "fields": [
+            {
+              "name": "first",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "second",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "std::pair<int, int>"
+        },
+        "o5": {
+          "fields": [
+            {
+              "name": "first",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "second",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "std::pair<int, int>"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "p",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::pair<int, std::string>"
+              }
+            },
+            {
+              "name": "t",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::tuple<int, double, std::string>"
+              }
+            },
+            {
+              "name": "edges",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::vector<std::pair<int, int>>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "first",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "second",
+              "value": {
+                "t": "str",
+                "type": "std::string",
+                "v": "one"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "std::pair<int, std::string>"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 10,
+          "locals": [
+            {
+              "name": "p",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::pair<int, std::string>"
+              }
+            },
+            {
+              "name": "t",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::tuple<int, double, std::string>"
+              }
+            },
+            {
+              "name": "edges",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::vector<std::pair<int, int>>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 10,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "2 3\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "p",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::pair<int, std::string>"
+              }
+            },
+            {
+              "name": "t",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::tuple<int, double, std::string>"
+              }
+            },
+            {
+              "name": "edges",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::vector<std::pair<int, int>>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 10,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "p",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::pair<int, std::string>"
+              }
+            },
+            {
+              "name": "t",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::tuple<int, double, std::string>"
+              }
+            },
+            {
+              "name": "edges",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::vector<std::pair<int, int>>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 8,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

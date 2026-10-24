@@ -1,0 +1,670 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.3.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 12
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "t": "uninit",
+                "type": "std::map<std::string, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 5,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::map<std::string, int>"
+              }
+            },
+            {
+              "name": "mm",
+              "value": {
+                "t": "uninit",
+                "type": "std::multimap<int, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "entries": [
+            {
+              "key": {
+                "t": "str",
+                "v": "a"
+              },
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "key": {
+                "t": "str",
+                "v": "b"
+              },
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "mapping",
+          "length": 2,
+          "ordered": true,
+          "truncated": false,
+          "type": "std::map<std::string, int>"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::map<std::string, int>"
+              }
+            },
+            {
+              "name": "mm",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::multimap<int, int>"
+              }
+            },
+            {
+              "name": "um",
+              "value": {
+                "t": "uninit",
+                "type": "std::unordered_map<int, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "entries": [
+            {
+              "key": {
+                "t": "int",
+                "v": "1"
+              },
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "key": {
+                "t": "int",
+                "v": "1"
+              },
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "kind": "mapping",
+          "length": 2,
+          "ordered": true,
+          "truncated": false,
+          "type": "std::multimap<int, int>"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::map<std::string, int>"
+              }
+            },
+            {
+              "name": "mm",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::multimap<int, int>"
+              }
+            },
+            {
+              "name": "um",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::unordered_map<int, int>"
+              }
+            },
+            {
+              "name": "umm",
+              "value": {
+                "t": "uninit",
+                "type": "std::unordered_multimap<int, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o3": {
+          "entries": [
+            {
+              "key": {
+                "t": "int",
+                "v": "2"
+              },
+              "value": {
+                "t": "int",
+                "v": "20"
+              }
+            },
+            {
+              "key": {
+                "t": "int",
+                "v": "1"
+              },
+              "value": {
+                "t": "int",
+                "v": "10"
+              }
+            }
+          ],
+          "kind": "mapping",
+          "length": 2,
+          "ordered": false,
+          "truncated": false,
+          "type": "std::unordered_map<int, int>"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::map<std::string, int>"
+              }
+            },
+            {
+              "name": "mm",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::multimap<int, int>"
+              }
+            },
+            {
+              "name": "um",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::unordered_map<int, int>"
+              }
+            },
+            {
+              "name": "umm",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "std::unordered_multimap<int, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o4": {
+          "entries": [
+            {
+              "key": {
+                "t": "int",
+                "v": "7"
+              },
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "key": {
+                "t": "int",
+                "v": "7"
+              },
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            }
+          ],
+          "kind": "mapping",
+          "length": 2,
+          "ordered": false,
+          "truncated": false,
+          "type": "std::unordered_multimap<int, int>"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 10,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::map<std::string, int>"
+              }
+            },
+            {
+              "name": "mm",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::multimap<int, int>"
+              }
+            },
+            {
+              "name": "um",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::unordered_map<int, int>"
+              }
+            },
+            {
+              "name": "umm",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "std::unordered_multimap<int, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "entries": [
+            {
+              "key": {
+                "t": "str",
+                "v": "a"
+              },
+              "value": {
+                "t": "int",
+                "v": "1"
+              }
+            },
+            {
+              "key": {
+                "t": "str",
+                "v": "b"
+              },
+              "value": {
+                "t": "int",
+                "v": "2"
+              }
+            },
+            {
+              "key": {
+                "t": "str",
+                "v": "c"
+              },
+              "value": {
+                "t": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "kind": "mapping",
+          "length": 3,
+          "ordered": true,
+          "truncated": false,
+          "type": "std::map<std::string, int>"
+        }
+      },
+      "i": 5,
+      "keyframe": false,
+      "line": 10,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::map<std::string, int>"
+              }
+            },
+            {
+              "name": "mm",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::multimap<int, int>"
+              }
+            },
+            {
+              "name": "um",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::unordered_map<int, int>"
+              }
+            },
+            {
+              "name": "umm",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "std::unordered_multimap<int, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 6,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 10,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "9\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::map<std::string, int>"
+              }
+            },
+            {
+              "name": "mm",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::multimap<int, int>"
+              }
+            },
+            {
+              "name": "um",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::unordered_map<int, int>"
+              }
+            },
+            {
+              "name": "umm",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "std::unordered_multimap<int, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "m",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::map<std::string, int>"
+              }
+            },
+            {
+              "name": "mm",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::multimap<int, int>"
+              }
+            },
+            {
+              "name": "um",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::unordered_map<int, int>"
+              }
+            },
+            {
+              "name": "umm",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "std::unordered_multimap<int, int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 9,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

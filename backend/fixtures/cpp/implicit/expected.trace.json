@@ -5,7 +5,7 @@
   },
   "id": "trc_0",
   "language": {
-    "adapter": "cpp-gdb/0.2.0",
+    "adapter": "cpp-gdb/0.3.0",
     "id": "cpp17-gcc",
     "runtime": "GCC 13.5.0"
   },
@@ -32,7 +32,7 @@
               "name": "items",
               "value": {
                 "t": "uninit",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             }
           ],
@@ -66,7 +66,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             }
           ],
@@ -80,9 +80,10 @@
           "kind": "sequence",
           "length": 0,
           "meta": {
-            "summary": "std::__debug::vector of length 0, capacity 0"
+            "capacity": 0
           },
-          "type": "std::__debug::vector<Item, std::allocator<Item> >"
+          "truncated": false,
+          "type": "std::vector<Item>"
         }
       },
       "i": 1,
@@ -110,7 +111,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             }
           ],
@@ -123,16 +124,16 @@
           "items": [
             {
               "id": "o2",
-              "t": "ref",
-              "type": "Item"
+              "t": "ref"
             }
           ],
           "kind": "sequence",
           "length": 1,
           "meta": {
-            "summary": "std::__debug::vector of length 1, capacity 1"
+            "capacity": 1
           },
-          "type": "std::__debug::vector<Item, std::allocator<Item> >"
+          "truncated": false,
+          "type": "std::vector<Item>"
         },
         "o2": {
           "fields": [
@@ -182,7 +183,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             },
             {
@@ -202,21 +203,20 @@
           "items": [
             {
               "id": "o3",
-              "t": "ref",
-              "type": "Item"
+              "t": "ref"
             },
             {
               "id": "o4",
-              "t": "ref",
-              "type": "Item"
+              "t": "ref"
             }
           ],
           "kind": "sequence",
           "length": 2,
           "meta": {
-            "summary": "std::__debug::vector of length 2, capacity 2"
+            "capacity": 2
           },
-          "type": "std::__debug::vector<Item, std::allocator<Item> >"
+          "truncated": false,
+          "type": "std::vector<Item>"
         },
         "o3": {
           "fields": [
@@ -290,7 +290,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             },
             {
@@ -362,7 +362,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             },
             {
@@ -549,7 +549,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             },
             {
@@ -607,7 +607,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             },
             {
@@ -665,7 +665,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             },
             {
@@ -724,7 +724,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<Item, std::allocator<Item> >"
+                "type": "std::vector<Item>"
               }
             },
             {

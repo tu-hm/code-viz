@@ -1,0 +1,875 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.3.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 14
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "t": "uninit",
+                "type": "int [5]"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 5,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "t": "uninit",
+                "type": "int [2][3]"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "v": "5"
+            },
+            {
+              "t": "int",
+              "v": "4"
+            },
+            {
+              "t": "int",
+              "v": "3"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            },
+            {
+              "t": "int",
+              "v": "1"
+            }
+          ],
+          "kind": "sequence",
+          "length": 5,
+          "truncated": false,
+          "type": "int [5]"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [2][3]"
+              }
+            },
+            {
+              "name": "arr",
+              "value": {
+                "t": "uninit",
+                "type": "std::array<int, 3>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "fixed": true,
+          "items": [
+            {
+              "id": "o3",
+              "t": "ref"
+            },
+            {
+              "id": "o4",
+              "t": "ref"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "int [2][3]"
+        },
+        "o3": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            },
+            {
+              "t": "int",
+              "v": "3"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "truncated": false,
+          "type": "int [3]"
+        },
+        "o4": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "v": "4"
+            },
+            {
+              "t": "int",
+              "v": "5"
+            },
+            {
+              "t": "int",
+              "v": "6"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "truncated": false,
+          "type": "int [3]"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [2][3]"
+              }
+            },
+            {
+              "name": "arr",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::array<int, 3>"
+              }
+            },
+            {
+              "name": "empty",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::array<int, 0>"
+              }
+            },
+            {
+              "name": "nested",
+              "value": {
+                "t": "uninit",
+                "type": "std::array<std::array<int, 2>, 2>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o5": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "v": "7"
+            },
+            {
+              "t": "int",
+              "v": "8"
+            },
+            {
+              "t": "int",
+              "v": "9"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "truncated": false,
+          "type": "std::array<int, 3>"
+        },
+        "o6": {
+          "fixed": true,
+          "items": [],
+          "kind": "sequence",
+          "length": 0,
+          "truncated": false,
+          "type": "std::array<int, 0>"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 10,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [2][3]"
+              }
+            },
+            {
+              "name": "arr",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::array<int, 3>"
+              }
+            },
+            {
+              "name": "empty",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::array<int, 0>"
+              }
+            },
+            {
+              "name": "nested",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "std::array<std::array<int, 2>, 2>"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "t": "uninit",
+                "type": "int *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o7": {
+          "fixed": true,
+          "items": [
+            {
+              "id": "o8",
+              "t": "ref"
+            },
+            {
+              "id": "o9",
+              "t": "ref"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "std::array<std::array<int, 2>, 2>"
+        },
+        "o8": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "std::array<int, 2>"
+        },
+        "o9": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "v": "3"
+            },
+            {
+              "t": "int",
+              "v": "4"
+            }
+          ],
+          "kind": "sequence",
+          "length": 2,
+          "truncated": false,
+          "type": "std::array<int, 2>"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 10,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [2][3]"
+              }
+            },
+            {
+              "name": "arr",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::array<int, 3>"
+              }
+            },
+            {
+              "name": "empty",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::array<int, 0>"
+              }
+            },
+            {
+              "name": "nested",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "std::array<std::array<int, 2>, 2>"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "addr": "0xdeadbeef",
+                "index": 1,
+                "t": "ptr",
+                "target": "o5",
+                "type": "int *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 5,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 10,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [2][3]"
+              }
+            },
+            {
+              "name": "arr",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::array<int, 3>"
+              }
+            },
+            {
+              "name": "empty",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::array<int, 0>"
+              }
+            },
+            {
+              "name": "nested",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "std::array<std::array<int, 2>, 2>"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "addr": "0xdeadbeef",
+                "index": 1,
+                "t": "ptr",
+                "target": "o5",
+                "type": "int *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o5": {
+          "fixed": true,
+          "items": [
+            {
+              "t": "int",
+              "v": "7"
+            },
+            {
+              "t": "int",
+              "v": "8"
+            },
+            {
+              "t": "int",
+              "v": "5"
+            }
+          ],
+          "kind": "sequence",
+          "length": 3,
+          "truncated": false,
+          "type": "std::array<int, 3>"
+        }
+      },
+      "i": 6,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [2][3]"
+              }
+            },
+            {
+              "name": "arr",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::array<int, 3>"
+              }
+            },
+            {
+              "name": "empty",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::array<int, 0>"
+              }
+            },
+            {
+              "name": "nested",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "std::array<std::array<int, 2>, 2>"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "addr": "0xdeadbeef",
+                "index": 1,
+                "t": "ptr",
+                "target": "o5",
+                "type": "int *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 7,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "27\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [2][3]"
+              }
+            },
+            {
+              "name": "arr",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::array<int, 3>"
+              }
+            },
+            {
+              "name": "empty",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::array<int, 0>"
+              }
+            },
+            {
+              "name": "nested",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "std::array<std::array<int, 2>, 2>"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "addr": "0xdeadbeef",
+                "index": 1,
+                "t": "ptr",
+                "target": "o5",
+                "type": "int *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 14,
+          "locals": [
+            {
+              "name": "a",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [5]"
+              }
+            },
+            {
+              "name": "grid",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [2][3]"
+              }
+            },
+            {
+              "name": "arr",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::array<int, 3>"
+              }
+            },
+            {
+              "name": "empty",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::array<int, 0>"
+              }
+            },
+            {
+              "name": "nested",
+              "value": {
+                "id": "o7",
+                "t": "ref",
+                "type": "std::array<std::array<int, 2>, 2>"
+              }
+            },
+            {
+              "name": "p",
+              "value": {
+                "addr": "0xdeadbeef",
+                "index": 1,
+                "t": "ptr",
+                "target": "o5",
+                "type": "int *"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 14,
+      "prevLine": 14,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 10,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

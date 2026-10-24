@@ -1,0 +1,708 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.3.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 13
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 5,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "t": "uninit",
+                "type": "std::optional<int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 5,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 6,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "t": "uninit",
+                "type": "std::unique_ptr<int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "kind": "opaque",
+          "summary": "std::optional = {[contained value] = 3}",
+          "type": "std::optional<int>"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 6,
+      "prevLine": 5,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 7,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::unique_ptr<int>"
+              }
+            },
+            {
+              "name": "s",
+              "value": {
+                "t": "uninit",
+                "type": "std::set<int>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "kind": "opaque",
+          "summary": "std::unique_ptr<int> = {get() = 0xmasked}",
+          "type": "std::unique_ptr<int>"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 7,
+      "prevLine": 6,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 8,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::unique_ptr<int>"
+              }
+            },
+            {
+              "name": "s",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            },
+            {
+              "name": "it",
+              "value": {
+                "t": "uninit",
+                "type": "__gnu_debug::_Safe_iterator<std::_Rb_tree_const_iterator<int>, std::set<int>, std::bidirectional_iterator_tag>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o3": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            },
+            {
+              "t": "int",
+              "v": "2"
+            }
+          ],
+          "kind": "set",
+          "length": 2,
+          "ordered": true,
+          "truncated": false,
+          "type": "std::set<int>"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 8,
+      "prevLine": 7,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 9,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::unique_ptr<int>"
+              }
+            },
+            {
+              "name": "s",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            },
+            {
+              "name": "it",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "__gnu_debug::_Safe_iterator<std::_Rb_tree_const_iterator<int>, std::set<int>, std::bidirectional_iterator_tag>"
+              }
+            },
+            {
+              "name": "z",
+              "value": {
+                "t": "uninit",
+                "type": "std::complex<double>"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o4": {
+          "kind": "opaque",
+          "summary": "1",
+          "type": "__gnu_debug::_Safe_iterator<std::_Rb_tree_const_iterator<int>, std::set<int>, std::bidirectional_iterator_tag>"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 9,
+      "prevLine": 8,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 10,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::unique_ptr<int>"
+              }
+            },
+            {
+              "name": "s",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            },
+            {
+              "name": "it",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "__gnu_debug::_Safe_iterator<std::_Rb_tree_const_iterator<int>, std::set<int>, std::bidirectional_iterator_tag>"
+              }
+            },
+            {
+              "name": "z",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::complex<double>"
+              }
+            },
+            {
+              "name": "rng",
+              "value": {
+                "t": "uninit",
+                "type": "std::mt19937"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o5": {
+          "kind": "opaque",
+          "summary": "{_M_value = 1 + 2i}",
+          "type": "std::complex<double>"
+        }
+      },
+      "i": 5,
+      "keyframe": false,
+      "line": 10,
+      "prevLine": 9,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::unique_ptr<int>"
+              }
+            },
+            {
+              "name": "s",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            },
+            {
+              "name": "it",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "__gnu_debug::_Safe_iterator<std::_Rb_tree_const_iterator<int>, std::set<int>, std::bidirectional_iterator_tag>"
+              }
+            },
+            {
+              "name": "z",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::complex<double>"
+              }
+            },
+            {
+              "name": "rng",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::mt19937"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o6": {
+          "kind": "opaque",
+          "summary": "{static state_size = 624, _M_x = {42, 3107752595, 1895908407, 3900362577, 3030691166, 4081230161, 2732361568, 1361238961, 3961642104, 867618704, 2837705690, 3281374275, 3928479052, 3691474744, 3088217",
+          "type": "std::mt19937"
+        }
+      },
+      "i": 6,
+      "keyframe": false,
+      "line": 11,
+      "prevLine": 10,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::unique_ptr<int>"
+              }
+            },
+            {
+              "name": "s",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            },
+            {
+              "name": "it",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "__gnu_debug::_Safe_iterator<std::_Rb_tree_const_iterator<int>, std::set<int>, std::bidirectional_iterator_tag>"
+              }
+            },
+            {
+              "name": "z",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::complex<double>"
+              }
+            },
+            {
+              "name": "rng",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::mt19937"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o6": {
+          "kind": "opaque",
+          "summary": "{static state_size = 624, _M_x = {723970371, 1229153189, 4170412009, 2042542564, 3342822751, 3177601514, 1210243767, 2648089330, 1412570585, 3849763494, 2465546753, 1778048360, 3414291523, 3703604926,",
+          "type": "std::mt19937"
+        }
+      },
+      "i": 7,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": "10\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::unique_ptr<int>"
+              }
+            },
+            {
+              "name": "s",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            },
+            {
+              "name": "it",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "__gnu_debug::_Safe_iterator<std::_Rb_tree_const_iterator<int>, std::set<int>, std::bidirectional_iterator_tag>"
+              }
+            },
+            {
+              "name": "z",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::complex<double>"
+              }
+            },
+            {
+              "name": "rng",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::mt19937"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 8,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "function",
+          "line": 13,
+          "locals": [
+            {
+              "name": "maybe",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "std::optional<int>"
+              }
+            },
+            {
+              "name": "owned",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "std::unique_ptr<int>"
+              }
+            },
+            {
+              "name": "s",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "std::set<int>"
+              }
+            },
+            {
+              "name": "it",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "__gnu_debug::_Safe_iterator<std::_Rb_tree_const_iterator<int>, std::set<int>, std::bidirectional_iterator_tag>"
+              }
+            },
+            {
+              "name": "z",
+              "value": {
+                "id": "o5",
+                "t": "ref",
+                "type": "std::complex<double>"
+              }
+            },
+            {
+              "name": "rng",
+              "value": {
+                "id": "o6",
+                "t": "ref",
+                "type": "std::mt19937"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 13,
+      "prevLine": 13,
+      "removedObjects": [],
+      "stack": [
+        "f0"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 10,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}

@@ -5,7 +5,7 @@
   },
   "id": "trc_0",
   "language": {
-    "adapter": "cpp-gdb/0.2.0",
+    "adapter": "cpp-gdb/0.3.0",
     "id": "cpp17-gcc",
     "runtime": "GCC 13.5.0"
   },
@@ -49,7 +49,7 @@
               "name": "v",
               "value": {
                 "t": "uninit",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             }
           ],
@@ -63,18 +63,15 @@
           "items": [
             {
               "id": "o2",
-              "t": "ref",
-              "type": "int [4]"
+              "t": "ref"
             },
             {
               "id": "o3",
-              "t": "ref",
-              "type": "int [4]"
+              "t": "ref"
             },
             {
               "id": "o4",
-              "t": "ref",
-              "type": "int [4]"
+              "t": "ref"
             }
           ],
           "kind": "sequence",
@@ -201,7 +198,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             }
           ],
@@ -214,26 +211,24 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "3"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "1"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "2"
             }
           ],
           "kind": "sequence",
           "length": 3,
           "meta": {
-            "summary": "std::__debug::vector of length 3, capacity 3"
+            "capacity": 3
           },
-          "type": "std::__debug::vector<int, std::allocator<int> >"
+          "truncated": false,
+          "type": "std::vector<int>"
         }
       },
       "i": 1,
@@ -279,14 +274,14 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
               "name": "count",
               "value": {
                 "t": "uninit",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             }
           ],
@@ -299,26 +294,24 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "1"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "2"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "3"
             }
           ],
           "kind": "sequence",
           "length": 3,
           "meta": {
-            "summary": "std::__debug::vector of length 3, capacity 3"
+            "capacity": 3
           },
-          "type": "std::__debug::vector<int, std::allocator<int> >"
+          "truncated": false,
+          "type": "std::vector<int>"
         }
       },
       "i": 2,
@@ -364,7 +357,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -372,7 +365,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             }
           ],
@@ -385,11 +378,9 @@
           "entries": [],
           "kind": "mapping",
           "length": 0,
-          "meta": {
-            "summary": "std::__debug::map with 0 elements"
-          },
           "ordered": true,
-          "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+          "truncated": false,
+          "type": "std::map<std::string, int>"
         }
       },
       "i": 3,
@@ -435,7 +426,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -443,7 +434,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             }
           ],
@@ -457,23 +448,19 @@
             {
               "key": {
                 "t": "str",
-                "type": "const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >",
                 "v": "a"
               },
               "value": {
                 "t": "int",
-                "type": "int",
                 "v": "1"
               }
             }
           ],
           "kind": "mapping",
           "length": 1,
-          "meta": {
-            "summary": "std::__debug::map with 1 element"
-          },
           "ordered": true,
-          "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+          "truncated": false,
+          "type": "std::map<std::string, int>"
         }
       },
       "i": 4,
@@ -519,7 +506,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -527,7 +514,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             },
             {
@@ -548,35 +535,29 @@
             {
               "key": {
                 "t": "str",
-                "type": "const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >",
                 "v": "a"
               },
               "value": {
                 "t": "int",
-                "type": "int",
                 "v": "1"
               }
             },
             {
               "key": {
                 "t": "str",
-                "type": "const std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >",
                 "v": "b"
               },
               "value": {
                 "t": "int",
-                "type": "int",
                 "v": "2"
               }
             }
           ],
           "kind": "mapping",
           "length": 2,
-          "meta": {
-            "summary": "std::__debug::map with 2 elements"
-          },
           "ordered": true,
-          "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+          "truncated": false,
+          "type": "std::map<std::string, int>"
         }
       },
       "i": 5,
@@ -622,7 +603,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -630,7 +611,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             },
             {
@@ -697,7 +678,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -705,7 +686,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             },
             {
@@ -803,7 +784,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -811,7 +792,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             },
             {
@@ -888,7 +869,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -896,7 +877,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             },
             {
@@ -999,7 +980,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1007,7 +988,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             },
             {
@@ -1084,7 +1065,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1092,7 +1073,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             },
             {
@@ -1153,7 +1134,7 @@
               "value": {
                 "id": "o5",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1161,7 +1142,7 @@
               "value": {
                 "id": "o6",
                 "t": "ref",
-                "type": "std::__debug::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, int> > >"
+                "type": "std::map<std::string, int>"
               }
             },
             {

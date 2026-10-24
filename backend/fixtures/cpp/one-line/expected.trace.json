@@ -5,7 +5,7 @@
   },
   "id": "trc_0",
   "language": {
-    "adapter": "cpp-gdb/0.2.0",
+    "adapter": "cpp-gdb/0.3.0",
     "id": "cpp17-gcc",
     "runtime": "GCC 13.5.0"
   },
@@ -32,7 +32,7 @@
               "name": "v",
               "value": {
                 "t": "uninit",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             }
           ],
@@ -66,7 +66,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             }
           ],
@@ -79,26 +79,24 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "3"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "1"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "2"
             }
           ],
           "kind": "sequence",
           "length": 3,
           "meta": {
-            "summary": "std::__debug::vector of length 3, capacity 3"
+            "capacity": 3
           },
-          "type": "std::__debug::vector<int, std::allocator<int> >"
+          "truncated": false,
+          "type": "std::vector<int>"
         }
       },
       "i": 1,
@@ -613,26 +611,24 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "3"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "1"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "1"
             }
           ],
           "kind": "sequence",
           "length": 3,
           "meta": {
-            "summary": "std::__debug::vector of length 3, capacity 3"
+            "capacity": 3
           },
-          "type": "std::__debug::vector<int, std::allocator<int> >"
+          "truncated": false,
+          "type": "std::vector<int>"
         }
       },
       "i": 12,
@@ -710,7 +706,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -730,26 +726,24 @@
           "items": [
             {
               "t": "int",
-              "type": "int",
               "v": "3"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "2"
             },
             {
               "t": "int",
-              "type": "int",
               "v": "1"
             }
           ],
           "kind": "sequence",
           "length": 3,
           "meta": {
-            "summary": "std::__debug::vector of length 3, capacity 3"
+            "capacity": 3
           },
-          "type": "std::__debug::vector<int, std::allocator<int> >"
+          "truncated": false,
+          "type": "std::vector<int>"
         }
       },
       "i": 14,
@@ -777,7 +771,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -865,7 +859,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -937,7 +931,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1072,7 +1066,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1160,7 +1154,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1228,7 +1222,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1270,7 +1264,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1312,7 +1306,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {
@@ -1355,7 +1349,7 @@
               "value": {
                 "id": "o1",
                 "t": "ref",
-                "type": "std::__debug::vector<int, std::allocator<int> >"
+                "type": "std::vector<int>"
               }
             },
             {

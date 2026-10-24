@@ -1,0 +1,22 @@
+{
+  "std::basic_string": {"kind": "str"},
+  "std::basic_string_view": {"kind": "str"},
+  "std::array": {"kind": "sequence", "read": "array"},
+  "std::vector": {"kind": "sequence", "read": "vector"},
+  "std::deque": {"kind": "sequence", "read": "deque"},
+  "std::list": {"kind": "sequence", "length": "_M_impl._M_node._M_size"},
+  "std::set": {"kind": "set", "ordered": true, "length": "_M_t._M_impl._M_node_count"},
+  "std::multiset": {"kind": "set", "ordered": true, "length": "_M_t._M_impl._M_node_count"},
+  "std::unordered_set": {"kind": "set", "ordered": false, "length": "_M_h._M_element_count"},
+  "std::unordered_multiset": {"kind": "set", "ordered": false, "length": "_M_h._M_element_count"},
+  "std::map": {"kind": "mapping", "ordered": true, "length": "_M_t._M_impl._M_node_count"},
+  "std::multimap": {"kind": "mapping", "ordered": true, "length": "_M_t._M_impl._M_node_count"},
+  "std::unordered_map": {"kind": "mapping", "ordered": false, "length": "_M_h._M_element_count"},
+  "std::unordered_multimap": {"kind": "mapping", "ordered": false, "length": "_M_h._M_element_count"},
+  "std::pair": {"kind": "record", "read": "pair"},
+  "std::tuple": {"kind": "record", "read": "tuple"},
+  "std::stack": {"kind": "sequence", "read": "adapter"},
+  "std::queue": {"kind": "sequence", "read": "adapter"},
+  "std::priority_queue": {"kind": "sequence", "read": "adapter"},
+  "std::bitset": {"kind": "sequence", "read": "bitset"}
+}

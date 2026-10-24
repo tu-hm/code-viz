@@ -1,0 +1,1089 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_0",
+  "language": {
+    "adapter": "cpp-gdb/0.3.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 41
+  },
+  "steps": [
+    {
+      "callId": 0,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 31,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 31,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "t": "uninit",
+                "type": "Square"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 0,
+      "keyframe": true,
+      "line": 31,
+      "prevLine": null,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 32,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 32,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "Shape::sides",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "sides",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Square"
+        }
+      },
+      "i": 1,
+      "keyframe": false,
+      "line": 32,
+      "prevLine": 31,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 33,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 33,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "Shape::sides",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "sides",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Square"
+        }
+      },
+      "i": 2,
+      "keyframe": false,
+      "line": 33,
+      "prevLine": 32,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 34,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 34,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "Shape::sides",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "sides",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Square"
+        }
+      },
+      "i": 3,
+      "keyframe": false,
+      "line": 34,
+      "prevLine": 33,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 35,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 35,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "t": "uninit",
+                "type": "Cell"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o1": {
+          "fields": [
+            {
+              "name": "Shape::sides",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "sides",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "len",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Square"
+        }
+      },
+      "i": 4,
+      "keyframe": false,
+      "line": 35,
+      "prevLine": 34,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 36,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 36,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "Cell"
+              }
+            },
+            {
+              "name": "g",
+              "value": {
+                "t": "uninit",
+                "type": "Grid"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o2": {
+          "fields": [
+            {
+              "name": "kind",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "i",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "7"
+              }
+            },
+            {
+              "name": "f",
+              "value": {
+                "t": "float",
+                "type": "float",
+                "v": "1e-44"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Cell"
+        }
+      },
+      "i": 5,
+      "keyframe": false,
+      "line": 36,
+      "prevLine": 35,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 37,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 37,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "Cell"
+              }
+            },
+            {
+              "name": "g",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "Grid"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o3": {
+          "fields": [
+            {
+              "name": "std::vector<int>",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "width",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Grid"
+        },
+        "o4": {
+          "items": [],
+          "kind": "sequence",
+          "length": 0,
+          "meta": {
+            "capacity": 0
+          },
+          "truncated": false,
+          "type": "std::vector<int>"
+        }
+      },
+      "i": 6,
+      "keyframe": false,
+      "line": 37,
+      "prevLine": 36,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 38,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 38,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "Cell"
+              }
+            },
+            {
+              "name": "g",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "Grid"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o3": {
+          "fields": [
+            {
+              "name": "std::vector<int>",
+              "value": {
+                "id": "o4",
+                "t": "ref",
+                "type": "std::vector<int>"
+              }
+            },
+            {
+              "name": "width",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            }
+          ],
+          "kind": "record",
+          "type": "Grid"
+        }
+      },
+      "i": 7,
+      "keyframe": false,
+      "line": 38,
+      "prevLine": 37,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 39,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 39,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "Cell"
+              }
+            },
+            {
+              "name": "g",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "Grid"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {
+        "o4": {
+          "items": [
+            {
+              "t": "int",
+              "v": "1"
+            }
+          ],
+          "kind": "sequence",
+          "length": 1,
+          "meta": {
+            "capacity": 1
+          },
+          "truncated": false,
+          "type": "std::vector<int>"
+        }
+      },
+      "i": 8,
+      "keyframe": false,
+      "line": 39,
+      "prevLine": 38,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 15,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f2": {
+          "id": "f2",
+          "kind": "method",
+          "line": 15,
+          "locals": [
+            {
+              "name": "this",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Square * const"
+              }
+            }
+          ],
+          "name": "Square::area",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 9,
+      "keyframe": false,
+      "line": 15,
+      "parentCallId": 0,
+      "prevLine": 39,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 1,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f2": {
+          "id": "f2",
+          "kind": "method",
+          "line": 15,
+          "locals": [
+            {
+              "name": "this",
+              "value": {
+                "addr": "0xdeadbeef",
+                "t": "ptr",
+                "target": "o1",
+                "type": "Square * const"
+              }
+            }
+          ],
+          "name": "Square::area",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "9"
+          }
+        }
+      },
+      "heap": {},
+      "i": 10,
+      "keyframe": false,
+      "line": 15,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 40,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 40,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "Cell"
+              }
+            },
+            {
+              "name": "g",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "Grid"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 11,
+      "keyframe": false,
+      "line": 40,
+      "prevLine": 39,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": "18\n"
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 41,
+          "locals": [
+            {
+              "name": "Shape::made",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "0"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 41,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "Cell"
+              }
+            },
+            {
+              "name": "g",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "Grid"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 12,
+      "keyframe": false,
+      "line": 41,
+      "prevLine": 40,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 0,
+      "error": null,
+      "event": "return",
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 41,
+          "locals": [
+            {
+              "name": "sq",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "Square"
+              }
+            },
+            {
+              "name": "c",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "Cell"
+              }
+            },
+            {
+              "name": "g",
+              "value": {
+                "id": "o3",
+                "t": "ref",
+                "type": "Grid"
+              }
+            }
+          ],
+          "name": "main",
+          "returnValue": {
+            "t": "int",
+            "type": "int",
+            "v": "0"
+          }
+        }
+      },
+      "heap": {},
+      "i": 13,
+      "keyframe": false,
+      "line": 41,
+      "prevLine": 41,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1"
+      ],
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "stepCount": 14,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.1"
+}
