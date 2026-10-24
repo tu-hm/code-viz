@@ -20,7 +20,8 @@ services:
 
   seaweedfs:
     image: chrislusf/seaweedfs:4.48@sha256:4e61d15fd35994cb1e43e1e553dff106794841fd9a99ade2fc8c8bfce4d7872d
-    command: ["server", "-s3", "-dir=/data"]
+    # a bucket takes 7 volume slots; default cap = free disk / 1 GB => 2 buckets on a 14 GB ci runner
+    command: ["server", "-s3", "-dir=/data", "-volume.max=1000"]
     ports:
       - "127.0.0.1:8333:8333"
     volumes:
