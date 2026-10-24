@@ -80,12 +80,20 @@ async function sha256(bytes: Uint8Array<ArrayBuffer>) {
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-async function text(bytes: Uint8Array<ArrayBuffer>) {
+async function unzip(bytes: Uint8Array<ArrayBuffer>, index: number) {
   const gzip = bytes[0] === 0x1f && bytes[1] === 0x8b
-  if (!gzip) return new TextDecoder().decode(bytes)
-  return new Response(
+  if (!gzip) return bytes
+  const unzipped = new Response(
     new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')),
-  ).text()
+  )
+  try {
+    return new Uint8Array(await unzipped.arrayBuffer())
+  } catch (e) {
+    throw traceError(
+      'ChecksumError',
+      `chunk ${index}: not valid gzip: ${e instanceof Error ? e.message : String(e)}`,
+    )
+  }
 }
 
 async function download(url: string, index: number) {
@@ -102,15 +110,15 @@ async function download(url: string, index: number) {
 }
 
 async function fetchChunk(link: Manifest['chunks'][number], index: number) {
-  const bytes = await download(link.url, index)
-  const hash = await sha256(bytes)
+  const json = await unzip(await download(link.url, index), index)
+  const hash = await sha256(json)
   if (hash !== link.sha256) {
     throw traceError(
       'ChecksumError',
       `chunk ${index}: sha256 is ${hash}, manifest says ${link.sha256}`,
     )
   }
-  const steps: unknown = JSON.parse(await text(bytes))
+  const steps: unknown = JSON.parse(new TextDecoder().decode(json))
   if (!Array.isArray(steps) || !steps.every(isStep)) {
     throw new Error(`chunk ${index}: not an array of trace steps`)
   }

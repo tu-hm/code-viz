@@ -34,10 +34,10 @@ function serveChunks(name: string, encode: (json: string) => Uint8Array<ArrayBuf
   const { header, chunks } = loadFixture(name)
   return Promise.all(
     chunks.map(async (steps, i) => {
-      const body = encode(JSON.stringify(steps))
+      const json = JSON.stringify(steps)
       const url = `https://chunks.example.com/${name}/${i}`
-      server.use(http.get(url, () => new HttpResponse(body)))
-      return { url, sha256: await sha256(body) }
+      server.use(http.get(url, () => new HttpResponse(encode(json))))
+      return { url, sha256: await sha256(new TextEncoder().encode(json)) }
     }),
   ).then((links): Manifest => ({ header, chunks: links, urlsExpireAt: later }))
 }
@@ -75,6 +75,11 @@ describe('a completed visualization from the mock API', () => {
       error: 'ChecksumError',
     },
     {
+      name: 'a cut-off gzip body is a ChecksumError',
+      reply: (body: string) => new HttpResponse(gzipSync(body).subarray(0, 20)),
+      error: 'ChecksumError',
+    },
+    {
       name: 'an HTTP error is a NetworkError',
       reply: () => new HttpResponse(null, { status: 500 }),
       error: 'NetworkError',
@@ -96,7 +101,7 @@ describe('a completed visualization from the mock API', () => {
   })
 })
 
-test('chunks gzipped without Content-Encoding are unzipped after their checksum', async () => {
+test('chunks gzipped without Content-Encoding are unzipped before their checksum', async () => {
   const manifest = await serveChunks('synthetic-1000', (json) => gzipSync(json))
   const loaded = await loadTrace({ manifest, refresh: () => Promise.reject(new Error('unused')) })
   expect(loaded.steps).toEqual(loadFixture('synthetic-1000').chunks.flat())
