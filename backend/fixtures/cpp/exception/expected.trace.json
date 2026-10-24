@@ -5,7 +5,7 @@
   },
   "id": "trc_0",
   "language": {
-    "adapter": "cpp-gdb/0.4.0",
+    "adapter": "cpp-gdb/0.5.0",
     "id": "cpp17-gcc",
     "runtime": "GCC 13.5.0"
   },
@@ -1203,6 +1203,19 @@
       "message": null,
       "signal": "SIGABRT"
     },
+    "lineHits": {
+      "11": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 4,
+      "17": 4,
+      "5": 5,
+      "6": 3,
+      "9": 1
+    },
+    "lineHitsSource": "trace",
     "stepCount": 26,
     "truncated": false,
     "truncation": null

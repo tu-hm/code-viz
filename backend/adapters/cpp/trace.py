@@ -14,7 +14,7 @@ import traceback
 import gdb
 
 LANGUAGE = "cpp17-gcc"
-ADAPTER = "cpp-gdb/0.4.0"
+ADAPTER = "cpp-gdb/0.5.0"
 SOURCE = "main.cpp"
 STDIN = "/work/stdin"
 WIRE_FD = 3
@@ -67,6 +67,11 @@ DW_FORM_STRING = 0x08
 DW_FORM_UDATA = 0x0F
 DW_FORM_LINE_STRP = 0x1F
 DW_FORM_SIZES = {0x05: 2, 0x06: 4, 0x07: 8, 0x0B: 1, 0x0E: 4, 0x1E: 16}
+GCOV_FUNCTION = 0x01000000
+GCOV_ARCS = 0x01430000
+GCOV_LINES = 0x01450000
+GCOV_ARC_COUNTS = 0x01A10000
+GCOV_ON_TREE = 1
 
 wire = os.fdopen(WIRE_FD, "w", buffering=1)
 os.set_inheritable(WIRE_FD, False)
@@ -729,6 +734,111 @@ def statement_rows(path):
     return rows
 
 
+def gcov_records(data, pos):
+    # gcda ends with a zero tag, gcno with its last record
+    while pos < len(data) and (tag := struct.unpack_from("<I", data, pos)[0]):
+        length, = struct.unpack_from("<i", data, pos + 4)
+        pos += 8
+        # gcc 13 writes a record of zero counters as its negated length, without the counters
+        if length < 0:
+            yield tag, bytes(-length)
+            continue
+        yield tag, data[pos:pos + length]
+        pos += length
+
+
+def gcov_string(data, pos):
+    n, = struct.unpack_from("<I", data, pos)
+    return data[pos + 4:pos + 4 + n].rstrip(b"\0").decode(), pos + 4 + n
+
+
+def gcov_notes(path):
+    with open(path, "rb") as f:
+        data = f.read()
+    _, pos = gcov_string(data, 16)
+    functions, current = {}, ""
+    for tag, rec in gcov_records(data, pos + 4):
+        if tag == GCOV_FUNCTION:
+            ident, = struct.unpack_from("<I", rec)
+            _, at = gcov_string(rec, 12)
+            artificial, = struct.unpack_from("<I", rec, at)
+            fn = functions[ident] = {"artificial": artificial, "arcs": [], "lines": collections.defaultdict(set)}
+        elif tag == GCOV_ARCS:
+            src, = struct.unpack_from("<I", rec)
+            fn["arcs"] += [(src,) + struct.unpack_from("<II", rec, at) for at in range(4, len(rec), 8)]
+        elif tag == GCOV_LINES:
+            block, = struct.unpack_from("<I", rec)
+            at = 4
+            while at < len(rec):
+                line, = struct.unpack_from("<I", rec, at)
+                at += 4
+                if line == 0:
+                    name, at = gcov_string(rec, at)
+                    current = name or current
+                elif os.path.basename(current) == SOURCE:
+                    fn["lines"][block].add(line)
+    return functions
+
+
+def gcov_counts(path):
+    with open(path, "rb") as f:
+        data = f.read()
+    counts, ident = {}, None
+    for tag, rec in gcov_records(data, 16):
+        if tag == GCOV_FUNCTION:
+            ident = struct.unpack_from("<I", rec)[0] if rec else None
+        elif tag == GCOV_ARC_COUNTS:
+            counts[ident] = struct.unpack("<%dq" % (len(rec) // 8), rec)
+    return counts
+
+
+def block_counts(arcs, measured):
+    known = iter(measured)
+    # arcs on gcc's spanning tree have no counter: solve them by flow conservation, as gcov does
+    count = [None if flags & GCOV_ON_TREE else next(known) for _, _, flags in arcs] + [None]
+    blocks = max(max(src, dst) for src, dst, _ in arcs) + 1
+    ins, outs = [[] for _ in range(blocks)], [[] for _ in range(blocks)]
+    for i, (src, dst, _) in enumerate(arcs):
+        outs[src].append(i)
+        ins[dst].append(i)
+    # block 0 is entry, 1 exit: an arc exit => entry makes them conserve flow like the rest
+    outs[1].append(len(arcs))
+    ins[0].append(len(arcs))
+    solved = True
+    while solved:
+        solved = False
+        for b in range(blocks):
+            for side, other in ((ins[b], outs[b]), (outs[b], ins[b])):
+                unknown = [i for i in side if count[i] is None]
+                if len(unknown) == 1 and all(count[i] is not None for i in other):
+                    count[unknown[0]] = sum(count[i] for i in other) - sum(count[i] for i in side if count[i] is not None)
+                    solved = True
+    return [sum(count[i] for i in ins[b]) for b in range(blocks)]
+
+
+def line_hits(lines):
+    # gcc -o main main.cpp names its coverage files main-main.gcno and main-main.gcda
+    base = "%s-%s" % (gdb.current_progspace().filename, os.path.splitext(SOURCE)[0])
+    # gcda is written at exit: none after _exit(), a signal or a sanitizer's report
+    if not os.path.exists(base + ".gcda"):
+        return {}
+    counts = gcov_counts(base + ".gcda")
+    # lines that get steps, minus closing braces: gcc puts the epilogue's block there in some functions only
+    stops = {line for line, closing in lines.values() if not closing}
+    hits = collections.Counter()
+    for ident, fn in gcov_notes(base + ".gcno").items():
+        if fn["artificial"] or not fn["lines"]:
+            continue
+        blocks = block_counts(fn["arcs"], counts[ident])
+        # a line's count is its busiest block: inlined library code splits a line into blocks that gcov adds up
+        top = {}
+        for block, nums in fn["lines"].items():
+            for line in nums & stops:
+                top[line] = max(top.get(line, 0), blocks[block])
+        hits.update(top)
+    return {"lineHits": {str(line): n for line, n in sorted(hits.items()) if n}, "lineHitsSource": "gcov"}
+
+
 def function_block(pc):
     block = gdb.block_for_pc(pc)
     while block is not None and block.function is None:
@@ -1162,11 +1272,12 @@ def crashed(error, calls, globals_, last):
     return snapshot("exception", line, calls[-1]["line"], calls, globals_) | {"error": error}
 
 
-def finished(stop):
+def finished(stop, lines):
     if isinstance(stop, gdb.SignalEvent):
         return {"type": "exit", "kind": "signal", "code": None, "signal": stop.stop_signal, "message": None}
     if hasattr(stop, "exit_code"):
-        return {"type": "exit", "kind": "normal", "code": stop.exit_code, "signal": None, "message": None}
+        msg = {"type": "exit", "kind": "normal", "code": stop.exit_code, "signal": None, "message": None}
+        return msg | line_hits(lines)
     killed = signal.Signals(int(gdb.convenience_variable("_exitsignal")))
     # SIGKILL comes from outside (oom killer): die the same way so the core applies its limits (§11)
     if killed == signal.SIGKILL:
@@ -1174,13 +1285,13 @@ def finished(stop):
     return {"type": "exit", "kind": "signal", "code": None, "signal": killed.name, "message": None}
 
 
-def untraced(breaks, calls):
+def untraced(breaks, calls, lines):
     for bp in breaks:
         bp.delete()
     for call in calls:
         disarm(call)
     run("continue")
-    return finished(stops[-1])
+    return finished(stops[-1], lines)
 
 
 def open_stdin():
@@ -1224,16 +1335,16 @@ def trace():
         stop = stops[-1]
         stops.clear()
         if isinstance(stop, gdb.ExitedEvent):
-            return finished(stop)
+            return finished(stop, lines)
         if isinstance(stop, gdb.SignalEvent):
             if calls:
                 send_step(crashed(signalled(stop.stop_signal, calls), calls, globals_, last))
-            return finished(stop)
+            return finished(stop, lines)
         frame = gdb.newest_frame()
         pc = frame.pc()
         if pc in checks:
             send_step(crashed(failed(checks[pc], frame, calls, globals_), calls, globals_, last))
-            return untraced(breaks, calls)
+            return untraced(breaks, calls, lines)
         if last is None:
             breaks.pop().delete()
             checks = check_functions()
@@ -1252,9 +1363,9 @@ def trace():
             send_step(msg)
             last, sent = msg, sent + 1
             if sent > max_steps:
-                return untraced(breaks, calls)
+                return untraced(breaks, calls, lines)
         if not calls:
-            return untraced(breaks, calls)
+            return untraced(breaks, calls, lines)
         run("continue")
 
 

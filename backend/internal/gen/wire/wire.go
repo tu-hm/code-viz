@@ -12,9 +12,13 @@ type Exit struct {
 	// Kind corresponds to the JSON schema field "kind".
 	Kind ExitKind `json:"kind"`
 
-	// Line number to times it ran, over the whole run, from the tracer's own counter
-	// (§19.9.3). Same shape as summary.lineHits.
+	// Line number to times it ran, over the whole run (§19.9.3). Same shape as
+	// summary.lineHits. Without it, the core counts the recorded steps.
 	LineHits map[string]int `json:"lineHits,omitzero"`
+
+	// Where lineHits come from: the tracer's own counter, or gcov after a normal
+	// exit.
+	LineHitsSource *ExitLineHitsSource `json:"lineHitsSource,omitzero"`
 
 	// Message corresponds to the JSON schema field "message".
 	Message ExitMessage `json:"message"`
@@ -35,6 +39,11 @@ const ExitKindOutputLimit ExitKind = "output_limit"
 const ExitKindSignal ExitKind = "signal"
 const ExitKindStepLimit ExitKind = "step_limit"
 const ExitKindTimeout ExitKind = "timeout"
+
+type ExitLineHitsSource string
+
+const ExitLineHitsSourceCounter ExitLineHitsSource = "counter"
+const ExitLineHitsSourceGcov ExitLineHitsSource = "gcov"
 
 type ExitMessage *string
 

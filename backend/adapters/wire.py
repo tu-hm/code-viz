@@ -29,6 +29,7 @@ class Exit(TypedDict):
     code: int | None
     kind: Literal["normal", "exception", "signal", "timeout", "memory_limit", "step_limit", "output_limit", "internal_error"]
     lineHits: NotRequired[dict[str, int]]
+    lineHitsSource: NotRequired[Literal["counter", "gcov"]]
     message: str | None
     signal: str | None
     type: Literal["exit"]

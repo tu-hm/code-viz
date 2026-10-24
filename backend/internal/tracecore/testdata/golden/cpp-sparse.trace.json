@@ -443,6 +443,15 @@
       "message": null,
       "signal": null
     },
+    "lineHits": {
+      "10": 1,
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1
+    },
+    "lineHitsSource": "trace",
     "stepCount": 6,
     "truncated": false,
     "truncation": null

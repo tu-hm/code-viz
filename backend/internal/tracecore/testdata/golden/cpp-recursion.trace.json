@@ -1173,6 +1173,17 @@
       "message": null,
       "signal": null
     },
+    "lineHits": {
+      "11": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "4": 9,
+      "5": 5,
+      "7": 4,
+      "8": 9
+    },
+    "lineHitsSource": "trace",
     "stepCount": 31,
     "truncated": false,
     "truncation": null

@@ -73,13 +73,21 @@
     },
     "exit": {
       "description": "Must be the last message.",
-      "allOf": [{ "$ref": "trace.v1.schema.json#/$defs/exit" }],
+      "allOf": [
+        { "$ref": "trace.v1.schema.json#/$defs/exit" },
+        { "if": { "required": ["lineHits"] }, "then": { "required": ["lineHitsSource"] } },
+        { "if": { "required": ["lineHitsSource"] }, "then": { "required": ["lineHits"] } }
+      ],
       "properties": {
         "lineHits": {
-          "description": "Line number to times it ran, over the whole run, from the tracer's own counter (§19.9.3). Same shape as summary.lineHits.",
+          "description": "Line number to times it ran, over the whole run (§19.9.3). Same shape as summary.lineHits. Without it, the core counts the recorded steps.",
           "type": "object",
           "propertyNames": { "pattern": "^[1-9][0-9]*$" },
           "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "lineHitsSource": {
+          "description": "Where lineHits come from: the tracer's own counter, or gcov after a normal exit.",
+          "enum": ["counter", "gcov"]
         }
       }
     },

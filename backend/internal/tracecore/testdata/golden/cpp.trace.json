@@ -154,6 +154,10 @@
       "message": "Segmentation fault",
       "signal": "SIGSEGV"
     },
+    "lineHits": {
+      "12": 1
+    },
+    "lineHitsSource": "trace",
     "stepCount": 2,
     "truncated": false,
     "truncation": null

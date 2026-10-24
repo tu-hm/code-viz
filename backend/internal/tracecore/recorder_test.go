@@ -16,6 +16,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
 	"github.com/tu-hm/code-viz/backend/internal/tracecore"
@@ -131,6 +132,8 @@ func TestShowInternals(t *testing.T) {
 	}
 }
 
+var ignoreHits = cmpopts.IgnoreFields(trace.Summary{}, "LineHits", "LineHitsSource")
+
 func TestStepLimit(t *testing.T) {
 	steps := []string{
 		stepLine(1, []trace.Frame{frame("m", "<module>", 1)}, nil),
@@ -138,10 +141,10 @@ func TestStepLimit(t *testing.T) {
 		stepLine(3, []trace.Frame{frame("m", "<module>", 3)}, nil),
 	}
 	marker := stepLine(4, []trace.Frame{frame("m", "<module>", 4)}, nil)
-	exitWithHits := `{"type":"exit","kind":"normal","code":0,"signal":null,"message":null,"lineHits":{"1":1,"4":7}}`
+	exitWithHits := `{"type":"exit","kind":"normal","code":0,"signal":null,"message":null,"lineHits":{"1":1,"4":7},"lineHitsSource":"counter"}`
 	code0, line3 := 0, 3
 	normal := trace.Exit{Kind: trace.ExitKindNormal, Code: &code0}
-	counter := trace.SummaryLineHitsSourceCounter
+	counter, fromSteps := trace.SummaryLineHitsSourceCounter, trace.SummaryLineHitsSourceTrace
 
 	past := wireLines(helloLine, steps[0], steps[1], steps[2])
 	past = append(past, write{1, "x"})
@@ -158,7 +161,7 @@ func TestStepLimit(t *testing.T) {
 		{
 			name:    "maxSteps steps are not truncated",
 			writes:  wireLines(append(append([]string{helloLine}, steps...), exitLine("normal", 0))...),
-			summary: trace.Summary{StepCount: 3, Exit: normal},
+			summary: trace.Summary{StepCount: 3, Exit: normal, LineHits: map[string]int{"1": 1, "2": 1, "3": 1}, LineHitsSource: &fromSteps},
 		},
 		{
 			name:   "a step past maxSteps truncates and the rest goes to the untraced tail",
@@ -246,7 +249,7 @@ func TestTraceSizeLimit(t *testing.T) {
 			lim := tracecore.DefaultLimits
 			lim.TraceBytes = tc.bytes
 			res := mustRecord(t, config(t, 1000, lim), tracecore.Outcome{}, writes)
-			if diff := cmp.Diff(tc.summary, res.Header.Summary); diff != "" {
+			if diff := cmp.Diff(tc.summary, res.Header.Summary, ignoreHits); diff != "" {
 				t.Errorf("summary (-want +got):\n%s", diff)
 			}
 		})
@@ -487,7 +490,7 @@ func TestExitMapping(t *testing.T) {
 				lines = append(lines, tc.exit)
 			}
 			res := mustRecord(t, config(t, 1000, tracecore.DefaultLimits), tc.out, wireLines(lines...))
-			if diff := cmp.Diff(tc.summary, res.Header.Summary); diff != "" {
+			if diff := cmp.Diff(tc.summary, res.Header.Summary, ignoreHits); diff != "" {
 				t.Errorf("summary (-want +got):\n%s", diff)
 			}
 		})
@@ -509,7 +512,7 @@ func TestUntracedTailAfterATimeLimit(t *testing.T) {
 		Exit:         trace.Exit{Kind: trace.ExitKindStepLimit},
 		UntracedTail: &trace.UntracedTail{Completed: false, Exit: trace.Exit{Kind: trace.ExitKindTimeout}},
 	}
-	if diff := cmp.Diff(want, res.Header.Summary); diff != "" {
+	if diff := cmp.Diff(want, res.Header.Summary, ignoreHits); diff != "" {
 		t.Errorf("summary (-want +got):\n%s", diff)
 	}
 }
@@ -553,6 +556,8 @@ func TestMalformedInputFails(t *testing.T) {
 		{"ref id cleared by a key that differs in case", wireLines(helloLine,
 			`{"type":"step","event":"line","line":1,"prevLine":null,"stack":[{"id":"m","name":"<module>","kind":"global","line":1,"locals":[{"name":"a","value":{"t":"ref","id":"1","ID":null}}],"returnValue":null}],"heap":{"1":{"kind":"class","name":"SECRET"}},"error":null}`,
 			exit)},
+		{"hit source cleared by a key that differs in case", wireLines(helloLine,
+			`{"type":"exit","kind":"normal","code":0,"signal":null,"message":null,"lineHits":{"1":1},"lineHitsSource":"counter","LineHitsSource":null}`)},
 		{"stream without hello", wireLines(`{"type":"log","level":"info","message":"SECRET"}`)},
 		{"bytes after exit", append(wireLines(helloLine, exit), write{3, "SECRET"})},
 	}

@@ -505,7 +505,8 @@ def trace(path: str) -> Exit:
     sys.settrace(None)
     sys.setprofile(None)
     line_hits = {str(line): n for line, n in sorted(hits.items())}
-    return {"type": "exit", "kind": kind, "code": code, "signal": None, "message": message, "lineHits": line_hits}
+    return {"type": "exit", "kind": kind, "code": code, "signal": None, "message": message, "lineHits": line_hits,
+            "lineHitsSource": "counter"}
 
 
 def crash(e: BaseException) -> NoReturn:

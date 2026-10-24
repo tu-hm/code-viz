@@ -80,8 +80,11 @@ func (r *Recorder) Finish(out Outcome, runErr error) (*Result, error) {
 		Exit:       program,
 	}
 	if r.exit != nil && r.exit.LineHits != nil {
-		source := trace.SummaryLineHitsSourceCounter
+		source := trace.SummaryLineHitsSource(*r.exit.LineHitsSource)
 		sum.LineHits, sum.LineHitsSource = r.exit.LineHits, &source
+	} else {
+		source := trace.SummaryLineHitsSourceTrace
+		sum.LineHits, sum.LineHitsSource = stepHits(r.steps), &source
 	}
 
 	res := &Result{Steps: r.steps, Logs: r.logs}
@@ -139,6 +142,17 @@ func (r *Recorder) programExit(out Outcome) trace.Exit {
 
 func exitOf(kind trace.ExitKind) trace.Exit {
 	return trace.Exit{Kind: kind}
+}
+
+func stepHits(steps []trace.Step) map[string]int {
+	hits := map[string]int{}
+	for _, s := range steps {
+		// a call step is the body's first line running
+		if s.Event == trace.EventLine || s.Event == trace.EventCall {
+			hits[strconv.Itoa(s.Line)]++
+		}
+	}
+	return hits
 }
 
 // linux numbering: the sandbox runs linux even when vizctl runs on macOS

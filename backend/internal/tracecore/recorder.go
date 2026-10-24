@@ -209,6 +209,9 @@ func (r *Recorder) message(line []byte) error {
 		if err := json.Unmarshal(line, r.exit); err != nil {
 			return r.malformed("exit does not decode")
 		}
+		if r.exit.LineHits != nil && r.exit.LineHitsSource == nil {
+			return r.malformed("exit with lineHits but no lineHitsSource")
+		}
 	}
 	return nil
 }
