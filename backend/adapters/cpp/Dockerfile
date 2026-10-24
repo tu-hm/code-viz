@@ -33,7 +33,6 @@ COPY --from=gcc /usr/local/ /usr/local/
 COPY --from=gdb /out/usr/local/bin/gdb /usr/local/bin/gdb
 COPY --from=gdb /out/usr/local/share/gdb/ /usr/local/share/gdb/
 COPY --from=shim /out/viz-shim /opt/viz/viz-shim
-COPY adapters/cpp/flush_init.cpp adapters/cpp/trace.py /opt/viz/
 # lib64 before /usr/lib: debian's libstdc++ (gcc 12) is too old for gcc 13 builds
 # printers move under gdb's data dir: the default auto-load safe-path refuses /usr/local/lib64
 # pch flags = manifest.yaml build.cmd, and build.cmd + build.safetyFlags; gcc picks the valid one by _GLIBCXX_DEBUG
@@ -48,3 +47,4 @@ RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/000-local-lib.conf \
     && g++ $flags -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all -o stdc++.h.gch/checks-on.gch \
     && rm stdc++.h.gch/*.gcno \
     && find / -xdev -perm /6000 -type f -exec chmod a-s {} +
+COPY adapters/cpp/flush_init.cpp adapters/cpp/trace.py /opt/viz/
