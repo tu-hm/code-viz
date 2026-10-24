@@ -1,0 +1,93 @@
+import { Button } from '@viz/ui'
+import type { StepState } from './engine.ts'
+import { stepDetail } from './step-label.ts'
+import type { Settings } from './store.ts'
+
+type ControlsProps = {
+  state: StepState | null
+  step: number
+  stepCount: number
+  playing: boolean
+  speed: Settings['autoplaySpeed']
+  onGo: (step: number) => void
+  onScrub: (step: number) => void
+  onTogglePlay: () => void
+}
+
+export function Controls({
+  state,
+  step,
+  stepCount,
+  playing,
+  speed,
+  onGo,
+  onScrub,
+  onTogglePlay,
+}: ControlsProps) {
+  const last = stepCount - 1
+  return (
+    <div className="flex flex-col gap-2 px-(--pane-padding) py-2">
+      <p className="truncate font-mono text-xs">
+        {state === null ? (
+          '\u00a0'
+        ) : (
+          <>
+            Step {state.i + 1} of {stepCount}
+            <span className="text-muted-foreground"> · {stepDetail(state)}</span>
+          </>
+        )}
+      </p>
+      <div className="flex flex-wrap items-center gap-1">
+        <Button
+          size="icon"
+          variant="ghost"
+          aria-label="First step"
+          disabled={step === 0}
+          onClick={() => onGo(0)}
+        >
+          <span aria-hidden>|◀</span>
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          aria-label="Previous step"
+          disabled={step === 0}
+          onClick={() => onGo(step - 1)}
+        >
+          <span aria-hidden>◀</span> Prev
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          aria-label="Next step"
+          disabled={step === last}
+          onClick={() => onGo(step + 1)}
+        >
+          Next <span aria-hidden>▶</span>
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          aria-label="Last step"
+          disabled={step === last}
+          onClick={() => onGo(last)}
+        >
+          <span aria-hidden>▶|</span>
+        </Button>
+        <Button size="sm" aria-label={playing ? 'Pause' : 'Play'} onClick={onTogglePlay}>
+          <span aria-hidden>{playing ? '❚❚' : '▶'}</span> {playing ? 'Pause' : 'Play'} {speed}×
+        </Button>
+      </div>
+      <input
+        type="range"
+        min={1}
+        max={stepCount}
+        value={step + 1}
+        aria-label="Step"
+        aria-valuetext={`Step ${step + 1} of ${stepCount}`}
+        onChange={(e) => onScrub(e.currentTarget.valueAsNumber - 1)}
+        className="w-full accent-primary"
+      />
+    </div>
+  )
+}
