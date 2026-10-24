@@ -50,14 +50,14 @@ The first two are done in BE-08. After the marker step, `trace.py` deletes every
 - [x] C++: run untraced to the first hit of a listed line, then start stepping
 - [x] Python: hook ignores events until the line is reached
 - [x] Include in the cache key
-- [ ] **Done:** §5.6 dialog works end to end
+- [x] **Done:** §5.6 dialog works end to end — FE-05's Start tracing from line… re-ran a step-limited Python loop from its `print` line against `make dev` (25 Oct): one `line` step there with the loop's totals
 
 **Result** (spec v1.13, §5.6, §10.2):
 
 - Both manifests say `startAtLines: true`; the worker and `vizctl` pass the lines as `VIZ_START_AT_LINES` through `app.TraceEnv`. The cache key had them already (BE-06, `NormalizeOptions`).
 - Python waits with hooks that only count lines; C++ breaks only on the listed lines' rows. At the first one to run, the tracer gives every user frame on the stack a call record, outermost first, and traces from there. The first step is a `line` step at that line with the whole stack and `prevLine: null`; output printed before it lands on it, and hit counts cover the whole run. A line that never runs gives no steps (`start-never`).
 - On aarch64, a C++ frame already running at the start that returns a struct in memory shows its return value as `unavailable`: `x8` no longer holds the address.
-- **Open:** the dialog is FE's (FE-05). The backend half runs end to end from `options` to steps in the `start-at-line` fixtures.
+- The dialog is FE-05's (`rerun-dialogs.tsx`). The backend half runs end to end from `options` to steps in the `start-at-line` fixtures.
 
 ## 4. Show range (M3-B05 · 1 d)
 

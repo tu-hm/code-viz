@@ -50,7 +50,7 @@ Every state other than "ready".
 - [x] With `summary.untracedTail`: "Traced the first 1,000 steps; the program then finished normally (not traced)", exit status, and the full output from `tail.txt.gz` appended in the output pane, marked as untraced — the tail shows on the last step, under "Printed after step 1,000, not traced"
 - [x] **Start tracing from line…** dialog: line input, current breakpoints, max steps (server max 5,000) → re-run with `options.startAtLines` — in the IDE (`rerun-dialogs.tsx`). A trace whose start line never ran gets its own screen, with the output and Trace from the start ([memory](../../../memory/frontend/empty-trace.md))
 - [x] **Raise limit to 5,000** → re-run with `maxSteps` — the language's `maxStepsCeiling`; hidden once the trace ran at it
-- [ ] **Show range…** on truncated big arrays → re-run with `options.captureRanges` (FR-11, BE-11 §4) — the dialog and the re-run are in, through `Player`'s `onShowRange`; the button on a windowed sequence is FE-06's
+- [x] **Show range…** on truncated big arrays → re-run with `options.captureRanges` (FR-11, BE-11 §4) — the dialog and the re-run, through `Player`'s `onShowRange` from FE-06's button; checked against `make dev` (25 Oct): a 1,500-item list re-run with `1200`–`1210` shows `… +1,200`, the 11 cells, `… +289`
 - [x] **Why?** explains the step limit
 - [ ] **Done:** matches the §5.6 mocks — needs design sign-off
 

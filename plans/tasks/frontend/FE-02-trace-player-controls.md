@@ -44,9 +44,9 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 
 **Layout (§5.2, §19.3)**
 - [ ] Header: language, file name, "Safety checks: on/off" (C++), Settings, Share (slot for FE-12), Open in new tab, Close (`Esc`) — all in; Share is a `share` slot and Open in new tab shows once FE-12 passes a `permalink`
-- [ ] Left: code pane (FE-03) + controls; right: state pane (FE-06 / FE-08 / FE-11 slots) — the code pane is in; the `statePane` slot waits on those tasks
+- [x] Left: code pane (FE-03) + controls; right: state pane (FE-06 / FE-08 / FE-11 slots) — the player draws FE-06's state pane itself (`StateBox`), so the `statePane` slot is gone; FE-08 and FE-11 add their views inside it
 - [x] Bottom row: STDIN (read-only) and STDOUT/STDERR **up to the current step**, stderr in red, current step's text highlighted
-- [ ] Status bar: exit status, step count, banner slot (FE-05) — `banner` slot waits on FE-05
+- [x] Status bar: exit status, step count, banner slot (FE-05) — FE-05's error, limit and untraced-tail banners are in the status bar; the `banner` slot carries the IDE's build warnings
 - [x] Draggable divider, width saved in `localStorage` — also ← / → when focused
 
 **Settings (§5.7, §19.3 display options)**
@@ -56,7 +56,7 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 - [ ] Persist in `localStorage` (anonymous); profile storage hook for signed-in users — `localStorage` done, each field validated on load; profile storage waits on the API auth decision (`usePlayer.persist.setOptions({ storage })` is where it plugs in)
 - [x] "Max steps" and "safety checks" apply on the next run (say so in the UI)
 
-- [ ] **Done:** the §5.3 layout renders around the fixture views; settings survive a reload — settings survive and the code pane is in; the state views come with FE-06. `?fixture=<name>` under `pnpm dev` shows the shell
+- [x] **Done:** the §5.3 layout renders around the fixture views; settings survive a reload — with FE-06's state pane; checked in Chrome against `make dev` (25 Oct). `?fixture=<name>` under `pnpm dev` shows it
 
 ## 5. Autoplay (M3-F06 · 1.5 d)
 
@@ -71,10 +71,10 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 
 - [x] Profile on the 5,000-step fixture with 500 heap objects — rebuild 0.08 ms on average; the copy to the main thread (175 KB, 1.6 ms) is the cost; p99 4.5 ms
 - [x] Memory under 300 MB (heap snapshot in CI perf job) — a forced-GC heap check in `pnpm test`: 53 MB for the trace plus a full cache; the main thread used 75 MB in Chrome
-- [ ] Virtualize long heap columns / containers (TanStack Virtual) — needs the heap view (FE-06)
+- [ ] Virtualize long heap columns / containers (TanStack Virtual) — not needed yet: FE-06's cards skip unchanged objects and use `content-visibility: auto` (4.0 ms p50 on 500 cards); revisit with FE-08's containers
 - [x] No layout shift between steps (§19.10) — for the shell: no box moved over 325 steps in Chrome; the views bring their own (FE-06)
 - [x] Perf budget test in CI: fail if stepping on the 1,000-step fixture goes over 16 ms — `engine.perf.test.ts`
-- [ ] **Done:** §13 step-navigation target met on 5,000 steps — met for the engine and shell (keydown to DOM max 6.1 ms in Chrome); not measured with the views, which don't exist yet
+- [x] **Done:** §13 step-navigation target met on 5,000 steps — keydown to DOM with FE-06's state pane on `synthetic-5000` (500 objects): 4.0 ms p50, 7.0 ms p95, 11.6 ms max in a production build in Chrome; `synthetic-1000` 1.9 ms p50
 
 ## Done when
 
