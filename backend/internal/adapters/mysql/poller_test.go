@@ -60,23 +60,14 @@ func TestPollerRunsEvery250msOnlyWhileARequestIsParked(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		c := &refusingConnector{}
 		db := sql.OpenDB(c)
-		defer closeDB(t, db)
+		t.Cleanup(func() { closeDB(t, db) })
 		var timers atomic.Int64
 		after := func(d time.Duration) <-chan time.Time {
 			timers.Add(1)
 			return time.After(d)
 		}
 		p := mysql.NewPoller(db, time.Now, after)
-		ctx, cancel := context.WithCancel(t.Context())
-		stopped := make(chan struct{})
-		go func() {
-			defer close(stopped)
-			p.Run(ctx)
-		}()
-		defer func() {
-			cancel()
-			<-stopped
-		}()
+		runPoller(t, p)
 
 		type total struct{ Timers, Queries int64 }
 		var got []total
@@ -132,12 +123,7 @@ func TestStoppedPollerWakesParkedRequestsAndParksNoMore(t *testing.T) {
 		asked <- struct{}{}
 		return nil
 	})
-	ctx, cancel := context.WithCancel(t.Context())
-	stopped := make(chan struct{})
-	go func() {
-		defer close(stopped)
-		p.Run(ctx)
-	}()
+	stop := runPoller(t, p)
 
 	parked := parkOnX(t, p, 0)
 	select {
@@ -145,8 +131,7 @@ func TestStoppedPollerWakesParkedRequestsAndParksNoMore(t *testing.T) {
 	case <-time.After(time.Minute):
 		t.Fatal("poller did not start polling for the parked request within a minute")
 	}
-	cancel()
-	<-stopped
+	stop()
 
 	if err := receive(t, parked.err); err != nil {
 		t.Errorf("request parked before the stop: err = %v, want nil", err)
@@ -298,7 +283,7 @@ func startPoller(t *testing.T, db *sql.DB) (*mysql.Poller, ticks) {
 	return p, c
 }
 
-func runPoller(t *testing.T, p *mysql.Poller) {
+func runPoller(t *testing.T, p *mysql.Poller) (stop func()) {
 	t.Helper()
 	ctx, cancel := context.WithCancel(t.Context())
 	stopped := make(chan struct{})
@@ -306,10 +291,12 @@ func runPoller(t *testing.T, p *mysql.Poller) {
 		defer close(stopped)
 		p.Run(ctx)
 	}()
-	t.Cleanup(func() {
+	stop = func() {
 		cancel()
 		<-stopped
-	})
+	}
+	t.Cleanup(stop)
+	return stop
 }
 
 type parked struct {
