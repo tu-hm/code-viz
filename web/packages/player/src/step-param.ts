@@ -11,21 +11,28 @@ export function stepFromUrl(search: string, stepCount: number) {
   return Math.min(Math.max(Number(raw), 1), stepCount) - 1
 }
 
+function writeStep(step: number | null) {
+  const url = new URL(location.href)
+  if (step === null) url.searchParams.delete('step')
+  else url.searchParams.set('step', String(step + 1))
+  history.replaceState(history.state, '', url)
+}
+
+// the param belongs to the open trace => dropped on close, so the next trace opens at its first step
 export function useStepParam() {
   useEffect(() => {
     let timer = 0
+    const { step } = usePlayer.getState()
+    if (step > 0) writeStep(step)
     const unsubscribe = usePlayer.subscribe((s, prev) => {
       if (s.step === prev.step) return
       clearTimeout(timer)
-      timer = window.setTimeout(() => {
-        const url = new URL(location.href)
-        url.searchParams.set('step', String(usePlayer.getState().step + 1))
-        history.replaceState(history.state, '', url)
-      }, writeDelayMs)
+      timer = window.setTimeout(() => writeStep(usePlayer.getState().step), writeDelayMs)
     })
     return () => {
       unsubscribe()
       clearTimeout(timer)
+      writeStep(null)
     }
   }, [])
 }

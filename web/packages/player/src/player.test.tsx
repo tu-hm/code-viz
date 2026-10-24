@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { fixtureNames, loadFixture } from '@viz/fixtures'
 import { beforeEach, describe, expect, test } from 'vitest'
 import { Player } from './player.tsx'
@@ -102,6 +102,17 @@ test('?step= opens the player at that step and follows navigation', async () => 
   fireEvent.click(button('Next step'))
   await counter(10, 19)
   await waitFor(() => expect(location.search).toBe('?step=10'))
+})
+
+test('closing drops ?step=, so the next trace opens at its first step', async () => {
+  history.replaceState(null, '', '/?step=9')
+  renderPlayer('python-aliasing')
+  await counter(9, 19)
+  cleanup()
+  expect(location.search).toBe('')
+
+  renderPlayer('python-aliasing')
+  await counter(1, 19)
 })
 
 test.each([
