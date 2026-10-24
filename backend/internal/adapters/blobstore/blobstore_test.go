@@ -76,7 +76,7 @@ func TestPutRetriesThreeTimesThenFailsAsInfraError(t *testing.T) {
 	}
 }
 
-func TestPutToUnreachableEndpointIsInfraError(t *testing.T) {
+func TestPutAndDeleteOnUnreachableEndpointAreInfraErrors(t *testing.T) {
 	var lc net.ListenConfig
 	ln, err := lc.Listen(t.Context(), "tcp", "127.0.0.1:0")
 	if err != nil {
@@ -86,10 +86,14 @@ func TestPutToUnreachableEndpointIsInfraError(t *testing.T) {
 	if err := ln.Close(); err != nil {
 		t.Fatal(err)
 	}
+	b := newBucket(t, closed, "down")
+	key := domain.ChunkKey("t7", "trc_0123", 0)
 
-	err = newBucket(t, closed, "down").Put(t.Context(), domain.ChunkKey("t7", "trc_0123", 0), []byte("x"))
-	if !errors.Is(err, domain.ErrInfra) {
-		t.Fatalf("err = %v, want ErrInfra", err)
+	if err := b.Put(t.Context(), key, []byte("x")); !errors.Is(err, domain.ErrInfra) {
+		t.Errorf("put: err = %v, want ErrInfra", err)
+	}
+	if err := b.Delete(t.Context(), []string{key}); !errors.Is(err, domain.ErrInfra) {
+		t.Errorf("delete: err = %v, want ErrInfra", err)
 	}
 }
 
@@ -152,22 +156,6 @@ func TestDeleteRemovesTheKeysAndSkipsMissingOnes(t *testing.T) {
 	want := map[string]int{keys[0]: http.StatusNotFound, keys[1]: http.StatusNotFound, keys[2]: http.StatusOK}
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("GET status by key (-want +got):\n%s", diff)
-	}
-}
-
-func TestDeleteOnUnreachableEndpointIsInfraError(t *testing.T) {
-	var lc net.ListenConfig
-	ln, err := lc.Listen(t.Context(), "tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	closed := "http://" + ln.Addr().String()
-	if err := ln.Close(); err != nil {
-		t.Fatal(err)
-	}
-	err = newBucket(t, closed, "down").Delete(t.Context(), []string{domain.ChunkKey("t7", "trc_0123", 0)})
-	if !errors.Is(err, domain.ErrInfra) {
-		t.Fatalf("err = %v, want ErrInfra", err)
 	}
 }
 
