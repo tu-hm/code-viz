@@ -23,7 +23,7 @@ export function valueText(v: Value): string {
   }
 }
 
-function callee(frame: Frame) {
+export function callee(frame: Frame) {
   return frame.kind === 'global' ? frame.name : `${frame.name}()`
 }
 

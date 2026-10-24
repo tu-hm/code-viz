@@ -19,6 +19,7 @@ import {
   OutputPanel,
   StdinPanel,
   type Mark,
+  type OutputEnd,
 } from './output.tsx'
 import { useSession, type LoadedTrace } from './session.ts'
 import { SettingsDialog } from './settings.tsx'
@@ -46,6 +47,9 @@ type PlayerProps = Slots & {
   permalink?: string
   expected?: string
   onClose: () => void
+  onStartAt?: () => void
+  onRaiseLimit?: () => void
+  onShowRange?: (variable: string) => void
 }
 
 const noOutput: OutputSegment[] = []
@@ -207,6 +211,15 @@ function CodeBox({
   )
 }
 
+function outputEnd({ header, stepCount, tail }: LoadedTrace): OutputEnd {
+  const { exit, untracedTail } = header.summary
+  return {
+    tail,
+    afterStep: stepCount,
+    truncated: exit.kind === 'output_limit' || untracedTail?.exit.kind === 'output_limit',
+  }
+}
+
 function OutputBox({ trace }: { trace: LoadedTrace }) {
   const output = usePlayer((s) => s.current?.output ?? noOutput)
   const shownStep = usePlayer((s) => s.current?.i ?? 0)
@@ -214,6 +227,7 @@ function OutputBox({ trace }: { trace: LoadedTrace }) {
   const expected = usePlayer((s) => s.expected)
   const exact = usePlayer((s) => s.exact)
   const go = usePlayer((s) => s.go)
+  const end = shownStep === trace.stepCount - 1 ? outputEnd(trace) : null
   const toggle = (
     <Check
       label="Compare"
@@ -221,7 +235,7 @@ function OutputBox({ trace }: { trace: LoadedTrace }) {
       onChange={(comparing) => usePlayer.setState({ comparing })}
     />
   )
-  if (!comparing) return <OutputPanel output={output} action={toggle} />
+  if (!comparing) return <OutputPanel output={output} end={end} action={toggle} />
 
   const comparison =
     expected === '' ? null : compareOutput(expected, exact, trace.prints, trace.tail)
@@ -239,7 +253,7 @@ function OutputBox({ trace }: { trace: LoadedTrace }) {
   }
   return (
     <div className="grid min-h-0 grid-cols-2 grid-rows-[minmax(0,1fr)_auto]">
-      <OutputPanel output={output} mark={mark} action={toggle} />
+      <OutputPanel output={output} mark={mark} end={end} action={toggle} />
       <ExpectedPanel
         expected={expected}
         exact={exact}
@@ -293,6 +307,8 @@ function Shell({
   language,
   permalink,
   onClose,
+  onStartAt,
+  onRaiseLimit,
   statePane,
   share,
   banner,
@@ -303,6 +319,7 @@ function Shell({
   useStepParam()
   const split = usePlayer((s) => s.split)
   const setSplit = usePlayer((s) => s.setSplit)
+  const go = usePlayer((s) => s.go)
 
   return (
     <div className="grid h-dvh grid-rows-[auto_minmax(0,1fr)_auto] bg-background text-foreground">
@@ -328,7 +345,18 @@ function Shell({
         <StdinPanel stdin={stdin} />
         <OutputBox trace={trace} />
       </div>
-      <StatusBar stepCount={stepCount} exit={header.summary.exit} banner={banner} />
+      <StatusBar
+        traceId={header.id}
+        summary={header.summary}
+        ending={trace.ending}
+        stepCount={stepCount}
+        maxSteps={header.options.maxSteps}
+        maxStepsCeiling={language.visualize.limits.maxStepsCeiling}
+        banner={banner}
+        onGo={go}
+        onStartAt={onStartAt}
+        onRaiseLimit={onRaiseLimit}
+      />
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import type { Print } from './compare.ts'
+import { ending } from './ending.ts'
 import { createEngine } from './engine.ts'
 import type { Step } from './gen/trace.ts'
 import { loadTrace, type FileSource, type Manifest, type TraceSource } from './load.ts'
@@ -11,11 +12,19 @@ export function createWorkerApi() {
 
   async function open(source: TraceSource) {
     const { header, steps, tail } = await loadTrace(source)
-    trace = { steps, engine: createEngine(steps) }
+    const engine = createEngine(steps)
+    trace = { steps, engine }
     const prints = steps
       .filter((s) => s.stdout !== '' || s.stderr !== '')
       .map((s): Print => ({ i: s.i, line: s.prevLine, stdout: s.stdout, stderr: s.stderr }))
-    return { header, stepCount: steps.length, prints, tail, functions: calledFunctions(steps) }
+    return {
+      header,
+      stepCount: steps.length,
+      prints,
+      tail,
+      functions: calledFunctions(steps),
+      ending: ending(steps, engine.state),
+    }
   }
 
   return {

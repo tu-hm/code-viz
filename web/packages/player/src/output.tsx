@@ -69,39 +69,59 @@ function withMark(output: OutputSegment[], mark: Mark | undefined): Piece[] {
   return pieces
 }
 
+export type OutputEnd = { tail: string; afterStep: number; truncated: boolean }
+
 export function OutputPanel({
   output,
   mark,
+  end,
   action,
 }: {
   output: OutputSegment[]
   mark?: Mark
+  end: OutputEnd | null
   action?: ReactNode
 }) {
+  const untraced = end !== null && end.tail !== ''
   return (
     <Panel label="Stdout / Stderr" action={action}>
       <div className="flex min-h-0 flex-1 flex-col-reverse overflow-auto">
-        <pre className={text}>
-          {output.length === 0 && <span className="text-faint">(nothing printed yet)</span>}
-          {withMark(output, mark).map((s, i) =>
-            'mark' in s ? (
-              <span key={i} className="font-sans text-danger">
-                {'  '}◀ {s.mark}
-              </span>
-            ) : (
-              <span
-                key={i}
-                className={cn(
-                  s.current && 'bg-trace-changed font-semibold',
-                  s.stream === 'stderr' && 'text-danger',
-                  s.current && s.stream === 'stderr' && 'bg-danger-subtle',
-                )}
-              >
-                {s.text}
-              </span>
-            ),
+        <div>
+          <pre className={text}>
+            {output.length === 0 && !untraced && (
+              <span className="text-faint">(nothing printed yet)</span>
+            )}
+            {withMark(output, mark).map((s, i) =>
+              'mark' in s ? (
+                <span key={i} className="font-sans text-danger">
+                  {'  '}◀ {s.mark}
+                </span>
+              ) : (
+                <span
+                  key={i}
+                  className={cn(
+                    s.current && 'bg-trace-changed font-semibold',
+                    s.stream === 'stderr' && 'text-danger',
+                    s.current && s.stream === 'stderr' && 'bg-danger-subtle',
+                  )}
+                >
+                  {s.text}
+                </span>
+              ),
+            )}
+          </pre>
+          {untraced && (
+            <section aria-label="Not traced" className="mt-1">
+              <h3 className="mono-label px-(--pane-padding) text-muted-foreground">
+                Printed after step {end.afterStep.toLocaleString('en')}, not traced
+              </h3>
+              <pre className={cn(text, 'text-muted-foreground')}>{end.tail}</pre>
+            </section>
           )}
-        </pre>
+          {end?.truncated && (
+            <p className={cn(text, 'text-muted-foreground')}>… (output truncated)</p>
+          )}
+        </div>
       </div>
     </Panel>
   )

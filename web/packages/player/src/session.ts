@@ -1,6 +1,7 @@
 import { proxy } from 'comlink'
 import { useEffect, useEffectEvent, useState } from 'react'
 import type { Print } from './compare.ts'
+import type { Ending } from './ending.ts'
 import type { TraceHeader, TraceSource } from './load.ts'
 import type { Jump } from './search.ts'
 import { spawnEngine } from './spawn-engine.ts'
@@ -13,6 +14,7 @@ export type LoadedTrace = {
   prints: Print[]
   tail: string
   functions: string[]
+  ending: Ending
   find: (from: number, jump: Jump) => Promise<number | null>
 }
 

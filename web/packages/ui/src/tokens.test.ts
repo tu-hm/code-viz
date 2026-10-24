@@ -66,6 +66,7 @@ const pairs: [fg: string, bgs: string[], min: number][] = [
     ['trace-executed-bg', 'trace-write-bg', 'trace-changed-bg', 'trace-error-bg'],
     text,
   ],
+  ['content-primary', ['bg-danger-subtle', 'bg-warning-subtle'], text],
   ['content-secondary', ['bg-canvas', 'bg-surface', 'bg-surface-alt', 'bg-raised'], text],
   ['content-brand', ['bg-canvas', 'bg-surface', 'bg-surface-alt', 'bg-brand-subtle'], text],
   ['content-danger', ['bg-canvas', 'bg-surface', 'bg-danger-subtle'], text],

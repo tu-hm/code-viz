@@ -23,11 +23,15 @@ export function renderPlayer(
     header: edit,
     tail,
     expected,
+    onStartAt,
+    onRaiseLimit,
   }: {
     language?: LanguageInfo
     header?: Partial<TraceHeader>
     tail?: string
     expected?: string
+    onStartAt?: () => void
+    onRaiseLimit?: () => void
   } = {},
 ) {
   const { header, chunks, source: code, stdin } = loadFixture(name)
@@ -41,6 +45,8 @@ export function renderPlayer(
       language={language}
       expected={expected}
       onClose={onClose}
+      onStartAt={onStartAt}
+      onRaiseLimit={onRaiseLimit}
     />,
   )
   return { onClose, stepCount: chunks.flat().length, stdin }
