@@ -75,6 +75,18 @@ The [testing cheat sheet](../docs/backend/conventions/testing-cheat-sheet.md) ap
 - A package that uses `react-dom`, directly or through Radix, declares `react` and `react-dom` as peer and dev dependencies at the same version. `react`, `react-dom`, `@types/react` and `@types/react-dom` move together in every package.
 - The stack is picked in §18.1. A library that does a job one there already does (state, data fetching, animation, layout) is a spec change first.
 
+## Agent skills
+
+`.claude/skills/` vendors three skills from vercel-labs (README, "Agent skills"). They are written for Next.js, so this file wins where they disagree:
+
+- Memoize only under R1, even where `rerender-memo` or `rendering-hoist-jsx` suggests it.
+- An effect reads changing callbacks through `useEffectEvent` (R2), not the ref pattern in `advanced-event-handler-refs`.
+- Server data goes through TanStack Query (R6), never SWR (`client-swr-dedup`).
+- Skip the `server-` rules, `next/dynamic` and anything about RSC or hydration. The IDE is a Vite app without SSR.
+- A library a rule suggests, such as `better-all`, is a spec change first (Dependencies).
+
+Don't edit the copies; a fix that matters here goes into this file.
+
 ## Traps
 
 Code that looks right and isn't. When you hit a new one, add it here in the same commit: symptom, cause, fix.

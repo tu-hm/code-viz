@@ -40,7 +40,7 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 
 ## Frontend
 
-None yet.
+- [Vendored agent skills](frontend/vendored-agent-skills.md): React, composition and web design skills live as plain copies in `web/.claude/skills`; `web/AGENTS.md` wins over them
 
 ## Backend
 

@@ -10,6 +10,7 @@ packages/player/   @viz/player: trace types (generated), loader, engine in a Web
 packages/ui/       @viz/ui: design tokens, Tailwind theme, fonts, primitives such as Button
 fixtures/          @viz/fixtures: traces in the API's shape (header + chunks), their loader and a synthetic generator
 scripts/           setup check, codegen
+.claude/skills/    agent skills for this workspace, vendored
 ```
 
 Packages export their TypeScript source directly. Nothing but `apps/ide` has a build step.
@@ -84,6 +85,22 @@ The hand-written traces are plain JSON. Edit them directly. `fixtures.test.ts` c
 ## Generated code
 
 `pnpm gen` writes `packages/player/src/gen/trace.ts` and `apps/ide/src/gen/api.ts`. `make gen` in `backend/` runs it as well, so one command regenerates Go and TypeScript after a contract change. Never edit these files. CI fails when they drift from the contract. In the trace types, `Value.t` and `HeapObject.kind` stay open (`| (string & {})`), so a `switch` over them always needs a fallback branch (§9.7).
+
+## Agent skills
+
+`.claude/skills/` holds skills that Claude Code loads while it works on files under `web/`. They are plain copies from [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills), so a fresh clone needs no `npx` and no network. Why they're vendored: [memory](../memory/frontend/vendored-agent-skills.md).
+
+| Skill                         | For                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| `vercel-react-best-practices` | Re-render, bundle and rendering performance rules                      |
+| `vercel-composition-patterns` | Compound components and React 19 APIs, for `@viz/ui` and the player    |
+| `web-design-guidelines`       | Accessibility and UX review; it fetches the current rules when it runs |
+
+[AGENTS.md](AGENTS.md#agent-skills) wins where a skill disagrees with it. Don't edit the copies. To refresh one, install a fresh copy in a scratch directory, copy it over the vendored folder and read the diff:
+
+```bash
+cd "$(mktemp -d)" && npx skills add vercel-labs/agent-skills --skill vercel-composition-patterns -a claude-code --copy -y
+```
 
 ## Common problems
 

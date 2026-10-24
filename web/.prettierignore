@@ -2,3 +2,4 @@
 **/gen/
 pnpm-lock.yaml
 apps/ide/public/mockServiceWorker.js
+.claude/skills/
