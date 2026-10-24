@@ -41,7 +41,8 @@ func TestCheckRequest(t *testing.T) {
 		{"capture ranges are invalid where the language lacks them", incapable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0, 50}}}}, domain.ErrInvalidRequest},
 		{"a capture range of one index is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0}}}}, domain.ErrInvalidRequest},
 		{"a capture range of three indexes is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0, 1, 2}}}}, domain.ErrInvalidRequest},
-		{"a negative capture index is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{-1, 5}}}}, domain.ErrInvalidRequest},
+		{"a negative capture start is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{-1, 5}}}}, domain.ErrInvalidRequest},
+		{"a negative capture end is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0, -1}}}}, domain.ErrInvalidRequest},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
