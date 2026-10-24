@@ -1,0 +1,29 @@
+name: vizload
+
+# backend/compose.yaml on other ports, so it runs next to make dev
+services:
+  mysql:
+    image: mysql:8.4.13@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69
+    environment:
+      MYSQL_DATABASE: viz
+      MYSQL_USER: viz
+      MYSQL_PASSWORD: viz
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    ports:
+      - "127.0.0.1:23306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=127.0.0.1", "--user=viz", "--password=viz"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.48@sha256:4e61d15fd35994cb1e43e1e553dff106794841fd9a99ade2fc8c8bfce4d7872d
+    command: ["server", "-s3", "-dir=/data", "-volume.max=1000"]
+    ports:
+      - "127.0.0.1:28333:8333"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8333/healthz"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
