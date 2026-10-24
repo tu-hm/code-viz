@@ -43,7 +43,7 @@ curl -si -X POST http://127.0.0.1:8080/api/v1/visualizations -H 'Content-Type: a
 curl -s 'http://127.0.0.1:8080/api/v1/visualizations/<id>?wait=20&since=0'   # repeat with since=<version> until completed
 ```
 
-Not built yet: the C++ runner image (BE-07, BE-08) and share links (BE-12). `make seed` loads no sample traces until BE-13 §1.
+Not built yet: C++ through the API, which waits for the BE-08 tracer (its manifest says `enabled: false`, so the API refuses `cpp17-gcc`; `vizctl` traces it), and share links (BE-12). `make seed` loads no sample traces until BE-13 §1.
 
 ## Trace a program locally
 
@@ -52,9 +52,10 @@ Not built yet: the C++ runner image (BE-07, BE-08) and share links (BE-12). `mak
 ```sh
 go run ./cmd/vizctl trace --lang python3 fixtures/python/aliasing/main.py < fixtures/python/aliasing/stdin > trace.json
 go run ./cmd/vizctl validate trace.json   # silent when the trace matches schema/trace.v1.schema.json
+go run ./cmd/vizctl trace --lang cpp17-gcc fixtures/cpp/stl/main.cpp < /dev/null > trace.json
 ```
 
-`--lang` is a manifest `id` from `adapters/*/manifest.yaml`. A program that fails its build step (a syntax error, or an import outside `modules.allow`) prints `compile_error` or `unsupported_module` with the diagnostics and exits 1. How the tracer, the wire protocol and the trace core fit together is in the [tracing architecture doc](../docs/backend/architecture/tracing.md).
+`--lang` is a manifest `id` from `adapters/*/manifest.yaml`. A program that fails its build step (a C++ compile error, a Python syntax error, or an import outside `modules.allow`) prints `compile_error` or `unsupported_module` with the diagnostics and exits 1. How the tracer, the wire protocol and the trace core fit together is in the [tracing architecture doc](../docs/backend/architecture/tracing.md).
 
 ## Docker dev sandbox
 
@@ -63,7 +64,7 @@ On a laptop, jobs run in Docker containers instead of nsjail, the production san
 **It is not a security boundary.** vizd logs a warning on every start with it, and refuses to start with it unless `VIZ_ENV` is `dev` or `test`, so it never runs in staging or production. Each job still gets its own container with no network, a read-only root, a 64 MB `/work`, 32 PIDs, a memory cap, no capabilities and a non-root user.
 
 - **It needs Docker.** The sandbox talks to the daemon at `DOCKER_HOST`, or `/var/run/docker.sock` if that's unset. That works with vizd on the host and with vizd in Compose with the socket mounted. If your Docker uses a context instead (OrbStack, Colima), export `DOCKER_HOST` as shown under Common problems.
-- **It refuses emulated images.** A runner image must match your machine's architecture, because GDB's `ptrace` fails under emulation. Run `make images` once to build them for your machine. Only the Python runner image exists so far; the C++ one comes with BE-07 and BE-08.
+- **It refuses emulated images.** A runner image must match your machine's architecture, because GDB's `ptrace` fails under emulation. Run `make images` once to build them for your machine. The C++ runner image builds GDB from source, so its first build is slow.
 - **Leftovers are cleaned up.** Sandbox containers carry `viz.job` and `viz.started` labels. When a sandbox starts, and every minute while the worker runs, it removes boxes started 2 minutes ago or more, longer than any job runs. A dev worker, `vizctl` and the tests can share one Docker daemon.
 
 `make test` runs the sandbox tests against your Docker, with a small busybox test image it builds itself. It also builds the runner images first, because the golden fixture test runs every `fixtures/<language>/<case>/` through `vizctl trace`.

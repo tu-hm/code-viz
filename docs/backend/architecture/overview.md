@@ -45,8 +45,8 @@ Dependencies point one way: `transport → app → domain`. `domain` and `tracec
 | `internal/gen/{api,trace,wire,sqlc}` | Types generated from the contracts, and query code generated from the SQL, by `make gen`. Never edited | Generated |
 | `schema/` | `trace.v1` and `wire.v1` JSON Schemas, and the Go package that validates against them | Done |
 | `api/` | `openapi.yaml`, the HTTP contract | Done (BE-01) |
-| `adapters/<language>/` | Each language's manifest, runner image and tracer | Python done (BE-03); C++ is a GDB prototype (BE-08 §1) |
-| `fixtures/<language>/<case>/` | Programs and the traces they must produce | 8 Python fixtures with goldens; 3 C++ programs without |
+| `adapters/<language>/` | Each language's manifest, runner image and tracer | Python done (BE-03); C++ has its build and runner image (BE-07) and a GDB prototype tracer, disabled until BE-08 |
+| `fixtures/<language>/<case>/` | Programs and the traces they must produce | 8 Python and 3 C++ fixtures with goldens |
 
 ## One visualization, end to end
 

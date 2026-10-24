@@ -17,9 +17,9 @@ docs/
 |---|---|---|
 | [Overview](backend/architecture/overview.md) | Architecture | Binaries, packages and their status, one visualization end to end |
 | [Sandbox](backend/architecture/sandbox.md) | Architecture | The `Sandbox` port, `viz-shim` and its frames, nsjail, the Docker dev sandbox |
-| [Tracing](backend/architecture/tracing.md) | Architecture | Manifest to trace: the Python tracer, the wire contract, `tracecore`, `vizctl` |
-| [Adding or changing a language adapter](backend/guides/language-adapter.md) | Guide | Manifest, runner image requirements, tracer, fixtures, wire contract changes, the G2 hook switch |
-| [Running the backend tests](backend/guides/testing.md) | Guide | What each test package covers and needs, golden traces, fuzzing |
+| [Tracing](backend/architecture/tracing.md) | Architecture | Manifest to trace: the Python tracer, the C++ build and its diagnostics, the wire contract, `tracecore`, `vizctl` |
+| [Adding or changing a language adapter](backend/guides/language-adapter.md) | Guide | Manifest, runner image requirements, the C++ runner image, tracer, fixtures, wire contract changes, the G2 hook switch |
+| [Running the backend tests](backend/guides/testing.md) | Guide | What each test package covers and needs, golden traces, captured GCC output, fuzzing |
 | [Database migrations](backend/guides/db-migrations.md) | Guide | goose on MySQL 8.4: online DDL, expand and contract, safe patterns |
 | [Comments cheat sheet](backend/conventions/comments-cheat-sheet.md) | Convention | Default zero comments; the eight kinds that earn one (E1–E8) |
 | [Testing cheat sheet](backend/conventions/testing-cheat-sheet.md) | Convention | 11 rules for tests that catch regressions |

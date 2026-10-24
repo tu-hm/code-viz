@@ -51,18 +51,16 @@ box, err := sb.Start(ctx, ports.SandboxSpec{
 	Memory: 256 << 20,
 })
 
-// build, when m.Build != nil: for Python, the syntax and import check
-build, err := box.Run(buildCtx, ports.Command{
-	Args: m.Build.Cmd,
-	Env:  []string{"VIZ_MODULES_ALLOW=" + strings.Join(m.AllowedModules, ",")},
-	Stdout: diag, Stderr: diag, Wire: io.Discard,
-})
+opts := trace.Options{MaxSteps: 1000, StartAtLines: []int{}}
+
+// build, when m.Build != nil: Python's syntax and import check, or g++
+b, kind, err := app.Build(ctx, box, m, opts)
 
 // trace
 rec := tracecore.NewRecorder(tracecore.Config{
 	ID:       id,
 	Source:   trace.Source{File: m.SourceFile, LineCount: lineCount(src)},
-	Options:  trace.Options{MaxSteps: 1000, StartAtLines: []int{}},
+	Options:  opts,
 	Limits:   tracecore.DefaultLimits,
 	Validate: val.Wire,
 })
@@ -77,9 +75,9 @@ res, err := rec.Finish(tracecore.Outcome{
 }, err)
 ```
 
-1. **Load the manifest** whose `id` matches `--lang`. `manifest.Load("adapters")` (`internal/adapters/manifest`, the `Adapters` port) reads and checks every `adapters/*/manifest.yaml` once and hands out a `domain.Manifest`: the build timeout as a `time.Duration`, `trace.env` as sorted `KEY=value` strings, and `Build` nil for a language with no build step.
+1. **Load the manifest** whose `id` matches `--lang`. `manifest.Load("adapters")` (`internal/adapters/manifest`, the `Adapters` port) reads and checks every `adapters/*/manifest.yaml` once and hands out a `domain.Manifest`: the build timeout as a `time.Duration`, `trace.env` and `build.env` as sorted `KEY=value` strings, and `Build` nil for a language with no build step.
 2. **Start one box** with the source and `stdin` written into `/work`. Stdin is a file, never fd 0 (sandbox guide, Rules for callers).
-3. **Build** under `build.timeoutMs`, if the manifest has a build. A non-zero exit fails the run before anything is traced: `unsupported_module` when the code equals `build.unsupportedModuleExit`, `compile_error` otherwise, with the build output as diagnostics.
+3. **Build** under `build.timeoutMs`, if the manifest has a build: `build.cmd`, then `build.safetyFlags` unless `opts.SafetyChecks` is false. A non-zero exit fails the run before anything is traced: `unsupported_module` when the code equals `build.unsupportedModuleExit`, `compile_error` otherwise, with the build output as diagnostics.
 4. **Trace** under the wall-time deadline (15 s by default, §11), with the recorder's three writers. When a writer returns an error, the sandbox kills the box. That's how the core enforces its hard limits.
 5. **Finish**: pass `Run`'s outcome and error in. A kill caused by one of the core's own limits still gives a trace. Any other error (infra, cancel, malformed output) comes back as an error.
 6. **Use the result**: `res.Trace()` is the whole document (what `vizctl` prints), `res.Chunks()` the gzipped chunks to store (chunk `i` goes to `BlobStore.Put` under `domain.ChunkKey("t7", id, i)`, §7.5), `res.Tail` the output after the step limit (`tail.txt.gz`, §19.9.5), and `res.Logs` the adapter's `log` messages, for internal logs only.
@@ -89,6 +87,7 @@ res, err := rec.Finish(tracecore.Outcome{
 | Env | Set by | Value |
 |---|---|---|
 | `VIZ_MODULES_ALLOW` | Caller, on the build | `modules.allow` from the manifest, comma-separated |
+| `TMPDIR` | Manifest `build.env` (C++) | `/work`: g++ writes temp files, and `/tmp` is read-only |
 | `VIZ_MAX_STEPS` | Caller, on the trace | `options.maxSteps` (1,000 by default, 5,000 at most) |
 | `VIZ_PROTOCOL_FD` | Manifest `trace.env` | `3` |
 | `PYTHONHASHSEED` | Manifest `trace.env` | `0`, so string hashes and set order are the same on every run (§7.12) |
@@ -106,6 +105,38 @@ Python has no compiler, so its build step is a check that runs before anything i
 | An import whose top-level module isn't in `VIZ_MODULES_ALLOW` (relative imports are always blocked) | 3 | `main.py:L:C: error: numpy isn't supported in the visualizer`, one line per import | `unsupported_module` |
 
 `modules.allow` is the pinned image's `sys.stdlib_module_names`, all 301 names, sorted. The diagnostics use GCC's format, so one parser covers the C++ and Python builds. The trace run doesn't check imports again: a dynamic import of a missing module fails at runtime as an ordinary exception.
+
+## The C++ build
+
+`build.cmd` in `adapters/cpp/manifest.yaml` is `g++ -std=gnu++17 … main.cpp /opt/viz/flush_init.cpp -o main` with the flags below. They stay on when safety checks are off.
+
+| Flag or file | Why |
+|---|---|
+| `-O0 -g3 -fno-omit-frame-pointer` | GDB sees every line and every local |
+| `--coverage` | Line hits for BE-11. The `.gcno` files land in `/work` |
+| `-Wall -Wextra -Wshadow` | The warnings panel (§19.6). Warnings come back from a build that succeeds |
+| `-fdiagnostics-plain-output` | No colors, carets, fix-its or URLs: `raw` is plain text with one diagnostic per line |
+| `/opt/viz/flush_init.cpp` | Unbuffered stdout and `std::unitbuf` before `main` (§7.11.2) |
+
+- **Safety checks (D21, §19.6).** `build.safetyFlags` (`-D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all`) go after `build.cmd` unless the request sets `options.safetyChecks: false`. Unset and `true` mean on (`domain.SafetyChecks`). `NormalizeOptions` keeps the field only when it's `false`, so unset and `true` share a cache key and `false` gets its own. `CheckRequest` rejects `false` for a language with no `build.safetyFlags`, such as Python. With checks on, the containers are libstdc++'s debug ones, so a trace shows `std::__debug::vector<int, …>`.
+- **Precompiled headers.** The image has one per value of `_GLIBCXX_DEBUG` in `bits/stdc++.h.gch/`, and GCC picks the one that fits the build. Their flags must match the manifest's ([language adapter guide](../guides/language-adapter.md#the-c-runner-image)).
+- **Env.** `build.env` sets `TMPDIR=/work`. The sandbox sets no `LANG`, so GCC quotes with ASCII `'`, not curly quotes.
+- **Timeout.** 10 s (`build.timeoutMs`). A build killed by it is `compile_error` with `raw` set to `Build timed out`.
+
+### Diagnostics
+
+`app.Build` keeps the whole build output, stdout and stderr together and cut at 64 KiB, as `build.raw`, and parses it into `build.diagnostics` (§8.3). `raw` is set whenever the build printed something. A diagnostic always points into `main.cpp`, because that's the only file the user can open:
+
+| GCC prints | Diagnostic |
+|---|---|
+| `main.cpp:6:14: error: expected ';' before 'return'` | Line 6, column 14, severity `error`, the message after it. `warning` the same way |
+| `main.cpp:2:10: fatal error: testlib.h: No such file or directory` | Severity `error` |
+| `…: note: …` | None; notes stay in `raw` |
+| An error or warning in a system header, such as `…/stl_algo.h:4859:7: error: no match for 'operator<' …` | At the last `main.cpp` location GCC printed before it: `main.cpp:10:9:   required from here`, or `In file included from main.cpp:2:` (column 1). GCC prints that context only when it changes, so it carries over to the errors after it. None when no `main.cpp` location came first |
+| ``/work/main.cpp:7: undefined reference to `solve(int)'``, from the linker | Line 7, column 1, severity `error` |
+| `main.cpp: In function 'int main()':`, `collect2: error: ld returned 1 exit status` | None |
+
+The §8.3 program fails with one error at 6:14, and `raw` is `main.cpp: In function 'int main()':` then `main.cpp:6:14: error: expected ';' before 'return'`, the same with checks on or off. `TestTraceNamesBuildFailure` (`cmd/vizctl`) runs it end to end; `TestBuildReadsGCCDiagnostics` (`internal/app`) covers each row above from captured GCC 13 output.
 
 ## The wire contract
 
@@ -238,6 +269,7 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | What | Where |
 |---|---|
 | G2: keep `settrace` or move to `sys.monitoring` | Gate on Fri 13 Nov; S2 recommends `sys.monitoring` |
+| The C++ tracer reading `/work/stdin` and honoring `VIZ_MAX_STEPS` | BE-08 |
 | Storing `Result.Tail` as `tail.txt.gz` and listing it in the trace manifest (the worker stores chunks and header only) | BE-11 §2 |
 | Signing the runner image | BE-03 §3, needs the registry (BE-13) |
 | A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | BE-10 |

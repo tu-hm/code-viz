@@ -4,7 +4,7 @@ An adapter is everything specific to one language: a manifest, a runner image an
 
 ## Add a language
 
-1. **Create `backend/adapters/<dir>/`** with a `manifest.yaml`, a `Dockerfile` and the tracer. The C++ prototype lives in `adapters/cpp/`; the Python adapter in `adapters/python/` is the complete example.
+1. **Create `backend/adapters/<dir>/`** with a `manifest.yaml`, a `Dockerfile` and the tracer. The Python adapter in `adapters/python/` is the complete example. `adapters/cpp/` has the C++ manifest, its runner image (below) and `trace.py`, the GDB prototype from spike S1a. The manifest says `enabled: false` until the BE-08 tracer lands; `vizctl` and the fixture test trace it anyway.
 2. **Write the manifest** (§10.2). `vizctl` and the worker load every `adapters/*/manifest.yaml` through `internal/adapters/manifest`, which checks them all at once: one bad manifest, or two with the same `id`, fails the load. They read:
 
    | Field | Meaning |
@@ -15,6 +15,8 @@ An adapter is everything specific to one language: a manifest, a runner image an
    | `image` | The runner image tag. The adapter's line in `make runner-images` reads it from the manifest |
    | `sourceFile` | The file name in `/work`, for example `main.py` |
    | `build.cmd`, `build.timeoutMs` | The build, or for an interpreted language a check. A non-zero exit is `compile_error`, and its output becomes the diagnostics. Leave out `build` for a language that needs neither |
+   | `build.safetyFlags` | Optional. Appended to `build.cmd` unless the request sets `options.safetyChecks: false` (D21, §19.6). A language without them rejects `false` with `invalid_request` |
+   | `build.env` | Optional. Extra environment for the build, for example `TMPDIR: /work` for g++ |
    | `build.unsupportedModuleExit` | Optional. The exit code that means `unsupported_module` instead |
    | `trace.cmd`, `trace.env` | The tracer command and its environment. The caller adds `VIZ_MAX_STEPS` |
    | `modules.allow` | Optional. Passed to the build as `VIZ_MODULES_ALLOW`, comma-separated |
@@ -42,9 +44,31 @@ For nsjail, the image is unpacked into a directory on the node (for example with
 - **empty `/work` and `/proc` directories, and empty files at `/dev/null`, `/dev/zero`, `/dev/random` and `/dev/urandom`.** The root is read-only, so nsjail can't create its mount points. `docker build` doesn't keep files written to `/dev`, so add them after unpacking.
 - **a mount without `nosuid`, `nodev` or `noexec`.** nsjail can't remount such a bind read-only inside a user namespace and fails with EPERM. The image layer of the worker container is fine. A directory under a host `/tmp` that is bind mounted into the container is not.
 
+## The C++ runner image
+
+`adapters/cpp/Dockerfile` builds `viz-runner-cpp:13.5-gdb14-1` (about 870 MB unpacked) on `debian:bookworm-slim`. Every base image is pinned by digest.
+
+| Piece | Where | Detail |
+|---|---|---|
+| GCC 13.5.0 | `/usr/local`, copied from the official `gcc` image | `/usr/local/lib64` comes first in the loader path (`/etc/ld.so.conf.d/000-local-lib.conf`). Debian's own `libstdc++` is GCC 12's, too old for what GCC 13 builds |
+| GDB 14.2 | `/usr/local/bin/gdb` | Built from source in a stage on the `gcc` image, from the GNU tarball pinned by checksum, with Python and without debuginfod. Bookworm ships GDB 13 |
+| Pretty printers | `/usr/local/share/gdb/auto-load/usr/local/lib64/` | libstdc++ installs them next to the library, but GDB's default `auto-load safe-path` refuses `/usr/local/lib64`. Under GDB's data directory they load with `-nx` |
+| Precompiled headers | `bits/stdc++.h.gch/checks-off.gch` and `checks-on.gch` | GCC tries every file in a `.gch` directory and uses the first one built with compatible flags. `_GLIBCXX_DEBUG` is defined in one and not the other, so each build matches exactly one |
+| `flush_init.cpp`, `trace.py`, `viz-shim` | `/opt/viz/` | |
+
+**The PCH flags must match the manifest's.** The `flags` line in the Dockerfile is `build.cmd` without its files and `-o`; `checks-on.gch` adds `build.safetyFlags`. GCC checks only two things when it picks a PCH: whether debug info is on, and macros the header tests, such as `_GLIBCXX_DEBUG`. A PCH built with another `-O`, `-f…`, `-W…` or `--coverage` is used without a word, so a flag changed on one side only goes unnoticed. After changing either side, check that each build still uses its own PCH: `-H` prints `!` before the PCH GCC used and `x` before one it rejected.
+
+```sh
+docker run --rm -i -w /work --tmpfs /work -e TMPDIR=/work viz-runner-cpp:13.5-gdb14-1 \
+  sh -c 'cat > main.cpp && g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output main.cpp /opt/viz/flush_init.cpp -o main -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all -H 2>&1' \
+  < main.cpp | grep '^[!x]'
+```
+
+GCC uses a PCH only when `#include <bits/stdc++.h>` comes before any code. A `#pragma GCC optimize(…)`, another `#include`, or a macro the headers test (`#define private public`) before it means the build parses the whole header without a PCH. Comments, unrelated macros, and `#define int long long` after the include are fine.
+
 ## Add a fixture
 
-Add `backend/fixtures/<dir>/<case>/` with the source file and an optional `stdin`. Run `make golden-update`, then read the new `expected.trace.json` step by step against the source. The fixture test finds the directory by itself. [Testing](testing.md#golden-traces) lists what each Python fixture pins.
+Add `backend/fixtures/<dir>/<case>/` with the source file and an optional `stdin`. Run `make golden-update`, then read the new `expected.trace.json` step by step against the source. The fixture test finds the directory by itself. [Testing](testing.md#golden-traces) lists what each fixture pins.
 
 ## Change the wire contract
 
