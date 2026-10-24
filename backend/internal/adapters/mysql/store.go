@@ -155,7 +155,6 @@ type lockedTrace struct {
 	enqueue   bool
 }
 
-// singleFlight locks the trace with nv.CacheKey, inserting it when there is none and resetting it when it can't serve nv (§7.12).
 func singleFlight(ctx context.Context, qs *sqlc.Queries, nv ports.NewVisualization, options []byte, now time.Time) (lockedTrace, error) {
 	expiresAt := now.Add(domain.Retention)
 	inserted, err := qs.InsertTrace(ctx, sqlc.InsertTraceParams{
@@ -189,8 +188,6 @@ func singleFlight(ctx context.Context, qs *sqlc.Queries, nv ports.NewVisualizati
 	return lockedTrace{id: t.ID, status: domain.TraceQueued, expiresAt: expiresAt, enqueue: true}, nil
 }
 
-// oldestQueued returns the subject's oldest queued visualization, with its trace locked, when the subject already has
-// domain.MaxActive queued or running ones. It returns nil when the subject has fewer, or none of them is queued.
 func oldestQueued(ctx context.Context, qs *sqlc.Queries, subject string) (*sqlc.ActiveVisualizationsRow, error) {
 	active, err := qs.ActiveVisualizations(ctx, subject)
 	if err != nil {
@@ -274,8 +271,7 @@ func (s *Store) Detach(ctx context.Context, id, subject string, now time.Time) e
 	return nil
 }
 
-// detach detaches visualization id and cancels the queued job of traceID when no other visualization waits on it (§8.5).
-// The caller holds the lock of traceID: lock order traces → visualizations → jobs.
+// caller holds lock of traceID: lock order traces → visualizations → jobs
 func (s *Store) detach(ctx context.Context, tx *sql.Tx, id, traceID string, now time.Time) error {
 	qs := sqlc.New(tx)
 	if err := qs.DetachVisualization(ctx, id); err != nil {
