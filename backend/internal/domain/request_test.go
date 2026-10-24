@@ -12,11 +12,17 @@ import (
 )
 
 var (
-	capable   = domain.Manifest{ID: "cpp17-gcc", Image: "viz-runner-cpp:13-1", Capabilities: domain.Capabilities{StartAtLines: true, CaptureRanges: true}}
-	incapable = domain.Manifest{ID: "python3", Image: "viz-runner-python:3.12.15-1"}
+	capable = domain.Manifest{
+		ID:           "cpp17-gcc",
+		Image:        "viz-runner-cpp:13-1",
+		Build:        &domain.Build{SafetyFlags: []string{"-D_GLIBCXX_DEBUG"}},
+		Capabilities: domain.Capabilities{StartAtLines: true, CaptureRanges: true},
+	}
+	incapable = domain.Manifest{ID: "python3", Image: "viz-runner-python:3.12.15-1", Build: &domain.Build{}}
 )
 
 func TestCheckRequest(t *testing.T) {
+	yes, no := true, false
 	tests := []struct {
 		name   string
 		m      domain.Manifest
@@ -43,6 +49,10 @@ func TestCheckRequest(t *testing.T) {
 		{"a capture range of three indexes is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0, 1, 2}}}}, domain.ErrInvalidRequest},
 		{"a negative capture start is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{-1, 5}}}}, domain.ErrInvalidRequest},
 		{"a negative capture end is invalid", capable, "", "", trace.Options{MaxSteps: 1000, CaptureRanges: map[string][][]int{"dp": {{0, -1}}}}, domain.ErrInvalidRequest},
+		{"safety checks switched off pass where the language has them", capable, "", "", trace.Options{MaxSteps: 1000, SafetyChecks: &no}, nil},
+		{"safety checks switched off are invalid where the language has none", incapable, "", "", trace.Options{MaxSteps: 1000, SafetyChecks: &no}, domain.ErrInvalidRequest},
+		{"safety checks switched off are invalid where the language has no build", domain.Manifest{ID: "node22"}, "", "", trace.Options{MaxSteps: 1000, SafetyChecks: &no}, domain.ErrInvalidRequest},
+		{"safety checks switched on pass where the language has none", incapable, "", "", trace.Options{MaxSteps: 1000, SafetyChecks: &yes}, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -95,6 +105,16 @@ func TestNormalizeOptions(t *testing.T) {
 			opts: trace.Options{MaxSteps: 7, ShowInternals: &yes},
 			want: trace.Options{MaxSteps: 7, StartAtLines: []int{}, ShowInternals: &yes},
 		},
+		{
+			name: "safetyChecks true is left out",
+			opts: trace.Options{MaxSteps: 7, SafetyChecks: &yes},
+			want: trace.Options{MaxSteps: 7, StartAtLines: []int{}},
+		},
+		{
+			name: "safetyChecks false is kept",
+			opts: trace.Options{MaxSteps: 7, SafetyChecks: &no},
+			want: trace.Options{MaxSteps: 7, StartAtLines: []int{}, SafetyChecks: &no},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -117,7 +137,7 @@ func TestCacheKey(t *testing.T) {
 		change(&r)
 		return r
 	}
-	no := false
+	yes, no := true, false
 	tests := []struct {
 		name string
 		b    request
@@ -126,6 +146,8 @@ func TestCacheKey(t *testing.T) {
 		{"start lines in another order trace the same", with(func(r *request) { r.opts.StartAtLines = []int{4, 2} }), true},
 		{"repeated start lines trace the same", with(func(r *request) { r.opts.StartAtLines = []int{2, 4, 4} }), true},
 		{"showInternals false traces the same as unset", with(func(r *request) { r.opts.ShowInternals = &no }), true},
+		{"safetyChecks true traces the same as unset", with(func(r *request) { r.opts.SafetyChecks = &yes }), true},
+		{"safetyChecks false builds another program", with(func(r *request) { r.opts.SafetyChecks = &no }), false},
 		{"another source", with(func(r *request) { r.source = "int main() { return 1; }" }), false},
 		{"another stdin", with(func(r *request) { r.stdin = "1 3" }), false},
 		{"another language", with(func(r *request) { r.m.ID = "c11-gcc" }), false},

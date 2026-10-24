@@ -110,8 +110,9 @@ func record(ctx context.Context, m domain.Manifest, src, stdin []byte) (res *tra
 	}
 	defer func() { err = errors.Join(err, box.Close(context.WithoutCancel(ctx))) }()
 
+	opts := trace.Options{MaxSteps: maxSteps, StartAtLines: []int{}}
 	if m.Build != nil {
-		b, kind, err := app.Build(ctx, box, m)
+		b, kind, err := app.Build(ctx, box, m, opts)
 		if err != nil {
 			return nil, err
 		}
@@ -127,7 +128,7 @@ func record(ctx context.Context, m domain.Manifest, src, stdin []byte) (res *tra
 	rec := tracecore.NewRecorder(tracecore.Config{
 		ID:       id,
 		Source:   trace.Source{File: m.SourceFile, LineCount: lineCount(src)},
-		Options:  trace.Options{MaxSteps: maxSteps, StartAtLines: []int{}},
+		Options:  opts,
 		Limits:   tracecore.DefaultLimits,
 		Validate: val.Wire,
 	})

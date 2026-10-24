@@ -38,6 +38,21 @@ enabled: true
 rollout: { percent: 100 }
 `
 
+const cpp = `id: cpp17-gcc
+displayName: "C++17 (GCC 13)"
+editorMode: c_cpp
+image: viz-runner-cpp:13-1
+sourceFile: main.cpp
+build:
+  cmd: ["g++", "-std=gnu++17", "main.cpp", "-o", "main"]
+  safetyFlags: ["-D_GLIBCXX_DEBUG", "-fsanitize=undefined"]
+  env: { TMPDIR: /work, LANG: C }
+  timeoutMs: 10000
+trace:
+  cmd: ["gdb", "-q", "-nx", "-batch", "-x", "/opt/viz/trace.py", "--args", "./main"]
+enabled: true
+`
+
 const node = `id: node22
 displayName: "Node.js 22"
 editorMode: javascript
@@ -48,13 +63,28 @@ trace:
 `
 
 func TestLoadReadsEveryManifest(t *testing.T) {
-	set, err := manifest.Load(writeManifests(t, map[string]string{"python": python, "node": node}))
+	set, err := manifest.Load(writeManifests(t, map[string]string{"cpp": cpp, "python": python, "node": node}))
 	if err != nil {
 		t.Fatal(err)
 	}
 	var adapters ports.Adapters = set
 
 	want := []domain.Manifest{
+		{
+			ID:          "cpp17-gcc",
+			DisplayName: "C++17 (GCC 13)",
+			EditorMode:  "c_cpp",
+			Enabled:     true,
+			Image:       "viz-runner-cpp:13-1",
+			SourceFile:  "main.cpp",
+			Build: &domain.Build{
+				Cmd:         []string{"g++", "-std=gnu++17", "main.cpp", "-o", "main"},
+				SafetyFlags: []string{"-D_GLIBCXX_DEBUG", "-fsanitize=undefined"},
+				Env:         []string{"LANG=C", "TMPDIR=/work"},
+				Timeout:     10 * time.Second,
+			},
+			TraceCmd: []string{"gdb", "-q", "-nx", "-batch", "-x", "/opt/viz/trace.py", "--args", "./main"},
+		},
 		{
 			ID:          "node22",
 			DisplayName: "Node.js 22",
@@ -85,7 +115,7 @@ func TestLoadReadsEveryManifest(t *testing.T) {
 		t.Errorf("Manifests() (-want +got):\n%s", diff)
 	}
 	got, ok := adapters.Manifest("python3")
-	if diff := cmp.Diff(want[1], got); !ok || diff != "" {
+	if diff := cmp.Diff(want[2], got); !ok || diff != "" {
 		t.Errorf("Manifest(python3) = _, %v (-want +got):\n%s", ok, diff)
 	}
 	if _, ok := adapters.Manifest("ruby"); ok {

@@ -48,11 +48,20 @@ func CheckRequest(m Manifest, source, stdin string, opts trace.Options) error {
 			}
 		}
 	}
+	if !SafetyChecks(opts) && (m.Build == nil || len(m.Build.SafetyFlags) == 0) {
+		return fmt.Errorf("%s has no safety checks to switch off: %w", m.ID, ErrInvalidRequest)
+	}
 	return nil
 }
 
+// SafetyChecks reports whether opts build with the language's safety checks: on unless switched off (D21).
+func SafetyChecks(opts trace.Options) bool {
+	return opts.SafetyChecks == nil || *opts.SafetyChecks
+}
+
 // NormalizeOptions returns opts in one form for all options that trace the same (§7.12): start lines and each
-// variable's ranges sorted without repeats, and no variable without ranges or showInternals that is false.
+// variable's ranges sorted without repeats, and no variable without ranges, showInternals that is false or
+// safetyChecks that is true.
 func NormalizeOptions(opts trace.Options) trace.Options {
 	lines := append([]int{}, opts.StartAtLines...)
 	slices.Sort(lines)
@@ -70,6 +79,9 @@ func NormalizeOptions(opts trace.Options) trace.Options {
 	}
 	if opts.ShowInternals != nil && *opts.ShowInternals {
 		n.ShowInternals = opts.ShowInternals
+	}
+	if !SafetyChecks(opts) {
+		n.SafetyChecks = opts.SafetyChecks
 	}
 	return n
 }

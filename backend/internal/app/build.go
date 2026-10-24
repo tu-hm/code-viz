@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/tu-hm/code-viz/backend/internal/domain"
 	"github.com/tu-hm/code-viz/backend/internal/gen/api"
+	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
 	"github.com/tu-hm/code-viz/backend/internal/ports"
 )
 
@@ -20,16 +22,20 @@ const maxBuildOutput = 64 << 10
 // gcc's format, which tracer.py --check prints too: main.py:3:5: error: invalid syntax
 var diagnostic = regexp.MustCompile(`^(\d+):(\d+): (error|warning): (.*)$`)
 
-// Build runs m's build step in box under m.Build.Timeout (§10.2) and returns it as the API shows it, with the failure kind when it failed.
-// The error is for a sandbox failure, never for a failed build.
-func Build(ctx context.Context, box ports.Box, m domain.Manifest) (api.Build, api.FailureKind, error) {
+// Build runs m's build step in box under m.Build.Timeout (§10.2), with m.Build.SafetyFlags unless opts switch them off,
+// and returns it as the API shows it, with the failure kind when it failed. The error is for a sandbox failure, never for a failed build.
+func Build(ctx context.Context, box ports.Box, m domain.Manifest, opts trace.Options) (api.Build, api.FailureKind, error) {
 	ctx, cancel := context.WithTimeout(ctx, m.Build.Timeout)
 	defer cancel()
+	args := m.Build.Cmd
+	if domain.SafetyChecks(opts) {
+		args = slices.Concat(m.Build.Cmd, m.Build.SafetyFlags)
+	}
 	out := &capped{max: maxBuildOutput}
 	start := time.Now()
 	exit, err := box.Run(ctx, ports.Command{
-		Args:   m.Build.Cmd,
-		Env:    []string{"VIZ_MODULES_ALLOW=" + strings.Join(m.AllowedModules, ",")},
+		Args:   args,
+		Env:    append([]string{"VIZ_MODULES_ALLOW=" + strings.Join(m.AllowedModules, ",")}, m.Build.Env...),
 		Stdout: out,
 		Stderr: out,
 		Wire:   io.Discard,

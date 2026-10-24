@@ -19,6 +19,8 @@ type Manifest struct {
 
 type Build struct {
 	Cmd                   []string
+	SafetyFlags           []string
+	Env                   []string // KEY=value, sorted by key
 	Timeout               time.Duration
 	UnsupportedModuleExit int
 }

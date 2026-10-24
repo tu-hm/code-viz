@@ -225,7 +225,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 		if err := w.Queue.Building(ctx, l, w.Now()); err != nil {
 			return fmt.Errorf("mark building: %w: %w", domain.ErrInfra, err)
 		}
-		b, kind, err := Build(runCtx, box, m)
+		b, kind, err := Build(runCtx, box, m, job.Options)
 		if err != nil {
 			return err
 		}

@@ -23,9 +23,11 @@ type file struct {
 	Image       string `yaml:"image"`
 	SourceFile  string `yaml:"sourceFile"`
 	Build       *struct {
-		Cmd                   []string `yaml:"cmd"`
-		TimeoutMs             int      `yaml:"timeoutMs"`
-		UnsupportedModuleExit int      `yaml:"unsupportedModuleExit"`
+		Cmd                   []string          `yaml:"cmd"`
+		SafetyFlags           []string          `yaml:"safetyFlags"`
+		Env                   map[string]string `yaml:"env"`
+		TimeoutMs             int               `yaml:"timeoutMs"`
+		UnsupportedModuleExit int               `yaml:"unsupportedModuleExit"`
 	} `yaml:"build"`
 	Trace struct {
 		Cmd []string          `yaml:"cmd"`
@@ -120,18 +122,26 @@ func Read(path string) (domain.Manifest, error) {
 		Image:          f.Image,
 		SourceFile:     f.SourceFile,
 		TraceCmd:       f.Trace.Cmd,
+		TraceEnv:       env(f.Trace.Env),
 		AllowedModules: f.Modules.Allow,
 		Capabilities:   domain.Capabilities(f.Capabilities),
 	}
 	if f.Build != nil {
 		m.Build = &domain.Build{
 			Cmd:                   f.Build.Cmd,
+			SafetyFlags:           f.Build.SafetyFlags,
+			Env:                   env(f.Build.Env),
 			Timeout:               time.Duration(f.Build.TimeoutMs) * time.Millisecond,
 			UnsupportedModuleExit: f.Build.UnsupportedModuleExit,
 		}
 	}
-	for _, k := range slices.Sorted(maps.Keys(f.Trace.Env)) {
-		m.TraceEnv = append(m.TraceEnv, k+"="+f.Trace.Env[k])
-	}
 	return m, nil
+}
+
+func env(vars map[string]string) []string {
+	var kv []string
+	for _, k := range slices.Sorted(maps.Keys(vars)) {
+		kv = append(kv, k+"="+vars[k])
+	}
+	return kv
 }
