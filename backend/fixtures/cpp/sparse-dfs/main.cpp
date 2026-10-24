@@ -8,10 +8,10 @@ int timer_ = 0;
 int n = 200000;
 
 void dfs(int u, int d) {
+    int child = 2 * u;
     if (u > n || timer_ == 6) return;
     depth_[u] = d;
     tin[u] = ++timer_;
-    int child = 2 * u;
     dfs(child, d + 1);
     dfs(child + 1, d + 1);
 }

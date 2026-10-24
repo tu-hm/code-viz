@@ -195,6 +195,13 @@
                 "type": "int",
                 "v": "0"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
             }
           ],
           "name": "dfs",
@@ -289,6 +296,14 @@
                 "type": "int",
                 "v": "0"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
             }
           ],
           "name": "dfs",
@@ -382,6 +397,14 @@
                 "type": "int",
                 "v": "0"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
             }
           ],
           "name": "dfs",
@@ -440,7 +463,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "1"
+                "v": "0"
               }
             },
             {
@@ -479,8 +502,9 @@
             {
               "name": "child",
               "value": {
-                "t": "uninit",
-                "type": "int"
+                "t": "int",
+                "type": "int",
+                "v": "2"
               }
             }
           ],
@@ -488,19 +512,7 @@
           "returnValue": null
         }
       },
-      "heap": {
-        "o2": {
-          "kind": "sequence",
-          "length": 200005,
-          "patch": {
-            "1": {
-              "t": "int",
-              "v": "1"
-            }
-          },
-          "type": "int [200005]"
-        }
-      },
+      "heap": {},
       "i": 4,
       "keyframe": false,
       "line": 14,
@@ -601,7 +613,19 @@
           "returnValue": null
         }
       },
-      "heap": {},
+      "heap": {
+        "o2": {
+          "kind": "sequence",
+          "length": 200005,
+          "patch": {
+            "1": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          "type": "int [200005]"
+        }
+      },
       "i": 5,
       "keyframe": false,
       "line": 15,
@@ -688,6 +712,13 @@
                 "t": "int",
                 "type": "int",
                 "v": "1"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
               }
             }
           ],
@@ -784,6 +815,14 @@
                 "type": "int",
                 "v": "1"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
             }
           ],
           "name": "dfs",
@@ -878,25 +917,21 @@
                 "type": "int",
                 "v": "1"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
             }
           ],
           "name": "dfs",
           "returnValue": null
         }
       },
-      "heap": {
-        "o1": {
-          "kind": "sequence",
-          "length": 200005,
-          "patch": {
-            "2": {
-              "t": "int",
-              "v": "1"
-            }
-          },
-          "type": "int [200005]"
-        }
-      },
+      "heap": {},
       "i": 8,
       "keyframe": false,
       "line": 13,
@@ -949,7 +984,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "2"
+                "v": "1"
               }
             },
             {
@@ -988,8 +1023,9 @@
             {
               "name": "child",
               "value": {
-                "t": "uninit",
-                "type": "int"
+                "t": "int",
+                "type": "int",
+                "v": "4"
               }
             }
           ],
@@ -998,13 +1034,13 @@
         }
       },
       "heap": {
-        "o2": {
+        "o1": {
           "kind": "sequence",
           "length": 200005,
           "patch": {
             "2": {
               "t": "int",
-              "v": "2"
+              "v": "1"
             }
           },
           "type": "int [200005]"
@@ -1111,7 +1147,19 @@
           "returnValue": null
         }
       },
-      "heap": {},
+      "heap": {
+        "o2": {
+          "kind": "sequence",
+          "length": 200005,
+          "patch": {
+            "2": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          "type": "int [200005]"
+        }
+      },
       "i": 10,
       "keyframe": false,
       "line": 15,
@@ -1199,6 +1247,13 @@
                 "t": "int",
                 "type": "int",
                 "v": "2"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
               }
             }
           ],
@@ -1296,6 +1351,14 @@
                 "type": "int",
                 "v": "2"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "8"
+              }
             }
           ],
           "name": "dfs",
@@ -1391,25 +1454,21 @@
                 "type": "int",
                 "v": "2"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "8"
+              }
             }
           ],
           "name": "dfs",
           "returnValue": null
         }
       },
-      "heap": {
-        "o1": {
-          "kind": "sequence",
-          "length": 200005,
-          "patch": {
-            "4": {
-              "t": "int",
-              "v": "2"
-            }
-          },
-          "type": "int [200005]"
-        }
-      },
+      "heap": {},
       "i": 13,
       "keyframe": false,
       "line": 13,
@@ -1463,7 +1522,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "3"
+                "v": "2"
               }
             },
             {
@@ -1502,8 +1561,9 @@
             {
               "name": "child",
               "value": {
-                "t": "uninit",
-                "type": "int"
+                "t": "int",
+                "type": "int",
+                "v": "8"
               }
             }
           ],
@@ -1512,13 +1572,13 @@
         }
       },
       "heap": {
-        "o2": {
+        "o1": {
           "kind": "sequence",
           "length": 200005,
           "patch": {
             "4": {
               "t": "int",
-              "v": "3"
+              "v": "2"
             }
           },
           "type": "int [200005]"
@@ -1626,7 +1686,19 @@
           "returnValue": null
         }
       },
-      "heap": {},
+      "heap": {
+        "o2": {
+          "kind": "sequence",
+          "length": 200005,
+          "patch": {
+            "4": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          "type": "int [200005]"
+        }
+      },
       "i": 15,
       "keyframe": false,
       "line": 15,
@@ -1715,6 +1787,13 @@
                 "t": "int",
                 "type": "int",
                 "v": "3"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
               }
             }
           ],
@@ -1813,6 +1892,14 @@
                 "type": "int",
                 "v": "3"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "16"
+              }
             }
           ],
           "name": "dfs",
@@ -1909,25 +1996,21 @@
                 "type": "int",
                 "v": "3"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "16"
+              }
             }
           ],
           "name": "dfs",
           "returnValue": null
         }
       },
-      "heap": {
-        "o1": {
-          "kind": "sequence",
-          "length": 200005,
-          "patch": {
-            "8": {
-              "t": "int",
-              "v": "3"
-            }
-          },
-          "type": "int [200005]"
-        }
-      },
+      "heap": {},
       "i": 18,
       "keyframe": false,
       "line": 13,
@@ -1982,7 +2065,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "4"
+                "v": "3"
               }
             },
             {
@@ -2021,8 +2104,9 @@
             {
               "name": "child",
               "value": {
-                "t": "uninit",
-                "type": "int"
+                "t": "int",
+                "type": "int",
+                "v": "16"
               }
             }
           ],
@@ -2031,13 +2115,13 @@
         }
       },
       "heap": {
-        "o2": {
+        "o1": {
           "kind": "sequence",
           "length": 200005,
           "patch": {
             "8": {
               "t": "int",
-              "v": "4"
+              "v": "3"
             }
           },
           "type": "int [200005]"
@@ -2146,7 +2230,19 @@
           "returnValue": null
         }
       },
-      "heap": {},
+      "heap": {
+        "o2": {
+          "kind": "sequence",
+          "length": 200005,
+          "patch": {
+            "8": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          "type": "int [200005]"
+        }
+      },
       "i": 20,
       "keyframe": false,
       "line": 15,
@@ -2236,6 +2332,13 @@
                 "t": "int",
                 "type": "int",
                 "v": "4"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
               }
             }
           ],
@@ -2335,6 +2438,14 @@
                 "type": "int",
                 "v": "4"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "32"
+              }
             }
           ],
           "name": "dfs",
@@ -2432,25 +2543,21 @@
                 "type": "int",
                 "v": "4"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "32"
+              }
             }
           ],
           "name": "dfs",
           "returnValue": null
         }
       },
-      "heap": {
-        "o1": {
-          "kind": "sequence",
-          "length": 200005,
-          "patch": {
-            "16": {
-              "t": "int",
-              "v": "4"
-            }
-          },
-          "type": "int [200005]"
-        }
-      },
+      "heap": {},
       "i": 23,
       "keyframe": false,
       "line": 13,
@@ -2506,7 +2613,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "5"
+                "v": "4"
               }
             },
             {
@@ -2545,8 +2652,9 @@
             {
               "name": "child",
               "value": {
-                "t": "uninit",
-                "type": "int"
+                "t": "int",
+                "type": "int",
+                "v": "32"
               }
             }
           ],
@@ -2555,13 +2663,13 @@
         }
       },
       "heap": {
-        "o2": {
+        "o1": {
           "kind": "sequence",
           "length": 200005,
           "patch": {
             "16": {
               "t": "int",
-              "v": "5"
+              "v": "4"
             }
           },
           "type": "int [200005]"
@@ -2671,7 +2779,19 @@
           "returnValue": null
         }
       },
-      "heap": {},
+      "heap": {
+        "o2": {
+          "kind": "sequence",
+          "length": 200005,
+          "patch": {
+            "16": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          "type": "int [200005]"
+        }
+      },
       "i": 25,
       "keyframe": false,
       "line": 15,
@@ -2762,6 +2882,13 @@
                 "t": "int",
                 "type": "int",
                 "v": "5"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
               }
             }
           ],
@@ -2862,6 +2989,14 @@
                 "type": "int",
                 "v": "5"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "64"
+              }
             }
           ],
           "name": "dfs",
@@ -2960,25 +3095,21 @@
                 "type": "int",
                 "v": "5"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "64"
+              }
             }
           ],
           "name": "dfs",
           "returnValue": null
         }
       },
-      "heap": {
-        "o1": {
-          "kind": "sequence",
-          "length": 200005,
-          "patch": {
-            "32": {
-              "t": "int",
-              "v": "5"
-            }
-          },
-          "type": "int [200005]"
-        }
-      },
+      "heap": {},
       "i": 28,
       "keyframe": false,
       "line": 13,
@@ -3035,7 +3166,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "6"
+                "v": "5"
               }
             },
             {
@@ -3074,8 +3205,9 @@
             {
               "name": "child",
               "value": {
-                "t": "uninit",
-                "type": "int"
+                "t": "int",
+                "type": "int",
+                "v": "64"
               }
             }
           ],
@@ -3084,13 +3216,13 @@
         }
       },
       "heap": {
-        "o2": {
+        "o1": {
           "kind": "sequence",
           "length": 200005,
           "patch": {
             "32": {
               "t": "int",
-              "v": "6"
+              "v": "5"
             }
           },
           "type": "int [200005]"
@@ -3201,7 +3333,19 @@
           "returnValue": null
         }
       },
-      "heap": {},
+      "heap": {
+        "o2": {
+          "kind": "sequence",
+          "length": 200005,
+          "patch": {
+            "32": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          "type": "int [200005]"
+        }
+      },
       "i": 30,
       "keyframe": false,
       "line": 15,
@@ -3294,6 +3438,13 @@
                 "type": "int",
                 "v": "6"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
             }
           ],
           "name": "dfs",
@@ -3306,6 +3457,113 @@
       "line": 11,
       "parentCallId": 6,
       "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7",
+        "f8"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f8": {
+          "id": "f8",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "64"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "128"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 32,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -3400,7 +3658,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "65535"
+                "v": "128"
               }
             }
           ],
@@ -3409,10 +3667,10 @@
         }
       },
       "heap": {},
-      "i": 32,
+      "i": 33,
       "keyframe": false,
       "line": 17,
-      "prevLine": 11,
+      "prevLine": 12,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -3434,7 +3692,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 33,
+      "i": 34,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -3541,7 +3799,7 @@
         }
       },
       "heap": {},
-      "i": 34,
+      "i": 35,
       "keyframe": false,
       "line": 16,
       "prevLine": 15,
@@ -3633,6 +3891,13 @@
                 "type": "int",
                 "v": "6"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
             }
           ],
           "name": "dfs",
@@ -3640,7 +3905,7 @@
         }
       },
       "heap": {},
-      "i": 35,
+      "i": 36,
       "keyframe": false,
       "line": 11,
       "parentCallId": 6,
@@ -3667,6 +3932,113 @@
         "f0": {
           "id": "f0",
           "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f9": {
+          "id": "f9",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "65"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "130"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 37,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7",
+        "f9"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
           "line": 17,
           "locals": [
             {
@@ -3739,7 +4111,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "65535"
+                "v": "130"
               }
             }
           ],
@@ -3748,10 +4120,10 @@
         }
       },
       "heap": {},
-      "i": 36,
+      "i": 38,
       "keyframe": false,
       "line": 17,
-      "prevLine": 11,
+      "prevLine": 12,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -3773,7 +4145,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 37,
+      "i": 39,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -3831,7 +4203,7 @@
         }
       },
       "heap": {},
-      "i": 38,
+      "i": 40,
       "keyframe": false,
       "line": 17,
       "prevLine": 16,
@@ -3855,7 +4227,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 39,
+      "i": 41,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -3961,7 +4333,7 @@
         }
       },
       "heap": {},
-      "i": 40,
+      "i": 42,
       "keyframe": false,
       "line": 16,
       "prevLine": 15,
@@ -4052,6 +4424,13 @@
                 "type": "int",
                 "v": "5"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
             }
           ],
           "name": "dfs",
@@ -4059,11 +4438,117 @@
         }
       },
       "heap": {},
-      "i": 41,
+      "i": 43,
       "keyframe": false,
       "line": 11,
       "parentCallId": 5,
       "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f10"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f10": {
+          "id": "f10",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "33"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "5"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "66"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 44,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -4157,7 +4642,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "64"
+                "v": "66"
               }
             }
           ],
@@ -4166,10 +4651,10 @@
         }
       },
       "heap": {},
-      "i": 42,
+      "i": 45,
       "keyframe": false,
       "line": 17,
-      "prevLine": 11,
+      "prevLine": 12,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -4190,7 +4675,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 43,
+      "i": 46,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -4247,7 +4732,7 @@
         }
       },
       "heap": {},
-      "i": 44,
+      "i": 47,
       "keyframe": false,
       "line": 17,
       "prevLine": 16,
@@ -4270,7 +4755,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 45,
+      "i": 48,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -4375,7 +4860,7 @@
         }
       },
       "heap": {},
-      "i": 46,
+      "i": 49,
       "keyframe": false,
       "line": 16,
       "prevLine": 15,
@@ -4445,6 +4930,14 @@
           "name": "Globals",
           "returnValue": null
         },
+        "f1": {
+          "id": "f1",
+          "kind": "function",
+          "line": 20,
+          "locals": [],
+          "name": "main",
+          "returnValue": null
+        },
         "f11": {
           "id": "f11",
           "kind": "function",
@@ -4465,218 +4958,16 @@
                 "type": "int",
                 "v": "4"
               }
-            }
-          ],
-          "name": "dfs",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 47,
-      "keyframe": false,
-      "line": 11,
-      "parentCallId": 4,
-      "prevLine": 16,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2",
-        "f3",
-        "f4",
-        "f5",
-        "f11"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "global",
-          "line": 17,
-          "locals": [
-            {
-              "name": "N",
-              "value": {
-                "t": "int",
-                "type": "const int",
-                "v": "200005"
-              }
-            },
-            {
-              "name": "depth_",
-              "value": {
-                "id": "o1",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "tin",
-              "value": {
-                "id": "o2",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "timer_",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "6"
-              }
-            },
-            {
-              "name": "n",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "200000"
-              }
-            }
-          ],
-          "name": "Globals",
-          "returnValue": null
-        },
-        "f11": {
-          "id": "f11",
-          "kind": "function",
-          "line": 17,
-          "locals": [
-            {
-              "name": "u",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "17"
-              }
-            },
-            {
-              "name": "d",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "4"
-              }
             },
             {
               "name": "child",
               "value": {
-                "t": "int",
-                "type": "int",
-                "v": "32"
+                "t": "uninit",
+                "type": "int"
               }
             }
           ],
           "name": "dfs",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 48,
-      "keyframe": false,
-      "line": 17,
-      "prevLine": 11,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2",
-        "f3",
-        "f4",
-        "f5",
-        "f11"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "callId": 10,
-      "error": null,
-      "event": "return",
-      "frames": {},
-      "heap": {},
-      "i": 49,
-      "keyframe": false,
-      "line": 17,
-      "prevLine": 17,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2",
-        "f3",
-        "f4",
-        "f5",
-        "f11"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "global",
-          "line": 17,
-          "locals": [
-            {
-              "name": "N",
-              "value": {
-                "t": "int",
-                "type": "const int",
-                "v": "200005"
-              }
-            },
-            {
-              "name": "depth_",
-              "value": {
-                "id": "o1",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "tin",
-              "value": {
-                "id": "o2",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "timer_",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "6"
-              }
-            },
-            {
-              "name": "n",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "200000"
-              }
-            }
-          ],
-          "name": "Globals",
-          "returnValue": null
-        },
-        "f1": {
-          "id": "f1",
-          "kind": "function",
-          "line": 20,
-          "locals": [],
-          "name": "main",
           "returnValue": null
         },
         "f2": {
@@ -4781,7 +5072,7 @@
         "f5": {
           "id": "f5",
           "kind": "function",
-          "line": 17,
+          "line": 16,
           "locals": [
             {
               "name": "u",
@@ -4888,7 +5179,8 @@
       },
       "i": 50,
       "keyframe": true,
-      "line": 17,
+      "line": 11,
+      "parentCallId": 4,
       "prevLine": 16,
       "removedObjects": [],
       "stack": [
@@ -4897,29 +5189,8 @@
         "f2",
         "f3",
         "f4",
-        "f5"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "callId": 4,
-      "error": null,
-      "event": "return",
-      "frames": {},
-      "heap": {},
-      "i": 51,
-      "keyframe": false,
-      "line": 17,
-      "prevLine": 17,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2",
-        "f3",
-        "f4",
-        "f5"
+        "f5",
+        "f11"
       ],
       "stderr": "",
       "stdout": ""
@@ -4931,7 +5202,7 @@
         "f0": {
           "id": "f0",
           "kind": "global",
-          "line": 16,
+          "line": 12,
           "locals": [
             {
               "name": "N",
@@ -4977,17 +5248,17 @@
           "name": "Globals",
           "returnValue": null
         },
-        "f4": {
-          "id": "f4",
+        "f11": {
+          "id": "f11",
           "kind": "function",
-          "line": 16,
+          "line": 12,
           "locals": [
             {
               "name": "u",
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "4"
+                "v": "17"
               }
             },
             {
@@ -4995,7 +5266,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "2"
+                "v": "4"
               }
             },
             {
@@ -5003,7 +5274,112 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "8"
+                "v": "34"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 51,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f11"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 17,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f11": {
+          "id": "f11",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "17"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "34"
               }
             }
           ],
@@ -5014,105 +5390,8 @@
       "heap": {},
       "i": 52,
       "keyframe": false,
-      "line": 16,
-      "prevLine": 15,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2",
-        "f3",
-        "f4"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "callId": 11,
-      "error": null,
-      "event": "call",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "global",
-          "line": 11,
-          "locals": [
-            {
-              "name": "N",
-              "value": {
-                "t": "int",
-                "type": "const int",
-                "v": "200005"
-              }
-            },
-            {
-              "name": "depth_",
-              "value": {
-                "id": "o1",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "tin",
-              "value": {
-                "id": "o2",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "timer_",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "6"
-              }
-            },
-            {
-              "name": "n",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "200000"
-              }
-            }
-          ],
-          "name": "Globals",
-          "returnValue": null
-        },
-        "f12": {
-          "id": "f12",
-          "kind": "function",
-          "line": 11,
-          "locals": [
-            {
-              "name": "u",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "9"
-              }
-            },
-            {
-              "name": "d",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "3"
-              }
-            }
-          ],
-          "name": "dfs",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 53,
-      "keyframe": false,
-      "line": 11,
-      "parentCallId": 3,
-      "prevLine": 16,
+      "line": 17,
+      "prevLine": 12,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -5120,7 +5399,31 @@
         "f2",
         "f3",
         "f4",
-        "f12"
+        "f5",
+        "f11"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 10,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {},
+      "i": 53,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f11"
       ],
       "stderr": "",
       "stdout": ""
@@ -5129,57 +5432,8 @@
       "error": null,
       "event": "line",
       "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "global",
-          "line": 17,
-          "locals": [
-            {
-              "name": "N",
-              "value": {
-                "t": "int",
-                "type": "const int",
-                "v": "200005"
-              }
-            },
-            {
-              "name": "depth_",
-              "value": {
-                "id": "o1",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "tin",
-              "value": {
-                "id": "o2",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "timer_",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "6"
-              }
-            },
-            {
-              "name": "n",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "200000"
-              }
-            }
-          ],
-          "name": "Globals",
-          "returnValue": null
-        },
-        "f12": {
-          "id": "f12",
+        "f5": {
+          "id": "f5",
           "kind": "function",
           "line": 17,
           "locals": [
@@ -5188,7 +5442,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "9"
+                "v": "8"
               }
             },
             {
@@ -5216,7 +5470,7 @@
       "i": 54,
       "keyframe": false,
       "line": 17,
-      "prevLine": 11,
+      "prevLine": 16,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -5224,13 +5478,13 @@
         "f2",
         "f3",
         "f4",
-        "f12"
+        "f5"
       ],
       "stderr": "",
       "stdout": ""
     },
     {
-      "callId": 11,
+      "callId": 4,
       "error": null,
       "event": "return",
       "frames": {},
@@ -5246,7 +5500,7 @@
         "f2",
         "f3",
         "f4",
-        "f12"
+        "f5"
       ],
       "stderr": "",
       "stdout": ""
@@ -5255,10 +5509,59 @@
       "error": null,
       "event": "line",
       "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 16,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
         "f4": {
           "id": "f4",
           "kind": "function",
-          "line": 17,
+          "line": 16,
           "locals": [
             {
               "name": "u",
@@ -5292,130 +5595,6 @@
       "heap": {},
       "i": 56,
       "keyframe": false,
-      "line": 17,
-      "prevLine": 16,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2",
-        "f3",
-        "f4"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "callId": 3,
-      "error": null,
-      "event": "return",
-      "frames": {},
-      "heap": {},
-      "i": 57,
-      "keyframe": false,
-      "line": 17,
-      "prevLine": 17,
-      "removedObjects": [],
-      "stack": [
-        "f0",
-        "f1",
-        "f2",
-        "f3",
-        "f4"
-      ],
-      "stderr": "",
-      "stdout": ""
-    },
-    {
-      "error": null,
-      "event": "line",
-      "frames": {
-        "f0": {
-          "id": "f0",
-          "kind": "global",
-          "line": 16,
-          "locals": [
-            {
-              "name": "N",
-              "value": {
-                "t": "int",
-                "type": "const int",
-                "v": "200005"
-              }
-            },
-            {
-              "name": "depth_",
-              "value": {
-                "id": "o1",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "tin",
-              "value": {
-                "id": "o2",
-                "t": "ref",
-                "type": "int [200005]"
-              }
-            },
-            {
-              "name": "timer_",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "6"
-              }
-            },
-            {
-              "name": "n",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "200000"
-              }
-            }
-          ],
-          "name": "Globals",
-          "returnValue": null
-        },
-        "f3": {
-          "id": "f3",
-          "kind": "function",
-          "line": 16,
-          "locals": [
-            {
-              "name": "u",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "2"
-              }
-            },
-            {
-              "name": "d",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "1"
-              }
-            },
-            {
-              "name": "child",
-              "value": {
-                "t": "int",
-                "type": "int",
-                "v": "4"
-              }
-            }
-          ],
-          "name": "dfs",
-          "returnValue": null
-        }
-      },
-      "heap": {},
-      "i": 58,
-      "keyframe": false,
       "line": 16,
       "prevLine": 15,
       "removedObjects": [],
@@ -5423,13 +5602,14 @@
         "f0",
         "f1",
         "f2",
-        "f3"
+        "f3",
+        "f4"
       ],
       "stderr": "",
       "stdout": ""
     },
     {
-      "callId": 12,
+      "callId": 11,
       "error": null,
       "event": "call",
       "frames": {
@@ -5482,8 +5662,8 @@
           "name": "Globals",
           "returnValue": null
         },
-        "f13": {
-          "id": "f13",
+        "f12": {
+          "id": "f12",
           "kind": "function",
           "line": 11,
           "locals": [
@@ -5492,7 +5672,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "5"
+                "v": "9"
               }
             },
             {
@@ -5500,7 +5680,14 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "2"
+                "v": "3"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
               }
             }
           ],
@@ -5509,10 +5696,10 @@
         }
       },
       "heap": {},
-      "i": 59,
+      "i": 57,
       "keyframe": false,
       "line": 11,
-      "parentCallId": 2,
+      "parentCallId": 3,
       "prevLine": 16,
       "removedObjects": [],
       "stack": [
@@ -5520,7 +5707,112 @@
         "f1",
         "f2",
         "f3",
-        "f13"
+        "f4",
+        "f12"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f12": {
+          "id": "f12",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "9"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "18"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 58,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f12"
       ],
       "stderr": "",
       "stdout": ""
@@ -5578,8 +5870,8 @@
           "name": "Globals",
           "returnValue": null
         },
-        "f13": {
-          "id": "f13",
+        "f12": {
+          "id": "f12",
           "kind": "function",
           "line": 17,
           "locals": [
@@ -5588,7 +5880,84 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "5"
+                "v": "9"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "18"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 59,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 12,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f12"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 11,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {},
+      "i": 60,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f12"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f4": {
+          "id": "f4",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
               }
             },
             {
@@ -5613,10 +5982,443 @@
         }
       },
       "heap": {},
-      "i": 60,
+      "i": 61,
       "keyframe": false,
       "line": 17,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 3,
+      "error": null,
+      "event": "return",
+      "frames": {},
+      "heap": {},
+      "i": 62,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 17,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 16,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f3": {
+          "id": "f3",
+          "kind": "function",
+          "line": 16,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "4"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 63,
+      "keyframe": false,
+      "line": 16,
+      "prevLine": 15,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "callId": 12,
+      "error": null,
+      "event": "call",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 11,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f13": {
+          "id": "f13",
+          "kind": "function",
+          "line": 11,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "5"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 64,
+      "keyframe": false,
+      "line": 11,
+      "parentCallId": 2,
+      "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f13"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f13": {
+          "id": "f13",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "5"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "10"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 65,
+      "keyframe": false,
+      "line": 12,
       "prevLine": 11,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f3",
+        "f13"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 17,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f13": {
+          "id": "f13",
+          "kind": "function",
+          "line": 17,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "5"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "2"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "10"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 66,
+      "keyframe": false,
+      "line": 17,
+      "prevLine": 12,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -5634,7 +6436,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 61,
+      "i": 67,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -5688,7 +6490,7 @@
         }
       },
       "heap": {},
-      "i": 62,
+      "i": 68,
       "keyframe": false,
       "line": 17,
       "prevLine": 16,
@@ -5708,7 +6510,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 63,
+      "i": 69,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -5810,7 +6612,7 @@
         }
       },
       "heap": {},
-      "i": 64,
+      "i": 70,
       "keyframe": false,
       "line": 16,
       "prevLine": 15,
@@ -5897,6 +6699,13 @@
                 "type": "int",
                 "v": "1"
               }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "uninit",
+                "type": "int"
+              }
             }
           ],
           "name": "dfs",
@@ -5904,11 +6713,113 @@
         }
       },
       "heap": {},
-      "i": 65,
+      "i": 71,
       "keyframe": false,
       "line": 11,
       "parentCallId": 1,
       "prevLine": 16,
+      "removedObjects": [],
+      "stack": [
+        "f0",
+        "f1",
+        "f2",
+        "f14"
+      ],
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "error": null,
+      "event": "line",
+      "frames": {
+        "f0": {
+          "id": "f0",
+          "kind": "global",
+          "line": 12,
+          "locals": [
+            {
+              "name": "N",
+              "value": {
+                "t": "int",
+                "type": "const int",
+                "v": "200005"
+              }
+            },
+            {
+              "name": "depth_",
+              "value": {
+                "id": "o1",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "tin",
+              "value": {
+                "id": "o2",
+                "t": "ref",
+                "type": "int [200005]"
+              }
+            },
+            {
+              "name": "timer_",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            },
+            {
+              "name": "n",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "200000"
+              }
+            }
+          ],
+          "name": "Globals",
+          "returnValue": null
+        },
+        "f14": {
+          "id": "f14",
+          "kind": "function",
+          "line": 12,
+          "locals": [
+            {
+              "name": "u",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "3"
+              }
+            },
+            {
+              "name": "d",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "1"
+              }
+            },
+            {
+              "name": "child",
+              "value": {
+                "t": "int",
+                "type": "int",
+                "v": "6"
+              }
+            }
+          ],
+          "name": "dfs",
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "i": 72,
+      "keyframe": false,
+      "line": 12,
+      "prevLine": 11,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -5998,7 +6909,7 @@
               "value": {
                 "t": "int",
                 "type": "int",
-                "v": "4"
+                "v": "6"
               }
             }
           ],
@@ -6007,10 +6918,10 @@
         }
       },
       "heap": {},
-      "i": 66,
+      "i": 73,
       "keyframe": false,
       "line": 17,
-      "prevLine": 11,
+      "prevLine": 12,
       "removedObjects": [],
       "stack": [
         "f0",
@@ -6027,7 +6938,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 67,
+      "i": 74,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -6080,7 +6991,7 @@
         }
       },
       "heap": {},
-      "i": 68,
+      "i": 75,
       "keyframe": false,
       "line": 17,
       "prevLine": 16,
@@ -6099,7 +7010,7 @@
       "event": "return",
       "frames": {},
       "heap": {},
-      "i": 69,
+      "i": 76,
       "keyframe": false,
       "line": 17,
       "prevLine": 17,
@@ -6175,7 +7086,7 @@
         }
       },
       "heap": {},
-      "i": 70,
+      "i": 77,
       "keyframe": false,
       "line": 21,
       "prevLine": 20,
@@ -6250,7 +7161,7 @@
         }
       },
       "heap": {},
-      "i": 71,
+      "i": 78,
       "keyframe": false,
       "line": 22,
       "prevLine": 21,
@@ -6325,7 +7236,7 @@
         }
       },
       "heap": {},
-      "i": 72,
+      "i": 79,
       "keyframe": false,
       "line": 23,
       "prevLine": 22,
@@ -6356,7 +7267,7 @@
         }
       },
       "heap": {},
-      "i": 73,
+      "i": 80,
       "keyframe": false,
       "line": 23,
       "prevLine": 23,
@@ -6376,7 +7287,7 @@
       "message": null,
       "signal": null
     },
-    "stepCount": 74,
+    "stepCount": 81,
     "truncated": false,
     "truncation": null
   },
