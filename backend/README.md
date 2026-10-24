@@ -34,7 +34,16 @@ curl -i http://127.0.0.1:8080/readyz    # 200: MySQL is reachable; 503 otherwise
 
 Press Ctrl-C to stop vizd. `make down` stops the containers and keeps their data. `make reset` also deletes the data.
 
-`--role=all` also runs the job worker: it claims queued jobs from MySQL, traces them in the Docker dev sandbox and puts the chunks in SeaweedFS. Not built yet: the API endpoints (BE-06), so jobs only come from rows you insert, and the C++ runner image (BE-07, BE-08). `make seed` loads no sample traces until BE-13 §1.
+`--role=all` runs both roles. The API serves `/api/v1` (`api/openapi.yaml`) and queues a job in MySQL for each new visualization; the job worker claims queued jobs, traces them in the Docker dev sandbox and puts the chunks in SeaweedFS. Try it with Python (build the runner image once with `make images`):
+
+```sh
+curl -s http://127.0.0.1:8080/api/v1/languages
+curl -si -X POST http://127.0.0.1:8080/api/v1/visualizations -H 'Content-Type: application/json' \
+  -d '{"language":"python3","source":"x = [1, 2]\nprint(x)\n","stdin":"","options":{"maxSteps":1000,"startAtLines":[]},"context":{"problemCode":null,"client":"curl"}}'
+curl -s 'http://127.0.0.1:8080/api/v1/visualizations/<id>?wait=20&since=0'   # repeat with since=<version> until completed
+```
+
+Not built yet: the C++ runner image (BE-07, BE-08) and share links (BE-12). `make seed` loads no sample traces until BE-13 §1.
 
 ## Trace a program locally
 
@@ -73,7 +82,7 @@ Everything listens on 127.0.0.1 only.
 
 ## Settings
 
-`make` reads `.env.example`, then `.env` if you created one, and exports both to vizd. To change a setting, copy `.env.example` to `.env` and edit the copy. `.env` is git-ignored. `.env.example` also lists the planned settings, commented out, with the task that adds each one.
+`make` reads `.env.example`, then `.env` if you created one, and exports both to vizd. To change a setting, copy `.env.example` to `.env` and edit the copy. `.env` is git-ignored.
 
 ## Commands
 

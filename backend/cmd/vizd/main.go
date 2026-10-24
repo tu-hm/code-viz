@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -85,6 +86,21 @@ func run() (err error) {
 	// TODO(tu-hm): add the sandbox self-check to readyz for worker and all once BE-02 lands
 	httptransport.HandleProbes(mux, ctx.Done(), db.PingContext)
 
+	var background sync.WaitGroup
+	defer func() {
+		stop()
+		background.Wait()
+	}()
+	if *role != "worker" {
+		viz, poller, err := newAPI(ctx, db, mux)
+		if err != nil {
+			return err
+		}
+		background.Go(func() { poller.Run(ctx) })
+		// api role, not worker: worker's db user and s3 key can't delete (BE-13 §4, §12)
+		background.Go(func() { cleanDaily(ctx, viz) })
+	}
+
 	worked := make(chan struct{})
 	if *role == "api" {
 		close(worked)
@@ -107,6 +123,68 @@ func run() (err error) {
 	stop()
 	<-worked
 	return err
+}
+
+type apiConfig struct {
+	AdaptersDir      string   `env:"VIZ_ADAPTERS_DIR" envDefault:"adapters"`
+	S3Endpoint       string   `env:"S3_ENDPOINT"`
+	S3PublicEndpoint string   `env:"S3_PUBLIC_ENDPOINT"`
+	S3Bucket         string   `env:"S3_BUCKET,required"`
+	S3PathStyle      bool     `env:"S3_PATH_STYLE"`
+	CORSOrigins      []string `env:"CORS_ORIGINS"`
+	IPHashKey        string   `env:"VIZ_IP_HASH_KEY,required"`
+	Slots            int      `env:"VIZ_SLOTS,required"`
+}
+
+func newAPI(ctx context.Context, db *sql.DB, mux *http.ServeMux) (*app.Visualizations, *mysql.Poller, error) {
+	var cfg apiConfig
+	if err := env.Parse(&cfg); err != nil {
+		return nil, nil, fmt.Errorf("load api config: %w", err)
+	}
+	if cfg.Slots < 1 {
+		return nil, nil, fmt.Errorf("load api config: VIZ_SLOTS must be 1 or more, got %d", cfg.Slots)
+	}
+	if len(cfg.IPHashKey) < 32 {
+		return nil, nil, errors.New("load api config: VIZ_IP_HASH_KEY must be 32 bytes or more")
+	}
+	adapters, err := manifest.Load(cfg.AdaptersDir)
+	if err != nil {
+		return nil, nil, fmt.Errorf("load manifests: %w", err)
+	}
+	blobs, err := blobstore.New(ctx, blobstore.Config{
+		Endpoint:       cfg.S3Endpoint,
+		PublicEndpoint: cfg.S3PublicEndpoint,
+		Bucket:         cfg.S3Bucket,
+		PathStyle:      cfg.S3PathStyle,
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("open blob store: %w", err)
+	}
+
+	poller := mysql.NewPoller(db, time.Now, time.After)
+	viz := &app.Visualizations{
+		Store:    mysql.NewStore(db, cfg.Slots*10),
+		Adapters: adapters,
+		Blobs:    blobs,
+		Events:   poller,
+		Now:      func() time.Time { return time.Now().UTC() },
+		Random:   rand.Reader,
+	}
+	httptransport.HandleAPI(mux, viz, []byte(cfg.IPHashKey), cfg.CORSOrigins)
+	return viz, poller, nil
+}
+
+func cleanDaily(ctx context.Context, viz *app.Visualizations) {
+	for {
+		if err := viz.Cleanup(ctx, viz.Now()); err != nil && ctx.Err() == nil {
+			slog.ErrorContext(ctx, "clean up expired visualizations", "err", err)
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(24 * time.Hour):
+		}
+	}
 }
 
 type workerConfig struct {
@@ -210,6 +288,7 @@ func serve(ctx context.Context, addr string, h http.Handler, worked <-chan struc
 	srv := &http.Server{
 		Handler:           h,
 		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      30 * time.Second, // long-poll GET holds up to 20 s (§8.3)
 	}
 	errc := make(chan error, 1)
 	go func() { errc <- srv.Serve(ln) }()
