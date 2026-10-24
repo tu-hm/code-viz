@@ -13,6 +13,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/prometheus/client_golang/prometheus/testutil"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/mysql"
 	"github.com/tu-hm/code-viz/backend/internal/domain"
@@ -39,7 +40,7 @@ func TestEnqueueCommitsAndRollsBackWithTheCallersTransaction(t *testing.T) {
 		if err := insertTrace(ctx, tx, "trc_aborted", t0); err != nil {
 			return err
 		}
-		if err := q.Enqueue(ctx, tx, "trc_aborted", false, t0); err != nil {
+		if err := q.Enqueue(ctx, tx, "trc_aborted", "", false, t0); err != nil {
 			return err
 		}
 		return errAbort
@@ -51,15 +52,25 @@ func TestEnqueueCommitsAndRollsBackWithTheCallersTransaction(t *testing.T) {
 		t.Fatalf("claim after rollback: err = %v, want ErrNoJob", err)
 	}
 
-	id := addJob(t, db, q, false, t0)
+	const id, parent = "trc_committed", "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
+	err = mysql.InTx(ctx, db, func(tx *sql.Tx) error {
+		if err := insertTrace(ctx, tx, id, t0); err != nil {
+			return err
+		}
+		return q.Enqueue(ctx, tx, id, parent, false, t0)
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	got := claim(t, q, "w1", t0)
 	want := ports.Job{
-		Lease:    ports.Lease{TraceID: id, Worker: "w1"},
-		Attempt:  1,
-		Language: "python3",
-		Source:   "print(input())",
-		Stdin:    "hi",
-		Options:  trace.Options{MaxSteps: 1000, StartAtLines: []int{}},
+		Lease:       ports.Lease{TraceID: id, Worker: "w1"},
+		Attempt:     1,
+		Language:    "python3",
+		Source:      "print(input())",
+		Stdin:       "hi",
+		Options:     trace.Options{MaxSteps: 1000, StartAtLines: []int{}},
+		TraceParent: parent,
 	}
 	if diff := cmp.Diff(want, got, cmpopts.IgnoreFields(ports.Lease{}, "JobID")); diff != "" {
 		t.Errorf("claimed job (-want +got):\n%s", diff)
@@ -90,6 +101,19 @@ func TestClaimTakesSignedInFirstThenOldestRunAfter(t *testing.T) {
 	want := []string{signedInEarly, signedInLate, signedInLateAgain, anonEarly, anonLate}
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("claim order (-want +got):\n%s", diff)
+	}
+}
+
+func TestQueueDepthCountsOnlyQueuedJobs(t *testing.T) {
+	t.Parallel()
+	db, q := newQueue(t)
+	for range 3 {
+		addJob(t, db, q, false, t0)
+	}
+	claim(t, q, "w1", t0)
+
+	if got := testutil.ToFloat64(mysql.NewQueueDepth(db)); got != 2 {
+		t.Errorf("vizd_jobs_queued = %v, want 2", got)
 	}
 }
 
@@ -573,7 +597,7 @@ func addJob(t *testing.T, db *sql.DB, q *mysql.Queue, signedIn bool, now time.Ti
 		if err := insertTrace(ctx, tx, id, now); err != nil {
 			return err
 		}
-		return q.Enqueue(ctx, tx, id, signedIn, now)
+		return q.Enqueue(ctx, tx, id, "", signedIn, now)
 	})
 	if err != nil {
 		t.Fatal(err)

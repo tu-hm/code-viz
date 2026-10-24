@@ -9,6 +9,8 @@ import (
 	"log/slog"
 	"time"
 
+	"go.opentelemetry.io/otel/propagation"
+
 	"github.com/tu-hm/code-viz/backend/internal/domain"
 	"github.com/tu-hm/code-viz/backend/internal/gen/api"
 	"github.com/tu-hm/code-viz/backend/internal/ports"
@@ -60,6 +62,8 @@ func (s *Visualizations) Create(ctx context.Context, c Caller, idempotencyKey st
 		return api.Visualization{}, err
 	}
 
+	span := propagation.MapCarrier{}
+	propagation.TraceContext{}.Inject(ctx, span)
 	now := s.Now()
 	v, err := s.Store.Create(ctx, ports.NewVisualization{
 		ID:             id,
@@ -72,6 +76,7 @@ func (s *Visualizations) Create(ctx context.Context, c Caller, idempotencyKey st
 		Source:         req.Source,
 		Stdin:          req.Stdin,
 		Options:        domain.NormalizeOptions(req.Options),
+		TraceParent:    span.Get("traceparent"),
 	}, now)
 	if err != nil {
 		return api.Visualization{}, err

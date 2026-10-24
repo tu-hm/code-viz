@@ -13,8 +13,9 @@ import (
 // JobQueue runs one job per trace (§7.13.2). A job status change and its trace's status change commit together.
 // Every method that takes a Lease returns domain.ErrLeaseLost, and changes nothing, once the job no longer runs under that lease.
 type JobQueue interface {
-	// Enqueue queues a job for traceID in tx, the transaction that created or reset the trace (§7.6).
-	Enqueue(ctx context.Context, tx *sql.Tx, traceID string, signedIn bool, now time.Time) error
+	// Enqueue queues a job for traceID in tx, the transaction that created or reset the trace (§7.6). traceParent is the
+	// W3C traceparent of the request that queued it, or "".
+	Enqueue(ctx context.Context, tx *sql.Tx, traceID, traceParent string, signedIn bool, now time.Time) error
 	// Cancel cancels traceID's job and the trace in tx when the job is still queued. A running job is left to finish.
 	Cancel(ctx context.Context, tx *sql.Tx, traceID string, now time.Time) error
 
@@ -45,12 +46,13 @@ type Lease struct {
 
 // Job is a claimed job with the input of its trace.
 type Job struct {
-	Lease    Lease
-	Attempt  int // 1 on the first claim
-	Language string
-	Source   string
-	Stdin    string
-	Options  trace.Options
+	Lease       Lease
+	Attempt     int // 1 on the first claim
+	Language    string
+	Source      string
+	Stdin       string
+	Options     trace.Options
+	TraceParent string // W3C traceparent of the request that queued the job, or ""
 }
 
 // CompletedTrace is what the API serves for a completed trace (§8.3).

@@ -25,6 +25,7 @@ import (
 
 	"github.com/goccy/go-yaml"
 	"github.com/google/go-cmp/cmp"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/manifest"
@@ -455,6 +456,37 @@ func TestRequestIDComesFromTheProxyOrIsGenerated(t *testing.T) {
 	}
 }
 
+func TestRequestsAreTimedByRoutePatternAndStatus(t *testing.T) {
+	t.Parallel()
+	s := newStack(t, newDB(t), 100)
+	for _, path := range []string{"/api/v1/languages", "/api/v1/languages", "/api/v1/visualizations/viz_00", "/api/v1/nope"} {
+		s.serve(newRequest(t, http.MethodGet, path, ""))
+	}
+
+	families, err := s.reg.Gather()
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]uint64{}
+	for _, f := range families {
+		for _, m := range f.GetMetric() {
+			labels := map[string]string{}
+			for _, l := range m.GetLabel() {
+				labels[l.GetName()] = l.GetValue()
+			}
+			got[f.GetName()+" "+labels["route"]+" "+labels["status"]] = m.GetHistogram().GetSampleCount()
+		}
+	}
+	want := map[string]uint64{
+		"vizd_http_request_duration_seconds GET /api/v1/languages 200":           2,
+		"vizd_http_request_duration_seconds GET /api/v1/visualizations/{id} 404": 1,
+		"vizd_http_request_duration_seconds /api/v1/ 404":                        1,
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("requests timed (-want +got):\n%s", diff)
+	}
+}
+
 func TestCORSAllowsOnlyTheIDEOrigins(t *testing.T) {
 	t.Parallel()
 	s := newStack(t, newDB(t), 100)
@@ -618,6 +650,7 @@ type stack struct {
 	q   *mysql.Queue
 	viz *app.Visualizations
 	h   http.Handler
+	reg *prometheus.Registry
 	now time.Time
 }
 
@@ -627,7 +660,7 @@ func newStack(t *testing.T, db *sql.DB, maxQueued int) *stack {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s := &stack{db: db, q: mysql.NewQueue(db), now: day0}
+	s := &stack{db: db, q: mysql.NewQueue(db), reg: prometheus.NewRegistry(), now: day0}
 	s.viz = &app.Visualizations{
 		Store:     mysql.NewStore(db, maxQueued),
 		Adapters:  adapters,
@@ -638,7 +671,7 @@ func newStack(t *testing.T, db *sql.DB, maxQueued int) *stack {
 		WebOrigin: ide,
 	}
 	mux := http.NewServeMux()
-	httptransport.HandleAPI(mux, s.viz, ipKey, []string{ide})
+	httptransport.HandleAPI(mux, s.viz, ipKey, []string{ide}, s.reg)
 	s.h = mux
 	return s
 }

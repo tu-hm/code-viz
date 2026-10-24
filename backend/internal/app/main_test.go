@@ -14,6 +14,9 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	tcmysql "github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"go.opentelemetry.io/otel"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/blobstore"
 	"github.com/tu-hm/code-viz/backend/internal/adapters/mysql"
@@ -24,6 +27,7 @@ var (
 	rootDSN  string
 	s3       string
 	resource atomic.Int64
+	spans    = tracetest.NewSpanRecorder()
 
 	mysqlContainer testcontainers.Container
 	s3Container    testcontainers.Container
@@ -35,6 +39,7 @@ func TestMain(m *testing.M) {
 
 func run(m *testing.M) int {
 	ctx := context.Background()
+	otel.SetTracerProvider(sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(spans)))
 	for k, v := range map[string]string{"AWS_REGION": "us-east-1", "AWS_ACCESS_KEY_ID": "viz", "AWS_SECRET_ACCESS_KEY": "viz"} {
 		if err := os.Setenv(k, v); err != nil {
 			fmt.Fprintf(os.Stderr, "set %s: %v\n", k, err)

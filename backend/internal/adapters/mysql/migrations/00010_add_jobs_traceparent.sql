@@ -1,0 +1,5 @@
+-- +goose Up
+ALTER TABLE jobs ADD COLUMN traceparent VARCHAR(55) NOT NULL DEFAULT '', ALGORITHM=INSTANT;
+
+-- +goose Down
+ALTER TABLE jobs DROP COLUMN traceparent, ALGORITHM=INSTANT;

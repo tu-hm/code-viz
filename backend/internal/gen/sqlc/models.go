@@ -120,6 +120,7 @@ type Job struct {
 	LeasedUntil sql.NullTime
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	Traceparent string
 }
 
 type Trace struct {

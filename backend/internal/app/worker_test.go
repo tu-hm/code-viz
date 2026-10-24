@@ -23,6 +23,10 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	oteltrace "go.opentelemetry.io/otel/trace"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/dockersandbox"
 	"github.com/tu-hm/code-viz/backend/internal/adapters/manifest"
@@ -99,7 +103,29 @@ func TestRunTracesPythonProgramsEndToEnd(t *testing.T) {
 	for i, tc := range tests {
 		ids[i] = addJob(t, db, "python3", tc.source, "Ada\n")
 	}
-	start(t, newWorker(t, db, adapters, sb, b)).idle(t)
+	reg := prometheus.NewRegistry()
+	w := newWorker(t, db, adapters, sb, b)
+	w.Metrics = app.NewWorkerMetrics(reg)
+	start(t, w).idle(t)
+
+	wantJobs := map[string]float64{
+		"kind=normal,language=python3,status=completed":          1,
+		"kind=exception,language=python3,status=completed":       1,
+		"kind=compile_error,language=python3,status=failed":      1,
+		"kind=unsupported_module,language=python3,status=failed": 1,
+	}
+	if diff := cmp.Diff(wantJobs, samples(t, reg, "vizd_jobs_total")); diff != "" {
+		t.Errorf("vizd_jobs_total (-want +got):\n%s", diff)
+	}
+	wantStages := map[string]float64{
+		"language=python3,stage=sandbox": 4,
+		"language=python3,stage=build":   4,
+		"language=python3,stage=trace":   2,
+		"language=python3,stage=store":   2,
+	}
+	if diff := cmp.Diff(wantStages, samples(t, reg, "vizd_job_stage_duration_seconds")); diff != "" {
+		t.Errorf("stage durations observed (-want +got):\n%s", diff)
+	}
 
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -128,6 +154,39 @@ func TestRunTracesPythonProgramsEndToEnd(t *testing.T) {
 				t.Errorf("chunks hold %d steps, want the header's %d", got, docs.Header.Summary.StepCount)
 			}
 		})
+	}
+}
+
+func TestJobSpansJoinTheTraceOfTheRequestThatQueuedTheJob(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t, 100)
+	ctx, req := otel.Tracer("test").Start(t.Context(), "request")
+	_, err := h.Create(ctx, app.Caller{Subject: "ip:1"}, "", api.CreateVisualizationRequest{
+		Language: "fake",
+		Source:   "x",
+		Options:  trace.Options{MaxSteps: 1000, StartAtLines: []int{}},
+	})
+	req.End()
+	if err != nil {
+		t.Fatal(err)
+	}
+	start(t, newWorker(t, h.db, h.Adapters, newFakeSandbox(traceSteps(1)), h.b)).idle(t)
+
+	names := map[oteltrace.SpanID]string{}
+	var ended []sdktrace.ReadOnlySpan
+	for _, s := range spans.Ended() {
+		if s.SpanContext().TraceID() == req.SpanContext().TraceID() {
+			names[s.SpanContext().SpanID()] = s.Name()
+			ended = append(ended, s)
+		}
+	}
+	parents := map[string]string{}
+	for _, s := range ended {
+		parents[s.Name()] = names[s.Parent().SpanID()]
+	}
+	want := map[string]string{"request": "", "job": "request", "sandbox": "job", "build": "job", "trace": "job", "store": "job"}
+	if diff := cmp.Diff(want, parents); diff != "" {
+		t.Errorf("parent of each span in the request's trace (-want +got):\n%s", diff)
 	}
 }
 
@@ -689,6 +748,7 @@ func newWorker(t testing.TB, db *sql.DB, adapters ports.Adapters, sb ports.Sandb
 		Blobs:    blobs,
 		Validate: val.Wire,
 		Now:      time.Now,
+		Metrics:  app.NewWorkerMetrics(prometheus.NewRegistry()),
 	}
 }
 
@@ -790,7 +850,7 @@ func addJob(t *testing.T, db *sql.DB, language, source, stdin string) string {
 		if err != nil {
 			return err
 		}
-		return mysql.NewQueue(db).Enqueue(ctx, tx, id, false, now)
+		return mysql.NewQueue(db).Enqueue(ctx, tx, id, "", false, now)
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -939,3 +999,29 @@ func closedEndpoint(t *testing.T) string {
 }
 
 func ptr[T any](v T) *T { return &v }
+
+func samples(t *testing.T, g prometheus.Gatherer, name string) map[string]float64 {
+	t.Helper()
+	families, err := g.Gather()
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]float64{}
+	for _, f := range families {
+		if f.GetName() != name {
+			continue
+		}
+		for _, m := range f.GetMetric() {
+			var labels []string
+			for _, l := range m.GetLabel() {
+				labels = append(labels, l.GetName()+"="+l.GetValue())
+			}
+			value := m.GetCounter().GetValue()
+			if h := m.GetHistogram(); h != nil {
+				value = float64(h.GetSampleCount())
+			}
+			got[strings.Join(labels, ",")] = value
+		}
+	}
+	return got
+}

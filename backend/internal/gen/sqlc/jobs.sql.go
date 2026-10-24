@@ -107,19 +107,21 @@ func (q *Queries) ExpiredLeases(ctx context.Context, now sql.NullTime) ([]Expire
 }
 
 const insertJob = `-- name: InsertJob :exec
-INSERT INTO jobs (trace_id, priority, run_after, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?)
+INSERT INTO jobs (trace_id, traceparent, priority, run_after, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?)
 `
 
 type InsertJobParams struct {
-	TraceID  string
-	Priority int8
-	Now      time.Time
+	TraceID     string
+	Traceparent string
+	Priority    int8
+	Now         time.Time
 }
 
 func (q *Queries) InsertJob(ctx context.Context, arg InsertJobParams) error {
 	_, err := q.db.ExecContext(ctx, insertJob,
 		arg.TraceID,
+		arg.Traceparent,
 		arg.Priority,
 		arg.Now,
 		arg.Now,
@@ -206,7 +208,7 @@ func (q *Queries) LockLeasedJob(ctx context.Context, arg LockLeasedJobParams) (i
 }
 
 const nextJob = `-- name: NextJob :one
-SELECT id, trace_id, attempt FROM jobs FORCE INDEX (claim_idx)
+SELECT id, trace_id, attempt, traceparent FROM jobs FORCE INDEX (claim_idx)
 WHERE queue = 'default' AND status = 'queued' AND run_after <= ?
 ORDER BY priority DESC, run_after, id
 LIMIT 1
@@ -214,15 +216,21 @@ FOR UPDATE SKIP LOCKED
 `
 
 type NextJobRow struct {
-	ID      uint64
-	TraceID string
-	Attempt int8
+	ID          uint64
+	TraceID     string
+	Attempt     int8
+	Traceparent string
 }
 
 func (q *Queries) NextJob(ctx context.Context, now time.Time) (NextJobRow, error) {
 	row := q.db.QueryRowContext(ctx, nextJob, now)
 	var i NextJobRow
-	err := row.Scan(&i.ID, &i.TraceID, &i.Attempt)
+	err := row.Scan(
+		&i.ID,
+		&i.TraceID,
+		&i.Attempt,
+		&i.Traceparent,
+	)
 	return i, err
 }
 

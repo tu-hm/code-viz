@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/tu-hm/code-viz/backend/internal/app"
 	"github.com/tu-hm/code-viz/backend/internal/domain"
 	"github.com/tu-hm/code-viz/backend/internal/gen/api"
@@ -21,9 +23,9 @@ const (
 	maxBody  = 1 << 20 // 64 KB source + 64 KB stdin at worst-case 6× JSON escaping (\u00XX) = 768 KB; rest for options
 )
 
-// HandleAPI registers the visualization API (§8) under /api/v1 on mux. ipKey keys the hash that stands for a caller's IP;
-// origins are the browser origins allowed to call the API.
-func HandleAPI(mux *http.ServeMux, viz *app.Visualizations, ipKey []byte, origins []string) {
+// HandleAPI registers the visualization API (§8) under /api/v1 on mux, and its metrics with reg. ipKey keys the hash that
+// stands for a caller's IP; origins are the browser origins allowed to call the API.
+func HandleAPI(mux *http.ServeMux, viz *app.Visualizations, ipKey []byte, origins []string, reg prometheus.Registerer) {
 	routes := http.NewServeMux()
 	routes.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
 		writeError(w, r, fmt.Errorf("no route %s %s: %w", r.Method, r.URL.Path, domain.ErrNotFound))
@@ -37,7 +39,7 @@ func HandleAPI(mux *http.ServeMux, viz *app.Visualizations, ipKey []byte, origin
 		BaseRouter:       routes,
 		ErrorHandlerFunc: writeParamError,
 	})
-	mux.Handle(basePath+"/", boundary(ipKey, cors(origins, routes)))
+	mux.Handle(basePath+"/", boundary(ipKey, cors(origins, observe(newRequestDurations(reg), routes))))
 }
 
 // text/plain POST skips the CORS preflight => a foreign page could spend its visitor's quota

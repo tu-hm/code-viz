@@ -11,6 +11,11 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/propagation"
+	oteltrace "go.opentelemetry.io/otel/trace"
+
 	"github.com/tu-hm/code-viz/backend/internal/domain"
 	"github.com/tu-hm/code-viz/backend/internal/gen/api"
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
@@ -41,6 +46,7 @@ type Worker struct {
 	Validate func(line []byte) error
 	Now      func() time.Time
 	After    func(time.Duration) <-chan time.Time
+	Metrics  *WorkerMetrics
 }
 
 type chore struct {
@@ -88,7 +94,9 @@ func (w *Worker) Run(ctx context.Context) {
 			}
 		}
 
+		start := w.Now()
 		job, err := w.Queue.Claim(jobs, w.Name, now)
+		w.Metrics.claim.Observe(w.Now().Sub(start).Seconds())
 		if err == nil {
 			empty = 0
 			w.run(jobs, job, now)
@@ -115,22 +123,35 @@ func idleDelay(empty int) time.Duration {
 }
 
 // run runs one job and records how it ended. ctx is canceled when a drain runs out of time.
+// The job's span joins the trace of the request that queued it.
 func (w *Worker) run(ctx context.Context, job ports.Job, claimed time.Time) {
-	err := w.attempt(ctx, job, claimed)
 	l := job.Lease
+	ctx = propagation.TraceContext{}.Extract(ctx, propagation.MapCarrier{"traceparent": job.TraceParent})
+	ctx, span := tracer.Start(ctx, "job", oteltrace.WithSpanKind(oteltrace.SpanKindConsumer), oteltrace.WithAttributes(
+		attribute.String("trace_id", l.TraceID),
+		attribute.String("language", job.Language),
+		attribute.Int("attempt", job.Attempt),
+	))
+	defer span.End()
+
+	err := w.attempt(ctx, job, claimed)
+	if err != nil {
+		span.SetStatus(codes.Error, err.Error())
+	}
 	switch {
 	case err == nil:
 	case errors.Is(err, domain.ErrLeaseLost):
 		slog.WarnContext(ctx, "job stopped, lease lost", "trace_id", l.TraceID, "err", err)
+		w.Metrics.jobs.WithLabelValues(job.Language, "lease_lost", "").Inc()
 	case errors.Is(err, tracecore.ErrMalformed):
 		slog.ErrorContext(ctx, "tracer output is malformed", "trace_id", l.TraceID, "language", job.Language, "err", err)
-		w.fail(ctx, l)
+		w.fail(ctx, job)
 	case errors.Is(err, domain.ErrInfra) || ctx.Err() != nil:
 		slog.WarnContext(ctx, "job requeued", "trace_id", l.TraceID, "attempt", job.Attempt, "err", err)
-		w.requeue(ctx, l)
+		w.requeue(ctx, job)
 	default:
 		slog.ErrorContext(ctx, "job failed", "trace_id", l.TraceID, "err", err)
-		w.fail(ctx, l)
+		w.fail(ctx, job)
 	}
 }
 
@@ -200,12 +221,14 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 	boxCtx, cancelBox := context.WithDeadline(ctx, claimed.Add(jobDeadline))
 	defer cancelBox()
 
-	box, err := w.Sandbox.Start(boxCtx, ports.SandboxSpec{
+	startCtx, end := w.stage(boxCtx, job, "sandbox")
+	box, err := w.Sandbox.Start(startCtx, ports.SandboxSpec{
 		JobID:  l.TraceID,
 		Image:  m.Image,
 		Files:  map[string][]byte{m.SourceFile: []byte(job.Source), "stdin": []byte(job.Stdin)},
 		Memory: memory,
 	})
+	end()
 	if err != nil {
 		return fmt.Errorf("start sandbox: %w", err)
 	}
@@ -224,7 +247,9 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 		if err := w.Queue.Building(ctx, l, w.Now()); err != nil {
 			return fmt.Errorf("mark building: %w: %w", domain.ErrInfra, err)
 		}
-		b, kind, err := Build(runCtx, box, m, job.Options)
+		buildCtx, end := w.stage(runCtx, job, "build")
+		b, kind, err := Build(buildCtx, box, m, job.Options)
+		end()
 		if err != nil {
 			return err
 		}
@@ -235,6 +260,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 			if err := w.Queue.Fail(ctx, l, kind, build, w.Now()); err != nil {
 				return fmt.Errorf("fail build: %w: %w", domain.ErrInfra, err)
 			}
+			w.Metrics.jobs.WithLabelValues(job.Language, "failed", string(kind)).Inc()
 			slog.InfoContext(ctx, "job failed its build", "trace_id", l.TraceID, "failure_kind", kind)
 			return nil
 		}
@@ -247,7 +273,8 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 	if err != nil {
 		return err
 	}
-	exit, err := box.Run(runCtx, ports.Command{
+	traceCtx, end := w.stage(runCtx, job, "trace")
+	exit, err := box.Run(traceCtx, ports.Command{
 		Args:   m.TraceCmd,
 		Env:    env,
 		Stdout: rec.Stdout(),
@@ -260,17 +287,20 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 		TimedOut:    exit.Limit == ports.LimitTime,
 		OutOfMemory: exit.Limit == ports.LimitMemory,
 	}, err)
+	end()
 	if err != nil {
 		return fmt.Errorf("run trace: %w", err)
 	}
 
+	storeCtx, end := w.stage(ctx, job, "store")
+	defer end()
 	chunks, err := res.Chunks()
 	if err != nil {
 		return fmt.Errorf("chunk trace: %w", err)
 	}
 	stored := make([]ports.Chunk, len(chunks))
 	for i, c := range chunks {
-		if err := w.Blobs.Put(ctx, domain.ChunkKey(domain.NewPrefix, l.TraceID, c.Index), "application/json", c.Gzip); err != nil {
+		if err := w.Blobs.Put(storeCtx, domain.ChunkKey(domain.NewPrefix, l.TraceID, c.Index), "application/json", c.Gzip); err != nil {
 			return fmt.Errorf("upload chunk %d: %w", c.Index, err)
 		}
 		stored[i] = ports.Chunk{Index: c.Index, FromStep: c.FromStep, ToStep: c.ToStep, SizeBytes: len(c.Gzip), SHA256: c.SHA256}
@@ -281,7 +311,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 		if err != nil {
 			return fmt.Errorf("gzip tail: %w", err)
 		}
-		if err := w.Blobs.Put(ctx, domain.TailKey(domain.NewPrefix, l.TraceID), "text/plain; charset=utf-8", gz); err != nil {
+		if err := w.Blobs.Put(storeCtx, domain.TailKey(domain.NewPrefix, l.TraceID), "text/plain; charset=utf-8", gz); err != nil {
 			return fmt.Errorf("upload tail: %w", err)
 		}
 		tail = &ports.Tail{SizeBytes: len(gz), SHA256: sum}
@@ -291,7 +321,7 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 		return fmt.Errorf("encode header: %w", err)
 	}
 	exitKind := res.Header.Summary.Exit.Kind
-	err = w.Queue.Complete(ctx, l, ports.CompletedTrace{
+	err = w.Queue.Complete(storeCtx, l, ports.CompletedTrace{
 		Header:        header,
 		Chunks:        stored,
 		Tail:          tail,
@@ -302,24 +332,39 @@ func (w *Worker) trace(ctx context.Context, job ports.Job, m domain.Manifest, re
 	if err != nil {
 		return fmt.Errorf("complete: %w: %w", domain.ErrInfra, err)
 	}
+	w.Metrics.jobs.WithLabelValues(job.Language, "completed", string(exitKind)).Inc()
 	slog.InfoContext(ctx, "job completed", "trace_id", l.TraceID, "exit_kind", exitKind, "steps", len(res.Steps))
 	return nil
 }
 
-func (w *Worker) requeue(ctx context.Context, l ports.Lease) {
-	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), cleanupTimeout)
-	defer cancel()
-	if err := w.Queue.Requeue(ctx, l, w.Now()); err != nil {
-		slog.ErrorContext(ctx, "requeue job", "trace_id", l.TraceID, "err", err)
+// stage starts a span for one stage of job; the func it returns ends the span and records the stage's time.
+func (w *Worker) stage(ctx context.Context, job ports.Job, name string) (context.Context, func()) {
+	ctx, span := tracer.Start(ctx, name)
+	start := w.Now()
+	return ctx, func() {
+		w.Metrics.stage.WithLabelValues(job.Language, name).Observe(w.Now().Sub(start).Seconds())
+		span.End()
 	}
 }
 
-func (w *Worker) fail(ctx context.Context, l ports.Lease) {
+func (w *Worker) requeue(ctx context.Context, job ports.Job) {
 	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), cleanupTimeout)
 	defer cancel()
-	if err := w.Queue.Fail(ctx, l, api.FailureKindInternalError, nil, w.Now()); err != nil {
-		slog.ErrorContext(ctx, "fail job", "trace_id", l.TraceID, "err", err)
+	if err := w.Queue.Requeue(ctx, job.Lease, w.Now()); err != nil {
+		slog.ErrorContext(ctx, "requeue job", "trace_id", job.Lease.TraceID, "err", err)
+		return
 	}
+	w.Metrics.jobs.WithLabelValues(job.Language, "infra_error", "").Inc()
+}
+
+func (w *Worker) fail(ctx context.Context, job ports.Job) {
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), cleanupTimeout)
+	defer cancel()
+	if err := w.Queue.Fail(ctx, job.Lease, api.FailureKindInternalError, nil, w.Now()); err != nil {
+		slog.ErrorContext(ctx, "fail job", "trace_id", job.Lease.TraceID, "err", err)
+		return
+	}
+	w.Metrics.jobs.WithLabelValues(job.Language, "failed", string(api.FailureKindInternalError)).Inc()
 }
 
 // TraceEnv is the environment of m's trace command for opts (§10.2): the step limit, the start lines and the capture

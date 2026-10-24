@@ -1,9 +1,9 @@
 -- name: InsertJob :exec
-INSERT INTO jobs (trace_id, priority, run_after, created_at, updated_at)
-VALUES (sqlc.arg(trace_id), sqlc.arg(priority), sqlc.arg(now), sqlc.arg(now), sqlc.arg(now));
+INSERT INTO jobs (trace_id, traceparent, priority, run_after, created_at, updated_at)
+VALUES (sqlc.arg(trace_id), sqlc.arg(traceparent), sqlc.arg(priority), sqlc.arg(now), sqlc.arg(now), sqlc.arg(now));
 
 -- name: NextJob :one
-SELECT id, trace_id, attempt FROM jobs FORCE INDEX (claim_idx)
+SELECT id, trace_id, attempt, traceparent FROM jobs FORCE INDEX (claim_idx)
 WHERE queue = 'default' AND status = 'queued' AND run_after <= sqlc.arg(now)
 ORDER BY priority DESC, run_after, id
 LIMIT 1

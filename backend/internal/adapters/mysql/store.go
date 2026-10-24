@@ -101,7 +101,7 @@ func (s *Store) Create(ctx context.Context, nv ports.NewVisualization, now time.
 			}
 		}
 		if t.enqueue {
-			if err := s.queue.Enqueue(ctx, tx, t.id, nv.SignedIn, now); err != nil {
+			if err := s.queue.Enqueue(ctx, tx, t.id, nv.TraceParent, nv.SignedIn, now); err != nil {
 				return err
 			}
 		}

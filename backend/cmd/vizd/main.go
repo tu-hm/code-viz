@@ -17,6 +17,9 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/blobstore"
 	"github.com/tu-hm/code-viz/backend/internal/adapters/dockersandbox"
@@ -35,10 +38,12 @@ type config struct {
 	MySQLDSN string `env:"MYSQL_DSN,required"`
 	Env      string `env:"VIZ_ENV,required"`
 	Sandbox  string `env:"VIZ_SANDBOX"`
+	Metrics  bool   `env:"VIZ_METRICS"`
+	OTLP     string `env:"OTEL_EXPORTER_OTLP_ENDPOINT"`
 }
 
 func main() {
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	slog.SetDefault(slog.New(spanHandler{slog.NewJSONHandler(os.Stdout, nil)}))
 
 	if err := run(); err != nil {
 		slog.Error("vizd stopped", "err", err)
@@ -75,16 +80,33 @@ func run() (err error) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	if flag.Arg(0) == "migrate" {
+	switch flag.Arg(0) {
+	case "migrate":
 		return mysql.Migrate(ctx, db, flag.Arg(1))
 	}
 
 	if *role != "api" && *role != "worker" && *role != "all" {
 		return fmt.Errorf("--role must be api, worker or all, got %q", *role)
 	}
+	stopTracing, err := startTracing(ctx, *role, cfg.OTLP)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+		defer cancel()
+		if serr := stopTracing(ctx); serr != nil {
+			err = errors.Join(err, fmt.Errorf("flush spans: %w", serr))
+		}
+	}()
 	mux := http.NewServeMux()
 	// TODO(tu-hm): add the sandbox self-check to readyz for worker and all once BE-02 lands
 	httptransport.HandleProbes(mux, ctx.Done(), db.PingContext)
+	reg := prometheus.NewRegistry()
+	reg.MustRegister(collectors.NewGoCollector(), collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	if cfg.Metrics {
+		mux.Handle("GET /metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+	}
 
 	// poller outlives SIGTERM until http shuts down => long-polls keep parking while the worker drains
 	polling, stopPolling := context.WithCancel(context.WithoutCancel(ctx))
@@ -95,7 +117,7 @@ func run() (err error) {
 		background.Wait()
 	}()
 	if *role != "worker" {
-		viz, poller, err := newAPI(ctx, db, mux)
+		viz, poller, err := newAPI(ctx, db, mux, reg)
 		if err != nil {
 			return err
 		}
@@ -108,7 +130,7 @@ func run() (err error) {
 	if *role == "api" {
 		close(worked)
 	} else {
-		w, closeSandbox, err := newWorker(ctx, sandbox, db)
+		w, closeSandbox, err := newWorker(ctx, sandbox, db, reg)
 		if err != nil {
 			return err
 		}
@@ -140,7 +162,7 @@ type apiConfig struct {
 	Slots            int      `env:"VIZ_SLOTS,required"`
 }
 
-func newAPI(ctx context.Context, db *sql.DB, mux *http.ServeMux) (*app.Visualizations, *mysql.Poller, error) {
+func newAPI(ctx context.Context, db *sql.DB, mux *http.ServeMux, reg prometheus.Registerer) (*app.Visualizations, *mysql.Poller, error) {
 	var cfg apiConfig
 	if err := env.Parse(&cfg); err != nil {
 		return nil, nil, fmt.Errorf("load api config: %w", err)
@@ -175,7 +197,8 @@ func newAPI(ctx context.Context, db *sql.DB, mux *http.ServeMux) (*app.Visualiza
 		Random:    rand.Reader,
 		WebOrigin: cfg.WebOrigin,
 	}
-	httptransport.HandleAPI(mux, viz, []byte(cfg.IPHashKey), cfg.CORSOrigins)
+	httptransport.HandleAPI(mux, viz, []byte(cfg.IPHashKey), cfg.CORSOrigins, reg)
+	reg.MustRegister(mysql.NewQueueDepth(db))
 	return viz, poller, nil
 }
 
@@ -199,7 +222,7 @@ type workerConfig struct {
 	S3PathStyle bool   `env:"S3_PATH_STYLE"`
 }
 
-func newWorker(ctx context.Context, sandbox string, db *sql.DB) (*app.Worker, func() error, error) {
+func newWorker(ctx context.Context, sandbox string, db *sql.DB, reg prometheus.Registerer) (*app.Worker, func() error, error) {
 	var cfg workerConfig
 	if err := env.Parse(&cfg); err != nil {
 		return nil, nil, fmt.Errorf("load worker config: %w", err)
@@ -235,6 +258,7 @@ func newWorker(ctx context.Context, sandbox string, db *sql.DB) (*app.Worker, fu
 		Validate: val.Wire,
 		Now:      time.Now,
 		After:    time.After,
+		Metrics:  app.NewWorkerMetrics(reg),
 	}, closeSandbox, nil
 }
 

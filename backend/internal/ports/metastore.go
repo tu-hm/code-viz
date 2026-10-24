@@ -48,6 +48,7 @@ type NewVisualization struct {
 	Source         string
 	Stdin          string
 	Options        trace.Options // normalized
+	TraceParent    string        // W3C traceparent of the request, or ""; its job's spans join that trace
 }
 
 // NewShare is a share link about to be made for the visualization From.

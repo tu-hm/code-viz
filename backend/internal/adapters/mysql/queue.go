@@ -30,12 +30,12 @@ func NewQueue(db *sql.DB) *Queue {
 	return &Queue{db: db}
 }
 
-func (q *Queue) Enqueue(ctx context.Context, tx *sql.Tx, traceID string, signedIn bool, now time.Time) error {
+func (q *Queue) Enqueue(ctx context.Context, tx *sql.Tx, traceID, traceParent string, signedIn bool, now time.Time) error {
 	var priority int8
 	if signedIn {
 		priority = 1
 	}
-	if err := sqlc.New(tx).InsertJob(ctx, sqlc.InsertJobParams{TraceID: traceID, Priority: priority, Now: now}); err != nil {
+	if err := sqlc.New(tx).InsertJob(ctx, sqlc.InsertJobParams{TraceID: traceID, Traceparent: traceParent, Priority: priority, Now: now}); err != nil {
 		return fmt.Errorf("insert job for trace %s: %w", traceID, err)
 	}
 	return nil
@@ -89,12 +89,13 @@ func (q *Queue) Claim(ctx context.Context, worker string, now time.Time) (ports.
 			return fmt.Errorf("decode options of trace %s: %w", next.TraceID, err)
 		}
 		job = ports.Job{
-			Lease:    ports.Lease{JobID: next.ID, TraceID: next.TraceID, Worker: worker},
-			Attempt:  int(next.Attempt) + 1,
-			Language: in.Language,
-			Source:   in.Source,
-			Stdin:    in.Stdin,
-			Options:  opts,
+			Lease:       ports.Lease{JobID: next.ID, TraceID: next.TraceID, Worker: worker},
+			Attempt:     int(next.Attempt) + 1,
+			Language:    in.Language,
+			Source:      in.Source,
+			Stdin:       in.Stdin,
+			Options:     opts,
+			TraceParent: next.Traceparent,
 		}
 		return nil
 	})
