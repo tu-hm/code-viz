@@ -16,7 +16,7 @@
 - [x] Auto-watch: variables used on the current line, tagged *auto*, drop off when the line changes — the next line's (`▷`) identifiers that are in scope, not internal and not references (arrays already have a card); **Pin** keeps one
 - [x] Pins persist for the session (per visualization) — kept per trace ID in the store, so closing and reopening the same trace keeps them until the page reloads
 - [x] Out-of-scope pins shown greyed ("not in scope")
-- [ ] **Done:** matches the §19.3 watch mock — `cpp-binary-search` step 11 gives the mock's rows in a test (`l 4 0 → 4`, `r 7 (unchanged)`, `mid 5* 3 → 5`, `ans -1 (unchanged)`); not yet checked in Chrome
+- [x] **Done:** matches the §19.3 watch mock — `cpp-binary-search` step 11 gives the mock's rows (`l 4 0 → 4`, `r 7 (unchanged)`, `mid 5* 3 → 5`, `ans -1 (unchanged)`), in a test and in Chrome, light and dark, compact at font size S and comfortable at L, 1280 and 1440 wide
 
 ## 2. Timeline strip & lanes (M5-F06 · 3 d)
 
@@ -25,7 +25,7 @@
 - [x] Prev / Next change of a pinned variable — for the selected lane (click its name), from the lane's own changes
 - [x] Hover shows step narration (FE-09) — over the strip and the lanes, and on focus of any marker
 - [x] Downsample markers for traces > 1,000 steps (no overlap) — whenever there are more steps than 16 px slots, at any length: one marker per slot, `!` before `▲` before `■` before `◆`, labelled "N more nearby"
-- [ ] **Done:** matches the §19.8 timeline mock — lanes, `┼`, `●` and Prev/Next are in; not yet checked in Chrome
+- [x] **Done:** matches the §19.8 timeline mock — checked in Chrome on `cpp-binary-search` and on `cpp-sparse-dfs`, where markers are crowded; four lanes show and more scroll, so the code pane keeps its lines
 
 ## Done when
 
