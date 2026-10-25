@@ -4,12 +4,13 @@ import type { Print } from './compare.ts'
 import type { Ending } from './ending.ts'
 import { same, type StepState } from './engine.ts'
 import type { TraceHeader, TraceSource } from './load.ts'
+import type { NarratedTrace } from './narration.ts'
 import type { Jump } from './search.ts'
 import { spawnEngine } from './spawn-engine.ts'
 import { stepFromUrl } from './step-param.ts'
 import { usePlayer } from './store.ts'
 
-export type LoadedTrace = {
+export type LoadedTrace = NarratedTrace & {
   header: TraceHeader
   stepCount: number
   prints: Print[]
@@ -38,10 +39,16 @@ function reuse(prev: StepState | null, next: StepState): StepState {
   return { ...next, heap, stack }
 }
 
-export function useSession(source: TraceSource, expected: string, code: string): Session {
+export function useSession(
+  source: TraceSource,
+  expected: string,
+  code: string,
+  stdin: string,
+): Session {
   const [session, setSession] = useState<Session>({ status: 'loading' })
   const prefilled = useEffectEvent(() => expected)
   const sourceCode = useEffectEvent(() => code)
+  const sourceInput = useEffectEvent(() => stdin)
 
   useEffect(() => {
     let alive = true
@@ -95,16 +102,34 @@ export function useSession(source: TraceSource, expected: string, code: string):
         revealed: null,
       })
       ready = true
-      setSession({ status: 'ready', ...opened, find: (from, jump) => remote.find(from, jump) })
+      setSession({
+        status: 'ready',
+        ...opened,
+        narrations: [],
+        input: [],
+        inputReads: [],
+        find: (from, jump) => remote.find(from, jump),
+      })
       show()
+      const describe = (facts: Awaited<ReturnType<typeof remote.parse>>) => {
+        remote.narrate(sourceInput(), facts, opened.header.language.id).then((described) => {
+          if (alive)
+            setSession((session) =>
+              session.status === 'ready' ? { ...session, ...described } : session,
+            )
+        }, fail)
+      }
       remote.parse(sourceCode(), opened.header.language.id).then(
         (facts) => {
-          if (alive) usePlayer.setState({ facts })
+          if (!alive) return
+          usePlayer.setState({ facts })
+          describe(facts)
         },
-        (e: unknown) => {
-          const reason = e instanceof Error ? e.message : String(e)
-          if (alive)
-            usePlayer.setState({ notice: `Couldn't parse the source for markers: ${reason}` })
+        (error: unknown) => {
+          if (!alive) return
+          const reason = error instanceof Error ? error.message : String(error)
+          usePlayer.setState({ notice: `Couldn't parse the source for markers: ${reason}` })
+          describe(null)
         },
       )
     }

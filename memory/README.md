@@ -40,6 +40,7 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 
 ## Frontend
 
+- [Narration yields](frontend/narration-yields.md): the worker yields between 16-step batches so narration cannot block a step request for the full pass
 - [Arrow overlay](frontend/arrow-overlay.md): arrows find cards and `●` through data attributes and highlight with `data-active`, so hover never re-renders a card; only the on-screen slice is measured
 - [Code pane keyboard](frontend/code-pane-keyboard.md): the code pane takes focus for the caret and Enter, but ← → Home End Space Esc stay the player's
 - [Empty trace](frontend/empty-trace.md): a trace with no steps gets the IDE's own screen with the tail, never the player

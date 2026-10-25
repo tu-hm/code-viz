@@ -11,12 +11,22 @@ export type LineFacts = {
   identifiers: string[]
   inputs: string[]
   scanf: string[]
+  getline: boolean
   header: (typeof headers)[number] | null
+  branch: { body: [number, number]; otherwise: [number, number] | null } | null
 }
 
 export type SourceFacts = Record<number, LineFacts>
 
-const none: LineFacts = { subscripts: [], identifiers: [], inputs: [], scanf: [], header: null }
+const none: LineFacts = {
+  subscripts: [],
+  identifiers: [],
+  inputs: [],
+  scanf: [],
+  getline: false,
+  header: null,
+  branch: null,
+}
 
 export function lineFacts(facts: SourceFacts | null, line: number | null | undefined): LineFacts {
   if (facts === null || line === null || line === undefined) return none
@@ -156,7 +166,15 @@ export function collectFacts(root: Node): SourceFacts {
   const facts: SourceFacts = {}
   const at = (node: Node) => {
     const line = node.startPosition.row + 1
-    facts[line] ??= { subscripts: [], identifiers: [], inputs: [], scanf: [], header: null }
+    facts[line] ??= {
+      subscripts: [],
+      identifiers: [],
+      inputs: [],
+      scanf: [],
+      getline: false,
+      header: null,
+      branch: null,
+    }
     return facts[line]
   }
   const todo = [root]
@@ -164,7 +182,21 @@ export function collectFacts(root: Node): SourceFacts {
     const node = todo.pop()!
     todo.push(...node.namedChildren.toReversed())
     const header = headerTypes[node.type]
-    if (header) at(node).header ??= header
+    if (header) {
+      const fact = at(node)
+      fact.header ??= header
+      if (header === 'if' || header === 'while') {
+        const body = node.childForFieldName('consequence') ?? node.childForFieldName('body')
+        const alternative = node.childForFieldName('alternative')
+        if (body) {
+          const range = (n: Node): [number, number] => [
+            n.startPosition.row + 1,
+            n.endPosition.row + 1,
+          ]
+          fact.branch ??= { body: range(body), otherwise: alternative ? range(alternative) : null }
+        }
+      }
+    }
     if (node.type === 'identifier') {
       const ids = at(node).identifiers
       if (!ids.includes(node.text)) ids.push(node.text)
@@ -179,6 +211,10 @@ export function collectFacts(root: Node): SourceFacts {
       if (format?.type === 'string_literal') {
         at(node).scanf.push(...(format.text.replaceAll('%%', '').match(conversion) ?? []))
       }
+    }
+    if (node.type === 'call_expression') {
+      const name = node.childForFieldName('function')?.text
+      if (name === 'getline' || name === 'std::getline') at(node).getline = true
     }
   }
   return facts

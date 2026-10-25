@@ -2,6 +2,7 @@ import { Button, cn } from '@viz/ui'
 import type { ReactNode } from 'react'
 import { jumpTarget, type Comparison } from './compare.ts'
 import type { OutputSegment } from './engine.ts'
+import type { InputStep } from './narration.ts'
 
 function Panel({
   label,
@@ -31,11 +32,43 @@ function Panel({
 const text =
   'px-(--pane-padding) font-mono text-(length:--code-font-size) leading-(--code-line-height) whitespace-pre-wrap break-words'
 
-export function StdinPanel({ stdin }: { stdin: string }) {
+export function StdinPanel({ stdin, position }: { stdin: string; position: InputStep | null }) {
+  const words = [...stdin.matchAll(/\S+/g)]
+  let end = 0
+  const parts: ReactNode[] = []
+  for (const [index, word] of words.entries()) {
+    parts.push(stdin.slice(end, word.index))
+    const read = index < (position?.token ?? 0)
+    const current = read && index >= (position?.from ?? 0)
+    parts.push(
+      <span
+        key={index}
+        aria-current={current ? 'true' : undefined}
+        className={cn(
+          read && 'text-muted-foreground',
+          current && 'bg-trace-write font-semibold text-foreground',
+        )}
+      >
+        {word[0]}
+      </span>,
+    )
+    end = word.index + word[0].length
+  }
+  parts.push(stdin.slice(end))
   return (
-    <Panel label="Stdin">
+    <Panel
+      label="Input"
+      action={
+        stdin === '' ? undefined : (
+          <span className="ml-auto font-mono text-xs text-muted-foreground">
+            {position?.token ?? 0} of {words.length} tokens read
+            {position?.inferred ? ' (inferred)' : ''}
+          </span>
+        )
+      }
+    >
       <pre className={cn(text, 'min-h-0 flex-1 overflow-auto')}>
-        {stdin === '' ? <span className="text-faint">(none)</span> : stdin}
+        {stdin === '' ? <span className="text-faint">(none)</span> : parts}
       </pre>
     </Panel>
   )

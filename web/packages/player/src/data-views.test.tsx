@@ -212,7 +212,9 @@ describe('index markers (§19.4.1)', () => {
       identifiers: names,
       inputs: [],
       scanf: [],
+      getline: false,
       header: null,
+      branch: null,
     },
   })
   const state = (locals: Local[], rest: Partial<StepState> = {}): StepState => ({
@@ -273,7 +275,9 @@ describe('index markers (§19.4.1)', () => {
         identifiers: ['s', 'i'],
         inputs: [],
         scanf: [],
+        getline: false,
         header: null,
+        branch: null,
       },
     }
     const word: Local = { name: 's', value: { t: 'str', v: 'code' } }

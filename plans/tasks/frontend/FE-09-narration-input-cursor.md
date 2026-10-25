@@ -13,30 +13,30 @@ Deterministic, template-based narration built in the browser (no AI, D22).
 
 ## 1. Narration v0 (M1-18 · 1.5 d · M1 week 6)
 
-- [ ] Rules engine: first matching rule wins (§19.5 order)
-- [ ] Rules: Call `f(args)`, Return `f returns v`, Output `Printed "…"`, Other changes `x = v (was w)` up to 3 then "+N more", fallback `Line L ran`
-- [ ] Error rule hooks into FE-05 §3 message when present
-- [ ] Shown under the step counter as `» …`
-- [ ] **Done:** every fixture step has a line
+- [x] Rules engine: first matching rule wins (§19.5 order)
+- [x] Rules: Call `f(args)`, Return `f returns v`, Output `Printed "…"`, Other changes `x = v (was w)` up to 3 then "+N more", fallback `Line L ran`
+- [x] Error rule hooks into FE-05 §3 message when present
+- [x] Shown under the step counter as `» …`
+- [x] **Done:** every fixture step has a line
 
 ## 2. Full narration (M3-F01 · 2 d)
 
-- [ ] Input read: `Read 13 from input (token 2 of 10)` (from §3 below)
-- [ ] Assignment with inferred reads: `dp[2][3] = 10 (was ·), from dp[1][3] = 4 and dp[2][2] = 6`
-- [ ] Loop header re-entered: `Loop at line 6: pass 3`
-- [ ] Branch taken: `Condition on line 8 was false → else` (next line matched against parsed structure)
-- [ ] Story panel: last 20 narrations, click to jump
-- [ ] Hover on the timeline (FE-11) shows any step's narration
-- [ ] One unit test per §19.5 rule, plus rule-priority tests
-- [ ] **Done:** every rule in the §19.5 table has a test
+- [x] Input read: `Read 13 from input (token 2 of 10)` (from §3 below)
+- [x] Assignment with inferred reads: `dp[2][3] = 10 (was ·), from dp[1][3] = 4 and dp[2][2] = 6`
+- [x] Loop header re-entered: `Loop at line 6: pass 3`
+- [x] Branch taken: `Condition on line 8 was false → else` (next line matched against parsed structure)
+- [x] Story panel: last 20 narrations, click to jump
+- [x] Hover on the timeline (FE-11) shows any step's narration
+- [x] One unit test per §19.5 rule, plus rule-priority tests
+- [x] **Done:** every rule in the §19.5 table has a test
 
 ## 3. Input cursor (M3-F03 · 2 d)
 
-- [ ] INPUT panel: stdin text, tokens read so far dimmed, token read at this step highlighted, "N of M tokens read"
-- [ ] Python: exact from `stdinPos` (§19.9.4)
-- [ ] C++: inferred — count `>>` operands on `cin` lines and `%` conversions in `scanf`; `getline` consumes to newline; mark as inferred
-- [ ] `◆` input-read markers feed the timeline strip (FE-11)
-- [ ] **Done:** binary-search fixture shows 10 of 10 tokens read
+- [x] INPUT panel: stdin text, tokens read so far dimmed, token read at this step highlighted, "N of M tokens read"
+- [x] Python: exact from `stdinPos` (§19.9.4)
+- [x] C++: inferred — count `>>` operands on `cin` lines and `%` conversions in `scanf`; `getline` consumes to newline; mark as inferred
+- [x] `◆` input-read markers feed the timeline strip (FE-11)
+- [x] **Done:** binary-search fixture shows 10 of 10 tokens read
 
 ## Done when
 

@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { fixtureNames, loadFixture } from '@viz/fixtures'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { Player } from './player.tsx'
 import { usePlayer } from './store.ts'
 import { cpp, renderPlayer } from './test-player.tsx'
@@ -158,9 +158,93 @@ test('stderr is red and the current step’s text is marked', async () => {
 test('stdin is shown read-only', async () => {
   const { stdin, stepCount } = renderPlayer('cpp-binary-search')
   await counter(1, stepCount)
-  const panel = screen.getByRole('region', { name: 'Stdin' })
+  const panel = screen.getByRole('region', { name: 'Input' })
   expect(panel.querySelector('pre')!.textContent).toBe(stdin)
   expect(within(panel).queryByRole('textbox')).toBeNull()
+})
+
+test('binary search marks the read tokens and reaches 10 of 10', async () => {
+  renderPlayer('cpp-binary-search')
+  await counter(1, 20)
+  fireEvent.click(button('Last step'))
+  await counter(20, 20)
+  const input = within(screen.getByRole('region', { name: 'Input' }))
+  await waitFor(() => expect(input.getByText('10 of 10 tokens read (inferred)')).toBeDefined())
+  expect(input.queryAllByText(/\d+/, { selector: '[aria-current="true"]' })).toHaveLength(0)
+  expect(input.getAllByText('13', { selector: 'span' })[0]!.className).toContain(
+    'text-muted-foreground',
+  )
+  fireEvent.click(button('First step'))
+  await counter(1, 20)
+  fireEvent.click(button('Next step'))
+  await counter(2, 20)
+  await waitFor(() => expect(input.getByText('2 of 10 tokens read (inferred)')).toBeDefined())
+  expect(input.getByText('13', { selector: '[aria-current="true"]' })).toBeDefined()
+})
+
+test('input markers show narration and jump to their step', async () => {
+  renderPlayer('cpp-binary-search')
+  await counter(1, 20)
+  const read = await screen.findByRole('button', { name: /^Input read at step 4:/ })
+  fireEvent.focus(read)
+  expect(screen.getByRole('tooltip').textContent).toMatch(/^Step 4: Read 8 tokens/)
+  fireEvent.click(read)
+  await counter(4, 20)
+  expect(screen.getByRole('region', { name: 'Input' }).textContent).toContain(
+    '10 of 10 tokens read',
+  )
+})
+
+test('Python highlights the exact token read at this step', async () => {
+  renderPlayer('python-aliasing')
+  await counter(1, 19)
+  fireEvent.click(button('Next step'))
+  await counter(2, 19)
+  fireEvent.click(button('Next step'))
+  await counter(3, 19)
+  fireEvent.click(button('Next step'))
+  await counter(4, 19)
+  const input = within(screen.getByRole('region', { name: 'Input' }))
+  expect(input.getByText('1 of 1 tokens read')).toBeDefined()
+  expect(input.getByText('5', { selector: '[aria-current="true"]' })).toBeDefined()
+})
+
+test('hovering the timeline narrates any step', async () => {
+  renderPlayer('cpp-binary-search')
+  await counter(1, 20)
+  await waitFor(() => expect(button('Story')).toHaveProperty('disabled', false))
+  const strip = screen.getByRole('slider', { name: 'Step' }).parentElement!
+  vi.spyOn(strip, 'getBoundingClientRect').mockReturnValue(DOMRect.fromRect({ x: 0, width: 190 }))
+  fireEvent.pointerMove(strip, { clientX: 100 })
+  expect(screen.getByRole('tooltip').textContent).toMatch(/^Step 11: mid = 5/)
+})
+
+test('the narration and Story jump to a previous narrated step', async () => {
+  renderPlayer('python-aliasing')
+  await counter(1, 19)
+  fireEvent.click(button('Last step'))
+  await counter(19, 19)
+  await waitFor(() => expect(button('Story')).toHaveProperty('disabled', false))
+  fireEvent.click(button('Story'))
+  const story = within(await screen.findByRole('dialog', { name: 'Story' }))
+  expect(story.getAllByRole('listitem')).toHaveLength(19)
+  fireEvent.click(story.getByRole('button', { name: '9 » Call square(x = 5)' }))
+  await counter(9, 19)
+  expect(screen.getByRole('paragraph', { name: 'Step narration' }).textContent).toBe(
+    '» Call square(x = 5)',
+  )
+})
+
+test('Story keeps the last 20 narrations', async () => {
+  const { stepCount } = renderPlayer('cpp-dp-grid')
+  await counter(1, stepCount)
+  fireEvent.click(button('Last step'))
+  await counter(stepCount, stepCount)
+  await waitFor(() => expect(button('Story')).toHaveProperty('disabled', false))
+  fireEvent.click(button('Story'))
+  const story = within(await screen.findByRole('dialog', { name: 'Story' }))
+  expect(story.getAllByRole('listitem')).toHaveLength(20)
+  expect(story.getAllByRole('button')[0]!.textContent).toMatch(new RegExp(`^${stepCount - 19} »`))
 })
 
 test('a trace in a newer major format is refused with a reason', async () => {

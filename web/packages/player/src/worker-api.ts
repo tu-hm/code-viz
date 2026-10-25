@@ -3,7 +3,9 @@ import { ending } from './ending.ts'
 import { createEngine } from './engine.ts'
 import type { Step } from './gen/trace.ts'
 import { loadTrace, type FileSource, type Manifest, type TraceSource } from './load.ts'
+import { narrate } from './narration.ts'
 import { calledFunctions, findStep, type Jump } from './search.ts'
+import type { SourceFacts } from './source-facts.ts'
 
 const prefetch = [1, -1, 2, -2]
 
@@ -44,6 +46,10 @@ export function createWorkerApi() {
     async parse(code: string, languageId: string) {
       const { parseSource } = await import('./parse.ts')
       return parseSource(code, languageId)
+    },
+    narrate(stdin: string, facts: SourceFacts | null, languageId: string) {
+      if (trace === null) throw new Error('narrate before open')
+      return narrate(trace.steps, stdin, facts, languageId)
     },
     find(from: number, jump: Jump) {
       if (trace === null) throw new Error('find before open')

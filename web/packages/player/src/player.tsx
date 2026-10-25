@@ -12,6 +12,7 @@ import { entries, locate, plan, runJump, type Entry } from './goto.ts'
 import { Header } from './header.tsx'
 import { useStepKeys } from './keys.ts'
 import { isTraceError, type TraceHeader, type TraceSource } from './load.ts'
+import type { InputStep } from './narration.ts'
 import {
   Check,
   CompareResult,
@@ -27,6 +28,7 @@ import { StatePane } from './state-pane.tsx'
 import { StatusBar } from './status-bar.tsx'
 import { useStepParam } from './step-param.ts'
 import { usePlayer } from './store.ts'
+import { TimelineStrip } from './timeline-strip.tsx'
 
 export type LanguageInfo = {
   displayName: string
@@ -175,12 +177,62 @@ function ControlsBox({ trace }: { trace: LoadedTrace }) {
         playing={playing}
         speed={speed}
         goto={<GotoBox trace={trace} />}
+        story={<StoryBox trace={trace} />}
+        narration={trace.narrations[step] ?? null}
+        timeline={
+          <TimelineStrip
+            step={step}
+            stepCount={stepCount}
+            reads={trace.inputReads}
+            narrations={trace.narrations}
+            onGo={go}
+            onScrub={scrub}
+          />
+        }
         onGo={go}
         onStepOver={() => void runJump('over', trace)}
-        onScrub={scrub}
         onTogglePlay={() => togglePlay(stepCount)}
       />
     </div>
+  )
+}
+
+function StoryBox({ trace }: { trace: LoadedTrace }) {
+  const step = usePlayer((s) => s.step)
+  const go = usePlayer((s) => s.go)
+  const [open, setOpen] = useState(false)
+  const first = Math.max(0, step - 19)
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="ghost" disabled={trace.narrations.length === 0}>
+          Story
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent label="Story">
+        <ol className="max-h-80 min-w-72 overflow-auto">
+          {trace.narrations.slice(first, step + 1).map((line, index) => (
+            <li key={first + index}>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-auto w-full justify-start text-left whitespace-normal"
+                aria-current={first + index === step ? 'step' : undefined}
+                onClick={() => {
+                  go(first + index)
+                  setOpen(false)
+                }}
+              >
+                <span className="mr-2 shrink-0 font-mono text-xs text-muted-foreground">
+                  {first + index + 1}
+                </span>{' '}
+                <span>» {line}</span>
+              </Button>
+            </li>
+          ))}
+        </ol>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -220,6 +272,11 @@ function outputEnd({ header, stepCount, tail }: LoadedTrace): OutputEnd {
     afterStep: stepCount,
     truncated: exit.kind === 'output_limit' || untracedTail?.exit.kind === 'output_limit',
   }
+}
+
+function InputBox({ stdin, input }: { stdin: string; input: InputStep[] }) {
+  const step = usePlayer((s) => s.current?.i ?? 0)
+  return <StdinPanel stdin={stdin} position={input[step] ?? null} />
 }
 
 function OutputBox({ trace }: { trace: LoadedTrace }) {
@@ -398,7 +455,7 @@ function Shell({
             onShowRange={onShowRange}
           />
         </div>
-        <StdinPanel stdin={stdin} />
+        <InputBox stdin={stdin} input={trace.input} />
         <OutputBox trace={trace} />
       </div>
       <StatusBar
@@ -418,7 +475,7 @@ function Shell({
 }
 
 export function Player({ source, expected, ...props }: PlayerProps) {
-  const session = useSession(source, expected ?? '', props.code)
+  const session = useSession(source, expected ?? '', props.code, props.stdin)
   useDisplayOptions()
 
   if (session.status === 'loading') {

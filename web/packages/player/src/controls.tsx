@@ -11,9 +11,11 @@ type ControlsProps = {
   playing: boolean
   speed: Settings['autoplaySpeed']
   goto: ReactNode
+  story: ReactNode
+  narration: string | null
+  timeline: ReactNode
   onGo: (step: number) => void
   onStepOver: () => void
-  onScrub: (step: number) => void
   onTogglePlay: () => void
 }
 
@@ -24,9 +26,11 @@ export function Controls({
   playing,
   speed,
   goto,
+  story,
+  narration,
+  timeline,
   onGo,
   onStepOver,
-  onScrub,
   onTogglePlay,
 }: ControlsProps) {
   const last = stepCount - 1
@@ -39,6 +43,16 @@ export function Controls({
           <>
             Step {state.i + 1} of {stepCount}
             <span className="text-muted-foreground"> · {stepDetail(state)}</span>
+          </>
+        )}
+      </p>
+      <p className="min-h-5 truncate text-sm" aria-label="Step narration">
+        {narration === null ? (
+          '\u00a0'
+        ) : (
+          <>
+            <span aria-hidden>» </span>
+            {narration}
           </>
         )}
       </p>
@@ -80,20 +94,12 @@ export function Controls({
           <span aria-hidden>▶|</span>
         </Button>
         {goto}
+        {story}
         <Button size="sm" aria-label={playing ? 'Pause' : 'Play'} onClick={onTogglePlay}>
           <span aria-hidden>{playing ? '❚❚' : '▶'}</span> {playing ? 'Pause' : 'Play'} {speed}×
         </Button>
       </div>
-      <input
-        type="range"
-        min={1}
-        max={stepCount}
-        value={step + 1}
-        aria-label="Step"
-        aria-valuetext={`Step ${step + 1} of ${stepCount}`}
-        onChange={(e) => onScrub(e.currentTarget.valueAsNumber - 1)}
-        className="w-full accent-primary"
-      />
+      {timeline}
     </div>
   )
 }
