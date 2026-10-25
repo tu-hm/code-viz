@@ -49,7 +49,7 @@ pnpm check        # gen + drift check, lint, typecheck, test, build; CI runs thi
 
 `pnpm dev` loads `apps/ide/.env.development`. Put your own overrides in `apps/ide/.env.development.local`, which git ignores. [`.env.example`](apps/ide/.env.example) lists every variable.
 
-**Against the local stack:** start the backend with `make dev` in `backend/`, then run `VITE_USE_MSW=false pnpm dev`.
+**Against the local stack:** start the backend with `make dev` in `backend/`, copy `apps/ide/.env.example` to `apps/ide/.env.development.local`, then run `pnpm dev`.
 
 ## Mock API
 
