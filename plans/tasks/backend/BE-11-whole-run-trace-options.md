@@ -76,12 +76,20 @@ The first two are done in BE-08. After the marker step, `trace.py` deletes every
 
 ## 5. (Conditional) Exact access hints (M5-B01 · 3 d)
 
-Only if FE spike S8 (tree-sitter accuracy) misses 95%.
+Only if FE spike S8 (tree-sitter accuracy) misses 95%. S8 got 77.6% of subscript lines right in contest-style code, and G5 triggered this on 25 Oct.
 
-- [ ] Emit `access[]` (`obj`, `path`, `mode`) from the tracer
-- [ ] Writes from the diff; reads from instrumentation
+- [x] Emit `access[]` (`obj`, `path`, `mode`) from the tracer
+- [x] Writes from the diff; reads from instrumentation
 
-Not started: spike S8 hasn't run (FE, M1-F01), so it isn't known whether this is needed.
+**Result** (spec v1.17, §7.11.1, §7.11.2, §10.1, §11, §19.9.2):
+
+- **Contract.** A wire step's `reads` lists every sequence cell read since the previous step, as `{obj, index}`. The core maps it to `access` entries `{obj: oN, path: [index], mode: "r"}`, each cell once, first read first. A read of an object missing from the heap, of anything but a sequence, or past its length is malformed. More than 1,000 distinct cells (a new §11 limit), or no `reads`, means the step has no `access`, and the player infers. Writes stay the player's diff, so `access` carries reads only.
+- **C++.** The build adds `-fsanitize=kernel-address` with every check made a call and links `/opt/viz/reads.o`, whose `__asan_load*` hooks append each load's address to a 4,096-entry buffer. `trace.py` reads and clears the buffer at each step, then maps addresses onto the innermost array, `std::array` or `vector` buffer it recorded. Pointer arithmetic (`p[2]`), struct fields (`jobs[1].e`), `t[l++]`, `t[p ^ 1]` and loads inside library templates (`max(dp[c], …)`) all count.
+  - **Gap:** GCC leaves the call out for a constant index into a named C array (`a[0]`, `*(a + 2)`).
+  - **Cost:** on 4 S7 programs, run time rises 12–18% with the safety checks on and 1.3–2.3× with them off. Builds take 0.6 s with checks off and 1.0 s with them on, with both PCHs rebuilt under the new flags.
+- **Python.** A `sys.monitoring` INSTRUCTION callback runs on `main.py`'s code only and turns itself off everywhere but `BINARY_SUBSCR`. There it evaluates the subscript's container and index from names, constants and integer arithmetic, `^ & | << >>` included, and records `list`, `tuple` and `deque` cells. It stops at the step limit, and its cost is within noise. `f_trace_opcodes` gave no opcode events in 3.12 unless set before `settrace`, and then cost every module ([memory](../../../memory/backend/read-hints.md)).
+- **2-D reads** name each row's object. FE-08's matrix maps rows back to `[r, c]`, in `marks.ts`.
+- **Fixtures.** `reads` in both languages, and `reads-pointers` in C++. `TestReadsNameTheCellsALineRead` checks the cells each line reads, and every golden now carries `access`, with steps otherwise unchanged.
 
 ## Done when
 
