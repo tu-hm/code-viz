@@ -59,6 +59,7 @@ function renderState(state: StepState, languageId: string, options: Options = {}
     facts: options.facts ?? null,
     pins: options.pins ?? {},
     onPin: vi.fn<(variable: string, names: string[]) => void>(),
+    onWatch: vi.fn<(target: string) => void>(),
     onShowInternals: vi.fn<() => void>(),
     onFrameLine: vi.fn<(line: number) => void>(),
     onView: vi.fn<(variable: string, view: ViewAs) => void>(),
@@ -368,6 +369,7 @@ describe('big arrays (§19.4.2)', () => {
         facts={facts}
         pins={{}}
         onPin={props.onPin}
+        onWatch={props.onWatch}
         onShowInternals={props.onShowInternals}
         onFrameLine={props.onFrameLine}
         onView={props.onView}

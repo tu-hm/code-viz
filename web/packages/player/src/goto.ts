@@ -24,7 +24,7 @@ type Params = Pick<
 
 type Plan = { label: string } & ({ jump: Jump } | { at: number } | { missing: string })
 
-function parseTarget(text: string): Target | null {
+export function parseTarget(text: string): Target | null {
   const m = /^\s*([A-Za-z_]\w*)((?:\[\d+\])*)\s*$/.exec(text)
   if (m === null) return null
   return { name: m[1]!, indices: [...m[2]!.matchAll(/\d+/g)].map((d) => Number(d[0])) }
@@ -63,7 +63,7 @@ export function plan(entry: Entry, p: Params, trace: LoadedTrace): Plan {
       return { label: `Next change of ${p.jumpChange.trim()}`, jump: { kind: 'change', target } }
     }
     case 'call': {
-      const name = p.jumpCall ?? trace.functions[0]
+      const name = p.jumpCall ?? Object.keys(trace.calls)[0]
       if (name === undefined) return { label: 'Next call', missing: 'this run calls no functions' }
       return { label: `Next call of ${name}`, jump: { kind: 'call', name } }
     }

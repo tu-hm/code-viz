@@ -5,7 +5,7 @@ import type { Ending } from './ending.ts'
 import { same, type StepState } from './engine.ts'
 import type { TraceHeader, TraceSource } from './load.ts'
 import type { NarratedTrace } from './narration.ts'
-import type { Jump } from './search.ts'
+import { targetText, type Change, type Jump, type Target } from './search.ts'
 import { spawnEngine } from './spawn-engine.ts'
 import { stepFromUrl } from './step-param.ts'
 import { usePlayer } from './store.ts'
@@ -15,9 +15,11 @@ export type LoadedTrace = NarratedTrace & {
   stepCount: number
   prints: Print[]
   tail: string
-  functions: string[]
+  calls: Record<string, number[]>
+  errors: number[]
   ending: Ending
   find: (from: number, jump: Jump) => Promise<number | null>
+  history: (target: Target) => Promise<Change[]>
 }
 
 type Session =
@@ -98,10 +100,12 @@ export function useSession(
         jumpLine: '',
         jumpChange: '',
         jumpCall: null,
+        lane: null,
         notice: null,
         revealed: null,
       })
       ready = true
+      const histories = new Map<string, Promise<Change[]>>()
       setSession({
         status: 'ready',
         ...opened,
@@ -109,6 +113,15 @@ export function useSession(
         input: [],
         inputReads: [],
         find: (from, jump) => remote.find(from, jump),
+        history(target) {
+          const key = targetText(target)
+          let changes = histories.get(key)
+          if (changes === undefined) {
+            changes = remote.history(target)
+            histories.set(key, changes)
+          }
+          return changes
+        },
       })
       show()
       const describe = (facts: Awaited<ReturnType<typeof remote.parse>>) => {

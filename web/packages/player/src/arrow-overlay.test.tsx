@@ -31,6 +31,7 @@ function pane(state: StepState, languageId: string, toggles: Toggles = {}) {
       facts={null}
       pins={{}}
       onPin={vi.fn<(variable: string, names: string[]) => void>()}
+      onWatch={vi.fn<(target: string) => void>()}
       onShowInternals={vi.fn<() => void>()}
       onFrameLine={vi.fn<(line: number) => void>()}
       onView={vi.fn<(variable: string, view: ViewAs) => void>()}

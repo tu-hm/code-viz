@@ -50,6 +50,7 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 - [State pane folding](frontend/state-pane-folding.md): internals' objects hide with them; pairs read inline, C++ by-value structs nest, table and matrix rows fold; "Show range…" only on truncated sequences
 - [State pane skips unchanged](frontend/state-pane-skips-unchanged.md): unchanged objects keep their identity across steps, and cards and frames compare what they draw; measure on a production build
 - [Visualize run](frontend/visualize-run.md): the create keeps its promise so Close can delete an unanswered run; the long-poll is one `queryFn` loop that resumes from the cached version; only unfinished runs are deleted; Retry keeps the `Idempotency-Key`, a re-run gets a new one
+- [Watch history](frontend/watch-history.md): the watch history, lanes and Prev / Next change share one forward walk per target that yields every 256 steps; auto-watch skips refs; pins last per trace until reload
 - [Vendored agent skills](frontend/vendored-agent-skills.md): React, composition and web design skills live as plain copies in `web/.claude/skills`; `web/AGENTS.md` wins over them
 
 ## Backend

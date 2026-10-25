@@ -8,8 +8,9 @@ import { useDisplayOptions } from './display.ts'
 import { Divider } from './divider.tsx'
 import type { OutputSegment } from './engine.ts'
 import { GotoMenu } from './goto-menu.tsx'
-import { entries, locate, plan, runJump, type Entry } from './goto.ts'
+import { entries, locate, parseTarget, plan, runJump, type Entry } from './goto.ts'
 import { Header } from './header.tsx'
+import { useHistories } from './histories.ts'
 import { useStepKeys } from './keys.ts'
 import { isTraceError, type TraceHeader, type TraceSource } from './load.ts'
 import type { InputStep } from './narration.ts'
@@ -22,6 +23,7 @@ import {
   type Mark,
   type OutputEnd,
 } from './output.tsx'
+import { targetText } from './search.ts'
 import { useSession, type LoadedTrace } from './session.ts'
 import { SettingsDialog } from './settings.tsx'
 import { StatePane } from './state-pane.tsx'
@@ -29,6 +31,8 @@ import { StatusBar } from './status-bar.tsx'
 import { useStepParam } from './step-param.ts'
 import { usePlayer } from './store.ts'
 import { TimelineStrip } from './timeline-strip.tsx'
+import { WatchPanel } from './watch-panel.tsx'
+import { autoTargets, watchRow } from './watch.ts'
 
 export type LanguageInfo = {
   displayName: string
@@ -55,6 +59,7 @@ type PlayerProps = Slots & {
 }
 
 const noOutput: OutputSegment[] = []
+const noWatches: string[] = []
 const noticeMs = 4000
 
 function useFrameThrottle(fn: (value: number) => void) {
@@ -118,7 +123,7 @@ function GotoPanel({ trace, onRun }: { trace: LoadedTrace; onRun: (entry: Entry)
       call={jumpCall}
       breakpoints={breakpoints}
       variables={[...new Set(variables)]}
-      functions={trace.functions}
+      functions={Object.keys(trace.calls)}
       onLine={(jumpLine) => usePlayer.setState({ jumpLine })}
       onChange={(jumpChange) => usePlayer.setState({ jumpChange })}
       onCall={(jumpCall) => usePlayer.setState({ jumpCall })}
@@ -166,7 +171,12 @@ function ControlsBox({ trace }: { trace: LoadedTrace }) {
   const playing = usePlayer((s) => s.playing)
   const speed = usePlayer((s) => s.settings.autoplaySpeed)
   const go = usePlayer((s) => s.go)
+  const lane = usePlayer((s) => s.lane)
+  const jumpCall = usePlayer((s) => s.jumpCall)
+  const watched = usePlayer((s) => s.watches[trace.header.id] ?? noWatches)
+  const histories = useHistories(trace, watched)
   const scrub = useFrameThrottle(go)
+  const callee = jumpCall ?? Object.keys(trace.calls)[0] ?? null
   return (
     <div className="relative">
       <NoticeBox />
@@ -183,10 +193,22 @@ function ControlsBox({ trace }: { trace: LoadedTrace }) {
           <TimelineStrip
             step={step}
             stepCount={stepCount}
-            reads={trace.inputReads}
+            events={{
+              read: trace.inputReads,
+              print: trace.prints.map((p) => p.i),
+              call: callee === null ? [] : (trace.calls[callee] ?? []),
+              error: trace.errors,
+            }}
+            callee={callee}
+            lanes={watched.map((target) => ({
+              target,
+              changes: histories[target]?.map((c) => c.step) ?? null,
+            }))}
+            lane={lane}
             narrations={trace.narrations}
             onGo={go}
             onScrub={scrub}
+            onLane={(lane) => usePlayer.setState({ lane })}
           />
         }
         onGo={go}
@@ -331,11 +353,43 @@ function OutputBox({ trace }: { trace: LoadedTrace }) {
   )
 }
 
+function WatchBox({ trace }: { trace: LoadedTrace }) {
+  const state = usePlayer((s) => s.current)
+  const facts = usePlayer((s) => s.facts)
+  const watched = usePlayer((s) => s.watches[trace.header.id] ?? noWatches)
+  const watch = usePlayer((s) => s.watch)
+  const unwatch = usePlayer((s) => s.unwatch)
+  const autos = state === null ? [] : autoTargets(state, facts, watched)
+  const histories = useHistories(trace, [...watched, ...autos])
+  if (state === null) return null
+  const languageId = trace.header.language.id
+  const row = (text: string, auto: boolean) =>
+    watchRow(state, parseTarget(text)!, text, auto, histories[text], languageId)
+  const variables = state.stack.flatMap((f) =>
+    f.locals.filter((l) => !l.internal).map((l) => l.name),
+  )
+  return (
+    <WatchPanel
+      rows={[...watched.map((t) => row(t, false)), ...autos.map((t) => row(t, true))]}
+      variables={[...new Set(variables)]}
+      onWatch={(text) => {
+        const target = parseTarget(text)
+        if (target === null) return 'Enter a variable or a cell such as a[2]'
+        watch(trace.header.id, targetText(target))
+        return null
+      }}
+      onUnwatch={(target) => unwatch(trace.header.id, target)}
+    />
+  )
+}
+
 function StateBox({
+  traceId,
   languageId,
   pointers,
   onShowRange,
 }: {
+  traceId: string
   languageId: string
   pointers: boolean
   onShowRange?: (variable: string) => void
@@ -351,6 +405,7 @@ function StateBox({
   const facts = usePlayer((s) => s.facts)
   const pins = usePlayer((s) => s.pins)
   const setPins = usePlayer((s) => s.setPins)
+  const watch = usePlayer((s) => s.watch)
   const updateSettings = usePlayer((s) => s.updateSettings)
   const revealLine = usePlayer((s) => s.revealLine)
   const setView = usePlayer((s) => s.setView)
@@ -371,6 +426,7 @@ function StateBox({
       facts={facts}
       pins={pins}
       onPin={setPins}
+      onWatch={(target) => watch(traceId, target)}
       onShowInternals={() => updateSettings({ showInternals: true })}
       onFrameLine={revealLine}
       onView={setView}
@@ -449,7 +505,11 @@ function Shell({
         </div>
         <Divider split={split} onSplit={setSplit} />
         <div className="min-h-0 overflow-auto">
+          <div className="px-(--pane-padding) pt-(--pane-padding)">
+            <WatchBox trace={trace} />
+          </div>
           <StateBox
+            traceId={header.id}
             languageId={header.language.id}
             pointers={language.visualize.capabilities.pointers}
             onShowRange={onShowRange}

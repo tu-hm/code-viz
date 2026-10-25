@@ -3,7 +3,7 @@ import { fixtureNames, loadFixture } from '@viz/fixtures'
 import { describe, expect, test } from 'vitest'
 import { createEngine, type StepState } from './engine.ts'
 import type { HeapObject, Step, Value } from './gen/trace.ts'
-import { calledFunctions, findStep, type Jump, type Target } from './search.ts'
+import { callSteps, changeHistory, findStep, type Jump, type Target } from './search.ts'
 
 function find(name: string, from: number, jump: Jump) {
   const steps = loadFixture(name).chunks.flat()
@@ -171,7 +171,7 @@ test.each([
   { name: 'nothing after the last call', fixture: 'cpp-fib-memo', from: 25, want: null },
   { name: 'a call in Python', fixture: 'python-aliasing', from: 0, want: 8 },
 ])('next call: $name', ({ fixture, from, want }) => {
-  const [name] = calledFunctions(loadFixture(fixture).chunks.flat())
+  const [name] = Object.keys(callSteps(loadFixture(fixture).chunks.flat()))
   expect(find(fixture, from, { kind: 'call', name: name! })).toBe(want)
 })
 
@@ -192,11 +192,11 @@ test.each([
 })
 
 test.each([
-  { fixture: 'cpp-fib-memo', want: ['fib'] },
-  { fixture: 'python-aliasing', want: ['square'] },
-  { fixture: 'cpp-binary-search', want: [] },
+  { fixture: 'cpp-fib-memo', want: { fib: [1, 4, 7, 10, 13, 15, 18, 21, 25] } },
+  { fixture: 'python-aliasing', want: { square: [8] } },
+  { fixture: 'cpp-binary-search', want: {} },
 ])('$fixture calls $want', ({ fixture, want }) => {
-  expect(calledFunctions(loadFixture(fixture).chunks.flat())).toEqual(want)
+  expect(callSteps(loadFixture(fixture).chunks.flat())).toEqual(want)
 })
 
 test.each([
@@ -245,7 +245,7 @@ function deep(value: Value, heap: Record<string, HeapObject>, seen = new Set<str
   seen.add(value.id)
   const o = heap[value.id]
   const children = [...(o?.items ?? []), ...(o?.fields ?? []).map((f) => f.value)]
-  return JSON.stringify([o, children.map((v) => deep(v, heap, seen))])
+  return JSON.stringify([value.id, o, children.map((v) => deep(v, heap, seen))])
 }
 
 function valueIn(state: StepState, name: string) {
@@ -284,4 +284,19 @@ describe.each(fixtureNames)('%s', (name) => {
       }
     },
   )
+
+  test.each(names)('the change history of %s matches replaying every step', async (variable) => {
+    const values = states.map((s) => {
+      const v = valueIn(s, variable)
+      return v === undefined ? undefined : deep(v, s.heap)
+    })
+    let last: string | undefined
+    const want: number[] = []
+    for (const [k, v] of values.entries()) {
+      if (v === undefined || v === last) continue
+      want.push(k)
+      last = v
+    }
+    expect((await changeHistory(steps, target(variable))).map((c) => c.step)).toEqual(want)
+  })
 })

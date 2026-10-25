@@ -44,6 +44,9 @@ type PlayerState = {
   notice: string | null
   views: Record<string, ViewAs>
   pins: Record<string, string[]>
+  // per trace id, kept across sessions until the page reloads
+  watches: Record<string, string[]>
+  lane: string | null
   revealed: { line: number } | null
   go: (step: number) => void
   setPlaying: (playing: boolean) => void
@@ -52,6 +55,8 @@ type PlayerState = {
   toggleBreakpoint: (line: number) => void
   setView: (variable: string, view: ViewAs) => void
   setPins: (variable: string, names: string[]) => void
+  watch: (traceId: string, target: string) => void
+  unwatch: (traceId: string, target: string) => void
   revealLine: (line: number) => void
 }
 
@@ -131,6 +136,8 @@ export const usePlayer = create<PlayerState>()(
       notice: null,
       views: {},
       pins: {},
+      watches: {},
+      lane: null,
       revealed: null,
       go: (step) => set({ step, playing: false, notice: null }),
       setPlaying: (playing) => set({ playing }),
@@ -144,6 +151,20 @@ export const usePlayer = create<PlayerState>()(
         })),
       setView: (variable, view) => set(({ views }) => ({ views: { ...views, [variable]: view } })),
       setPins: (variable, names) => set(({ pins }) => ({ pins: { ...pins, [variable]: names } })),
+      watch: (traceId, target) =>
+        set(({ watches }) => {
+          const now = watches[traceId] ?? []
+          if (now.includes(target)) return {}
+          return { watches: { ...watches, [traceId]: [...now, target] } }
+        }),
+      unwatch: (traceId, target) =>
+        set(({ watches, lane }) => ({
+          watches: {
+            ...watches,
+            [traceId]: (watches[traceId] ?? []).filter((t) => t !== target),
+          },
+          lane: lane === target ? null : lane,
+        })),
       revealLine: (line) => set({ revealed: { line } }),
     }),
     {

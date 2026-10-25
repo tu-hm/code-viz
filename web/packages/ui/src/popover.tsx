@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 
 export const Popover = PopoverPrimitive.Root
 export const PopoverTrigger = PopoverPrimitive.Trigger
+export const PopoverAnchor = PopoverPrimitive.Anchor
 
 export function PopoverContent({ label, children }: { label: string; children: ReactNode }) {
   return (

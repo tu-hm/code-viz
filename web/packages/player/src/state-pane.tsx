@@ -1,5 +1,5 @@
-import { Button, cn } from '@viz/ui'
-import { memo, useEffect, useId, useRef, type Ref } from 'react'
+import { Button, cn, Popover, PopoverAnchor, PopoverContent } from '@viz/ui'
+import { memo, useEffect, useId, useRef, useState, type Ref } from 'react'
 import { ArrowOverlay } from './arrow-overlay.tsx'
 import { HeapCard } from './cards.tsx'
 import { same, type StepState } from './engine.ts'
@@ -12,6 +12,7 @@ import {
   layoutState,
   sameList,
   sameReads,
+  type CardView,
   type FrameView,
   type Look,
 } from './state-layout.ts'
@@ -35,6 +36,7 @@ type StatePaneProps = {
   facts: SourceFacts | null
   pins: Record<string, string[]>
   onPin: (variable: string, names: string[]) => void
+  onWatch: (target: string) => void
   onShowInternals: () => void
   onFrameLine: (line: number) => void
   onView: (variable: string, view: ViewAs) => void
@@ -107,7 +109,7 @@ const FrameTable = memo(function FrameTable({
                 (changed?.includes(l.name) === true || inlineChanged(l.value, look))
               const marked = l.value.t === 'str' ? strings?.[l.name] : undefined
               return (
-                <tr key={l.name} className={rowClass}>
+                <tr key={l.name} data-local={l.name} className={rowClass}>
                   <th
                     scope="row"
                     className={cn(
@@ -166,6 +168,21 @@ const FrameTable = memo(function FrameTable({
   )
 }, sameFrame)
 
+function watchTarget(el: EventTarget, cards: CardView[]) {
+  if (!(el instanceof Element)) return null
+  const name = el.closest('[data-local]')?.getAttribute('data-local')
+  if (name != null) return name
+  const cell = el.closest('[data-cell]')?.getAttribute('data-cell')
+  const id = el.closest('[data-card]')?.getAttribute('data-card')
+  if (cell == null || id == null) return null
+  const variable = cards.find((c) => c.id === id)?.variable
+  if (variable === undefined) return null
+  return `${variable}${cell
+    .split(',')
+    .map((i) => `[${i}]`)
+    .join('')}`
+}
+
 export function StatePane({
   state,
   languageId,
@@ -175,6 +192,7 @@ export function StatePane({
   facts,
   pins,
   onPin,
+  onWatch,
   onShowInternals,
   onFrameLine,
   onView,
@@ -186,6 +204,7 @@ export function StatePane({
   const stack = useRef<HTMLElement>(null)
   const heap = useRef<HTMLElement>(null)
   const activeId = state?.stack.at(-1)?.id
+  const [menu, setMenu] = useState<{ target: string; x: number; y: number } | null>(null)
 
   useEffect(() => {
     activeFrame.current?.scrollIntoView({ block: 'nearest' })
@@ -208,7 +227,15 @@ export function StatePane({
   const strings = stringMarkers(state, facts)
 
   return (
-    <div className="@container relative flex flex-col gap-4 p-(--pane-padding)">
+    <div
+      className="@container relative flex flex-col gap-4 p-(--pane-padding)"
+      onContextMenu={(e) => {
+        const target = watchTarget(e.target, cards)
+        if (target === null) return
+        e.preventDefault()
+        setMenu({ target, x: e.clientX, y: e.clientY })
+      }}
+    >
       <div className="grid items-start gap-6 @xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <section ref={stack} aria-labelledby={stackId} className="flex min-w-0 flex-col gap-3">
           <h2 id={stackId} className="mono-label text-muted-foreground">
@@ -258,6 +285,26 @@ export function StatePane({
         {pointers && <span>focus or hover ● to see the address</span>}
       </p>
       <ArrowOverlay redrawOn={layout} draw={settings.drawArrows} stack={stack} heap={heap} />
+      <Popover open={menu !== null} onOpenChange={(open) => !open && setMenu(null)}>
+        <PopoverAnchor asChild>
+          <span className="fixed size-0" style={{ left: menu?.x, top: menu?.y }} />
+        </PopoverAnchor>
+        {menu !== null && (
+          <PopoverContent label={`Actions for ${menu.target}`}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="justify-start"
+              onClick={() => {
+                onWatch(menu.target)
+                setMenu(null)
+              }}
+            >
+              Pin {menu.target} to watch
+            </Button>
+          </PopoverContent>
+        )}
+      </Popover>
     </div>
   )
 }

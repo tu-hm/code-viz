@@ -109,7 +109,7 @@ function Cell({
   look: Look
 }) {
   return (
-    <li className="flex flex-col items-center gap-0.5">
+    <li data-cell={index} className="flex flex-col items-center gap-0.5">
       <span className={cn(cellClass, on && changedClass)}>
         {index !== undefined && <span className="sr-only">[{index}] </span>}
         <ValueView value={value} look={look} />

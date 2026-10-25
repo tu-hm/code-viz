@@ -213,9 +213,9 @@ test('hovering the timeline narrates any step', async () => {
   renderPlayer('cpp-binary-search')
   await counter(1, 20)
   await waitFor(() => expect(button('Story')).toHaveProperty('disabled', false))
-  const strip = screen.getByRole('slider', { name: 'Step' }).parentElement!
-  vi.spyOn(strip, 'getBoundingClientRect').mockReturnValue(DOMRect.fromRect({ x: 0, width: 190 }))
-  fireEvent.pointerMove(strip, { clientX: 100 })
+  const slider = screen.getByRole('slider', { name: 'Step' })
+  vi.spyOn(slider, 'getBoundingClientRect').mockReturnValue(DOMRect.fromRect({ x: 0, width: 190 }))
+  fireEvent.pointerMove(slider, { clientX: 100 })
   expect(screen.getByRole('tooltip').textContent).toMatch(/^Step 11: mid = 5/)
 })
 

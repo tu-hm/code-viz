@@ -4,7 +4,7 @@ import { createEngine } from './engine.ts'
 import type { Step } from './gen/trace.ts'
 import { loadTrace, type FileSource, type Manifest, type TraceSource } from './load.ts'
 import { narrate } from './narration.ts'
-import { calledFunctions, findStep, type Jump } from './search.ts'
+import { callSteps, changeHistory, findStep, type Jump, type Target } from './search.ts'
 import type { SourceFacts } from './source-facts.ts'
 
 const prefetch = [1, -1, 2, -2]
@@ -24,7 +24,8 @@ export function createWorkerApi() {
       stepCount: steps.length,
       prints,
       tail,
-      functions: calledFunctions(steps),
+      calls: callSteps(steps),
+      errors: steps.flatMap((s) => (s.error === null ? [] : [s.i])),
       ending: ending(steps, engine.state),
     }
   }
@@ -54,6 +55,10 @@ export function createWorkerApi() {
     find(from: number, jump: Jump) {
       if (trace === null) throw new Error('find before open')
       return findStep(trace.steps, trace.engine.base, from, jump)
+    },
+    history(target: Target) {
+      if (trace === null) throw new Error('history before open')
+      return changeHistory(trace.steps, target)
     },
   }
 }

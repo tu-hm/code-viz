@@ -3,6 +3,13 @@ import type { HeapObject, Step, Value } from './gen/trace.ts'
 
 export type Target = { name: string; indices: number[] }
 
+export function targetText({ name, indices }: Target) {
+  return `${name}${indices.map((i) => `[${i}]`).join('')}`
+}
+
+// before: the last value it had, null for its first one
+export type Change = { step: number; before: Value | null; value: Value }
+
 export type Jump =
   | { kind: 'over' }
   | { kind: 'out' }
@@ -25,13 +32,13 @@ function callee(step: Step) {
   return id === undefined ? undefined : step.frames[id]?.name
 }
 
-export function calledFunctions(steps: Step[]) {
-  const names = new Set<string>()
+export function callSteps(steps: Step[]) {
+  const calls: Record<string, number[]> = {}
   for (let k = 1; k < steps.length; k++) {
     const name = steps[k]!.event === 'call' ? callee(steps[k]!) : undefined
-    if (name !== undefined) names.add(name)
+    if (name !== undefined) (calls[name] ??= []).push(k)
   }
-  return [...names]
+  return calls
 }
 
 function lookup(stack: string[], base: Base, name: string) {
@@ -98,6 +105,24 @@ function findChange(steps: Step[], start: Base, from: number, target: Target) {
     if (seen === undefined || changed(seen, value, walk.heap)) return k
   }
   return null
+}
+
+const historyBatch = 256 // synthetic-5000: up to 15 ms a walk => ~0.8 ms between step requests
+
+export async function changeHistory(steps: Step[], target: Target) {
+  const walk: Base = { frames: new Map(), heap: new Map() }
+  const changes: Change[] = []
+  let seen: Seen | undefined
+  for (let k = 0; k < steps.length; k++) {
+    if (k % historyBatch === historyBatch - 1) await new Promise((resolve) => setTimeout(resolve))
+    apply(walk, steps[k]!)
+    const value = resolve(steps[k]!.stack, walk, target)
+    if (value === undefined) continue
+    if (seen !== undefined && !changed(seen, value, walk.heap)) continue
+    changes.push({ step: k, before: seen?.value ?? null, value })
+    seen = { value, objects: reach(value, walk.heap) }
+  }
+  return changes
 }
 
 function findPreviousChange(

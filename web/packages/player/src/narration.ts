@@ -98,7 +98,7 @@ function beforeAt(state: StepState, root: Value | undefined, indices: (number | 
   return at(state.heap, root, indices)
 }
 
-function shown(value: Value | undefined, languageId: string, cell = false) {
+export function shown(value: Value | undefined, languageId: string, cell = false) {
   if (value === undefined || value.t === 'uninit' || (cell && isDefault(value))) return '·'
   if (value.t === 'ref' || value.t === 'ptr') return valueText(value)
   return formatterFor(languageId).value(value).text

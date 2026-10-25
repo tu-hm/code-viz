@@ -88,6 +88,7 @@ export function ArrayView({
           return (
             <li
               key={index}
+              data-cell={index}
               className="flex flex-col items-center gap-0.5"
               style={{ gridRow: 2, gridColumn: column(index) }}
             >

@@ -125,6 +125,7 @@ export function MatrixView({
                     return (
                       <td
                         key={c}
+                        data-cell={`${row.index},${c}`}
                         className={cn(
                           'h-(--cell-size) min-w-(--cell-size) rounded-sm bg-background px-1.5 whitespace-nowrap transition-colors duration-(--duration-fade)',
                           level(value),
