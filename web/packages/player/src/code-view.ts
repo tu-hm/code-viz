@@ -117,7 +117,21 @@ const lines = latest<Lines>(setLines, {
   breakpoints: [],
 })
 const hovered = latest(showHits, null)
-const focused = latest(setFocused, false)
+// a click focuses and moves the caret too => only a keyboard caret shows its line's share
+const caret = StateField.define({
+  create: () => ({ focused: false, keyboard: true }),
+  update(value, tr) {
+    let { focused, keyboard } = value
+    for (const e of tr.effects) {
+      if (!e.is(setFocused)) continue
+      focused = e.value
+      if (!focused) keyboard = true
+    }
+    if (tr.isUserEvent('select.pointer')) keyboard = false
+    else if (tr.selection) keyboard = true
+    return focused === value.focused && keyboard === value.keyboard ? value : { focused, keyboard }
+  },
+})
 
 function markAt(marks: LineMarks, line: number) {
   return markKinds.find((kind) => marks[kind] === line)
@@ -264,10 +278,11 @@ function hitCounts({ counts, recordedOnly }: LineHits): Extension {
   const max = Math.max(...values)
   const heat = (count: number) =>
     max === min ? undefined : heatLevels.find(([at]) => (count - min) / (max - min) >= at)?.[1]
-  const tooltip = showTooltip.compute([hovered, focused, 'selection'], (state): Tooltip | null => {
+  const tooltip = showTooltip.compute([hovered, caret, 'selection'], (state): Tooltip | null => {
+    const { focused, keyboard } = state.field(caret)
     const n =
       state.field(hovered) ??
-      (state.field(focused) ? state.doc.lineAt(state.selection.main.head).number : null)
+      (focused && keyboard ? state.doc.lineAt(state.selection.main.head).number : null)
     const count = n === null ? undefined : counts[n]
     if (n === null || count === undefined) return null
     return {
@@ -292,7 +307,7 @@ function hitCounts({ counts, recordedOnly }: LineHits): Extension {
       initialSpacer: () => new Spacer(`×${max.toLocaleString('en')}`),
     }),
     hovered,
-    focused,
+    caret,
     EditorView.focusChangeEffect.of((_, focusing) => setFocused.of(focusing)),
     tooltip,
   ]

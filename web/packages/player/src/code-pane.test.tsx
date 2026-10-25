@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { EditorView } from '@codemirror/view'
 import { fixtureNames, loadFixture } from '@viz/fixtures'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { usePlayer } from './store.ts'
@@ -118,6 +119,22 @@ test('hit counts tint the hottest lines and show their share on hover and focus'
 
   putCaret(4)
   expect(await screen.findByText('ran once · 4% of all lines run')).toBeDefined()
+})
+
+test('a click in the code does not leave the share over the line above', async () => {
+  renderPlayer('cpp-binary-search')
+  await counter(1, 20)
+  putCaret(4)
+  expect(await screen.findByText('ran once · 4% of all lines run')).toBeDefined()
+
+  const view = EditorView.findFromDOM(code())!
+  act(() => {
+    view.dispatch({
+      selection: { anchor: view.state.doc.line(6).from },
+      userEvent: 'select.pointer',
+    })
+  })
+  await waitFor(() => expect(screen.queryByText(/^ran \d+ times|^ran once/)).toBeNull())
 })
 
 test('lines that all ran equally often get no tint', async () => {
