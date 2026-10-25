@@ -153,11 +153,13 @@ function Minimap({
 }
 
 export function BigArray({
+  name,
   id,
   object,
   look,
   marks,
 }: {
+  name: string
   id: string
   object: HeapObject
   look: Look
@@ -188,7 +190,7 @@ export function BigArray({
     <div
       className="flex flex-col gap-2"
       role="group"
-      aria-label={`${size.toLocaleString('en')} cells, window ${start}–${start + count - 1}`}
+      aria-label={`${name}, ${size.toLocaleString('en')} cells, window ${start}–${start + count - 1}`}
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key !== '[' && e.key !== ']') return
@@ -224,18 +226,23 @@ export function BigArray({
         after={size - start - count}
       />
       <div className="flex flex-wrap gap-1 font-sans">
-        <Button size="sm" variant="ghost" disabled={start <= lo} onClick={() => move(-windowSize)}>
-          <span aria-hidden>◀ </span>Window
-          <span className="sr-only"> back</span>
+        <Button
+          size="sm"
+          variant="ghost"
+          aria-label="Window back"
+          disabled={start <= lo}
+          onClick={() => move(-windowSize)}
+        >
+          ◀ Window
         </Button>
         <Button
           size="sm"
           variant="ghost"
+          aria-label="Window forward"
           disabled={start + windowSize >= hi}
           onClick={() => move(windowSize)}
         >
-          Window<span aria-hidden> ▶</span>
-          <span className="sr-only"> forward</span>
+          Window ▶
         </Button>
         <GoToIndex lo={lo} hi={hi} onGo={(i) => setStart(page(i))} />
         <Button

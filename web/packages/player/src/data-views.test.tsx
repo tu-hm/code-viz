@@ -254,6 +254,82 @@ describe('index markers (§19.4.1)', () => {
   })
 })
 
+describe('big arrays (§19.4.2)', () => {
+  const big = () => screen.getByRole('group', { name: /^depth_, 200,005 cells, window/ })
+
+  test('cpp-sparse-dfs step 30: a 16-cell window follows u, with a minimap', async () => {
+    await renderStep('cpp-sparse-dfs', 30)
+    expect(big().getAttribute('aria-label')).toBe('depth_, 200,005 cells, window 32–47')
+    const cells = within(big()).getAllByRole('listitem')
+    expect(cells.map((li) => li.textContent)).toContain('… +32')
+    expect(cells.map((li) => li.textContent)).toContain('… +199,957')
+    expect(cells.find((li) => li.textContent.startsWith('[32]'))!.textContent).toBe(
+      '[32] u 5* (changed)32',
+    )
+    expect(
+      within(big())
+        .getByRole('img', { name: /^minimap/ })
+        .getAttribute('aria-label'),
+    ).toBe('minimap: 5 cells differ from 0, 1 changed this step, window 32–47')
+  })
+
+  test('[ and ], the buttons and Go to index… move the window', async () => {
+    await renderStep('cpp-sparse-dfs', 30)
+    fireEvent.keyDown(big(), { key: ']' })
+    expect(big().getAttribute('aria-label')).toBe('depth_, 200,005 cells, window 48–63')
+    fireEvent.keyDown(big(), { key: '[' })
+    fireEvent.keyDown(big(), { key: '[' })
+    expect(big().getAttribute('aria-label')).toBe('depth_, 200,005 cells, window 16–31')
+    fireEvent.click(within(big()).getByRole('button', { name: 'Window forward' }))
+    expect(big().getAttribute('aria-label')).toBe('depth_, 200,005 cells, window 32–47')
+    fireEvent.click(within(big()).getByRole('button', { name: 'Go to index…' }))
+    const input = await screen.findByRole('textbox', { name: 'Index' })
+    fireEvent.change(input, { target: { value: '200005' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Go' }))
+    expect(screen.getByRole('alert').textContent).toBe('Enter an index from 0 to 200,004')
+    fireEvent.change(input, { target: { value: '150,000' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Go' }))
+    expect(big().getAttribute('aria-label')).toBe('depth_, 200,005 cells, window 150000–150015')
+    expect(within(big()).getAllByRole('listitem')[0]!.textContent).toBe('… +150,000')
+  })
+
+  test('Non-zero only lists the cells that differ from the default', async () => {
+    await renderStep('cpp-sparse-dfs', 30)
+    fireEvent.click(within(big()).getByRole('button', { name: 'Non-zero only' }))
+    const list = within(big()).getByRole('region', { name: 'Non-zero only' })
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((li) => li.textContent),
+    ).toEqual(['[2]=1', '[4]=2', '[8]=3', '[16]=4', '[32]=5* (changed)'])
+  })
+
+  test('the window keeps its place on steps that neither index nor write the array', async () => {
+    const facts = await factsOf('cpp-sparse-dfs')
+    const view = await renderStep('cpp-sparse-dfs', 30)
+    const props = { ...view, state: stateAt('cpp-sparse-dfs', 31) }
+    const pane = (step: number) => (
+      <StatePane
+        state={stateAt('cpp-sparse-dfs', step)}
+        languageId="cpp17-gcc"
+        pointers
+        settings={props.settings}
+        views={{}}
+        facts={facts}
+        pins={{}}
+        onPin={props.onPin}
+        onShowInternals={props.onShowInternals}
+        onFrameLine={props.onFrameLine}
+        onView={props.onView}
+      />
+    )
+    view.rerender(pane(32))
+    expect(big().getAttribute('aria-label')).toBe('depth_, 200,005 cells, window 32–47')
+    view.rerender(pane(10))
+    expect(big().getAttribute('aria-label')).toBe('depth_, 200,005 cells, window 0–15')
+  })
+})
+
 describe.each(fixtureNames)('%s', (name) => {
   test('every step draws its markers and grids without holes', { timeout: 30_000 }, async () => {
     const steps = loadFixture(name).chunks.flat()

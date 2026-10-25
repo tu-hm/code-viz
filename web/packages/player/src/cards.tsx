@@ -264,7 +264,8 @@ function SequenceBody({ card, look, marks }: Pick<CardProps, 'card' | 'look' | '
   if (matrix && view === 'matrix') {
     return <MatrixView name={variable ?? `#${id}`} matrix={matrix} look={look} marks={marks} />
   }
-  if ((o.length ?? 0) > bigArray) return <BigArray id={id} object={o} look={look} marks={marks} />
+  if ((o.length ?? 0) > bigArray)
+    return <BigArray name={variable ?? `#${id}`} id={id} object={o} look={look} marks={marks} />
   if (marks.indexed && !o.sparse && (o.items?.length ?? 0) === (o.length ?? 0)) {
     return (
       <ArrayView id={id} object={o} look={look} marks={marks} start={0} count={o.length ?? 0} />
@@ -279,6 +280,11 @@ function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRan
   const facts = [`${look.format.sizeLabel} ${(o.length ?? 0).toLocaleString('en')}`]
   if (matrix && view === 'matrix') facts[0] = `${matrix.rows.length} × ${matrix.columns}`
   if (typeof capacity === 'number') facts.push(`cap ${capacity.toLocaleString('en')}`)
+  if (o.sparse && !o.truncated) {
+    const set = Object.keys(o.sparse.items).length.toLocaleString('en')
+    const zero = o.sparse.default.v === '0' || o.sparse.default.v === 'false'
+    facts.push(zero ? `${set} non-zero` : `${set} not ${look.format.value(o.sparse.default).text}`)
+  }
   const name = variable ?? `#${id}`
   const options: ViewAs[] | null = table ? ['table', 'cells'] : matrix ? ['matrix', 'cells'] : null
   return (

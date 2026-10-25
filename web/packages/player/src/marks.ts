@@ -46,11 +46,27 @@ function intScope(values: Record<string, Value>): Scope {
   }
 }
 
-export function scopeOf(state: StepState) {
+// per step and per parse, not per card: synthetic-5000's 500 cards with a 500-local globals frame
+const scopes = new WeakMap<StepState, Record<string, Value>>()
+const subscripted = new WeakMap<SourceFacts, Set<string>>()
+
+function scopeOf(state: StepState) {
+  const hit = scopes.get(state)
+  if (hit) return hit
   const values: Record<string, Value> = {}
   const frames = [...state.stack.filter((f) => f.kind === 'global'), state.stack.at(-1)]
   for (const f of frames) for (const l of f?.locals ?? []) values[l.name] = l.value
+  scopes.set(state, values)
   return values
+}
+
+function arraysIn(facts: SourceFacts) {
+  let set = subscripted.get(facts)
+  if (!set) {
+    set = new Set(Object.values(facts).flatMap((f) => f.subscripts.map((s) => s.array)))
+    subscripted.set(facts, set)
+  }
+  return set
 }
 
 function cellKey(path: number[]) {
@@ -185,15 +201,16 @@ export function marksFor(
 ): CardMarks {
   if (card.object.kind !== 'sequence') return noMarks
   const arrays = names(card)
+  const indexed = facts !== null && [...arrays].some((a) => arraysIn(facts).has(a))
+  const access = state.access?.some((a) => a.obj === card.id) === true
+  if (!indexed && !access && pins.length === 0) return noMarks
   const on = (line: number | null) =>
     lineFacts(facts, line).subscripts.filter((s) => arrays.has(s.array))
   const ran = on(state.prevLine)
   const scope = intScope(scopeOf(state))
   const before = intScope(state.before.scope)
   return {
-    indexed:
-      facts !== null &&
-      Object.values(facts).some((f) => f.subscripts.some((s) => arrays.has(s.array))),
+    indexed,
     ...markersOf(card, [...on(state.line), ...ran], scope, pins),
     ...readsOf(card, ran, before, state),
     narration: narrationOf(card, ran, before, state, format),
