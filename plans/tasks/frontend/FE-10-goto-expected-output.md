@@ -13,7 +13,7 @@ All searches run in the browser over the loaded trace.
 
 ## 1. Go to… (M1-F03 · 2.5 d)
 
-- [ ] Search module in the worker: scan steps forward/backward from the current one; early exit — forward, in the worker (`search.ts`), stopping at the first match; the worst full walk takes 8 ms on the 5,000-step fixture. Backward waits for its first caller, FE-11's "Prev change"
+- [x] Search module in the worker: scan steps forward/backward from the current one; early exit — forward, in the worker (`search.ts`), stopping at the first match; the worst full walk takes 8 ms on the 5,000-step fixture. Backward finds the previous change for FE-11's "Prev change"
 - [x] Step over (`Shift + →`): next step in the same frame (or the caller after return) — also Shift-click on Next (§5.9)
 - [x] Step out (`Shift + ↑`): first step back in the caller — the first step without the current frame, which can be the caller's next call; nothing from the outermost frame
 - [x] Next time line *L* runs (`L`); uses breakpoints when no line is given — a `line` or `call` step whose next line is *L*; a return or exception step repeats its line and doesn't count

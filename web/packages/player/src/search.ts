@@ -8,6 +8,7 @@ export type Jump =
   | { kind: 'out' }
   | { kind: 'line'; lines: number[] }
   | { kind: 'change'; target: Target }
+  | { kind: 'previousChange'; target: Target }
   | { kind: 'call'; name: string }
   | { kind: 'print' }
   | { kind: 'error' }
@@ -99,6 +100,28 @@ function findChange(steps: Step[], start: Base, from: number, target: Target) {
   return null
 }
 
+function findPreviousChange(
+  steps: Step[],
+  base: (k: number) => Base,
+  from: number,
+  target: Target,
+) {
+  for (let k = from - 1; k > 0; k--) {
+    const now = base(k)
+    const value = resolve(steps[k]!.stack, now, target)
+    if (value === undefined) continue
+    const previous = base(k - 1)
+    const before = resolve(steps[k - 1]!.stack, previous, target)
+    if (
+      before === undefined ||
+      changed({ value: before, objects: reach(before, previous.heap) }, value, now.heap)
+    ) {
+      return k
+    }
+  }
+  return null
+}
+
 export function findStep(steps: Step[], base: (k: number) => Base, from: number, jump: Jump) {
   const { stack } = steps[from]!
   const depth = stack.length
@@ -116,6 +139,8 @@ export function findStep(steps: Step[], base: (k: number) => Base, from: number,
       )
     case 'change':
       return findChange(steps, base(from), from, jump.target)
+    case 'previousChange':
+      return findPreviousChange(steps, base, from, jump.target)
     case 'call':
       return firstAfter(steps, from, (s) => s.event === 'call' && callee(s) === jump.name)
     case 'print':

@@ -133,6 +133,39 @@ test.each([
 })
 
 test.each([
+  {
+    name: 'scalar at the current step is skipped',
+    fixture: 'cpp-binary-search',
+    t: target('mid'),
+    from: 10,
+    want: 6,
+  },
+  {
+    name: 'matrix cell skips other cells',
+    fixture: 'cpp-dp-grid',
+    t: target('dp', 2, 3),
+    from: 23,
+    want: 21,
+  },
+  {
+    name: 'alias finds the mutation',
+    fixture: 'python-aliasing',
+    t: target('b'),
+    from: 8,
+    want: 7,
+  },
+  {
+    name: 'no earlier change',
+    fixture: 'cpp-binary-search',
+    t: target('mid'),
+    from: 6,
+    want: null,
+  },
+])('previous change of $name', ({ fixture, t, from, want }) => {
+  expect(find(fixture, from, { kind: 'previousChange', target: t })).toBe(want)
+})
+
+test.each([
   { name: 'the first call', fixture: 'cpp-fib-memo', from: 0, want: 1 },
   { name: 'a call after a return', fixture: 'cpp-fib-memo', from: 13, want: 15 },
   { name: 'nothing after the last call', fixture: 'cpp-fib-memo', from: 25, want: null },
