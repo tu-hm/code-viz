@@ -1,0 +1,68 @@
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - errcheck
+    - errname
+    - errorlint
+    - forbidigo
+    - gocritic
+    - gosec
+    - govet
+    - ineffassign
+    - nilerr
+    - noctx
+    - nolintlint
+    - rowserrcheck
+    - sloglint
+    - sqlclosecheck
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - wastedassign
+  settings:
+    errcheck:
+      check-blank: true
+    forbidigo:
+      forbid:
+        - pattern: ^time\.Sleep$
+          msg: wait on a channel, ctx or timer; inject the clock
+        - pattern: ^log\.(Print|Fatal|Panic)(f|ln)?$
+          msg: use log/slog
+        - pattern: ^fmt\.Print(f|ln)?$
+          msg: debug print; write to an explicit io.Writer or use log/slog
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    sloglint:
+      kv-only: true
+      context: scope
+      static-msg: true
+      msg-style: lowercased
+      key-naming-case: snake
+  exclusions:
+    generated: strict
+    presets:
+      - std-error-handling
+    rules:
+      - path: _test\.go
+        linters:
+          - bodyclose
+          - gosec
+          - noctx
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: strict
