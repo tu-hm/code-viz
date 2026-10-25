@@ -1,0 +1,236 @@
+# Expected subscripts per line, labelled by hand from what the line does, not from the parser.
+# "== file [trace]" starts a program; the trace path is relative to the repo root.
+# "line: mode array[index]...; ..." lists every element access on that line. Lines not listed have none.
+# mode: r read, w write, rw both. An index is written as in the source; one that isn't
+# identifier ± constant or a constant can never be inferred, and counts as a miss when read.
+# Declarations (int a[5]), list literals and whole-slice copies (a[:]) are not element accesses.
+
+== 01-binary-search.cpp backend/fixtures/cpp/binary-search/expected.trace.json
+9: r a[mid]
+12: r a[mid]
+
+== 02-capture-ranges.cpp backend/fixtures/cpp/capture-ranges/expected.trace.json
+9: w names[250]
+10: r dist[15003]
+11: r names[250]
+
+== 03-aliasing.cpp backend/fixtures/cpp/aliasing/expected.trace.json
+19: rw a[i]
+21: r a[0]; r b[0]; r c[0]; r d["k"]
+
+== 04-check-index-array.cpp backend/fixtures/cpp/check-index-array/expected.trace.json
+8: w cnt[i]
+10: r cnt[1]
+
+== 05-check-index-string.cpp backend/fixtures/cpp/check-index-string/expected.trace.json
+7: r s[i]
+
+== 06-check-index-vector.cpp backend/fixtures/cpp/check-index-vector/expected.trace.json
+8: r a[i]
+
+== 07-implicit.cpp backend/fixtures/cpp/implicit/expected.trace.json
+13: r items[0]
+15: r items[1]
+
+== 08-line-hits.cpp backend/fixtures/cpp/line-hits/expected.trace.json
+10: r a[mid]
+
+== 09-input.cpp backend/fixtures/cpp/input/expected.trace.json
+18: r names[i]
+
+== 10-pointer.cpp backend/fixtures/cpp/pointer/expected.trace.json
+10: w cnt["ab"]
+13: w depth[3]
+15: r v[0]
+
+== 11-one-line.cpp backend/fixtures/cpp/one-line/expected.trace.json
+11: r v[0]
+
+== 12-segfault.cpp backend/fixtures/cpp/segfault/expected.trace.json
+6: rw arr[i]
+12: r cnt[n]
+
+== 13-sparse-default.cpp backend/fixtures/cpp/sparse-default/expected.trace.json
+8: w dist[1]
+9: w dist[2]
+12: w cnt[7]
+15: w seen[4]
+17: w w[2]
+18: r dist[2]; r cnt[7]; r seen[4]; r w[2]
+
+== 14-read-loop.cpp backend/fixtures/cpp/read-loop/expected.trace.json
+8: w a[i]
+10: r a[i]
+
+== 15-stack-overflow.cpp backend/fixtures/cpp/stack-overflow/expected.trace.json
+5: w pad[0]
+6: r pad[0]
+
+== 16-sparse-window.cpp backend/fixtures/cpp/sparse-window/expected.trace.json
+8: w big[3]
+9: w big[500000]
+11: w a[5]
+12: r big[3]; r a[5]
+
+== 17-sparse-dfs.cpp backend/fixtures/cpp/sparse-dfs/expected.trace.json
+13: w depth_[u]
+14: w tin[u]
+
+== 18-stl.cpp backend/fixtures/cpp/stl/expected.trace.json
+15: w count["a"]
+16: w count["b"]
+20: w grid[1][2]
+21: r v[0]
+
+== 19-thread-main.cpp backend/fixtures/cpp/thread-main/expected.trace.json
+5: w seen[v]
+6: r adj[v]
+7: r seen[u]
+22: rw adj[a]
+23: rw adj[b]
+
+== 20-type-fixed-array.cpp backend/fixtures/cpp/type-fixed-array/expected.trace.json
+11: w arr[2]; r a[0]
+12: r a[0]; r grid[1][2]; r arr[2]; r nested[1][0]
+
+== 21-type-mapping.cpp backend/fixtures/cpp/type-mapping/expected.trace.json
+9: w m["c"]
+
+== 22-type-pair-tuple.cpp backend/fixtures/cpp/type-pair-tuple/expected.trace.json
+9: r edges[1]
+
+== 23-type-string.cpp backend/fixtures/cpp/type-string/expected.trace.json
+17: r longLit[0]
+
+== 24-aliasing.py backend/fixtures/python/aliasing/expected.trace.json
+13: rw a[i]
+
+== 25-binary-search.py backend/fixtures/python/binary-search/expected.trace.json
+5: r a[mid]
+7: r a[mid]
+
+== 26-capture-ranges.py backend/fixtures/python/capture-ranges/expected.trace.json
+6: w names[1200]
+7: r dist[2500]
+8: r names[1200]
+
+== 27-error-index-object.py backend/fixtures/python/error-index-object/expected.trace.json
+9: r row[slot]
+
+== 28-error-index-grid.py backend/fixtures/python/error-index-grid/expected.trace.json
+5: r grid[r][c]
+
+== 29-exception.py backend/fixtures/python/exception/expected.trace.json
+2: r a[i]
+
+== 30-thread-main.py backend/fixtures/python/thread-main/expected.trace.json
+6: w seen[v]
+7: r adj[v]
+8: r seen[u]
+17: rw adj[a]
+18: rw adj[b]
+
+== 31-dp-grid.cpp web/fixtures/cpp-dp-grid
+7: w dp[i][0]
+8: w dp[0][j]
+11: w dp[i][j]; r dp[i-1][j]; r dp[i][j-1]
+12: r dp[n-1][m-1]
+
+== 32-fib-memo.cpp web/fixtures/cpp-fib-memo
+8: r memo[n]
+9: w memo[n]
+
+== 33-binary-search-mock.cpp web/fixtures/cpp-binary-search
+10: r a[mid]
+
+== 34-prefix-sum.cpp
+9: w a[i]
+10: w pre[i]; r pre[i-1]; r a[i]
+13: r pre[r]; r pre[l-1]
+
+== 35-rep-macro.cpp
+7: w a[i]
+8: rw cnt[a[i]]; r a[i]
+10: r cnt[v]; r cnt[best]
+
+== 36-grid-bfs.cpp
+9: w g[i]
+12: w dist[0][0]
+16: r dx[d]; r dy[d]
+18: r g[nx][ny]; r dist[nx][ny]
+19: w dist[nx][ny]; r dist[x][y]
+23: r dist[n-1][m-1]
+
+== 37-knapsack.cpp
+6: w w[i]; w v[i]
+9: r w[i]
+10: w dp[c]; r dp[c]; r dp[c-w[i]]; r w[i]; r v[i]
+11: r dp[W]
+
+== 38-lcs.cpp
+9: r s[i-1]; r t[j-1]; w dp[i][j]; r dp[i-1][j-1]
+10: w dp[i][j]; r dp[i-1][j]; r dp[i][j-1]
+12: r dp[n][m]
+
+== 39-sieve.cpp
+9: r composite[i]
+10: r primes[j]
+11: w composite[i*primes[j]]; r primes[j]
+12: r primes[j]
+
+== 40-two-pointers.cpp
+9: r a[r]
+10: r a[l++]
+
+== 41-fenwick.cpp
+5: rw bit[i]
+9: r bit[i]
+
+== 42-segtree.cpp
+6: w t[p+=N]; w t[p>>1]; r t[p]; r t[p^1]
+11: r t[l++]
+12: r t[--r]
+
+== 43-lis.cpp
+6: w a[i]
+8: r a[i]
+9: r a[i]
+10: r a[i]
+
+== 44-dsu.cpp
+4: r p[x]; w p[x]
+8: r sz[a]; r sz[b]
+9: w p[b]; rw sz[a]; r sz[b]
+14: w p[i]; w sz[i]
+
+== 45-pointer-arith.cpp
+6: w a[i]
+9: r p[i]; r a[i]
+11: r a[n-1]
+
+== 46-matrix-power.cpp
+11: w C[i][j]; r C[i][j]; r A[i][k]; r B[k][j]
+18: r R[0][1]
+
+== 47-struct-sort.cpp
+7: w v[i]
+11: r v[i]
+
+== 48-sparse-table.cpp
+7: w st[0][i]
+8: w lg[i]; r lg[i/2]
+11: w st[k][i]; r st[k-1][i]; r st[k-1][i+(1<<(k-1))]
+13: r lg[r-l+1]
+14: r st[k][l]; r st[k][r-(1<<k)+1]
+
+== 49-prefix.py
+7: w pre[i+1]; r pre[i]; r a[i]
+11: r pre[r]; r pre[l-1]
+
+== 50-grid-dp.py
+4: w dp[0][0]
+7: r g[i][j]
+8: w dp[i][j]
+11: rw dp[i][j]; r dp[i-1][j]
+13: rw dp[i][j]; r dp[i][j-1]
+14: r dp[n-1][m-1]
