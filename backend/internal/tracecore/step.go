@@ -55,6 +55,10 @@ func (r *Recorder) step(s wire.Step) error {
 		}
 		heap[id] = obj
 	}
+	access, err := m.access(s.Reads, heap)
+	if err != nil {
+		return err
+	}
 
 	i := len(r.steps)
 	st := trace.Step{
@@ -73,6 +77,7 @@ func (r *Recorder) step(s wire.Step) error {
 		StdinPos:       s.StdinPos,
 		CallID:         s.CallID,
 		ParentCallID:   s.ParentCallID,
+		Access:         access,
 	}
 	next := snapshotJSON{frames: map[string][]byte{}, heap: map[string][]byte{}, objects: m.order}
 	for _, f := range frames {
@@ -259,6 +264,41 @@ func (m *mapper) ref(native string) (string, bool, error) {
 	m.order = append(m.order, id)
 	m.queue = append(m.queue, native)
 	return id, true, nil
+}
+
+// nil reads => nil access, not empty: the adapter didn't record them, so the player infers (§19.9.2)
+func (m *mapper) access(reads []wire.StepReadsElem, heap map[string]trace.HeapObject) ([]trace.Access, error) {
+	if reads == nil {
+		return nil, nil
+	}
+	type cell struct {
+		id    string
+		index int
+	}
+	out := []trace.Access{}
+	seen := map[cell]bool{}
+	for _, rd := range reads {
+		if _, ok := m.heap[rd.Obj]; !ok {
+			return nil, m.r.malformed("read of an object missing from heap")
+		}
+		id, kept := m.seen[rd.Obj]
+		if !kept {
+			continue
+		}
+		obj := heap[id]
+		if obj.Kind != trace.HeapObjectKindSequence || obj.Length == nil || rd.Index >= *obj.Length {
+			return nil, m.r.malformed("read outside a sequence")
+		}
+		if seen[cell{id, rd.Index}] {
+			continue
+		}
+		seen[cell{id, rd.Index}] = true
+		out = append(out, trace.Access{Obj: id, Path: []int{rd.Index}, Mode: trace.AccessModeR})
+	}
+	if len(out) > m.r.cfg.Limits.Reads {
+		return nil, nil
+	}
+	return out, nil
 }
 
 func (m *mapper) object(o trace.HeapObject) (trace.HeapObject, error) {

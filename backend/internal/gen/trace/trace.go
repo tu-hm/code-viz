@@ -332,7 +332,9 @@ type StdinPos struct {
 }
 
 type Step struct {
-	// Access corresponds to the JSON schema field "access".
+	// Set by adapters that record reads (§19.9.2): every sequence cell read while
+	// prevLine ran, as one-index paths. Empty when nothing was read; left out when
+	// the reads aren't known. Writes come from the diff.
 	Access []Access `json:"access,omitzero"`
 
 	// Set on call and return steps (§19.9.6).

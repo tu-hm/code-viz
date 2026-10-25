@@ -31,6 +31,7 @@ type Limits struct {
 	Items       int // per container
 	Cells       int // non-default cells per sparse sequence; more => window only (§19.9.1)
 	StepCells   int // non-default cells across one step message's sparse sequences
+	Reads       int // distinct cells read per step; more => the step's reads are dropped (§19.9.2)
 }
 
 // DefaultLimits are the §11 defaults (D16).
@@ -43,6 +44,7 @@ var DefaultLimits = Limits{
 	Items:       1000,
 	Cells:       10_000,
 	StepCells:   100_000,
+	Reads:       1000,
 }
 
 const maxLogBytes = 64 << 10 // adapter log messages kept per run

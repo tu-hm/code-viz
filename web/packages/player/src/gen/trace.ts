@@ -229,6 +229,9 @@ export interface Step {
     kind?: ErrorKind;
     values?: ErrorValues;
   } | null;
+  /**
+   * Set by adapters that record reads (§19.9.2): every sequence cell read while prevLine ran, as one-index paths. Empty when nothing was read; left out when the reads aren't known. Writes come from the diff.
+   */
   access?: Access[];
   stdinPos?: StdinPos;
   /**

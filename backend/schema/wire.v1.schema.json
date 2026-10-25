@@ -59,7 +59,19 @@
         },
         "stdinPos": { "$ref": "trace.v1.schema.json#/$defs/stdinPos" },
         "callId": { "type": "integer", "minimum": 0 },
-        "parentCallId": { "type": "integer", "minimum": 0 }
+        "parentCallId": { "type": "integer", "minimum": 0 },
+        "reads": {
+          "description": "Every sequence cell the program read since the previous step, first read first (§19.9.2). Left out when the adapter couldn't record them all.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["obj", "index"],
+            "properties": {
+              "obj": { "description": "A sequence in this step's heap.", "type": "string", "minLength": 1 },
+              "index": { "description": "Counted from the sequence's start, not its window's.", "type": "integer", "minimum": 0 }
+            }
+          }
+        }
       }
     },
     "out": {

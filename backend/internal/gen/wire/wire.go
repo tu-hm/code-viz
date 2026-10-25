@@ -136,6 +136,10 @@ type Step struct {
 	// PrevLine corresponds to the JSON schema field "prevLine".
 	PrevLine StepPrevLine `json:"prevLine"`
 
+	// Every sequence cell the program read since the previous step, first read first
+	// (§19.9.2). Left out when the adapter couldn't record them all.
+	Reads []StepReadsElem `json:"reads,omitzero"`
+
 	// Outermost first. A frame id names one call and is not reused within the run.
 	Stack []trace.Frame `json:"stack"`
 
@@ -161,3 +165,11 @@ type StepError struct {
 }
 
 type StepPrevLine *int
+
+type StepReadsElem struct {
+	// Counted from the sequence's start, not its window's.
+	Index int `json:"index"`
+
+	// A sequence in this step's heap.
+	Obj string `json:"obj"`
+}

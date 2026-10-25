@@ -152,7 +152,11 @@
             "values": { "$ref": "#/$defs/errorValues" }
           }
         },
-        "access": { "type": "array", "items": { "$ref": "#/$defs/access" } },
+        "access": {
+          "description": "Set by adapters that record reads (§19.9.2): every sequence cell read while prevLine ran, as one-index paths. Empty when nothing was read; left out when the reads aren't known. Writes come from the diff.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/access" }
+        },
         "stdinPos": { "$ref": "#/$defs/stdinPos" },
         "callId": { "description": "Set on call and return steps (§19.9.6).", "type": "integer", "minimum": 0 },
         "parentCallId": { "description": "Set on call steps that have a traced caller.", "type": "integer", "minimum": 0 }

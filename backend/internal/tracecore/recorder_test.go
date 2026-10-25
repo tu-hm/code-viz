@@ -19,6 +19,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
+	"github.com/tu-hm/code-viz/backend/internal/gen/wire"
 	"github.com/tu-hm/code-viz/backend/internal/tracecore"
 )
 
@@ -547,6 +548,55 @@ func TestOutputGoesToTheNextStep(t *testing.T) {
 	}
 }
 
+func TestReadsBecomeAccess(t *testing.T) {
+	heap := map[string]trace.HeapObject{"1": list(intv("7")), "2": list(intv("8"), intv("9")), "3": list(intv("1"))}
+	locals := []trace.Local{local("a", ref("1")), local("b", ref("2")), local("c", ref("3"))}
+	read := func(obj string, index int) wire.StepReadsElem { return wire.StepReadsElem{Obj: obj, Index: index} }
+	access := func(obj string, index int) trace.Access {
+		return trace.Access{Obj: obj, Path: []int{index}, Mode: trace.AccessModeR}
+	}
+	tests := []struct {
+		name    string
+		reads   []wire.StepReadsElem
+		objects int
+		cells   int
+		want    []trace.Access
+	}{
+		{name: "no reads recorded means no access", reads: nil, want: nil},
+		{name: "reads recorded but none made is an empty access", reads: []wire.StepReadsElem{}, want: []trace.Access{}},
+		{
+			name:  "reads name trace ids, first read first, each cell once",
+			reads: []wire.StepReadsElem{read("2", 1), read("1", 0), read("2", 1), read("2", 0)},
+			want:  []trace.Access{access("o2", 1), access("o1", 0), access("o2", 0)},
+		},
+		{
+			name:    "reads of objects past the heap budget are dropped",
+			reads:   []wire.StepReadsElem{read("3", 0), read("1", 0)},
+			objects: 2,
+			want:    []trace.Access{access("o1", 0)},
+		},
+		{name: "reads up to the limit are kept", reads: []wire.StepReadsElem{read("2", 0), read("2", 1)}, cells: 2, want: []trace.Access{access("o2", 0), access("o2", 1)}},
+		{name: "more reads than the limit are dropped whole", reads: []wire.StepReadsElem{read("2", 0), read("2", 1), read("1", 0)}, cells: 2, want: nil},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			lim := tracecore.DefaultLimits
+			if tc.objects > 0 {
+				lim.HeapObjects = tc.objects
+			}
+			if tc.cells > 0 {
+				lim.Reads = tc.cells
+			}
+			st := wire.Step{Event: trace.EventLine, Line: 1, Stack: []trace.Frame{frame("m", "<module>", 1, locals...)}, Heap: heap, Reads: tc.reads}
+			writes := wireLines(helloLine, message("step", st), exitLine("normal", 0))
+			got := mustRecord(t, config(t, 1000, lim), tracecore.Outcome{}, writes).Steps[0].Access
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("access (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
 func TestMalformedInputFails(t *testing.T) {
 	step := stepLine(1, []trace.Frame{frame("m", "<module>", 1)}, nil)
 	exit := exitLine("normal", 0)
@@ -568,6 +618,9 @@ func TestMalformedInputFails(t *testing.T) {
 			`{"type":"exit","kind":"normal","code":0,"signal":null,"message":null,"lineHits":{"1":1},"lineHitsSource":"counter","LineHitsSource":null}`)},
 		{"stream without hello", wireLines(`{"type":"log","level":"info","message":"SECRET"}`)},
 		{"bytes after exit", append(wireLines(helloLine, exit), write{3, "SECRET"})},
+		{"read of an object missing from heap", wireLines(helloLine, readsLine("SECRET", 0), exit)},
+		{"read past the end of a sequence", wireLines(helloLine, readsLine("1", 1), exit)},
+		{"read of an object that is not a sequence", wireLines(helloLine, readsLine("2", 0), exit)},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -680,4 +733,12 @@ func TestChunks(t *testing.T) {
 	if diff := cmp.Diff([][2]int{{0, 249}, {250, 499}, {500, 500}}, bounds); diff != "" {
 		t.Errorf("chunk bounds (-want +got):\n%s", diff)
 	}
+}
+
+func readsLine(obj string, index int) string {
+	name := "SECRET"
+	locals := []trace.Local{local("a", ref("1")), local("b", ref("2"))}
+	heap := map[string]trace.HeapObject{"1": list(intv("1")), "2": {Kind: trace.HeapObjectKindClass, Name: &name}}
+	return message("step", wire.Step{Event: trace.EventLine, Line: 1, Stack: []trace.Frame{frame("m", "<module>", 1, locals...)}, Heap: heap,
+		Reads: []wire.StepReadsElem{{Obj: obj, Index: index}}})
 }

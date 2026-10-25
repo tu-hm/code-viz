@@ -113,6 +113,7 @@ class Step(TypedDict):
     line: int
     parentCallId: NotRequired[int]
     prevLine: int | None
+    reads: NotRequired[list[StepReads]]
     stack: list[Frame]
     stdinPos: NotRequired[StdinPos]
     type: Literal["step"]
@@ -124,6 +125,11 @@ class StepError(TypedDict):
     message: str
     type: str
     values: NotRequired[ErrorValues]
+
+
+class StepReads(TypedDict):
+    index: int
+    obj: str
 
 
 class Value(TypedDict):
