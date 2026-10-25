@@ -3,12 +3,13 @@ import { useId, type ReactNode } from 'react'
 import { densities, fontSizes, speeds, themes, type Settings } from './store.ts'
 
 const maxStepChoices = [100, 500, 1000, 2000, 5000]
+const rowClass = 'flex min-h-8 items-center justify-between gap-4'
 
 function Group({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
-    <fieldset className="flex flex-col gap-2">
-      <legend className="mono-label mb-2 text-muted-foreground">{title}</legend>
-      {note && <p className="text-muted-foreground">{note}</p>}
+    <fieldset className="flex flex-col gap-1">
+      <legend className="mono-label mb-1 text-muted-foreground">{title}</legend>
+      {note && <p className="mb-1 text-muted-foreground">{note}</p>}
       {children}
     </fieldset>
   )
@@ -24,7 +25,7 @@ function Toggle({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <label className="flex items-center justify-between gap-4">
+    <label className={rowClass}>
       {label}
       <input
         type="checkbox"
@@ -50,12 +51,12 @@ function Select<T extends string | number>({
   onChange: (value: T) => void
 }) {
   return (
-    <label className="flex items-center justify-between gap-4">
+    <label className={rowClass}>
       {label}
       <select
         value={String(value)}
         onChange={(e) => onChange(options[e.currentTarget.selectedIndex]!)}
-        className="h-9 rounded-xl border border-input bg-background px-3 text-base sm:text-sm"
+        className="h-8 w-28 rounded-lg border border-input bg-background px-2 text-base sm:text-sm"
       >
         {options.map((o) => (
           <option key={o} value={String(o)}>
@@ -82,19 +83,21 @@ function Choice<T extends string>({
 }) {
   const name = useId()
   return (
-    <div role="radiogroup" aria-label={legend} className="flex items-center justify-between gap-4">
+    <div role="radiogroup" aria-label={legend} className={rowClass}>
       {legend}
-      <div className="flex gap-3">
+      <div className="flex rounded-full bg-muted p-0.5">
         {options.map((o) => (
-          <label key={o} className="flex items-center gap-1.5">
+          <label key={o}>
             <input
               type="radio"
               name={name}
               checked={o === value}
               onChange={() => onChange(o)}
-              className="size-4 accent-primary"
+              className="peer sr-only"
             />
-            {format(o)}
+            <span className="flex h-7 cursor-pointer items-center rounded-full px-3 text-sm text-muted-foreground transition-colors duration-(--duration-control) peer-checked:bg-background peer-checked:text-foreground peer-checked:shadow-raised peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring hover:text-foreground">
+              {format(o)}
+            </span>
           </label>
         ))}
       </div>

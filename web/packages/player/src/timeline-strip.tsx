@@ -128,7 +128,7 @@ export function TimelineStrip({
       type="button"
       aria-label={eventLabel(marker, callee, target, narrations[marker.step])}
       className={cn(
-        'absolute top-1/2 z-10 flex size-4 -translate-1/2 items-center justify-center rounded-sm bg-background text-sm leading-none hover:bg-accent focus-visible:bg-accent',
+        'absolute top-1/2 flex size-4 -translate-1/2 items-center justify-center rounded-sm bg-background text-sm leading-none hover:bg-accent focus-visible:bg-accent',
         colors[marker.kind],
       )}
       style={{ left: left(marker.at) }}

@@ -21,7 +21,9 @@ const field = 'h-8 rounded-lg border border-input bg-background px-2 font-mono t
 
 function Keys({ children }: { children: string }) {
   return (
-    <kbd className="ml-auto shrink-0 pl-3 font-mono text-xs text-muted-foreground">{children}</kbd>
+    <kbd className="pr-3 pl-4 text-right font-mono text-xs whitespace-nowrap text-muted-foreground">
+      {children}
+    </kbd>
   )
 }
 
@@ -42,29 +44,38 @@ export function GotoMenu({
   const variableList = useId()
 
   function row(entry: Entry, text: string, input?: ReactNode, after?: string) {
+    const disabled = found[entry] === false
     return (
-      <li className="flex items-center gap-1.5">
+      <li className="col-span-3 grid grid-cols-subgrid items-center">
         <Button
           size="sm"
           variant="ghost"
           aria-label={labels[entry]}
-          disabled={found[entry] === false}
+          disabled={disabled}
           onClick={() => onRun(entry)}
-          className="justify-start"
+          className={cn('justify-start text-sm', input === undefined && 'col-span-2')}
         >
           {text}
         </Button>
-        {input}
-        {after && <span aria-hidden>{after}</span>}
+        {input !== undefined && (
+          <span className="flex items-center gap-1.5">
+            {input}
+            {after && (
+              <span aria-hidden className={cn(disabled && 'text-faint')}>
+                {after}
+              </span>
+            )}
+          </span>
+        )}
         <Keys>{shortcuts[entry]}</Keys>
       </li>
     )
   }
 
   return (
-    <ul className="flex flex-col gap-0.5 text-sm">
-      <li className="flex h-8 items-center px-3 text-muted-foreground">
-        Next step / previous step
+    <ul className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-y-0.5 text-sm">
+      <li className="col-span-3 grid h-8 grid-cols-subgrid items-center pl-3 text-muted-foreground">
+        <span className="col-span-2">Next step / previous step</span>
         <Keys>→ / ←</Keys>
       </li>
       {row('over', 'Step over (next line in this call)')}
