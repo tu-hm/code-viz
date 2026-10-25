@@ -116,7 +116,7 @@ export function WatchPanel({
                   <tr
                     key={row.target}
                     className={cn(
-                      'h-(--row-height) border-b border-border align-top last:border-b-0',
+                      'h-(--row-height) border-b border-border last:border-b-0',
                       missing && 'text-muted-foreground',
                     )}
                   >
@@ -131,26 +131,34 @@ export function WatchPanel({
                     </th>
                     <td
                       className={cn(
-                        'py-0.5 pr-3 break-all transition-colors duration-(--duration-fade)',
+                        'min-w-[6ch] px-2 py-0.5 whitespace-nowrap transition-colors duration-(--duration-fade)',
                         row.changed && changedClass,
                       )}
                     >
-                      {missing ? (
+                      {row.value === null ? (
                         <span className="font-sans">not in scope</span>
                       ) : (
                         <>
-                          {row.value}
+                          <span
+                            title={row.value}
+                            className="inline-block max-w-[24ch] truncate align-bottom"
+                          >
+                            {row.value}
+                          </span>
                           <Mark on={row.changed} />
                         </>
                       )}
                     </td>
-                    <td className="w-full py-0.5 text-muted-foreground">{row.history}</td>
-                    <td className="py-0.5 text-right font-sans whitespace-nowrap">
+                    <td className="w-full py-0.5 pl-2 break-words text-muted-foreground">
+                      {row.history}
+                    </td>
+                    <td className="py-0.5 pl-2 text-right font-sans whitespace-nowrap">
                       {row.auto ? (
                         <Button
                           size="sm"
                           variant="ghost"
                           aria-label={`Pin ${row.target}`}
+                          className="h-(--row-height) px-2"
                           onClick={() => onWatch(row.target)}
                         >
                           Pin
@@ -160,6 +168,7 @@ export function WatchPanel({
                           size="icon"
                           variant="ghost"
                           aria-label={`Unpin ${row.target}`}
+                          className="size-(--row-height) text-xs text-muted-foreground"
                           onClick={() => onUnwatch(row.target)}
                         >
                           <span aria-hidden>✕</span>

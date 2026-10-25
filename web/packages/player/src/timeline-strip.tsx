@@ -1,5 +1,5 @@
 import { Button, cn } from '@viz/ui'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 
 const kinds = ['error', 'call', 'print', 'read'] as const
 type Kind = (typeof kinds)[number]
@@ -46,6 +46,17 @@ function place(events: [Placed['kind'], number[]][], stepCount: number, width: n
     }
   }
   return [...placed.values()]
+}
+
+function Key({ kind, children }: { kind: Placed['kind']; children: ReactNode }) {
+  return (
+    <span>
+      <span aria-hidden className={colors[kind]}>
+        {glyphs[kind]}
+      </span>{' '}
+      {children}
+    </span>
+  )
 }
 
 function useWidth() {
@@ -117,7 +128,7 @@ export function TimelineStrip({
       type="button"
       aria-label={eventLabel(marker, callee, target, narrations[marker.step])}
       className={cn(
-        'absolute top-1/2 z-10 flex size-4 -translate-1/2 items-center justify-center rounded-sm bg-background text-xs leading-none hover:bg-accent focus-visible:bg-accent',
+        'absolute top-1/2 z-10 flex size-4 -translate-1/2 items-center justify-center rounded-sm bg-background text-sm leading-none hover:bg-accent focus-visible:bg-accent',
         colors[marker.kind],
       )}
       style={{ left: left(marker.at) }}
@@ -149,13 +160,6 @@ export function TimelineStrip({
           {lanes.length > 0 && 'events'}
         </span>
         <div ref={track} className="relative h-6">
-          <span
-            aria-hidden
-            className="absolute top-1/2 -translate-1/2 text-xs leading-none text-brand"
-            style={{ left: left(last === 0 ? 0 : step / last) }}
-          >
-            ●
-          </span>
           {markers.map((m) => markerButton(m, ''))}
         </div>
         <span />
@@ -172,64 +176,81 @@ export function TimelineStrip({
           onChange={(event) => onScrub(event.currentTarget.valueAsNumber - 1)}
           className="w-full accent-primary"
         />
-        {lanes.map((l) => (
-          <Fragment key={l.target}>
+        {lanes.length > 0 && (
+          <div className="col-span-2 grid max-h-[calc(4*1.25rem)] grid-cols-subgrid items-center overflow-y-auto">
+            {lanes.map((l) => (
+              <Fragment key={l.target}>
+                <Button
+                  size="sm"
+                  variant={l === selected ? 'secondary' : 'ghost'}
+                  aria-pressed={l === selected}
+                  aria-label={`Lane ${l.target}`}
+                  className="h-5 justify-start px-1 font-mono text-xs font-normal"
+                  onClick={() => onLane(l.target)}
+                >
+                  {l.target}
+                </Button>
+                <div className="relative h-5" aria-label={`Changes of ${l.target}`} role="group">
+                  <span aria-hidden className="absolute inset-x-0 top-1/2 border-t border-border" />
+                  <span
+                    aria-hidden
+                    className="absolute inset-y-0 border-l border-brand"
+                    style={{ left: left(last === 0 ? 0 : step / last) }}
+                  />
+                  {l.changes === null ? (
+                    <span className="absolute top-0 left-0 text-xs text-muted-foreground">…</span>
+                  ) : (
+                    place([['change', l.changes]], stepCount, width).map((m) =>
+                      markerButton(m, l.target),
+                    )
+                  )}
+                </div>
+              </Fragment>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
+        {shown.has('read') && <Key kind="read">input read</Key>}
+        {shown.has('print') && <Key kind="print">printed</Key>}
+        {shown.has('call') && (
+          <Key kind="call">
+            call of <code className="font-mono">{callee}</code>
+          </Key>
+        )}
+        {shown.has('error') && <Key kind="error">error</Key>}
+        {lanes.length > 0 && <Key kind="change">value set or changed</Key>}
+        <span>
+          <span aria-hidden className="text-primary">
+            ●
+          </span>{' '}
+          you are here
+        </span>
+        {selected && (
+          <span className="ml-auto flex flex-wrap gap-1">
             <Button
               size="sm"
-              variant={l === selected ? 'secondary' : 'ghost'}
-              aria-pressed={l === selected}
-              aria-label={`Lane ${l.target}`}
-              className="h-5 justify-start px-1 font-mono text-xs"
-              onClick={() => onLane(l.target)}
+              variant="ghost"
+              className="h-6 px-2"
+              disabled={previous === undefined}
+              onClick={() => onGo(previous!)}
             >
-              {l.target}
+              <span aria-hidden>◀</span> Prev change of{' '}
+              <code className="font-mono">{selected.target}</code>
             </Button>
-            <div className="relative h-5" aria-label={`Changes of ${l.target}`} role="group">
-              <span aria-hidden className="absolute inset-x-0 top-1/2 border-t border-border" />
-              <span
-                aria-hidden
-                className="absolute inset-y-0 border-l border-brand"
-                style={{ left: left(last === 0 ? 0 : step / last) }}
-              />
-              {l.changes === null ? (
-                <span className="absolute top-0 left-0 text-xs text-muted-foreground">…</span>
-              ) : (
-                place([['change', l.changes]], stepCount, width).map((m) =>
-                  markerButton(m, l.target),
-                )
-              )}
-            </div>
-          </Fragment>
-        ))}
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 px-2"
+              disabled={next === undefined}
+              onClick={() => onGo(next!)}
+            >
+              Next change of <code className="font-mono">{selected.target}</code>{' '}
+              <span aria-hidden>▶</span>
+            </Button>
+          </span>
+        )}
       </div>
-      <p className="flex flex-wrap gap-x-4 text-xs text-muted-foreground">
-        {shown.has('read') && <span>◆ input read</span>}
-        {shown.has('print') && <span>■ printed</span>}
-        {shown.has('call') && <span>▲ call of {callee}</span>}
-        {shown.has('error') && <span>! error</span>}
-        {lanes.length > 0 && <span>┼ value set or changed</span>}
-        <span>● you are here</span>
-      </p>
-      {selected && (
-        <div className="flex flex-wrap gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            disabled={previous === undefined}
-            onClick={() => onGo(previous!)}
-          >
-            <span aria-hidden>◀</span> Prev change of {selected.target}
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            disabled={next === undefined}
-            onClick={() => onGo(next!)}
-          >
-            Next change of {selected.target} <span aria-hidden>▶</span>
-          </Button>
-        </div>
-      )}
     </div>
   )
 }

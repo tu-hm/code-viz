@@ -290,7 +290,7 @@ export function StatePane({
           <span className="fixed size-0" style={{ left: menu?.x, top: menu?.y }} />
         </PopoverAnchor>
         {menu !== null && (
-          <PopoverContent label={`Actions for ${menu.target}`}>
+          <PopoverContent label={`Actions for ${menu.target}`} side="bottom" className="w-auto p-1">
             <Button
               size="sm"
               variant="ghost"
@@ -300,7 +300,7 @@ export function StatePane({
                 setMenu(null)
               }}
             >
-              Pin {menu.target} to watch
+              Pin <code className="font-mono">{menu.target}</code> to watch
             </Button>
           </PopoverContent>
         )}
