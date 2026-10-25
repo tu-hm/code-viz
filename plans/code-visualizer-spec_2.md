@@ -106,6 +106,7 @@
 | v1.14 | 2026-10-24 | **Share links (BE-12).** A share link is a new visualization ID of the same trace (`visualizations.shared`), not the visualization's own ID: since v1.7 that ID is the read key, so revoking it would lock out an owner whose IP changed, and sharing again would bring back a link that had leaked. `POST /visualizations/{id}/share` works only for the caller that created the visualization, and only once it is `completed`; anything else gets `400 invalid_request`. It copies the chunks and tail from `t7/` to `t90/`, sets `storage_prefix = 't90'`, and keeps the trace, the visualization and the link for 90 days from the share; calling it again returns the same link. `DELETE /visualizations/{id}/share` revokes it: the link answers `404` for everyone, the visualization keeps its 90 days, and sharing again makes a new link. The `t7/` copies stay until the cleanup deletes the trace, so URLs signed before the share keep working. `GET` sends `Cache-Control: public, max-age=60` for a share link, which reads the same for every caller, and `no-store` otherwise (§7.5, §7.8, §8.6, §12). |
 | v1.15 | 2026-10-24 | **C++ through the API.** The `cpp17-gcc` manifest is `enabled: true`, so `GET /languages` lists it and `POST /visualizations` accepts it (§8.1, §10.2); v1.9 had kept it off. It passes the §15 conformance suite (`TestPortsAgreeAcrossLanguages`). G5 (the safety-check flags) and the build's own memory limit stay open. |
 | v1.16 | 2026-10-24 | **Observability and the beta deploy path (BE-13 §1–§2).** `jobs.traceparent` keeps the W3C trace context of the create request that queued the job, so the worker's `job` span and its stage spans (`sandbox`, `build`, `trace`, `store`) continue that request's OpenTelemetry trace (§7.5, §18.2). vizd exports spans over OTLP/HTTP only when `OTEL_EXPORTER_OTLP_ENDPOINT` is set, and serves Prometheus metrics at `GET /metrics` only with `VIZ_METRICS=true`; both are off by default. Log lines inside a span carry `otel_trace_id` and `otel_span_id`, since `trace_id` already names the `trc_` ID. **Deploy path for the M1 beta:** one server running MySQL, SeaweedFS, the API and the worker as Docker Compose containers (`docs/deploy.md`), not native packages and systemd units; Kubernetes (D15) stays the target after the beta. |
+| v1.17 | 2026-10-25 | **Exact read hints (BE-11 §5).** Spike S8 found tree-sitter inference right on 77.6% of subscript lines in contest-style code, against a 95% target, mostly on indices it can't evaluate (`t[p ^ 1]`, `a[l++]`, `dp[c - w[i]]`), so G5 triggered BE-11 §5. Both tracers now send the sequence cells each step read, and the core turns them into `access` (§19.9.2). **C++:** the build adds `-fsanitize=kernel-address` with every check made a call (`asan-instrumentation-with-call-threshold=0`) and links `/opt/viz/reads.o`, whose hooks record each load's address; the tracer maps addresses onto the arrays, `std::array`s and `vector`s it records. Pointer arithmetic, struct fields and loads inside library code (`max(dp[c], …)`) count. GCC leaves out the call for a constant index into a named C array (`a[0]`), so those reads are missing. With the safety checks on, the hooks add 12–18% to the program's run time; without them, 1.3–2.3× (§7.11.2). **Python:** a `sys.monitoring` INSTRUCTION callback on `main.py`'s code, beside `sys.settrace`, evaluates each subscript's container and index just before it runs, from names, constants and integer arithmetic only (§7.11.1). Writes still come from the diff. A new §11 limit: 1,000 distinct cells read per step; past it the step has no `access`. |
 
 ---
 
@@ -830,10 +831,12 @@ Database load stays small. Each job costs about 4 row writes, 3 queue writes (in
 - **Blocked modules:** numpy, pandas, matplotlib and any other non-stdlib import fail before the run with `unsupported_module`. The allowlist lives in the adapter manifest.
 - **Build step:** Python has no compiler, so its build step is a check: `python3 -I /opt/viz/tracer.py --check main.py`. A syntax error exits 1 with `main.py:L:C: error: …` diagnostics (`compile_error`); an import that isn't in `modules.allow` exits 3 with the same format (`unsupported_module`). The worker treats it like any other build (§7.7).
 - **Threads:** a thread started from `main.py` runs to the end before `start()` returns, so its steps form one call stack with the caller's. This traces the common `threading.Thread(target=main)` trick for a bigger stack. A program whose thread waits on the thread that started it hangs until the time limit.
+- **Reads (§19.9.2, v1.17):** a `sys.monitoring` INSTRUCTION callback runs on `main.py`'s code objects only, and turns itself off at every instruction but `BINARY_SUBSCR`. There it evaluates the subscript's container and index again, from names, constants, subscripts of built-in sequences and integer arithmetic, so it never runs the program's code; a `list`, `tuple` or `deque` read by an `int` is recorded, a negative index as the cell it reaches. It stops at the step limit. `f_trace_opcodes` can't be used: 3.12 sends opcode events only to hooks installed after some frame set it, and then to every instruction of every module.
 
 #### 7.11.2 C++17 (GCC 13)
 
-- **Build:** `g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 main.cpp /opt/viz/flush_init.cpp -o main`. `--coverage` gives line hits (§19.9.3), the warnings feed the warnings panel (§19.6), plain output keeps `raw` to one diagnostic per line, and the `ggc` params make GCC collect garbage early: it sizes its heap from the host's RAM, not the box's 256 MB (spike S7).
+- **Build:** `g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 -fsanitize=kernel-address -fno-sanitize-address-use-after-scope --param asan-instrumentation-with-call-threshold=0 --param asan-stack=0 --param asan-globals=0 --param asan-memintrin=0 main.cpp /opt/viz/flush_init.cpp /opt/viz/reads.o -o main`. `--coverage` gives line hits (§19.9.3), the warnings feed the warnings panel (§19.6), plain output keeps `raw` to one diagnostic per line, and the `ggc` params make GCC collect garbage early: it sizes its heap from the host's RAM, not the box's 256 MB (spike S7). The `kernel-address` flags and `reads.o` record reads (below).
+- **Reads (§19.9.2, v1.17):** `-fsanitize=kernel-address` with the call threshold at 0 turns every load and store in `main.cpp` into a call to `__asan_load4` and its siblings, with no shadow memory and no runtime. `reads.o`, built into the image without the sanitizer, defines them: a load appends its address to a buffer of 4,096, and a store does nothing. At each step the tracer reads the buffer, clears it, and maps each address to the innermost array, `std::array` or `vector` buffer recorded in that step. More than 4,096 loads since the last step (a `sort`) means the step has no reads. GCC skips the call for a constant index into a named C array, which it proves in bounds, so `a[0]` isn't seen while `a[i]` is.
 - **Safety checks (default, D21):** the build also adds `-D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all` (manifest `build.safetyFlags`) unless the request sets `options.safetyChecks: false` (§8.2, §19.6). Spike S7 found `_GLIBCXX_DEBUG` too slow for CP code and proposes lighter flags for G5 (§0.3 v1.8).
 - **Precompiled headers:** the runner image ships a `bits/stdc++.h.gch/` directory with two headers, one built with the build flags and one with the safety flags added. GCC tries both and uses the one whose `_GLIBCXX_DEBUG` matches the build. Each must be built with exactly its build's flags: GCC doesn't check most flags, and a header built with a different `-fsanitize` can crash it. With the header, a typical CP build takes 0.3–0.8 s (S7); a source with a `#pragma` or another `#include` before `<bits/stdc++.h>` builds without it.
 - **Forced flushing:** `flush_init.cpp` sets stdout to unbuffered and turns on `std::unitbuf` before `main()` runs. Output then appears at the step that printed it, even when the user calls `ios::sync_with_stdio(false)`:
@@ -1325,7 +1328,7 @@ The tracer writes NDJSON (one JSON message per line) to **file descriptor 3**. T
 | Message | Fields | Notes |
 |---|---|---|
 | `hello` | `protocol: 1`, `language`, `runtime`, `adapter` | Must be the first message |
-| `step` | `event`, `line`, `prevLine`, `stack: [Frame]`, `heap: {nativeId: Object}`, `error?` | A **full** snapshot, except that a sparse sequence sent in the previous step may come as a `patch` (below). Object IDs are the adapter's own (Python `id()`, C++ `address:type`). |
+| `step` | `event`, `line`, `prevLine`, `stack: [Frame]`, `heap: {nativeId: Object}`, `error?`, `reads?` | A **full** snapshot, except that a sparse sequence sent in the previous step may come as a `patch` (below). Object IDs are the adapter's own (Python `id()`, C++ `address:type`). `reads` is every sequence cell read since the previous step, `[{obj, index}]`, or absent when the adapter couldn't record them all (§19.9.2). |
 | `out` | `stream: "stdout" \| "stderr"`, `data` | Optional. Only needed if the adapter captures output itself instead of through fd 1/2. |
 | `exit` | `kind`, `code`, `signal`, `message`, `lineHits?`, `lineHitsSource?` | Must be the last message. `lineHits` (`{"<line>": count}` over the whole run) and `lineHitsSource` (`counter`, the tracer's own counter, or `gcov`) come together and are copied to `summary` (§19.9.3). Without them the core counts the recorded line and call steps, with `lineHitsSource: "trace"`. |
 | `log` | `level`, `message` | Adapter debug output. Kept in internal logs, never shown to users. |
@@ -1355,7 +1358,10 @@ build:
   cmd: ["g++", "-std=gnu++17", "-O0", "-g3", "-fno-omit-frame-pointer",
         "--coverage", "-Wall", "-Wextra", "-Wshadow", "-fdiagnostics-plain-output",
         "--param", "ggc-min-heapsize=32768", "--param", "ggc-min-expand=30",
-        "main.cpp", "/opt/viz/flush_init.cpp", "-o", "main"]
+        "-fsanitize=kernel-address", "-fno-sanitize-address-use-after-scope",
+        "--param", "asan-instrumentation-with-call-threshold=0", "--param", "asan-stack=0",
+        "--param", "asan-globals=0", "--param", "asan-memintrin=0",
+        "main.cpp", "/opt/viz/flush_init.cpp", "/opt/viz/reads.o", "-o", "main"]
   safetyFlags: ["-D_GLIBCXX_DEBUG", "-fsanitize=undefined", "-fno-sanitize-recover=all"]
   env: { TMPDIR: /work }    # g++ writes temp files; only /work is writable
   timeoutMs: 10000
@@ -1456,6 +1462,7 @@ All of these are configurable per language in the manifest, with global ceilings
 | Non-default cells per sparse sequence | 10,000 | — | `truncated: true`; only the cells of `window` (the first 1,000, or the variable's `captureRanges` window) are kept |
 | `captureRanges` | 4 KB as JSON | — | `400 invalid_request`. It reaches the tracer as one environment variable (§10.2) |
 | Non-default cells per step message | 100,000 | — | `truncation.reason = size_limit`; bounds the core's copy of sparse sequences |
+| Cells read per step | 1,000 distinct | — | The step has no `access`, and the player infers reads from the line (§19.9.2). The C++ tracer also gives up past 4,096 loads since the last step |
 | Items drawn before "show more" | 100 | — | UI only |
 | Heap objects per step | 500 | 2,000 | Pointers aren't followed further; `target: null`. A Python reference past the budget becomes `unavailable` with reason `object_limit` |
 | Pointer-follow depth (C++) | 32 | 128 | Same as above |
@@ -2125,21 +2132,21 @@ All additions are optional and backward compatible (§9.7). Older players ignore
 - **C++:** the tracer reads each array of scalars longer than 64 with one memory read per step (`gdb.Inferior.read_memory`; at most 4 MB per array and 16 MB per step) and diffs it against what it sent last, so dirty cells are exact. Arrays over the budget fall back to the first 1,000 cells (§7.11.2). S6: read and diff of 200,005 ints take about 0.1 ms per step.
 - **Python:** lists up to 100,000 elements are compared against a copy from the previous step. Not built yet; no task owns it.
 
-#### 19.9.2 Access hints (reads are inferred)
+#### 19.9.2 Access hints (reads)
 
 ```jsonc
 {
   "access": [
-    { "obj": "o7", "path": [2, 3], "mode": "w" },
-    { "obj": "o7", "path": [1, 3], "mode": "r", "inferred": true },
-    { "obj": "o7", "path": [2, 2], "mode": "r", "inferred": true }
+    { "obj": "o9", "path": [3], "mode": "r" },   // dp[1][3]: o9 is row 1
+    { "obj": "o10", "path": [2], "mode": "r" },  // dp[2][2]
+    { "obj": "o7", "path": [1], "mode": "r" }    // dp[1] itself, the row fetched on the way
   ]
 }
 ```
 
-- **Writes** come from the diff, so they're exact.
-- **Reads** are inferred in the browser. It parses the executed line with tree-sitter (D23), finds subscripts whose index is *identifier ± constant*, and evaluates them with the values from **before** the line ran. Hovering shows "read (inferred)".
-- **Adapters with exact information** (a future instrumented tracer, for example) may send `access` directly. The browser then uses that and skips its own inference.
+- **Writes** come from the diff, so they're exact. `access` carries no writes.
+- **Reads come from the tracers** (v1.17, BE-11 §5): every sequence cell read while `prevLine` ran, first read first, each cell once. A read names the sequence that holds the cell and one index into it, so a 2-D read names its row's object; the matrix view maps rows back to their cells. C++ records loads through compiler instrumentation, Python each subscript just before it runs (§7.11.1, §7.11.2). An empty `access` means nothing was read.
+- **Without `access`** (more than 1,000 cells read, §11, or a language whose tracer doesn't record reads), the browser infers reads: it parses the executed line with tree-sitter (D23), finds subscripts whose index is *identifier ± constant*, and evaluates them with the values from **before** the line ran. Hovering shows "read (inferred)". The player also infers when `access` is empty, which brings back C++ reads GCC doesn't instrument: a constant index into a named C array (`a[0]`).
 
 #### 19.9.3 Line hit counts for the whole run
 

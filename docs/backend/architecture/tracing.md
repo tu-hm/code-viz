@@ -121,6 +121,7 @@ Python has no compiler, so its build step is a check that runs before anything i
 | `-fdiagnostics-plain-output` | No colors, carets, fix-its or URLs: `raw` is plain text with one diagnostic per line |
 | `--param ggc-min-heapsize=32768 --param ggc-min-expand=30` | GCC sizes its garbage-collected heap from the host's RAM, not the box's 256 MiB. Collecting early keeps a build that can't use the PCH inside the box, for 5–10% more build time and the same code ([S7](../../../plans/spikes/s7-safety-checks.md)) |
 | `/opt/viz/flush_init.cpp` | Unbuffered stdout and `std::unitbuf` before `main` (§7.11.2) |
+| `-fsanitize=kernel-address -fno-sanitize-address-use-after-scope --param asan-instrumentation-with-call-threshold=0 --param asan-stack=0 --param asan-globals=0 --param asan-memintrin=0`, `/opt/viz/reads.o` | Every load in `main.cpp` calls a hook in `reads.o` that records its address, for the read hints ([Reads](#reads-1)). No shadow memory, no redzones, no runtime |
 
 - **Safety checks (D21, §19.6).** `build.safetyFlags` (`-D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all`) go after `build.cmd` unless the request sets `options.safetyChecks: false`. Unset and `true` mean on (`domain.SafetyChecks`). `NormalizeOptions` keeps the field only when it's `false`, so unset and `true` share a cache key and `false` gets its own. `CheckRequest` rejects `false` for a language with no `build.safetyFlags`, such as Python. With checks on, the containers are libstdc++'s debug ones, so a trace shows `std::__debug::vector<int, …>`.
 - **Precompiled headers.** The image has one per value of `_GLIBCXX_DEBUG` in `bits/stdc++.h.gch/`, and GCC picks the one that fits the build. Their flags must match the manifest's ([language adapter guide](../guides/language-adapter.md#the-c-runner-image)).
@@ -168,6 +169,7 @@ sequenceDiagram
 | Output | The Python tracer captures stdout and stderr itself and sends `out` messages of at most 16,384 characters (64 KiB as UTF-8). The C++ program writes its own fd 1 and 2. `viz-shim` forwards what it wrote before a wire line ahead of that line, and the tracer doesn't resume the program until `viz-shim` has read the line, so nothing written later overtakes it (§10.1). Output between step k−1 and step k belongs to step k: it was printed while step k's `prevLine` ran. Output after the last step goes to the last step |
 | Step limit | The tracer sends at most `maxSteps + 1` steps. The extra one is a marker that the program went on. The core drops it, records `truncation.step_limit`, and keeps reading `out` and `exit` for the untraced tail. Not a kill (D25) |
 | Line hits | `exit.lineHits` and `exit.lineHitsSource` come together and become `summary.lineHits` and `summary.lineHitsSource` (§19.9.3). Python counts every line event in `main.py` over the whole run (`counter`); C++ reads gcov after a normal exit (`gcov`, [Line hits](#line-hits-from-gcov)). An `exit` without them gets the recorded steps' counts: every `line` and `call` step, `lineHitsSource: "trace"` |
+| Reads | `step.reads` lists every sequence cell read since the previous step, `{obj, index}`, first read first: the native id of a sequence in the step's heap and an index from its start, not its window's. Present and empty means nothing was read; absent means the tracer couldn't record them all. The core makes them the step's `access` ([Transform](#transform)) |
 | Exceptions | Python: one `exception` step where the exception is raised in `main.py` (`line` is the raising line), not one per frame it unwinds through. Uncaught: `exit {kind: "exception", code: 1, message: "IndexError: …"}`. `SystemExit(n)`: `exit {kind: "normal", code: n}`. C++: a signal or a failed safety check gives one `exception` step with `error {type: "SIGSEGV", message, line}`, then the program's real exit. A caught C++ exception makes no step; an uncaught one ends in `abort()` and shows as `SIGABRT`. An error may carry `kind` and `values` ([Friendly errors](#friendly-errors-196)) |
 
 ## Friendly errors (§19.6)
@@ -259,6 +261,17 @@ The user sees one exception step, line counts keep going, and the exit is right.
 ### Error values
 
 The exception step's `kind` comes from the exception's type ([Friendly errors](#friendly-errors-196)). Its values come from the expression that raised it: the position of the instruction at `f_lasti` (`co_positions()`) is the span of a `Subscript`, `BinOp` or `AugAssign` node in the parsed `main.py`. The tracer then evaluates that node's parts again, but only names, constants, subscripts of a `list`, `tuple`, `str`, `range`, `deque` or `dict` by an `int` or `str`, and integer `+`, `-`, `*`, `//`, `%`. Anything else could run the program's code (a property, a `__getitem__`, an `__index__`, a call), so that value is left out: `a[f(x)]` gets `name` and `size` but no `index`. The source is parsed once, at the first exception.
+
+### Reads
+
+The read hints (§19.9.2) come from a `sys.monitoring` INSTRUCTION callback, `on_instruction`, beside the settrace hooks. It runs only on code objects from `main.py`: `on_call` enables it on each new one (`watch`), and `begin` on the frames already running at a start line. Every instruction that isn't `BINARY_SUBSCR` returns `DISABLE`, so after its first run only subscripts call back.
+
+- **What it records.** At a `BINARY_SUBSCR` the container and index are on the value stack, already evaluated. The instruction's position is its `Subscript` node's span, as for [Error values](#error-values), and the tracer evaluates the node's container and index again with the same evaluator, which also takes `^`, `&`, `|`, `<<` and `>>`. A `list`, `tuple` or `deque` read by an `int` inside its length is recorded, a negative index as the cell it reaches; a `dict`, a `str`, a slice, a subclass or an index from a call is not.
+- **Per step.** The reads wait in `reads`, keyed by `(id(container), index)`, with the container itself as the value, so no other object can take its `id()` before the step goes out. `step` sends those whose container is in the step's heap and clears them. Past 1,000 distinct cells it sends no `reads` for that step.
+- **At the step limit** the tracer turns the callback off on every watched code object, so the untraced tail runs without it.
+- **The tool id is `sys.monitoring.DEBUGGER_ID`.** A program that claims it too gets the `ValueError` `use_tool_id` raises for a taken id.
+- **Why not `f_trace_opcodes`.** 3.12 builds settrace on `sys.monitoring` and enables opcode events only for hooks installed after some frame has set `f_trace_opcodes`; from then on every instruction of every module goes through the legacy tracing layer, the tail's included. Setting it in the call hook, as the docs suggest, gives no events at all.
+- On a 1,001-step program with a 200,000-iteration tail, the tracer with reads takes the same time as without, within noise (0.13–0.16 s, one CPU).
 
 ### Threads
 
@@ -362,6 +375,16 @@ A length outside `[0, 2^32)` comes from garbage memory and makes the object `opa
 - `vector<bool>`, arrays of enums and arrays of anything but scalars stay dense.
 - **Dense containers** record their first 100 items and their real `length`. A cut one has `truncated`, and a cut sequence `window {start: 0, count: 100}`. Why 100, not §11's 1,000: a 1,000-entry `map` at 1,000 items took 13.5 s per 1,000 steps, about 10 µs per tree node inside the printers. A small array of scalars is read with one `read_memory` per step: 0.02 ms for 100 ints, against 0.13 ms one `gdb.Value` at a time.
 
+### Reads
+
+The read hints (§19.9.2) need every load the program makes, with its address. The build turns them all into calls ([The C++ build](#the-c-build)): `-fsanitize=kernel-address` is AddressSanitizer for code without its runtime, and `asan-instrumentation-with-call-threshold=0` makes each check a call to `__asan_load4(addr)`, `__asan_store8(addr)` and their siblings instead of an inline shadow-memory test. `asan-stack=0`, `asan-globals=0`, `asan-memintrin=0` and `-fno-sanitize-address-use-after-scope` leave out the redzones, global registration, `memcpy` wrappers and scope poisoning that would need ASan's runtime. `reads.o` defines the hooks: a load appends its address to `viz_reads` (4,096 entries) and counts it in `viz_reads_count`; a store does nothing. The image builds it at `-O2` without the sanitizer, or each hook would call itself.
+
+- **Mapping.** `contiguous` tags each array, `std::array` and `vector` it records with its buffer's address and element size (`buffer`, which `wire_object` strips). `send_step` reads the count and the addresses, clears the count, and maps each address to the innermost buffer that holds it (a struct's array inside a `vector`'s element is innermost): the cell is the offset over the element size. Each cell goes out once, first read first.
+- **What counts.** Loads anywhere in `main.cpp`'s object code: a subscript, `*(p + i)`, a field `v[i].s` (element `i`), and loads inside library code instantiated there, such as `std::max(dp[c], …)` reading through its reference, `vector`'s fill constructor reading its first cell, or a destructor walking the rows. A row fetched on the way to a cell (`grid[1]` in `grid[1][2]`) is a read of the outer sequence. Taking an address (`&a[1]`) reads nothing.
+- **What doesn't.** GCC leaves the call out when it can prove a load in bounds of a named variable: a constant index into a C array declared in `main.cpp` (`a[0]`, `*(a + 2)`), global or local. `a[i]`, `p[2]` and every `vector` or `std::array` subscript are seen. Loads inside the shared libstdc++ (`istream`, `string` code that isn't a template) aren't instrumented either.
+- **Per step.** Loads before the first step (global constructors, the run up to a start line) are cleared at the first stop. More than 4,096 loads since the last step (a `sort`, a long library call) sends no `reads`. A return step's reused frame objects carry no buffer, so reads of the returning frame's own arrays during its epilogue are lost.
+- **Cost.** Builds take 0.6 s with checks off and 1.0 s with them on, each with its precompiled header. Run time without GDB, one CPU, 4 S7 programs: 12–18% more with the safety checks on (the default), 1.3–2.3× with them off. The tracer adds one 8-byte read, one write and one read of the recorded addresses per step.
+
 ### Signals and deep recursion
 
 - **A signal ends the trace.** Any signal GDB stops on (`SIGSEGV`, `SIGFPE`, `SIGABRT`, …) gives one `exception` step at the innermost call's current line, with `error {type: "SIGSEGV", message: "Segmentation fault", line}` (`message` is `strsignal`'s text), then `exit {kind: "signal", signal: "SIGSEGV"}`. An uncaught C++ exception ends in `abort()`, so it shows as `SIGABRT`. A signal before `main` gives only the exit. When GDB can't find any call's frame any more, as after a return to a smashed address, the error step repeats the last step's stack and line.
@@ -407,6 +430,7 @@ An exception in the tracer's own code sends `log` (level `error`) and `exit {kin
 - A step that changes most of a 200,005-int array (a `sort`) costs about 6 ms to diff, against 0.1 ms for a few cells.
 - A safety check that fails after the step limit, or before `main`, gives no error step: only the exit and the report on stderr. So does a failed vptr check.
 - Deep recursion that ends as `memory_limit` has no error step, so no `recursion_too_deep`.
+- A constant index into a named C array (`a[0]`) records no read ([Reads](#reads-1)).
 
 ### Numbers
 
@@ -444,6 +468,7 @@ Through `vizctl`, with the build and the container start, 1,000 steps with a glo
 | Heap budget | At most `Limits.HeapObjects` (500) objects per step. A `ref` past the budget becomes `unavailable` with reason `object_limit`; a `ptr` loses its `target` (§11) |
 | Strings and containers | Strings are cut at `Limits.StringChars` runes, with `len` and `truncated`. Items and entries are cut at `Limits.Items`, with `truncated` |
 | Sparse sequences | The core keeps each sparse sequence's non-default cells as the last step message left them, keyed by native id. A full sparse form replaces them; a `patch` changes them, and must have a sparse form under the same id in the previous step message, the same `type` and `length`, keys under `length` and inside the window, scalar cells and no other field, or the run is malformed. Over `Limits.Cells` (10,000) cells the stored object keeps only the cells of a `Limits.Items` window, with `truncated` |
+| Reads | A step's `reads` become `access` entries `{obj: oN, path: [index], mode: "r"}`, each cell once, first read first. A read of an object missing from the step message's heap, of anything but a sequence, or past its `length` is malformed. A read of an object the transform dropped (heap budget, internals) is left out. Over `Limits.Reads` (1,000) distinct cells, or with no `reads` in the message, the step has no `access` |
 | Keyframes | Every step where `i % 50 == 0` carries every frame and every object (D2) |
 | Deltas | The other steps carry each frame and object whose JSON differs from the previous step, whole, plus `removedObjects`: ids reachable in the previous step and not in this one. `stack` is always complete. A sparse sequence is compared without its cells: when the rest is unchanged, the delta is `{kind, type, length, patch}` with the cells that changed, or nothing. Keyframes are built from the core's copy, never from the tracer's patches |
 
@@ -461,6 +486,7 @@ Malformed input fails the run with `ErrMalformed`. That covers a schema failure,
 | Heap objects, frames, strings, items | 500 / 100 / 1,000 / 1,000 | Per step, in the transform | No | Cut in place (above) |
 | Non-default cells per sparse sequence | 10,000 | The stored object | No | `truncated`, the adapter's window, or the first 1,000 cells |
 | Non-default cells per step message | 100,000 | Applying the step's sparse forms and patches; bounds the core's copy | Yes | `truncation size_limit`, `exit.kind = step_limit` |
+| Cells read per step | 1,000 | Mapping the step's reads | No | No `access` on that step |
 
 ### Finishing
 
@@ -490,7 +516,6 @@ One leftover: `encoding/json` matches keys case-insensitively, so a forged `"ID"
 | `target` and `index` for a pointer into a `vector`'s buffer | No task yet |
 | Signing the runner image | BE-03 §3, needs the registry (BE-13) |
 | A traceback on the program's stderr for an uncaught exception (today only `exit.message` has it) | No task yet |
-| Exact access hints (`access[]`) from the tracers, only if FE spike S8's tree-sitter inference misses 95% | BE-11 §5 |
 | `captureRanges` for containers read through the printers, and by position in a `map` or `set` | No task yet |
 | A test that fake fd-3 messages from user code end as `internal_error` | BE-02 §5 |
 | `sys.stdin.buffer`, `open(0)` and `sys.stdout.buffer` (fd 0 is `/dev/null`; the writers are text only) | Not planned |

@@ -85,6 +85,7 @@ Both sets must pass on amd64 and arm64. CI runs them on amd64 inside `make check
 | `error-other` | `int("ten")`: a `ValueError` step with no `kind` |
 | `input` | Several `input()` calls: no step outside `main.py`, `stdinPos` advancing |
 | `long` | Over 1,000 steps: `step_limit`, the untraced tail with the full output, `lineHits` for the whole run |
+| `reads` | Read hints (§19.9.2) on the subscripts tree-sitter can't evaluate: `t[p ^ 1]`, a knapsack's `dp[c - w[i]]`, a loop over `t[l]`, and `grid[0][-1]` recorded as the cell it reaches. `TestReadsNameTheCellsALineRead` checks each line's cells |
 | `recursion-limit` | A `RecursionError` step with `recursion_too_deep` and the user's `limit` 100, then the program catches it and finishes |
 | `start-at-line` | `startAtLines` 6 and 12: the first step is the `print` inside `sum_to` at `i == 5`, with the module frame under it and the earlier output; line hits cover the whole run |
 | `start-never` | `startAtLines` on a branch that never runs: no steps, the program's normal exit, line hits |
@@ -118,6 +119,8 @@ Both sets must pass on amd64 and arm64. CI runs them on amd64 inside `make check
 | `pointer` | The §5.4 program: `MAXN` and the global `int[200005]` (sparse, default `0`, then a one-cell `patch`) in the globals frame, a `vector`, a `map<string, int>`, and two `Node` records linked through `head->next`. `sort` makes no steps |
 | `range-for` | A range-for over a vector: `__for_range`, `__for_begin` and `__for_end` hidden by default, `x` taking each element, one step per iteration on the `for` line |
 | `read-loop` | A VLA sized from stdin, then `for (...) cin >> a[i];` on one line over 1,200 numbers: the call step on `main`'s first statement, not its closing brace, one step per iteration, `step_limit` at 1,000 steps, and the untraced tail with the full output and the normal exit. The VLA is sparse: each iteration's delta is a one-cell `patch`, and each keyframe carries every number read so far |
+| `reads` | The Python `reads` port: the same cells on the same lines, `t[l++]` for the loop, plus the library's own loads (`vector`'s fill constructor reads its first cell, destructors read the rows) |
+| `reads-pointers` | Reads through `p[2]`, a struct field (`jobs[1].e` reads element 1), a local array and a `std::array` by a variable index, and a 2-D DP whose reads name each row. `&a[1]` reads nothing, and a constant index into a named C array (`*(a + 2)`, `b[0]`) isn't seen |
 | `recursion` | `fib(4)`: 9 calls, each with its own frame and the right `parentCallId`, two of them from one line, and each return step with its value |
 | `start-at-line` | The Python `start-at-line` port: `startAtLines` 9 and 18 start inside `sum_to`, with `main`'s frame joined under it, and `sum_to` returns `36` |
 | `start-never` | The Python `start-never` port: no breakpoint is ever hit, so the program runs to its exit with no steps; gcov still counts the lines |
@@ -150,7 +153,7 @@ Both sets must pass on amd64 and arm64. CI runs them on amd64 inside `make check
 
 ```sh
 docker run --rm --network none -i -w /work --tmpfs /work -e TMPDIR=/work viz-runner-cpp:13.5-gdb14-1 \
-  sh -c 'cat > main.cpp && g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 main.cpp /opt/viz/flush_init.cpp -o main -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all 2>&1' \
+  sh -c 'cat > main.cpp && g++ -std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 -fsanitize=kernel-address -fno-sanitize-address-use-after-scope --param asan-instrumentation-with-call-threshold=0 --param asan-stack=0 --param asan-globals=0 --param asan-memintrin=0 main.cpp /opt/viz/flush_init.cpp /opt/viz/reads.o -o main -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all 2>&1' \
   < main.cpp > build.txt
 ```
 
