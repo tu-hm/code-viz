@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -53,6 +54,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -118,6 +120,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -167,6 +170,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o1",
+          "path": [
+            0
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -217,6 +229,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -267,6 +280,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o1",
+          "path": [
+            1
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -317,6 +339,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -367,6 +390,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o1",
+          "path": [
+            2
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -417,6 +449,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -467,6 +500,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -517,6 +551,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -559,6 +594,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -601,6 +637,7 @@
       "stdout": "8\n"
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -643,6 +680,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "return",

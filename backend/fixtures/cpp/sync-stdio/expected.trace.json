@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -45,6 +46,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -70,6 +72,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -103,6 +106,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -144,6 +148,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -186,6 +191,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -228,6 +234,7 @@
       "stdout": "1 "
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -270,6 +277,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -312,6 +320,7 @@
       "stdout": "4 "
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -354,6 +363,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -396,6 +406,7 @@
       "stdout": "9 "
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -430,6 +441,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -464,6 +476,7 @@
       "stdout": "\n"
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -498,6 +511,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "return",

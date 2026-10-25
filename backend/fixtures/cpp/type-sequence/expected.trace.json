@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -53,6 +54,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -111,6 +113,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -176,6 +179,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -249,6 +253,22 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o3",
+          "path": [
+            0
+          ]
+        },
+        {
+          "mode": "r",
+          "obj": "o3",
+          "path": [
+            1
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -326,6 +346,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -405,6 +426,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -495,6 +517,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -582,6 +605,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -665,6 +689,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -731,6 +756,22 @@
       "stdout": "14\n"
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o3",
+          "path": [
+            0
+          ]
+        },
+        {
+          "mode": "r",
+          "obj": "o3",
+          "path": [
+            1
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -797,6 +838,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "return",

@@ -42,9 +42,11 @@ RUN echo /usr/local/lib64 > /etc/ld.so.conf.d/000-local-lib.conf \
     && mv /usr/local/lib64/libstdc++.so.*-gdb.py /usr/local/share/gdb/auto-load/usr/local/lib64/ \
     && cd "/usr/local/include/c++/$(g++ -dumpfullversion)/$(g++ -dumpmachine)/bits" \
     && mkdir stdc++.h.gch \
-    && flags='-std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 -x c++-header stdc++.h' \
+    && flags='-std=gnu++17 -O0 -g3 -fno-omit-frame-pointer --coverage -Wall -Wextra -Wshadow -fdiagnostics-plain-output --param ggc-min-heapsize=32768 --param ggc-min-expand=30 -fsanitize=kernel-address -fno-sanitize-address-use-after-scope --param asan-instrumentation-with-call-threshold=0 --param asan-stack=0 --param asan-globals=0 --param asan-memintrin=0 -x c++-header stdc++.h' \
     && g++ $flags -o stdc++.h.gch/checks-off.gch \
     && g++ $flags -D_GLIBCXX_DEBUG -fsanitize=undefined -fno-sanitize-recover=all -o stdc++.h.gch/checks-on.gch \
     && rm stdc++.h.gch/*.gcno \
     && find / -xdev -perm /6000 -type f -exec chmod a-s {} +
 COPY adapters/cpp/flush_init.cpp adapters/cpp/trace.py adapters/cpp/typemap.json /opt/viz/
+COPY adapters/cpp/reads.cpp /tmp/
+RUN g++ -std=gnu++17 -O2 -c /tmp/reads.cpp -o /opt/viz/reads.o && rm /tmp/reads.cpp

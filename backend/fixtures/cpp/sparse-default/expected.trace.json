@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -77,6 +78,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -134,6 +136,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -189,6 +192,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -252,6 +256,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -315,6 +320,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o2",
+          "path": [
+            0
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -383,6 +397,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -447,6 +462,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -531,6 +547,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -605,6 +622,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -684,6 +702,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -766,6 +785,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -846,6 +866,22 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o2",
+          "path": [
+            7
+          ]
+        },
+        {
+          "mode": "r",
+          "obj": "o3",
+          "path": [
+            4
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -914,6 +950,7 @@
       "stdout": "9.5\n"
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -982,6 +1019,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "return",

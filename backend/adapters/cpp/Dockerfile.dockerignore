@@ -6,3 +6,4 @@
 !adapters/cpp/flush_init.cpp
 !adapters/cpp/trace.py
 !adapters/cpp/typemap.json
+!adapters/cpp/reads.cpp

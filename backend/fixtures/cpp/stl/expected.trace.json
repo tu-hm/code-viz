@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -168,6 +169,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -244,6 +246,29 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o5",
+          "path": [
+            0
+          ]
+        },
+        {
+          "mode": "r",
+          "obj": "o5",
+          "path": [
+            1
+          ]
+        },
+        {
+          "mode": "r",
+          "obj": "o5",
+          "path": [
+            2
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -327,6 +352,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -396,6 +422,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -476,6 +503,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -573,6 +601,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -648,6 +677,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -754,6 +784,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -839,6 +870,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -950,6 +982,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o5",
+          "path": [
+            0
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -1035,6 +1076,7 @@
       "stdout": "1 viz 1\n"
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1120,6 +1162,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "return",

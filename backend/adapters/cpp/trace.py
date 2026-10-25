@@ -1,4 +1,5 @@
 import array
+import bisect
 import collections
 import fcntl
 import itertools
@@ -32,6 +33,7 @@ MAX_SUMMARY = 200  # opaque text, as python cuts repr (§10.3)
 PAGE = 4096
 MAX_DEPTH = 32  # pointer hops from a local or global (§11 maxPointerDepth)
 MAX_FRAMES = 100  # innermost, besides the globals frame; the core keeps the same (§11)
+MAX_LOADS = 4096  # = viz_reads' size in reads.cpp; more loads since the last step => no reads
 CHARS = ("char", "signed char", "unsigned char")
 INT_FORMATS = {1: "b", 2: "h", 4: "i", 8: "q"}
 FLOAT_FORMATS = {4: "f", 8: "d"}
@@ -83,6 +85,7 @@ user_types = {}
 declarations = {}
 type_names = {}
 shown = {}  # key => sparse sequence as the core holds it after the last step message
+loads_at = []  # addresses of reads.o's viz_reads_count and viz_reads
 capture = {}  # variable name => (first index, count) to record of a sequence too long to record whole (FR-11)
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "typemap.json")) as f:
     TYPEMAP = json.load(f)
@@ -335,6 +338,8 @@ def window(span, length, most):
 
 def contiguous(base, addr, elem, length, head, span, snap, depth):
     t = elem.strip_typedefs()
+    if addr is not None:
+        head = dict(head, buffer=(addr, t.sizeof))
     if addr is not None and length > SPARSE_MIN and unpack_format(t):
         size = t.sizeof
         whole = length * size <= MAX_ARRAY_BYTES and snap["read"] + length * size <= MAX_READ_BYTES
@@ -473,12 +478,46 @@ def new_snap():
 def send_step(msg):
     global shown
     now = {}
+    loads = recorded_loads()
+    if loads is not None:
+        msg["reads"] = reads(loads, msg["heap"])
     msg["heap"] = {key: wire_object(key, obj, now) for key, obj in msg["heap"].items()}
     shown = now
     send(msg)
 
 
+def recorded_loads():
+    inferior = gdb.selected_inferior()
+    n = struct.unpack("=Q", inferior.read_memory(loads_at[0], 8))[0]
+    inferior.write_memory(loads_at[0], bytes(8))
+    if n > MAX_LOADS:
+        return None
+    return struct.unpack("=%dQ" % n, inferior.read_memory(loads_at[1], 8 * n)) if n else ()
+
+
+def reads(loads, heap):
+    buffers = sorted((obj["buffer"][0], obj["buffer"][0] + obj["length"] * obj["buffer"][1], obj["buffer"][1], key)
+                     for key, obj in heap.items() if "buffer" in obj)
+    starts = [b[0] for b in buffers]
+    reach = list(itertools.accumulate((b[1] for b in buffers), max))
+    out = {}
+    for addr in loads:
+        inner = None
+        # buffers nest (a struct's array inside a vector's): the innermost one names the cell
+        i = bisect.bisect_right(starts, addr) - 1
+        while i >= 0 and reach[i] > addr:
+            lo, hi, _, _ = buffers[i]
+            if addr < hi and (inner is None or hi - lo < inner[1] - inner[0]):
+                inner = buffers[i]
+            i -= 1
+        if inner is not None:
+            out[inner[3], (addr - inner[0]) // inner[2]] = None
+    return [{"obj": key, "index": index} for key, index in out]
+
+
 def wire_object(key, obj, now):
+    if "buffer" in obj:
+        obj = {k: v for k, v in obj.items() if k != "buffer"}
     if "read" in obj:
         out, now[key] = sparse(obj, shown.get(key))
         return out
@@ -1370,6 +1409,7 @@ def trace():
     send({"type": "hello", "protocol": 1, "language": LANGUAGE, "runtime": runtime, "adapter": ADAPTER})
 
     globals_ = global_symbols(main.symtab)
+    loads_at[:] = [int(gdb.parse_and_eval("(long)&%s" % name)) for name in ("viz_reads_count", "viz_reads")]
     lines = line_stops(gdb.current_progspace().filename)
     body = function_block(int(main.value().address))
     entry = min(pc for pc in lines if body.start <= pc < body.end)
@@ -1399,6 +1439,8 @@ def trace():
             send_step(crashed(failed(checks[pc], frame, calls, globals_), calls, globals_, last))
             return untraced(breaks, calls, lines)
         if last is None:
+            # loads before the first step (global constructors, or the run up to a start line) aren't any step's
+            gdb.selected_inferior().write_memory(loads_at[0], bytes(8))
             for bp in breaks:
                 bp.delete()
             checks = check_functions()

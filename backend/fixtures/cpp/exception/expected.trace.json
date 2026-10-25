@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -53,6 +54,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -111,6 +113,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "call",
@@ -156,6 +159,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -190,6 +194,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -238,6 +243,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -280,6 +286,7 @@
       "stdout": "caught: vector::_M_range_check: __n (which is 5) >= this->size() (which is 3)\n"
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -323,6 +330,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -372,6 +380,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -422,6 +431,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 2,
       "error": null,
       "event": "call",
@@ -467,6 +477,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o1",
+          "path": [
+            0
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -510,6 +529,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 2,
       "error": null,
       "event": "return",
@@ -558,6 +578,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -608,6 +629,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -658,6 +680,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 3,
       "error": null,
       "event": "call",
@@ -703,6 +726,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o1",
+          "path": [
+            1
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -746,6 +778,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 3,
       "error": null,
       "event": "return",
@@ -794,6 +827,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -844,6 +878,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -894,6 +929,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 4,
       "error": null,
       "event": "call",
@@ -939,6 +975,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o1",
+          "path": [
+            2
+          ]
+        }
+      ],
       "error": null,
       "event": "line",
       "frames": {
@@ -982,6 +1027,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 4,
       "error": null,
       "event": "return",
@@ -1030,6 +1076,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1080,6 +1127,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1130,6 +1178,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 5,
       "error": null,
       "event": "call",
@@ -1175,6 +1224,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": {
         "line": 5,
         "message": "Aborted",

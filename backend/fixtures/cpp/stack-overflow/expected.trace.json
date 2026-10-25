@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -45,6 +46,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "call",
@@ -109,6 +111,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -152,6 +155,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 2,
       "error": null,
       "event": "call",
@@ -217,6 +221,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -273,6 +278,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 3,
       "error": null,
       "event": "call",
@@ -339,6 +345,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -396,6 +403,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 4,
       "error": null,
       "event": "call",
@@ -463,6 +471,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -521,6 +530,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 5,
       "error": null,
       "event": "call",
@@ -589,6 +599,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -648,6 +659,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 6,
       "error": null,
       "event": "call",
@@ -717,6 +729,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -777,6 +790,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 7,
       "error": null,
       "event": "call",
@@ -847,6 +861,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -908,6 +923,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": {
         "kind": "recursion_too_deep",
         "line": 6,

@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -53,6 +54,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -94,6 +96,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -136,6 +139,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "call",
@@ -181,6 +185,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": {
         "kind": "division_by_zero",
         "line": 5,
