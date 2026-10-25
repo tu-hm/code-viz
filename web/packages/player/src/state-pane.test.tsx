@@ -102,6 +102,7 @@ function stepState(
     stack,
     heap,
     changed: { locals: {}, cells: {} },
+    before: { scope: {}, cells: {} },
     newObjects: [],
     output: [],
     ...rest,

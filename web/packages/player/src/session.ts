@@ -38,9 +38,10 @@ function reuse(prev: StepState | null, next: StepState): StepState {
   return { ...next, heap, stack }
 }
 
-export function useSession(source: TraceSource, expected: string): Session {
+export function useSession(source: TraceSource, expected: string, code: string): Session {
   const [session, setSession] = useState<Session>({ status: 'loading' })
   const prefilled = useEffectEvent(() => expected)
+  const sourceCode = useEffectEvent(() => code)
 
   useEffect(() => {
     let alive = true
@@ -81,6 +82,7 @@ export function useSession(source: TraceSource, expected: string): Session {
       usePlayer.setState({
         step: stepFromUrl(location.search, opened.stepCount),
         current: null,
+        facts: null,
         playing: false,
         breakpoints: [],
         expected,
@@ -95,6 +97,16 @@ export function useSession(source: TraceSource, expected: string): Session {
       ready = true
       setSession({ status: 'ready', ...opened, find: (from, jump) => remote.find(from, jump) })
       show()
+      remote.parse(sourceCode(), opened.header.language.id).then(
+        (facts) => {
+          if (alive) usePlayer.setState({ facts })
+        },
+        (e: unknown) => {
+          const reason = e instanceof Error ? e.message : String(e)
+          if (alive)
+            usePlayer.setState({ notice: `Couldn't parse the source for markers: ${reason}` })
+        },
+      )
     }
 
     start().catch(fail)

@@ -41,6 +41,10 @@ export function createWorkerApi() {
       })
       return result
     },
+    async parse(code: string, languageId: string) {
+      const { parseSource } = await import('./parse.ts')
+      return parseSource(code, languageId)
+    },
     find(from: number, jump: Jump) {
       if (trace === null) throw new Error('find before open')
       return findStep(trace.steps, trace.engine.base, from, jump)

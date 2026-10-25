@@ -11,7 +11,7 @@ import {
   type Look,
   type Table,
 } from './state-layout.ts'
-import { viewAs, type ViewAs } from './store.ts'
+import type { ViewAs } from './store.ts'
 import { changedClass, Fields, Mark, ValueView } from './value-view.tsx'
 
 export type CardProps = {
@@ -219,18 +219,22 @@ function RowTable({
   )
 }
 
+const viewLabels: Record<ViewAs, string> = { table: 'Table', cells: 'Cells', matrix: 'Matrix' }
+
 function ViewToggle({
   name,
   view,
+  options,
   onView,
 }: {
   name: string
   view: ViewAs
+  options: readonly ViewAs[]
   onView: (view: ViewAs) => void
 }) {
   return (
     <div role="group" aria-label={`View ${name} as`} className="flex gap-1 font-sans">
-      {viewAs.map((v) => (
+      {options.map((v) => (
         <Button
           key={v}
           size="sm"
@@ -238,7 +242,7 @@ function ViewToggle({
           aria-pressed={v === view}
           onClick={() => onView(v)}
         >
-          {v === 'table' ? 'Table' : 'Cells'}
+          {viewLabels[v]}
         </Button>
       ))}
     </div>
@@ -259,7 +263,14 @@ function SequenceCard({ card, look, isNew, onView, onShowRange }: CardProps) {
       facts={facts}
       actions={
         <>
-          {table && <ViewToggle name={name} view={view} onView={(v) => onView(name, v)} />}
+          {table && (
+            <ViewToggle
+              name={name}
+              view={view}
+              options={['table', 'cells']}
+              onView={(v) => onView(name, v)}
+            />
+          )}
           {o.truncated && variable !== undefined && onShowRange && (
             <Button
               size="sm"

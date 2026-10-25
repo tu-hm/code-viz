@@ -7,3 +7,8 @@ saveExact: true
 minimumReleaseAge: 10080 # 7 days: time for a hijacked release to be caught and pulled
 minimumReleaseAgeStrict: true
 blockExoticSubdeps: true
+allowBuilds:
+  # native Node bindings; the player loads the grammars' .wasm files instead
+  tree-sitter-c: false
+  tree-sitter-cpp: false
+  tree-sitter-python: false

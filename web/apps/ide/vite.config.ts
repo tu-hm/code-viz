@@ -12,6 +12,8 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset({ panicThreshold: 'all_errors' })] }),
     tailwindcss(),
   ],
+  // es => the worker can split off web-tree-sitter and load it only when it parses
+  worker: { format: 'es' },
   server: {
     strictPort: true,
     fs: {

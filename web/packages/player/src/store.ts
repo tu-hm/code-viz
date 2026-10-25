@@ -2,12 +2,13 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { StepState } from './engine.ts'
 import { isRecord } from './is-record.ts'
+import type { SourceFacts } from './source-facts.ts'
 
 export const speeds = [0.5, 1, 2, 4] as const
 export const densities = ['compact', 'comfortable'] as const
 export const fontSizes = ['s', 'm', 'l'] as const
 export const themes = ['system', 'light', 'dark'] as const
-export const viewAs = ['table', 'cells'] as const
+export const viewAs = ['table', 'cells', 'matrix'] as const
 
 export type ViewAs = (typeof viewAs)[number]
 
@@ -30,6 +31,7 @@ type PlayerState = {
   step: number
   playing: boolean
   current: StepState | null
+  facts: SourceFacts | null
   breakpoints: number[]
   settings: Settings
   split: number
@@ -114,6 +116,7 @@ export const usePlayer = create<PlayerState>()(
       step: 0,
       playing: false,
       current: null,
+      facts: null,
       breakpoints: [],
       settings: defaultSettings,
       split: 0.5,

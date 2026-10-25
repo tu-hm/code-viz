@@ -22,6 +22,24 @@ vi.mock('./spawn-engine.ts', async () => {
   return { spawnEngine: spawn }
 })
 
+// jsdom can't fetch the grammars' ?url paths; under Node, Language.load reads a file path itself
+vi.mock('./grammars.ts', async () => {
+  const { createRequire } = await import('node:module')
+  const { Language, Parser } = await import('web-tree-sitter')
+  const require = createRequire(import.meta.url)
+  const files = {
+    cpp: 'tree-sitter-cpp/tree-sitter-cpp.wasm',
+    python: 'tree-sitter-python/tree-sitter-python.wasm',
+  }
+  return {
+    grammars: files,
+    loadGrammar: async (grammar: keyof typeof files) => {
+      await Parser.init()
+      return Language.load(require.resolve(files[grammar]))
+    },
+  }
+})
+
 // jsdom has no matchMedia; the theme setting reads prefers-color-scheme through it
 if (typeof window !== 'undefined') {
   window.matchMedia = (media: string) =>

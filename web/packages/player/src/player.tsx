@@ -404,7 +404,7 @@ function Shell({
 }
 
 export function Player({ source, expected, ...props }: PlayerProps) {
-  const session = useSession(source, expected ?? '')
+  const session = useSession(source, expected ?? '', props.code)
   useDisplayOptions()
 
   if (session.status === 'loading') {

@@ -15,6 +15,11 @@ export type StepState = Pick<
     // sequence: absolute index; set, mapping: position in items or entries; record: field name; sparse: cell index
     cells: Record<string, string[]>
   }
+  // values before the line ran: the previous step's innermost and global frames, old sequence cells
+  before: {
+    scope: Record<string, Value>
+    cells: Record<string, Record<string, Value>>
+  }
   newObjects: string[]
   output: OutputSegment[]
 }
@@ -63,6 +68,11 @@ function changedKeys(before: Map<string, Value>, after: Map<string, Value>) {
 function sequenceCells(o: HeapObject) {
   const start = o.window?.start ?? 0
   return new Map((o.items ?? []).map((v, i) => [String(start + i), v]))
+}
+
+function cellAt(o: HeapObject, key: string): Value | undefined {
+  if (o.sparse) return o.sparse.items[key] ?? o.sparse.default
+  return o.items?.[Number(key) - (o.window?.start ?? 0)]
 }
 
 function fieldCells(o: HeapObject) {
@@ -149,16 +159,32 @@ export function createEngine(steps: Step[]) {
       return frame
     })
     const changed: StepState['changed'] = { locals: {}, cells: {} }
+    const before: StepState['before'] = { scope: {}, cells: {} }
     const newObjects: string[] = []
     if (prev) {
+      const frames = steps[k - 1]!.stack.map((id) => prev.frames.get(id))
+      for (const frame of [...frames.filter((f) => f?.kind === 'global'), frames.at(-1)]) {
+        for (const l of frame?.locals ?? []) before.scope[l.name] = l.value
+      }
       for (const frame of stack) {
         const names = changedLocals(prev.frames.get(frame.id), frame)
         if (names.length > 0) changed.locals[frame.id] = names
       }
       for (const [id, o] of cur.heap) {
-        const before = prev.heap.get(id)
-        if (!before) newObjects.push(id)
-        else if (!same(before, o)) changed.cells[id] = changedCells(before, o)
+        const was = prev.heap.get(id)
+        if (!was) newObjects.push(id)
+        else if (!same(was, o)) {
+          const keys = changedCells(was, o)
+          changed.cells[id] = keys
+          if (o.kind === 'sequence') {
+            before.cells[id] = Object.fromEntries(
+              keys.flatMap((key) => {
+                const v = cellAt(was, key)
+                return v === undefined ? [] : [[key, v]]
+              }),
+            )
+          }
+        }
       }
     }
 
@@ -176,6 +202,7 @@ export function createEngine(steps: Step[]) {
       stack,
       heap: Object.fromEntries(cur.heap),
       changed,
+      before,
       newObjects,
       output: output(k),
     }
