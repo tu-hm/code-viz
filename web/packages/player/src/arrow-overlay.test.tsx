@@ -24,9 +24,13 @@ function pane(state: StepState, languageId: string, toggles: Toggles = {}) {
         highlightChanges: true,
         drawArrows: true,
         showAddresses: false,
+        matrixView: true,
         ...toggles,
       }}
       views={{}}
+      facts={null}
+      pins={{}}
+      onPin={vi.fn<(variable: string, names: string[]) => void>()}
       onShowInternals={vi.fn<() => void>()}
       onFrameLine={vi.fn<(line: number) => void>()}
       onView={vi.fn<(variable: string, view: ViewAs) => void>()}
@@ -239,6 +243,7 @@ describe('§5.4 C++ mock, step 6: pointers', () => {
         stack: [frame],
         heap,
         changed: { locals: {}, cells: {} },
+        before: { scope: {}, cells: {} },
         newObjects: [],
         output: [],
       }

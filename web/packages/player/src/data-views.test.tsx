@@ -51,6 +51,8 @@ function renderState(state: StepState, languageId: string, options: Options = {}
       showInternals: false,
       showUnreachable: false,
       highlightChanges: true,
+      drawArrows: true,
+      showAddresses: false,
       matrixView: options.matrixView ?? true,
     },
     views: options.views ?? {},
