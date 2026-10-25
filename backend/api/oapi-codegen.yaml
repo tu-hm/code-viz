@@ -1,0 +1,10 @@
+package: api
+output: internal/gen/api/api.go
+generate:
+  models: true
+  std-http-server: true
+  strict-server: true
+output-options:
+  name-normalizer: ToCamelCaseWithInitialisms
+compatibility:
+  always-prefix-enum-values: true

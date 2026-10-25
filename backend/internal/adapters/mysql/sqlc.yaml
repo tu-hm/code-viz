@@ -1,0 +1,17 @@
+version: "2"
+sql:
+  - engine: mysql
+    schema: migrations
+    queries: queries
+    gen:
+      go:
+        package: sqlc
+        out: ../../gen/sqlc
+        overrides:
+          - db_type: int
+            go_type: int
+          # database/sql can't scan NULL into json.RawMessage
+          - db_type: json
+            nullable: true
+            go_type:
+              type: "[]byte"

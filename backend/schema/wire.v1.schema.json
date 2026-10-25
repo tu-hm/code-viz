@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tu-hm/code-viz/schema/wire.v1.schema.json",
+  "title": "Message",
+  "description": "One NDJSON line an adapter writes on fd 3 (spec §10.1). Unknown fields are allowed.",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": { "enum": ["hello", "step", "out", "exit", "log"] }
+  },
+  "allOf": [
+    { "if": { "properties": { "type": { "const": "hello" } } }, "then": { "$ref": "#/$defs/hello" } },
+    { "if": { "properties": { "type": { "const": "step" } } }, "then": { "$ref": "#/$defs/step" } },
+    { "if": { "properties": { "type": { "const": "out" } } }, "then": { "$ref": "#/$defs/out" } },
+    { "if": { "properties": { "type": { "const": "exit" } } }, "then": { "$ref": "#/$defs/exit" } },
+    { "if": { "properties": { "type": { "const": "log" } } }, "then": { "$ref": "#/$defs/log" } }
+  ],
+  "$defs": {
+    "hello": {
+      "description": "Must be the first message.",
+      "type": "object",
+      "required": ["protocol", "language", "runtime", "adapter"],
+      "properties": {
+        "protocol": { "type": "integer", "const": 1 },
+        "language": { "type": "string", "minLength": 1 },
+        "runtime": { "type": "string", "minLength": 1 },
+        "adapter": { "type": "string", "minLength": 1 }
+      }
+    },
+    "step": {
+      "description": "A full snapshot, except that a sparse sequence in the previous step under the same id may come as a patch of its changed cells (§19.9.1). Frame and object ids are the adapter's own, e.g. Python id() or C++ address:type.",
+      "type": "object",
+      "required": ["event", "line", "prevLine", "stack", "heap", "error"],
+      "properties": {
+        "event": { "$ref": "trace.v1.schema.json#/$defs/event" },
+        "line": { "type": "integer", "minimum": 1 },
+        "prevLine": { "type": ["integer", "null"], "minimum": 1 },
+        "stack": {
+          "description": "Outermost first. A frame id names one call and is not reused within the run.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "trace.v1.schema.json#/$defs/frame" }
+        },
+        "heap": {
+          "type": "object",
+          "propertyNames": { "minLength": 1 },
+          "additionalProperties": { "$ref": "trace.v1.schema.json#/$defs/heapObject" }
+        },
+        "error": {
+          "type": ["object", "null"],
+          "required": ["type", "message", "line"],
+          "properties": {
+            "type": { "type": "string", "minLength": 1 },
+            "message": { "type": "string" },
+            "line": { "type": "integer", "minimum": 1 },
+            "kind": { "$ref": "trace.v1.schema.json#/$defs/errorKind" },
+            "values": { "$ref": "trace.v1.schema.json#/$defs/errorValues" }
+          }
+        },
+        "stdinPos": { "$ref": "trace.v1.schema.json#/$defs/stdinPos" },
+        "callId": { "type": "integer", "minimum": 0 },
+        "parentCallId": { "type": "integer", "minimum": 0 },
+        "reads": {
+          "description": "Every sequence cell the program read since the previous step, first read first (§19.9.2). Left out when the adapter couldn't record them all.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["obj", "index"],
+            "properties": {
+              "obj": { "description": "A sequence in this step's heap.", "type": "string", "minLength": 1 },
+              "index": { "description": "Counted from the sequence's start, not its window's.", "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "out": {
+      "description": "Program output, only from adapters that capture it themselves instead of on fd 1 and 2.",
+      "type": "object",
+      "required": ["stream", "data"],
+      "properties": {
+        "stream": { "enum": ["stdout", "stderr"] },
+        "data": { "type": "string" }
+      }
+    },
+    "exit": {
+      "description": "Must be the last message.",
+      "allOf": [
+        { "$ref": "trace.v1.schema.json#/$defs/exit" },
+        { "if": { "required": ["lineHits"] }, "then": { "required": ["lineHitsSource"] } },
+        { "if": { "required": ["lineHitsSource"] }, "then": { "required": ["lineHits"] } }
+      ],
+      "properties": {
+        "lineHits": {
+          "description": "Line number to times it ran, over the whole run (§19.9.3). Same shape as summary.lineHits. Without it, the core counts the recorded steps.",
+          "type": "object",
+          "propertyNames": { "pattern": "^[1-9][0-9]*$" },
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "lineHitsSource": {
+          "description": "Where lineHits come from: the tracer's own counter, or gcov after a normal exit.",
+          "enum": ["counter", "gcov"]
+        }
+      }
+    },
+    "log": {
+      "description": "Adapter debug output, kept in internal logs and never shown to users.",
+      "type": "object",
+      "required": ["level", "message"],
+      "properties": {
+        "level": { "enum": ["debug", "info", "warn", "error"] },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "id": "trc_8c1f4e2a9b7d6c35",
+  "language": { "id": "python3", "runtime": "CPython 3.12.4", "adapter": "py-settrace/1.2.0" },
+  "source": { "file": "main.py", "lineCount": 14 },
+  "options": { "maxSteps": 1000, "startAtLines": [] },
+  "summary": {
+    "stepCount": 19,
+    "truncated": false,
+    "truncation": null,
+    "exit": { "kind": "normal", "code": 0, "signal": null, "message": null }
+  },
+  "encoding": { "mode": "delta", "keyframeInterval": 50 },
+  "steps": [
+    {
+      "i": 0,
+      "event": "line",
+      "prevLine": null,
+      "line": 1,
+      "keyframe": true,
+      "stack": ["f0"],
+      "frames": {
+        "f0": { "id": "f0", "name": "<module>", "kind": "global", "line": 1, "locals": [], "returnValue": null }
+      },
+      "heap": {},
+      "removedObjects": [],
+      "stdout": "",
+      "stderr": "",
+      "error": null
+    },
+    {
+      "i": 8,
+      "event": "call",
+      "prevLine": 9,
+      "line": 2,
+      "keyframe": false,
+      "stack": ["f0", "f1"],
+      "frames": {
+        "f1": {
+          "id": "f1",
+          "name": "square",
+          "kind": "function",
+          "line": 2,
+          "locals": [{ "name": "x", "value": { "t": "int", "v": "5" } }],
+          "returnValue": null
+        }
+      },
+      "heap": {},
+      "removedObjects": [],
+      "stdout": "",
+      "stderr": "",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+*
+!go.mod
+!go.sum
+!cmd/viz-shim/
+!internal/shim/
+!adapters/python/tracer.py
