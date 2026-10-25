@@ -90,12 +90,11 @@ function shape(card: CardView) {
 }
 
 function markersOf(
-  card: CardView,
+  dims: number[],
   subscripts: Subscript[],
   scope: Scope,
   pins: string[],
 ): Pick<CardMarks, 'markers' | 'hidden' | 'range'> {
-  const dims = shape(card)
   const found = new Map<string, Marker>()
   const add = (axis: number, label: string, name: string, at: number, plain: boolean) => {
     const key = `${axis}|${name}`
@@ -211,8 +210,23 @@ export function marksFor(
   const before = intScope(state.before.scope)
   return {
     indexed,
-    ...markersOf(card, [...on(state.line), ...ran], scope, pins),
+    ...markersOf(shape(card), [...on(state.line), ...ran], scope, pins),
     ...readsOf(card, ran, before, state),
     narration: narrationOf(card, ran, before, state, format),
   }
+}
+
+export function stringMarkers(state: StepState, facts: SourceFacts | null) {
+  const out: Record<string, Marker[]> = {}
+  if (facts === null) return out
+  const values = scopeOf(state)
+  const subscripts = [state.line, state.prevLine].flatMap((l) => lineFacts(facts, l).subscripts)
+  for (const [name, v] of Object.entries(values)) {
+    if (v.t !== 'str' || v.v === undefined) continue
+    const on = subscripts.filter((s) => s.array === name && s.indices.length === 1)
+    if (on.length === 0) continue
+    const { markers } = markersOf([[...v.v].length], on, intScope(values), [])
+    if (markers.length > 0) out[name] = markers
+  }
+  return out
 }

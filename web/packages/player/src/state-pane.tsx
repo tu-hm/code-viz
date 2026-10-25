@@ -2,9 +2,10 @@ import { Button, cn } from '@viz/ui'
 import { memo, useEffect, useId, useRef, type Ref } from 'react'
 import { ArrowOverlay } from './arrow-overlay.tsx'
 import { HeapCard } from './cards.tsx'
-import type { StepState } from './engine.ts'
+import { same, type StepState } from './engine.ts'
 import { formatterFor } from './format.ts'
-import { marksFor } from './marks.ts'
+import { IndexedString } from './indexed-string.tsx'
+import { marksFor, stringMarkers, type Marker } from './marks.ts'
 import type { SourceFacts } from './source-facts.ts'
 import {
   inlineChanged,
@@ -47,6 +48,7 @@ type FrameProps = {
   active: boolean
   changed: string[] | undefined
   look: Look
+  strings: Record<string, Marker[]> | undefined
   onLine: (line: number) => void
   onShowInternals: () => void
   ref?: Ref<HTMLDivElement>
@@ -61,6 +63,7 @@ function sameFrame(a: FrameProps, b: FrameProps) {
     a.onLine === b.onLine &&
     a.onShowInternals === b.onShowInternals &&
     sameList(a.changed, b.changed) &&
+    same(a.strings, b.strings) &&
     sameReads(a.view.reads, b.view.reads, a.look, b.look)
   )
 }
@@ -71,6 +74,7 @@ const FrameTable = memo(function FrameTable({
   active,
   changed,
   look,
+  strings,
   onLine,
   onShowInternals,
   ref,
@@ -101,6 +105,7 @@ const FrameTable = memo(function FrameTable({
               const on =
                 look.highlight &&
                 (changed?.includes(l.name) === true || inlineChanged(l.value, look))
+              const marked = l.value.t === 'str' ? strings?.[l.name] : undefined
               return (
                 <tr key={l.name} className={rowClass}>
                   <th
@@ -118,7 +123,11 @@ const FrameTable = memo(function FrameTable({
                       on && changedClass,
                     )}
                   >
-                    <ValueView value={l.value} look={look} />
+                    {marked ? (
+                      <IndexedString value={l.value} markers={marked} />
+                    ) : (
+                      <ValueView value={l.value} look={look} />
+                    )}
                     <Mark on={on} />
                   </td>
                 </tr>
@@ -196,6 +205,7 @@ export function StatePane({
     addresses: settings.showAddresses,
   }
   const fresh = new Set(state.newObjects)
+  const strings = stringMarkers(state, facts)
 
   return (
     <div className="@container relative flex flex-col gap-4 p-(--pane-padding)">
@@ -214,6 +224,7 @@ export function StatePane({
                 active={active}
                 changed={state.changed.locals[view.frame.id]}
                 look={look}
+                strings={active || view.frame.kind === 'global' ? strings : undefined}
                 onLine={onFrameLine}
                 onShowInternals={onShowInternals}
               />

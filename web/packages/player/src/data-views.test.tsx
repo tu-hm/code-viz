@@ -242,6 +242,28 @@ describe('index markers (§19.4.1)', () => {
     expect(onPin).toHaveBeenCalledWith('a', ['l', 'r'])
   })
 
+  test('a string indexed on the line reads inline with its markers', () => {
+    const facts: SourceFacts = {
+      2: {
+        subscripts: [{ array: 's', indices: [{ name: 'i', offset: 0 }], mode: 'r' }],
+        identifiers: ['s', 'i'],
+        inputs: [],
+        scanf: [],
+        header: null,
+      },
+    }
+    const word: Local = { name: 's', value: { t: 'str', v: 'code' } }
+    renderState(state([word, int('i', 2)]), 'cpp17-gcc', { facts })
+    const row = screen.getByRole('row', { name: /^s / })
+    expect(within(row).getByText('▼').parentElement!.textContent).toBe('i▼d')
+    expect(within(row).getByText('i at 2')).toBeDefined()
+    const { unmount } = renderState(state([word, int('i', 7)]), 'cpp17-gcc', { facts })
+    expect(screen.getAllByText(/out of range, size 4/)[0]!.textContent).toBe(
+      'i = 7 ▶ out of range, size 4',
+    )
+    unmount()
+  })
+
   test('a step with access[] uses it instead of inferring reads', () => {
     renderState(
       state([int('i', 1)], { access: [{ obj: 'o1', path: [6], mode: 'r' }] }),
