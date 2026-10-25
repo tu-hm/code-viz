@@ -287,6 +287,8 @@ function StateBox({
   const showInternals = usePlayer((s) => s.settings.showInternals)
   const showUnreachable = usePlayer((s) => s.settings.showUnreachable)
   const highlightChanges = usePlayer((s) => s.settings.highlightChanges)
+  const drawArrows = usePlayer((s) => s.settings.drawArrows)
+  const showAddresses = usePlayer((s) => s.settings.showAddresses)
   const views = usePlayer((s) => s.views)
   const updateSettings = usePlayer((s) => s.updateSettings)
   const revealLine = usePlayer((s) => s.revealLine)
@@ -296,7 +298,7 @@ function StateBox({
       state={state}
       languageId={languageId}
       pointers={pointers}
-      settings={{ showInternals, showUnreachable, highlightChanges }}
+      settings={{ showInternals, showUnreachable, highlightChanges, drawArrows, showAddresses }}
       views={views}
       onShowInternals={() => updateSettings({ showInternals: true })}
       onFrameLine={revealLine}

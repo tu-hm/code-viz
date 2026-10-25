@@ -1,5 +1,6 @@
 import { Button, cn } from '@viz/ui'
 import { memo, useEffect, useId, useRef, type Ref } from 'react'
+import { ArrowOverlay } from './arrow-overlay.tsx'
 import { HeapCard } from './cards.tsx'
 import type { StepState } from './engine.ts'
 import { formatterFor } from './format.ts'
@@ -18,7 +19,10 @@ type StatePaneProps = {
   state: StepState | null
   languageId: string
   pointers: boolean
-  settings: Pick<Settings, 'showInternals' | 'showUnreachable' | 'highlightChanges'>
+  settings: Pick<
+    Settings,
+    'showInternals' | 'showUnreachable' | 'highlightChanges' | 'drawArrows' | 'showAddresses'
+  >
   views: Record<string, ViewAs>
   onShowInternals: () => void
   onFrameLine: (line: number) => void
@@ -157,6 +161,8 @@ export function StatePane({
   const stackId = useId()
   const heapId = useId()
   const activeFrame = useRef<HTMLDivElement>(null)
+  const stack = useRef<HTMLElement>(null)
+  const heap = useRef<HTMLElement>(null)
   const activeId = state?.stack.at(-1)?.id
 
   useEffect(() => {
@@ -165,7 +171,8 @@ export function StatePane({
 
   if (state === null) return null
   const format = formatterFor(languageId)
-  const { frames, cards, inline, nested } = layoutState(state, { ...settings, views, format })
+  const layout = layoutState(state, { ...settings, views, format })
+  const { frames, cards, inline, nested } = layout
   const look: Look = {
     format,
     heap: state.heap,
@@ -173,13 +180,14 @@ export function StatePane({
     nested,
     changed: state.changed.cells,
     highlight: settings.highlightChanges,
+    addresses: settings.showAddresses,
   }
   const fresh = new Set(state.newObjects)
 
   return (
-    <div className="@container flex flex-col gap-4 p-(--pane-padding)">
+    <div className="@container relative flex flex-col gap-4 p-(--pane-padding)">
       <div className="grid items-start gap-6 @xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-        <section aria-labelledby={stackId} className="flex min-w-0 flex-col gap-3">
+        <section ref={stack} aria-labelledby={stackId} className="flex min-w-0 flex-col gap-3">
           <h2 id={stackId} className="mono-label text-muted-foreground">
             Stack
           </h2>
@@ -199,7 +207,7 @@ export function StatePane({
             )
           })}
         </section>
-        <section aria-labelledby={heapId} className="flex min-w-0 flex-col gap-3">
+        <section ref={heap} aria-labelledby={heapId} className="flex min-w-0 flex-col gap-3">
           <h2 id={heapId} className="mono-label text-muted-foreground">
             Heap
           </h2>
@@ -220,7 +228,9 @@ export function StatePane({
         {settings.highlightChanges && <span>* changed since the previous step</span>}
         <span>· not set yet</span>
         {pointers && <span>∅ null pointer</span>}
+        {pointers && <span>focus or hover ● to see the address</span>}
       </p>
+      <ArrowOverlay redrawOn={layout} draw={settings.drawArrows} stack={stack} heap={heap} />
     </div>
   )
 }

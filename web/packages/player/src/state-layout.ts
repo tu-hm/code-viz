@@ -30,6 +30,7 @@ export type Look = {
   nested: ReadonlySet<string>
   changed: StepState['changed']['cells']
   highlight: boolean
+  addresses: boolean
 }
 
 export type StateLayout = {
@@ -61,10 +62,14 @@ export function sameList(a: readonly string[] | undefined, b: readonly string[] 
 }
 
 export function sameReads(a: Reads, b: Reads, x: Look, y: Look) {
-  if (x.format !== y.format || x.highlight !== y.highlight) return false
+  if (x.format !== y.format || x.highlight !== y.highlight || x.addresses !== y.addresses) {
+    return false
+  }
   if (!sameList(a.drawn, b.drawn) || !sameList(a.named, b.named)) return false
   const sameStatus = (id: string) =>
-    x.inline[id] === y.inline[id] && x.nested.has(id) === y.nested.has(id)
+    x.inline[id] === y.inline[id] &&
+    x.nested.has(id) === y.nested.has(id) &&
+    Object.hasOwn(x.heap, id) === Object.hasOwn(y.heap, id)
   return (
     a.drawn.every(
       (id) => x.heap[id] === y.heap[id] && sameList(x.changed[id], y.changed[id]) && sameStatus(id),

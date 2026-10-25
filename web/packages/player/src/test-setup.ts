@@ -44,3 +44,12 @@ if (typeof Range !== 'undefined') {
 if (typeof Element !== 'undefined') {
   Element.prototype.scrollIntoView = () => {}
 }
+
+// jsdom has no ResizeObserver; the arrow overlay redraws on resize with it
+if (typeof window !== 'undefined') {
+  window.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}

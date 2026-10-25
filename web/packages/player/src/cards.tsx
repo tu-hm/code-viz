@@ -51,8 +51,9 @@ function Card({
     // content-visibility: offscreen cards skip layout, synthetic-5000 8.1 => 4.0 ms p50
     <article
       aria-labelledby={titleId}
+      data-card={id}
       className={cn(
-        'flex min-w-0 flex-col gap-2 rounded-xl bg-card p-3 font-mono text-(length:--code-font-size) [contain-intrinsic-size:auto_6rem] [content-visibility:auto]',
+        'flex min-w-0 flex-col gap-2 rounded-xl bg-card p-3 data-active:outline-2 data-active:-outline-offset-2 data-active:outline-trace-arrow-active font-mono text-(length:--code-font-size) [contain-intrinsic-size:auto_6rem] [content-visibility:auto]',
         isNew && 'transition-opacity duration-(--duration-fade) starting:opacity-0',
         unreachable && 'text-muted-foreground',
       )}

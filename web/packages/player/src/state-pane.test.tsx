@@ -14,7 +14,12 @@ beforeEach(() => {
 })
 
 type Options = {
-  settings?: Partial<Pick<Settings, 'showInternals' | 'showUnreachable' | 'highlightChanges'>>
+  settings?: Partial<
+    Pick<
+      Settings,
+      'showInternals' | 'showUnreachable' | 'highlightChanges' | 'drawArrows' | 'showAddresses'
+    >
+  >
   views?: Record<string, ViewAs>
   onShowRange?: (variable: string) => void
 }
@@ -39,6 +44,8 @@ function paneProps(state: StepState, languageId: string, options: Options = {}) 
       showInternals: false,
       showUnreachable: false,
       highlightChanges: true,
+      drawArrows: true,
+      showAddresses: false,
       ...options.settings,
     },
     views: options.views ?? {},

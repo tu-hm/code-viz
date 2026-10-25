@@ -19,15 +19,42 @@ export function Mark({ on }: { on: boolean }) {
   )
 }
 
-function RefLabel({ id, index, title }: { id: string; index?: number; title?: string }) {
+function RefLabel({
+  id,
+  index,
+  title,
+  addr,
+  showAddr,
+}: {
+  id: string
+  index?: number
+  title?: string
+  addr?: string
+  showAddr?: boolean
+}) {
   return (
-    <span className="whitespace-nowrap" title={title}>
-      <span aria-hidden className="text-trace-arrow">
+    <button
+      type="button"
+      data-arrow-to={id}
+      data-addr={addr === undefined ? undefined : ''}
+      title={title}
+      className="group/ref cursor-pointer rounded-sm text-left whitespace-nowrap data-active:underline"
+    >
+      <span
+        aria-hidden
+        className="text-trace-arrow transition-colors duration-(--duration-fade) group-data-active/ref:text-trace-arrow-active"
+      >
         ●──▶{' '}
       </span>
-      <span className="sr-only">points to </span>#{id}
+      <span className="sr-only">points to</span> #{id}
       {index !== undefined && `[${index}]`}
-    </span>
+      {showAddr && (
+        <>
+          {' '}
+          <span className="text-muted-foreground">{addr}</span>
+        </>
+      )}
+    </button>
   )
 }
 
@@ -91,15 +118,27 @@ export function ValueView({ value, look }: { value: Value; look: Look }) {
       if (value.addr === '0x0') {
         return <Faint glyph="∅" text="null pointer" title={hover(value.type, 'nullptr')} />
       }
-      if (value.target === undefined) {
+      if (value.target === undefined || !Object.hasOwn(look.heap, value.target)) {
         return (
-          <span className="text-muted-foreground" title={hover(value.type, 'not followed')}>
+          <span
+            className="text-muted-foreground"
+            title={hover(
+              value.type,
+              value.target === undefined ? 'not followed' : 'no object here',
+            )}
+          >
             {value.addr}
           </span>
         )
       }
       return (
-        <RefLabel id={value.target} index={value.index} title={hover(value.type, value.addr)} />
+        <RefLabel
+          id={value.target}
+          index={value.index}
+          title={hover(value.type, value.addr)}
+          addr={value.addr}
+          showAddr={look.addresses}
+        />
       )
     case 'uninit':
       return <Faint glyph="·" text="not set yet" title={hover(value.type, 'not set yet')} />
