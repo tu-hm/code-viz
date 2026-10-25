@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -50,6 +51,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -94,6 +96,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "call",
@@ -135,6 +138,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -174,6 +178,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 2,
       "error": null,
       "event": "call",
@@ -216,6 +221,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -256,6 +262,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 3,
       "error": null,
       "event": "call",
@@ -299,6 +306,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -340,6 +348,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 4,
       "error": null,
       "event": "call",
@@ -384,6 +393,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -426,6 +436,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 5,
       "error": null,
       "event": "call",
@@ -471,6 +482,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -514,6 +526,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 5,
       "error": null,
       "event": "return",
@@ -561,6 +574,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 6,
       "error": null,
       "event": "call",
@@ -606,6 +620,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -649,6 +664,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 6,
       "error": null,
       "event": "return",
@@ -696,6 +712,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 4,
       "error": null,
       "event": "return",
@@ -742,6 +759,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 7,
       "error": null,
       "event": "call",
@@ -786,6 +804,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -828,6 +847,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 7,
       "error": null,
       "event": "return",
@@ -874,6 +894,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 3,
       "error": null,
       "event": "return",
@@ -919,6 +940,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 8,
       "error": null,
       "event": "call",
@@ -962,6 +984,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1003,6 +1026,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 9,
       "error": null,
       "event": "call",
@@ -1047,6 +1071,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1089,6 +1114,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 9,
       "error": null,
       "event": "return",
@@ -1135,6 +1161,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 10,
       "error": null,
       "event": "call",
@@ -1179,6 +1206,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1221,6 +1249,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 10,
       "error": null,
       "event": "return",
@@ -1267,6 +1296,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 8,
       "error": null,
       "event": "return",
@@ -1312,6 +1342,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 2,
       "error": null,
       "event": "return",
@@ -1356,6 +1387,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 11,
       "error": null,
       "event": "call",
@@ -1398,6 +1430,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1438,6 +1471,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 12,
       "error": null,
       "event": "call",
@@ -1481,6 +1515,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1522,6 +1557,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 13,
       "error": null,
       "event": "call",
@@ -1566,6 +1602,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1608,6 +1645,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 13,
       "error": null,
       "event": "return",
@@ -1654,6 +1692,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 14,
       "error": null,
       "event": "call",
@@ -1698,6 +1737,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1740,6 +1780,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 14,
       "error": null,
       "event": "return",
@@ -1786,6 +1827,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 12,
       "error": null,
       "event": "return",
@@ -1831,6 +1873,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 15,
       "error": null,
       "event": "call",
@@ -1874,6 +1917,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1915,6 +1959,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 15,
       "error": null,
       "event": "return",
@@ -1960,6 +2005,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 11,
       "error": null,
       "event": "return",
@@ -2004,6 +2050,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "return",
@@ -2047,6 +2094,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "return",

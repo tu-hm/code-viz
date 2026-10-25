@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -50,6 +51,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -94,6 +96,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -132,6 +135,7 @@
       "stdout": "{'w': <class 'int'>, 'h': <class 'int'>, 'return': <class 'int'>}\n"
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "call",
@@ -180,6 +184,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "return",
@@ -230,6 +235,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "return",

@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -50,6 +51,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -80,6 +82,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -110,6 +113,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -154,6 +158,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -192,6 +197,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "call",
@@ -233,6 +239,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 2,
       "error": null,
       "event": "call",
@@ -275,6 +282,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 3,
       "error": null,
       "event": "call",
@@ -318,6 +326,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 4,
       "error": null,
       "event": "call",
@@ -362,6 +371,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 5,
       "error": null,
       "event": "call",
@@ -407,6 +417,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 6,
       "error": null,
       "event": "call",
@@ -453,6 +464,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 7,
       "error": null,
       "event": "call",
@@ -500,6 +512,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 8,
       "error": null,
       "event": "call",
@@ -548,6 +561,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 9,
       "error": null,
       "event": "call",
@@ -597,6 +611,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 10,
       "error": null,
       "event": "call",
@@ -647,6 +662,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 11,
       "error": null,
       "event": "call",
@@ -698,6 +714,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 12,
       "error": null,
       "event": "call",
@@ -750,6 +767,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 13,
       "error": null,
       "event": "call",
@@ -803,6 +821,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 14,
       "error": null,
       "event": "call",
@@ -857,6 +876,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 15,
       "error": null,
       "event": "call",
@@ -912,6 +932,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 16,
       "error": null,
       "event": "call",
@@ -968,6 +989,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 17,
       "error": null,
       "event": "call",
@@ -1025,6 +1047,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 18,
       "error": null,
       "event": "call",
@@ -1083,6 +1106,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 19,
       "error": null,
       "event": "call",
@@ -1142,6 +1166,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 20,
       "error": null,
       "event": "call",
@@ -1202,6 +1227,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 21,
       "error": null,
       "event": "call",
@@ -1263,6 +1289,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 22,
       "error": null,
       "event": "call",
@@ -1325,6 +1352,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 23,
       "error": null,
       "event": "call",
@@ -1388,6 +1416,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 24,
       "error": null,
       "event": "call",
@@ -1452,6 +1481,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 25,
       "error": null,
       "event": "call",
@@ -1517,6 +1547,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 26,
       "error": null,
       "event": "call",
@@ -1583,6 +1614,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 27,
       "error": null,
       "event": "call",
@@ -1650,6 +1682,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 28,
       "error": null,
       "event": "call",
@@ -1718,6 +1751,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 29,
       "error": null,
       "event": "call",
@@ -1787,6 +1821,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 30,
       "error": null,
       "event": "call",
@@ -1857,6 +1892,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 31,
       "error": null,
       "event": "call",
@@ -1928,6 +1964,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 32,
       "error": null,
       "event": "call",
@@ -2000,6 +2037,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 33,
       "error": null,
       "event": "call",
@@ -2073,6 +2111,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 34,
       "error": null,
       "event": "call",
@@ -2147,6 +2186,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 35,
       "error": null,
       "event": "call",
@@ -2222,6 +2262,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 36,
       "error": null,
       "event": "call",
@@ -2298,6 +2339,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 37,
       "error": null,
       "event": "call",
@@ -2375,6 +2417,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 38,
       "error": null,
       "event": "call",
@@ -2453,6 +2496,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 39,
       "error": null,
       "event": "call",
@@ -2532,6 +2576,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 40,
       "error": null,
       "event": "call",
@@ -2612,6 +2657,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 41,
       "error": null,
       "event": "call",
@@ -2693,6 +2739,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 42,
       "error": null,
       "event": "call",
@@ -2775,6 +2822,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 43,
       "error": null,
       "event": "call",
@@ -2858,6 +2906,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 44,
       "error": null,
       "event": "call",
@@ -2942,6 +2991,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 45,
       "error": null,
       "event": "call",
@@ -3027,6 +3077,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 46,
       "error": null,
       "event": "call",
@@ -3855,6 +3906,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 47,
       "error": null,
       "event": "call",
@@ -3942,6 +3994,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 48,
       "error": null,
       "event": "call",
@@ -4030,6 +4083,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 49,
       "error": null,
       "event": "call",
@@ -4119,6 +4173,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 50,
       "error": null,
       "event": "call",
@@ -4209,6 +4264,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 51,
       "error": null,
       "event": "call",
@@ -4300,6 +4356,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 52,
       "error": null,
       "event": "call",
@@ -4392,6 +4449,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 53,
       "error": null,
       "event": "call",
@@ -4485,6 +4543,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 54,
       "error": null,
       "event": "call",
@@ -4579,6 +4638,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 55,
       "error": null,
       "event": "call",
@@ -4674,6 +4734,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 56,
       "error": null,
       "event": "call",
@@ -4770,6 +4831,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 57,
       "error": null,
       "event": "call",
@@ -4867,6 +4929,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 58,
       "error": null,
       "event": "call",
@@ -4965,6 +5028,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 59,
       "error": null,
       "event": "call",
@@ -5064,6 +5128,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 60,
       "error": null,
       "event": "call",
@@ -5164,6 +5229,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 61,
       "error": null,
       "event": "call",
@@ -5265,6 +5331,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 62,
       "error": null,
       "event": "call",
@@ -5367,6 +5434,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 63,
       "error": null,
       "event": "call",
@@ -5470,6 +5538,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 64,
       "error": null,
       "event": "call",
@@ -5574,6 +5643,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 65,
       "error": null,
       "event": "call",
@@ -5679,6 +5749,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 66,
       "error": null,
       "event": "call",
@@ -5785,6 +5856,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 67,
       "error": null,
       "event": "call",
@@ -5892,6 +5964,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 68,
       "error": null,
       "event": "call",
@@ -6000,6 +6073,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 69,
       "error": null,
       "event": "call",
@@ -6109,6 +6183,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 70,
       "error": null,
       "event": "call",
@@ -6219,6 +6294,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 71,
       "error": null,
       "event": "call",
@@ -6330,6 +6406,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 72,
       "error": null,
       "event": "call",
@@ -6442,6 +6519,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 73,
       "error": null,
       "event": "call",
@@ -6555,6 +6633,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 74,
       "error": null,
       "event": "call",
@@ -6669,6 +6748,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 75,
       "error": null,
       "event": "call",
@@ -6784,6 +6864,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 76,
       "error": null,
       "event": "call",
@@ -6900,6 +6981,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 77,
       "error": null,
       "event": "call",
@@ -7017,6 +7099,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 78,
       "error": null,
       "event": "call",
@@ -7135,6 +7218,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 79,
       "error": null,
       "event": "call",
@@ -7254,6 +7338,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 80,
       "error": null,
       "event": "call",
@@ -7374,6 +7459,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 81,
       "error": null,
       "event": "call",
@@ -7495,6 +7581,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 82,
       "error": null,
       "event": "call",
@@ -7617,6 +7704,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 83,
       "error": null,
       "event": "call",
@@ -7740,6 +7828,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 84,
       "error": null,
       "event": "call",
@@ -7864,6 +7953,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 85,
       "error": null,
       "event": "call",
@@ -7989,6 +8079,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 86,
       "error": null,
       "event": "call",
@@ -8115,6 +8206,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 87,
       "error": null,
       "event": "call",
@@ -8242,6 +8334,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 88,
       "error": null,
       "event": "call",
@@ -8370,6 +8463,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 89,
       "error": null,
       "event": "call",
@@ -8499,6 +8593,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 90,
       "error": null,
       "event": "call",
@@ -8629,6 +8724,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 91,
       "error": null,
       "event": "call",
@@ -8760,6 +8856,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 92,
       "error": null,
       "event": "call",
@@ -8892,6 +8989,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 93,
       "error": null,
       "event": "call",
@@ -9025,6 +9123,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 94,
       "error": null,
       "event": "call",
@@ -9159,6 +9258,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 95,
       "error": null,
       "event": "call",
@@ -9294,6 +9394,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 96,
       "error": null,
       "event": "call",
@@ -10972,6 +11073,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": {
         "kind": "recursion_too_deep",
         "line": 7,
@@ -11098,6 +11200,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -11136,6 +11239,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -11187,6 +11291,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -11227,6 +11332,7 @@
       "stdout": "caught: maximum recursion depth exceeded\n"
     },
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "return",

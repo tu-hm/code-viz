@@ -38,14 +38,19 @@ HEADROOM = 50  # frames kept free above the user's recursion limit for the hook 
 CO_VARARGS = 0x04
 CO_VARKEYWORDS = 0x08
 RETURNS = {opcode.opmap["RETURN_VALUE"], opcode.opmap["RETURN_CONST"], opcode.opmap["YIELD_VALUE"]}
+SUBSCRIPT = opcode.opmap["BINARY_SUBSCR"]
+MAX_READS = 1000  # distinct cells per step; the core keeps the same (§11)
+MONITOR = sys.monitoring.DEBUGGER_ID
 # functools has no public type for @cache and @lru_cache wrappers
 FUNCTIONS = (types.FunctionType, types.MethodType, types.BuiltinFunctionType,
              functools._lru_cache_wrapper)  # pyright: ignore[reportPrivateUsage]
 THREAD_START = threading.Thread.start.__code__
 INDEXABLE = (list, tuple, str, range, collections.deque)
+SEQUENCES = (list, tuple, collections.deque)
 ARITHMETIC: dict[type[ast.operator], Callable[[int, int], int]] = {
     ast.Add: int.__add__, ast.Sub: int.__sub__, ast.Mult: int.__mul__, ast.FloorDiv: int.__floordiv__,
-    ast.Mod: int.__mod__}
+    ast.Mod: int.__mod__, ast.BitXor: int.__xor__, ast.BitAnd: int.__and__, ast.BitOr: int.__or__,
+    ast.LShift: int.__lshift__, ast.RShift: int.__rshift__}
 
 wire: io.TextIOWrapper
 max_steps = 1000
@@ -72,6 +77,10 @@ token_ends: list[int] = []
 recursion_limit = sys.getrecursionlimit()
 source = b""
 spans: dict[tuple[int | None, int | None, int | None, int | None], ast.AST] | None = None
+positions: dict[types.CodeType, list[tuple[int | None, int | None, int | None, int | None]]] = {}
+reads: dict[tuple[int, int], object] = {}  # (id, index) => the sequence, kept alive so its id isn't reused before the step
+reads_lost = False
+watched: set[types.CodeType] = set()
 set_recursion_limit = sys.setrecursionlimit
 
 
@@ -237,7 +246,7 @@ def stack_of(frame: types.FrameType | None) -> list[types.FrameType]:
 
 
 def step(frame: types.FrameType, event: Event, error: StepError | None = None, returned: object = None) -> None:
-    global sent, tail, call_hook
+    global sent, tail, call_hook, reads_lost
     frames = stack_of(frame)
     kept = frames if len(frames) <= MAX_FRAMES + 1 else frames[:1] + frames[-MAX_FRAMES:]
     windows.clear()
@@ -262,6 +271,10 @@ def step(frame: types.FrameType, event: Event, error: StepError | None = None, r
         msg["callId"] = call_ids[frame]
     if event == "call" and len(frames) > 1:
         msg["parentCallId"] = call_ids[frames[-2]]
+    if not reads_lost:
+        msg["reads"] = [{"obj": str(oid), "index": index} for oid, index in reads if str(oid) in heap]
+    reads.clear()
+    reads_lost = False
     send(msg)
     pending.discard(frame)
     last_lines[frame] = line
@@ -270,6 +283,8 @@ def step(frame: types.FrameType, event: Event, error: StepError | None = None, r
         tail, call_hook = True, count_call
         sys.settrace(count_call)
         threading.settrace(count_call)
+        for code in watched:
+            sys.monitoring.set_local_events(MONITOR, code, 0)
 
 
 def depth(frame: types.FrameType | None) -> int:
@@ -327,15 +342,18 @@ def on_call(frame: types.FrameType, event: str, arg: Any) -> TraceFunction | Non
     next_call += 1
     # settrace reports the call at the def line; the call step waits for the first body line
     pending.add(frame)
+    watch(frame.f_code)
     return on_event
 
 
-def failing_node(frame: types.FrameType) -> ast.AST | None:
+def node_at(code: types.CodeType, offset: int) -> ast.AST | None:
     global spans
     if spans is None:
         spans = {(node.lineno, node.end_lineno, node.col_offset, node.end_col_offset): node
                  for node in ast.walk(ast.parse(source)) if isinstance(node, (ast.Subscript, ast.BinOp, ast.AugAssign))}
-    return spans.get(list(frame.f_code.co_positions())[frame.f_lasti // 2])
+    if code not in positions:
+        positions[code] = list(code.co_positions())
+    return spans.get(positions[code][offset // 2])
 
 
 def evaluate(node: ast.AST, frame: types.FrameType) -> object:
@@ -374,7 +392,7 @@ def explain(error: StepError, frame: types.FrameType, exc: BaseException) -> Non
         error["kind"] = "recursion_too_deep"
         error["values"] = {"depth": len(stack_of(frame)), "limit": recursion_limit}
         return
-    node = failing_node(frame)
+    node = node_at(frame.f_code, frame.f_lasti)
     if isinstance(exc, ZeroDivisionError):
         error["kind"] = "division_by_zero"
         if isinstance(node, ast.BinOp):
@@ -394,6 +412,45 @@ def explain(error: StepError, frame: types.FrameType, exc: BaseException) -> Non
     if type(index) is int and abs(index) < 1 << 63:
         values["index"] = str(index)
     error["kind"], error["values"] = "index_out_of_range", values
+
+
+def watch(code: types.CodeType) -> None:
+    if code not in watched:
+        watched.add(code)
+        sys.monitoring.set_local_events(MONITOR, code, sys.monitoring.events.INSTRUCTION)
+
+
+def on_instruction(code: types.CodeType, offset: int) -> object:
+    if code.co_code[offset] != SUBSCRIPT:
+        return sys.monitoring.DISABLE
+    try:
+        on_subscript(sys._getframe(1), node_at(code, offset))  # pyright: ignore[reportPrivateUsage]
+    except Exception as e:
+        crash(e)
+    return None
+
+
+def on_subscript(frame: types.FrameType, node: ast.AST | None) -> None:
+    global reads_lost
+    # BINARY_SUBSCR's position is its Subscript's span; container and index are on the stack, evaluated again here
+    if not isinstance(node, ast.Subscript):
+        return
+    try:
+        container, index = evaluate(node.value, frame), evaluate(node.slice, frame)
+    except (LookupError, TypeError, ArithmeticError):
+        return
+    if type(container) not in SEQUENCES or type(index) is not int:
+        return
+    n = len(cast("Sequence[object]", container))
+    if index < 0:
+        index += n
+    if not 0 <= index < n:
+        return
+    key = (id(container), index)
+    if key not in reads and len(reads) == MAX_READS:
+        reads_lost = True
+        return
+    reads[key] = container
 
 
 def on_exception(frame: types.FrameType, exc: BaseException) -> None:
@@ -484,6 +541,7 @@ def begin(frame: types.FrameType) -> None:
         next_call += 1
         last_lines[f] = f.f_lineno
         f.f_trace = on_event
+        watch(f.f_code)
     last_lines[frame] = None
 
 
@@ -536,6 +594,8 @@ def trace(path: str) -> Exit:
         # dont_inherit: the user's program must not get this file's __future__ annotations
         program = compile(src, path, "exec", dont_inherit=True)
         call_hook = wait_call if start_lines else on_call
+        sys.monitoring.use_tool_id(MONITOR, "viz")
+        sys.monitoring.register_callback(MONITOR, sys.monitoring.events.INSTRUCTION, on_instruction)
         threading.settrace(call_hook)
         sys.settrace(call_hook)
         exec(program, module.__dict__)

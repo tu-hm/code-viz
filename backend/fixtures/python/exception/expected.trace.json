@@ -19,6 +19,7 @@
   },
   "steps": [
     {
+      "access": [],
       "callId": 0,
       "error": null,
       "event": "call",
@@ -50,6 +51,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -94,6 +96,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -160,6 +163,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -205,6 +209,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 1,
       "error": null,
       "event": "call",
@@ -253,6 +258,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": {
         "kind": "index_out_of_range",
         "line": 2,
@@ -286,6 +292,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -331,6 +338,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -389,6 +397,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -436,6 +445,7 @@
       "stdout": "caught: list index out of range\n"
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -488,6 +498,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -547,6 +558,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 2,
       "error": null,
       "event": "call",
@@ -595,6 +607,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o2",
+          "path": [
+            0
+          ]
+        }
+      ],
       "callId": 2,
       "error": null,
       "event": "return",
@@ -645,6 +666,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -704,6 +726,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -763,6 +786,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 3,
       "error": null,
       "event": "call",
@@ -811,6 +835,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o2",
+          "path": [
+            1
+          ]
+        }
+      ],
       "callId": 3,
       "error": null,
       "event": "return",
@@ -861,6 +894,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -920,6 +954,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -979,6 +1014,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 4,
       "error": null,
       "event": "call",
@@ -1027,6 +1063,15 @@
       "stdout": ""
     },
     {
+      "access": [
+        {
+          "mode": "r",
+          "obj": "o2",
+          "path": [
+            2
+          ]
+        }
+      ],
       "callId": 4,
       "error": null,
       "event": "return",
@@ -1077,6 +1122,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1136,6 +1182,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": null,
       "event": "line",
       "frames": {
@@ -1195,6 +1242,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "callId": 5,
       "error": null,
       "event": "call",
@@ -1243,6 +1291,7 @@
       "stdout": ""
     },
     {
+      "access": [],
       "error": {
         "kind": "index_out_of_range",
         "line": 2,
