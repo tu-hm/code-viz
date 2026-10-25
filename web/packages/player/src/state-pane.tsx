@@ -4,6 +4,8 @@ import { ArrowOverlay } from './arrow-overlay.tsx'
 import { HeapCard } from './cards.tsx'
 import type { StepState } from './engine.ts'
 import { formatterFor } from './format.ts'
+import { marksFor } from './marks.ts'
+import type { SourceFacts } from './source-facts.ts'
 import {
   inlineChanged,
   layoutState,
@@ -21,9 +23,17 @@ type StatePaneProps = {
   pointers: boolean
   settings: Pick<
     Settings,
-    'showInternals' | 'showUnreachable' | 'highlightChanges' | 'drawArrows' | 'showAddresses'
+    | 'showInternals'
+    | 'showUnreachable'
+    | 'highlightChanges'
+    | 'drawArrows'
+    | 'showAddresses'
+    | 'matrixView'
   >
   views: Record<string, ViewAs>
+  facts: SourceFacts | null
+  pins: Record<string, string[]>
+  onPin: (variable: string, names: string[]) => void
   onShowInternals: () => void
   onFrameLine: (line: number) => void
   onView: (variable: string, view: ViewAs) => void
@@ -153,6 +163,9 @@ export function StatePane({
   pointers,
   settings,
   views,
+  facts,
+  pins,
+  onPin,
   onShowInternals,
   onFrameLine,
   onView,
@@ -218,7 +231,10 @@ export function StatePane({
               card={card}
               look={look}
               isNew={fresh.has(card.id)}
+              marks={marksFor(card, state, facts, format, pins[card.variable ?? ''] ?? [])}
+              pins={card.variable === undefined ? undefined : pins[card.variable]}
               onView={onView}
+              onPin={onPin}
               onShowRange={onShowRange}
             />
           ))}

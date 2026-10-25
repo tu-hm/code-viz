@@ -43,6 +43,7 @@ type PlayerState = {
   jumpCall: string | null
   notice: string | null
   views: Record<string, ViewAs>
+  pins: Record<string, string[]>
   revealed: { line: number } | null
   go: (step: number) => void
   setPlaying: (playing: boolean) => void
@@ -50,6 +51,7 @@ type PlayerState = {
   setSplit: (split: number) => void
   toggleBreakpoint: (line: number) => void
   setView: (variable: string, view: ViewAs) => void
+  setPins: (variable: string, names: string[]) => void
   revealLine: (line: number) => void
 }
 
@@ -128,6 +130,7 @@ export const usePlayer = create<PlayerState>()(
       jumpCall: null,
       notice: null,
       views: {},
+      pins: {},
       revealed: null,
       go: (step) => set({ step, playing: false, notice: null }),
       setPlaying: (playing) => set({ playing }),
@@ -140,6 +143,7 @@ export const usePlayer = create<PlayerState>()(
             : [...breakpoints, line].sort((a, b) => a - b),
         })),
       setView: (variable, view) => set(({ views }) => ({ views: { ...views, [variable]: view } })),
+      setPins: (variable, names) => set(({ pins }) => ({ pins: { ...pins, [variable]: names } })),
       revealLine: (line) => set({ revealed: { line } }),
     }),
     {

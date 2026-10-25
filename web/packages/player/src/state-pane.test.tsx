@@ -3,6 +3,7 @@ import { fixtureNames, loadFixture } from '@viz/fixtures'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { createEngine, type StepState } from './engine.ts'
 import type { Frame, HeapObject, Local } from './gen/trace.ts'
+import type { SourceFacts } from './source-facts.ts'
 import { StatePane } from './state-pane.tsx'
 import { usePlayer, type Settings, type ViewAs } from './store.ts'
 import { renderPlayer } from './test-player.tsx'
@@ -17,10 +18,17 @@ type Options = {
   settings?: Partial<
     Pick<
       Settings,
-      'showInternals' | 'showUnreachable' | 'highlightChanges' | 'drawArrows' | 'showAddresses'
+      | 'showInternals'
+      | 'showUnreachable'
+      | 'highlightChanges'
+      | 'drawArrows'
+      | 'showAddresses'
+      | 'matrixView'
     >
   >
   views?: Record<string, ViewAs>
+  facts?: SourceFacts | null
+  pins?: Record<string, string[]>
   onShowRange?: (variable: string) => void
 }
 
@@ -46,9 +54,13 @@ function paneProps(state: StepState, languageId: string, options: Options = {}) 
       highlightChanges: true,
       drawArrows: true,
       showAddresses: false,
+      matrixView: true,
       ...options.settings,
     },
     views: options.views ?? {},
+    facts: options.facts ?? null,
+    pins: options.pins ?? {},
+    onPin: vi.fn<(variable: string, names: string[]) => void>(),
     onShowInternals: vi.fn<() => void>(),
     onFrameLine: vi.fn<(line: number) => void>(),
     onView: vi.fn<(variable: string, view: ViewAs) => void>(),
@@ -120,7 +132,14 @@ const frame = (locals: Local[], name = 'main', kind: Frame['kind'] = 'function')
 const ref = (name: string, id: string): Local => ({ name, value: { t: 'ref', id } })
 const int = (v: number) => ({ t: 'int', v: String(v) })
 
-const html = (el: Element) => el.innerHTML.replace(/(id|aria-labelledby)="[^"]*"/g, '$1=""')
+function html(el: Element) {
+  const copy = el.cloneNode(true) as Element
+  for (const big of copy.querySelectorAll('[role="group"][aria-label*="cells, window"]')) {
+    big.replaceChildren()
+    big.removeAttribute('aria-label')
+  }
+  return copy.innerHTML.replace(/(id|aria-labelledby)="[^"]*"/g, '$1=""')
+}
 
 function walkOrder(stepCount: number) {
   const reach = stepCount > 1000 ? 3 : stepCount > 100 ? 8 : stepCount
@@ -161,7 +180,7 @@ describe.each(fixtureNames)('%s', (name) => {
   )
 
   test(
-    'stepping in place draws what a fresh render of each step draws',
+    'stepping in place draws what a fresh render of each step draws, big-array windows aside',
     { timeout: 30_000 },
     () => {
       const props = paneProps(stateAt(name, 1), loadFixture(name).header.language.id)
@@ -357,6 +376,7 @@ describe('a windowed sequence', () => {
         .getAllByRole('listitem')
         .map((li) => li.textContent),
     ).toEqual(['… +2,495', '[2495] 24952495', '[2496] 24962496', '[2497] 24972497', '… +502'])
+    expect(card('o1').textContent).toContain('only cells 2,495–2,497 were recorded')
     fireEvent.click(screen.getByRole('button', { name: 'Show range…' }))
     expect(onShowRange).toHaveBeenCalledWith('xs')
   })

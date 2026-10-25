@@ -12,6 +12,8 @@ export type Table = {
   rows: { index: number; id: string; cells: Value[] }[]
 }
 
+export type Matrix = { rows: { index: number; id: string }[]; columns: number }
+
 export type CardView = {
   id: string
   object: HeapObject
@@ -19,6 +21,7 @@ export type CardView = {
   variable: string | undefined
   unreachable: boolean
   table: Table | null
+  matrix: Matrix | null
   view: ViewAs
   reads: Reads
 }
@@ -194,6 +197,26 @@ function tableOf(o: HeapObject, heap: Record<string, HeapObject>, format: Format
   return { columns: columns!, rows }
 }
 
+const primitives = new Set(['int', 'float', 'bool', 'char', 'str', 'uninit'])
+
+function matrixOf(o: HeapObject, heap: Record<string, HeapObject>): Matrix | null {
+  if (o.kind !== 'sequence' || o.sparse || o.truncated || !o.items || o.items.length === 0) {
+    return null
+  }
+  const start = o.window?.start ?? 0
+  const rows: Matrix['rows'] = []
+  let columns: number | null = null
+  for (const [i, item] of o.items.entries()) {
+    const row = item.t === 'ref' && item.id !== undefined ? heap[item.id] : undefined
+    if (row?.kind !== 'sequence' || row.sparse || row.truncated || !row.items) return null
+    columns ??= row.items.length
+    if (columns === 0 || row.items.length !== columns) return null
+    if (!row.items.every((v) => primitives.has(v.t))) return null
+    rows.push({ index: start + i, id: item.id! })
+  }
+  return { rows, columns: columns! }
+}
+
 function firstSeen(a: string, b: string) {
   const n = (id: string) => (/^o\d+$/.test(id) ? Number(id.slice(1)) : Number.NaN)
   const [x, y] = [n(a), n(b)]
@@ -205,11 +228,12 @@ export function layoutState(
   options: {
     showInternals: boolean
     showUnreachable: boolean
+    matrixView: boolean
     views: Record<string, ViewAs>
     format: Formatter
   },
 ): StateLayout {
-  const { showInternals, showUnreachable, views, format } = options
+  const { showInternals, showUnreachable, matrixView, views, format } = options
   const { stack, heap } = state
   const shown = walk(
     frameRoots(stack, (l) => showInternals || !l.internal),
@@ -249,8 +273,13 @@ export function layoutState(
     const places = placesOf(id)
     const variable = places.find((p) => p.variable !== undefined)?.variable
     const table = tableOf(heap[id]!, heap, format)
-    const view = views[variable ?? `#${id}`] ?? 'table'
-    const rows = new Set(table !== null && view === 'table' ? table.rows.map((r) => r.id) : [])
+    const matrix = table === null ? matrixOf(heap[id]!, heap) : null
+    const fallback = table !== null ? 'table' : matrix !== null && matrixView ? 'matrix' : 'cells'
+    const view = views[variable ?? `#${id}`] ?? fallback
+    const rows = new Set([
+      ...(table !== null && view === 'table' ? table.rows.map((r) => r.id) : []),
+      ...(matrix !== null && view === 'matrix' ? matrix.rows.map((r) => r.id) : []),
+    ])
     return {
       id,
       object: heap[id]!,
@@ -263,6 +292,7 @@ export function layoutState(
       variable,
       unreachable: !reachable.has(id),
       table,
+      matrix,
       view,
       reads: readsOf(
         [id],
@@ -275,8 +305,9 @@ export function layoutState(
 
   const folded = new Set<string>()
   for (const card of cards) {
-    if (card.table === null || card.view !== 'table') continue
-    for (const row of card.table.rows) {
+    const rows =
+      card.view === 'table' ? card.table?.rows : card.view === 'matrix' ? card.matrix?.rows : null
+    for (const row of rows ?? []) {
       if (placesOf(row.id).every((p) => p.object === card.id && !p.pointer)) folded.add(row.id)
     }
   }

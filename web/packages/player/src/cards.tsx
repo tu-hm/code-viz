@@ -1,8 +1,14 @@
 import { Button, cn } from '@viz/ui'
 import { memo, useId, type ReactNode } from 'react'
+import { ArrayView } from './array-view.tsx'
+import { BigArray, bigArray } from './big-array.tsx'
+import { same } from './engine.ts'
 import type { HeapObject, Value } from './gen/trace.ts'
 import { isRecord } from './is-record.ts'
 import type { kinds } from './load.ts'
+import type { CardMarks } from './marks.ts'
+import { MatrixView } from './matrix-view.tsx'
+import { PinMarkers } from './pin-markers.tsx'
 import {
   inlineChanged,
   sameList,
@@ -18,7 +24,10 @@ export type CardProps = {
   card: CardView
   look: Look
   isNew: boolean
+  marks: CardMarks
+  pins: string[] | undefined
   onView: (variable: string, view: ViewAs) => void
+  onPin: (variable: string, names: string[]) => void
   onShowRange?: (variable: string) => void
 }
 
@@ -249,12 +258,29 @@ function ViewToggle({
   )
 }
 
-function SequenceCard({ card, look, isNew, onView, onShowRange }: CardProps) {
-  const { id, object: o, table, view, variable } = card
+function SequenceBody({ card, look, marks }: Pick<CardProps, 'card' | 'look' | 'marks'>) {
+  const { id, object: o, table, matrix, view, variable } = card
+  if (table && view === 'table') return <RowTable id={id} object={o} table={table} look={look} />
+  if (matrix && view === 'matrix') {
+    return <MatrixView name={variable ?? `#${id}`} matrix={matrix} look={look} marks={marks} />
+  }
+  if ((o.length ?? 0) > bigArray) return <BigArray id={id} object={o} look={look} marks={marks} />
+  if (marks.indexed && !o.sparse && (o.items?.length ?? 0) === (o.length ?? 0)) {
+    return (
+      <ArrayView id={id} object={o} look={look} marks={marks} start={0} count={o.length ?? 0} />
+    )
+  }
+  return <Cells id={id} object={o} look={look} />
+}
+
+function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRange }: CardProps) {
+  const { id, object: o, table, matrix, view, variable } = card
   const capacity = isRecord(o.meta) ? o.meta.capacity : undefined
   const facts = [`${look.format.sizeLabel} ${(o.length ?? 0).toLocaleString('en')}`]
+  if (matrix && view === 'matrix') facts[0] = `${matrix.rows.length} × ${matrix.columns}`
   if (typeof capacity === 'number') facts.push(`cap ${capacity.toLocaleString('en')}`)
   const name = variable ?? `#${id}`
+  const options: ViewAs[] | null = table ? ['table', 'cells'] : matrix ? ['matrix', 'cells'] : null
   return (
     <Card
       card={card}
@@ -263,13 +289,11 @@ function SequenceCard({ card, look, isNew, onView, onShowRange }: CardProps) {
       facts={facts}
       actions={
         <>
-          {table && (
-            <ViewToggle
-              name={name}
-              view={view}
-              options={['table', 'cells']}
-              onView={(v) => onView(name, v)}
-            />
+          {options && (
+            <ViewToggle name={name} view={view} options={options} onView={(v) => onView(name, v)} />
+          )}
+          {variable !== undefined && !(matrix && view === 'matrix') && !table && (
+            <PinMarkers variable={variable} pins={pins ?? []} onPin={onPin} />
           )}
           {o.truncated && variable !== undefined && onShowRange && (
             <Button
@@ -284,11 +308,7 @@ function SequenceCard({ card, look, isNew, onView, onShowRange }: CardProps) {
         </>
       }
     >
-      {table && view === 'table' ? (
-        <RowTable id={id} object={o} table={table} look={look} />
-      ) : (
-        <Cells id={id} object={o} look={look} />
-      )}
+      <SequenceBody card={card} look={look} marks={marks} />
     </Card>
   )
 }
@@ -424,11 +444,15 @@ function sameCard(a: CardProps, b: CardProps) {
     a.isNew === b.isNew &&
     a.onView === b.onView &&
     a.onShowRange === b.onShowRange &&
+    a.onPin === b.onPin &&
+    sameList(a.pins, b.pins) &&
+    same(a.marks, b.marks) &&
     a.card.id === b.card.id &&
     a.card.variable === b.card.variable &&
     a.card.unreachable === b.card.unreachable &&
     a.card.view === b.card.view &&
     (a.card.table === null) === (b.card.table === null) &&
+    (a.card.matrix === null) === (b.card.matrix === null) &&
     sameList(a.card.referrers, b.card.referrers) &&
     sameReads(a.card.reads, b.card.reads, a.look, b.look)
   )

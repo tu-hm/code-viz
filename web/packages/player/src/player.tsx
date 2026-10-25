@@ -289,7 +289,11 @@ function StateBox({
   const highlightChanges = usePlayer((s) => s.settings.highlightChanges)
   const drawArrows = usePlayer((s) => s.settings.drawArrows)
   const showAddresses = usePlayer((s) => s.settings.showAddresses)
+  const matrixView = usePlayer((s) => s.settings.matrixView)
   const views = usePlayer((s) => s.views)
+  const facts = usePlayer((s) => s.facts)
+  const pins = usePlayer((s) => s.pins)
+  const setPins = usePlayer((s) => s.setPins)
   const updateSettings = usePlayer((s) => s.updateSettings)
   const revealLine = usePlayer((s) => s.revealLine)
   const setView = usePlayer((s) => s.setView)
@@ -298,8 +302,18 @@ function StateBox({
       state={state}
       languageId={languageId}
       pointers={pointers}
-      settings={{ showInternals, showUnreachable, highlightChanges, drawArrows, showAddresses }}
+      settings={{
+        showInternals,
+        showUnreachable,
+        highlightChanges,
+        drawArrows,
+        showAddresses,
+        matrixView,
+      }}
       views={views}
+      facts={facts}
+      pins={pins}
+      onPin={setPins}
       onShowInternals={() => updateSettings({ showInternals: true })}
       onFrameLine={revealLine}
       onView={setView}
