@@ -139,6 +139,28 @@ describe('matrix view (§19.4.3)', () => {
     expect(screen.queryAllByRole('table', { name: /^dp/ })).toEqual([])
   })
 
+  test('exact reads name each row, and land on the matrix cells they read', async () => {
+    const facts = await factsOf('cpp-dp-grid')
+    const at: StepState = {
+      ...stateAt('cpp-dp-grid', 22),
+      access: [
+        { obj: 'o1', path: [1], mode: 'r' },
+        { obj: 'o3', path: [3], mode: 'r' },
+        { obj: 'o4', path: [2], mode: 'r' },
+      ],
+    }
+    renderState(at, 'cpp17-gcc', { facts })
+    const rows = within(screen.getByRole('table', { name: 'dp, 4 by 5' })).getAllByRole('row')
+    expect(cellTexts(rows[2]!)).toEqual(['1', '2', '3', '(4) (read)', '5'])
+    expect(cellTexts(rows[3]!)).toEqual([
+      '1',
+      '3',
+      '(6) (read)',
+      '[10] (written this step)',
+      '·not set',
+    ])
+  })
+
   test('heat tint shades cells by value on demand', async () => {
     await renderStep('cpp-dp-grid', 38)
     const grid = screen.getByRole('table', { name: 'dp, 4 by 5' })

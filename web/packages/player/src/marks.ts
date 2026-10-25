@@ -131,13 +131,25 @@ function markersOf(
   return { markers, hidden: all.length - markers.length, range }
 }
 
+// a 2-d read names its row's object (§19.9.2); a matrix folds its rows in, so their reads are its cells
+function exactReads(card: CardView, state: StepState) {
+  const rows = new Map(
+    card.view === 'matrix' ? card.matrix?.rows.map((row) => [row.id, row.index]) : [],
+  )
+  return (state.access ?? []).flatMap((a) => {
+    const row = rows.get(a.obj)
+    if (a.mode !== 'r' || (a.obj !== card.id && row === undefined)) return []
+    return [{ path: row === undefined ? a.path : [row, ...a.path], inferred: a.inferred === true }]
+  })
+}
+
 function readsOf(card: CardView, subscripts: Subscript[], before: Scope, state: StepState) {
   const dims = shape(card)
-  const access = state.access?.filter((a) => a.obj === card.id && a.mode === 'r')
-  if (access !== undefined && (state.access?.length ?? 0) > 0) {
+  if ((state.access?.length ?? 0) > 0) {
+    const access = exactReads(card, state)
     return {
-      reads: access.map((a) => cellKey(a.path.map(Number))),
-      inferred: access.some((a) => a.inferred === true),
+      reads: [...new Set(access.map((a) => cellKey(a.path)))],
+      inferred: access.some((a) => a.inferred),
     }
   }
   const reads = subscripts.flatMap((s) => {
@@ -201,7 +213,7 @@ export function marksFor(
   if (card.object.kind !== 'sequence') return noMarks
   const arrays = names(card)
   const indexed = facts !== null && [...arrays].some((a) => arraysIn(facts).has(a))
-  const access = state.access?.some((a) => a.obj === card.id) === true
+  const access = exactReads(card, state).length > 0
   if (!indexed && !access && pins.length === 0) return noMarks
   const on = (line: number | null) =>
     lineFacts(facts, line).subscripts.filter((s) => arrays.has(s.array))
