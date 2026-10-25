@@ -71,7 +71,7 @@ Load a trace and move to any step instantly. Includes the visualizer frame (head
 
 - [x] Profile on the 5,000-step fixture with 500 heap objects — rebuild 0.08 ms on average; the copy to the main thread (175 KB, 1.6 ms) is the cost; p99 4.5 ms
 - [x] Memory under 300 MB (heap snapshot in CI perf job) — a forced-GC heap check in `pnpm test`: 53 MB for the trace plus a full cache; the main thread used 75 MB in Chrome
-- [ ] Virtualize long heap columns / containers (TanStack Virtual) — not needed yet: FE-06's cards skip unchanged objects and use `content-visibility: auto` (4.0 ms p50 on 500 cards); revisit with FE-08's containers
+- [x] Virtualize long heap columns / containers (TanStack Virtual) — settled, not built: FE-06's cards skip unchanged objects and use `content-visibility: auto` (4.0 ms p50 on 500 cards), and FE-08 draws a big array as a 16-cell window with a minimap and at most 200 Non-zero entries, so no container draws more than 100 cells; stepping `cpp-sparse-dfs` (two `int[200005]`) takes 2.5 ms p50
 - [x] No layout shift between steps (§19.10) — for the shell: no box moved over 325 steps in Chrome; the views bring their own (FE-06)
 - [x] Perf budget test in CI: fail if stepping on the 1,000-step fixture goes over 16 ms — `engine.perf.test.ts`
 - [x] **Done:** §13 step-navigation target met on 5,000 steps — keydown to DOM with FE-06's state pane on `synthetic-5000` (500 objects): 4.0 ms p50, 7.0 ms p95, 11.6 ms max in a production build in Chrome; `synthetic-1000` 1.9 ms p50

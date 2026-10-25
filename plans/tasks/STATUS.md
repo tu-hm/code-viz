@@ -7,7 +7,7 @@
 ## Now
 
 - **In progress:** BE-01 (41/46). CI runs `make check` on every push and PR to `main`, and the first run is green. Every item left waits on another task or on a decision; see [BE-01 open items](#be-01-open-items).
-- **In progress:** FE-02 (40/43). `@viz/player` loads a trace in a Web Worker and steps it inside the §5.2 shell with settings, autoplay and FE-06's state pane; `?fixture=<name>` under `pnpm dev` shows it. Stepping `synthetic-5000` with 500 heap cards takes 4.0 ms p50 and 11.6 ms at worst from keydown to DOM, inside the §13 budget. Closing the player drops `?step=`, so the next trace opens at its first step. Left: the Share slot (FE-12), profile storage (auth), and virtualizing containers if FE-08 needs it.
+- **In progress:** FE-02 (41/43). `@viz/player` loads a trace in a Web Worker and steps it inside the §5.2 shell with settings, autoplay and FE-06's state pane; `?fixture=<name>` under `pnpm dev` shows it. Stepping `synthetic-5000` with 500 heap cards takes 4.0 ms p50 and 11.6 ms at worst from keydown to DOM, inside the §13 budget. Closing the player drops `?step=`, so the next trace opens at its first step. Virtualizing containers isn't needed: FE-08 draws big arrays as a 16-cell window. Left: the Share slot (FE-12) and profile storage (auth).
 - **Done except the backward scan:** FE-10 (19/20). Go to… jumps from the controls row or a key: step over and out (`Shift + →`, `Shift + ↑`, Shift-click Next), next time a line or a breakpoint runs (`L`), next change of a variable, a cell or a whole array (`C`), next call (`F`), print (`P`), error (`E`) and first wrong output (`D`). The searches run in the worker (8 ms worst case on 5,000 steps), entries with no match are disabled, and a miss says "not found after step N". The compare puts a pasted EXPECTED column next to the output, ignores trailing spaces and line endings unless Exact is on, and jumps to the step that printed the first wrong character, untraced tail included; `Player`'s `expected` prop fills it from a problem's sample. Left: scanning backward, which FE-11's "Prev change" needs first.
 - **Done except stories:** FE-03 (14/15). The code pane is CodeMirror 6: `▶ ▷ !` with their bands, breakpoints from a line number or Enter that stop autoplay, and whole-run `×n` hit counts, tinted, with their share on hover or focus; Python and C++ highlighting loads on demand. It matches the §19.3 mock in Chrome, light and dark. Left: a story per fixture, with Storybook (FE-01 §4).
 - **Done:** FE-04 (18/18). The IDE has an editable CodeMirror editor with a language picker fed by `GET /languages`, and **Visualize** (or `Ctrl/Cmd + Shift + Enter`) for each language that can visualize. A click POSTs the code, stdin and settings with one `Idempotency-Key`, opens the visualizer at once, long-polls with `since` until the status is final and hands the trace to the player; Cancel or Close deletes a run that isn't final. Network errors, `502`–`504` and `Retry-After` are retried, so a poll survives `vizd` restarting: checked against `make dev` by killing it mid-poll. Python and C++ both visualize from the real API in Chrome. API errors reach FE-05 as `ApiError` with the §8.7 `code`.
@@ -27,7 +27,8 @@
 - **In progress:** BE-06 (49/52). `vizd` serves the visualization API: create with single-flight, quota, idempotency and the 2-active rule; get with long-poll; owner-only delete; the nightly cleanup of expired rows and chunks; server-side copy for BE-12. Open: spike S5 and the browser checks.
 - **Done except signing:** BE-07 (20/21). The C++ runner image is GCC 13.5 and GDB 14.2, with one precompiled header per safety-check mode; builds take 0.3–0.8 s. `options.safetyChecks: false` switches the checks off. GCC diagnostics point at the user's line, and the §8.3 example is reproduced. Spike S7 is in: `_GLIBCXX_DEBUG` fails the 3× run-time target, so G5 has a decision (below).
 - **In progress:** BE-13 (11/68). `make dev` builds the runner images, runs MySQL with the §7.13 settings, and `make seed` loads all 66 golden traces (Python and C++) as completed visualizations. vizd has Prometheus metrics (`VIZ_METRICS=true`) and OpenTelemetry tracing (`OTEL_EXPORTER_OTLP_ENDPOINT`), both off by default; a create request and its job share one trace through `jobs.traceparent`, seen end to end in the dev Jaeger. The beta deploys as Docker Compose on one server (spec v1.16).
-- **Next, by the suggested order:** BE-13 §3–§6. On FE: FE-08 (array and matrix views); FE-06 §2 and FE-05 are in.
+- **Done except two items:** FE-08 (35/37). The worker parses the source with web-tree-sitter (C++ and Python grammars, loaded only when a trace opens) into per-line facts, without holding up a step. A 2-D sequence draws as a matrix with `[x]` writes, `(x)` inferred reads and the §19.4.3 narration; 1-D arrays get index markers, pins, `l..r` ranges and out-of-range markers, strings too; arrays over 64 cells get a 16-cell window, a minimap, Go to index… and Non-zero only. Matches the §19.3 and §19.4.3 mocks in Chrome; stepping the new 200,005-cell `cpp-sparse-dfs` fixture takes 2.5 ms p50. S8 ([report](../spikes/s8-tree-sitter.md)): 99.9% of traced steps correct, but 77.6% of subscript lines in contest-style code, so it recommends triggering BE-11 §5. Left: a corpus of real CP solutions, a check on a matrix over 30 × 30, and design sign-off (M1-21).
+- **Next, by the suggested order:** BE-13 §3–§6. On FE: FE-09 (narration and input cursor), which FE-08 §3 unblocked; FE-07 and FE-08 are in.
 - **Ahead of plan:** M0 starts Mon 26 Oct. Both BE → FE contracts are delivered early.
 
 ## Decisions waiting on you
@@ -38,6 +39,7 @@
 - [ ] API: should a failed response carry the trace ID (§5.6)?
 - [ ] Queue: cancel a running job? §7.7 and the §7.13.2 SQL cancel queued jobs only, which is what `JobQueue.Cancel` does; §7.13.2's prose and BE-05 §2–3 also stop a running one at its next lease check. Allowing it is one more status in `Cancel`'s `WHERE`, and the worker then sees `ErrLeaseLost`.
 - [ ] G5 (Fri 19 Feb): keep `_GLIBCXX_DEBUG` (D21) or switch to `-D_GLIBCXX_ASSERTIONS` plus a narrower UBSan? S7: with `_GLIBCXX_DEBUG`, 3 of 10 CP solutions never finished in 60 s and 6 of 9 measured ran over 3×. The lighter flags stay within 3× but drop iterator checks ([S7 report](../spikes/s7-safety-checks.md)).
+- [ ] G5 (Fri 19 Feb): trigger BE-11 §5 (exact access hints from the tracers)? S8: tree-sitter inference is right on 99.9% of the traced fixture steps but on 77.6% of subscript lines in contest-style code, mostly indices like `t[p ^ 1]` or `a[l++]` that the spec never evaluates; the corpus is the repo's goldens plus 17 programs written for the spike, not real submissions ([S8 report](../spikes/s8-tree-sitter.md)).
 - [ ] C++ build memory: the build shares the program's 256 MB box. Should it get its own limit (512 MB, the §11 ceiling), and should a build that runs out of memory say so instead of "Build timed out"? With the S7 flags the worst build has about 40 MB to spare.
 - [ ] Lead items (option A vs B before 16 Nov, MySQL hosting): see [README.md](README.md#lead--design-tasks-not-in-the-befe-lists).
 
@@ -76,20 +78,20 @@
 | Task | Milestone | Status | Done | Next step, or what it waits on |
 |---|---|---|---|---|
 | [FE-01](frontend/FE-01-foundation-fixtures.md) Foundation & fixtures | M0–M1 | 🟡 | 28/37 | §4 Storybook (week 6); §5 seeded traces (`make seed` loads none yet, BE-13 §1) |
-| [FE-02](frontend/FE-02-trace-player-controls.md) Trace player & controls | M0–M1, M3 | 🟡 | 40/43 | Shell, state pane, banners and the perf budget with 500 heap cards are in. Open: the Share slot (FE-12), profile storage (auth), virtualizing containers (FE-08) |
+| [FE-02](frontend/FE-02-trace-player-controls.md) Trace player & controls | M0–M1, M3 | 🟡 | 41/43 | Shell, state pane, banners and the perf budget with 500 heap cards are in; no virtualizing needed after FE-08. Open: the Share slot (FE-12), profile storage (auth) |
 | [FE-03](frontend/FE-03-code-pane.md) Code pane | M0, M3 | 🟡 | 14/15 | Code pane, breakpoints and hit counts are in. Open: a story per fixture (FE-01 §4) |
 | [FE-04](frontend/FE-04-visualize-from-ide.md) Visualize from the IDE | M1 | ✅ | 18/18 | Done: editor, Visualize, create, long-poll and cancel, against the real API |
 | [FE-05](frontend/FE-05-run-states-errors.md) Run states & errors | M1–M3 | 🟡 | 23/29 | Every state, build diagnostics, friendly errors and the re-run dialogs are in. Open: stories (FE-01 §4), the Report link's target, design sign-off |
 | [FE-06](frontend/FE-06-stack-heap-view.md) Stack & heap view | M0–M2, M4 | 🟡 | 29/34 | Frames, heap cards, formatters and struct tables are in. Open: design sign-off on §5.3/§5.4, the C check (BE-14) |
 | [FE-07](frontend/FE-07-reference-pointer-arrows.md) Reference & pointer arrows | M0–M2 | 🟡 | 20/21 | Arrows, hover highlight, the >30 fallback and C++ pointers are in; S3 done. Open: 16 ms at 4× CPU throttle, which the state pane misses without arrows too |
-| [FE-08](frontend/FE-08-array-matrix-views.md) Array & matrix views | M1–M2 | 🟢 | 0/37 | Can start: FE-06 is in. Sequences show their first 100 cells (16 of a sparse array) with no way to the rest until FE-08's window |
+| [FE-08](frontend/FE-08-array-matrix-views.md) Array & matrix views | M1–M2 | 🟡 | 35/37 | Matrix, markers, inferred reads, big-array window and S8 are in. Open: real CP solutions for S8, a matrix over 30 × 30; S8 recommends BE-11 §5 (G5) |
 | [FE-09](frontend/FE-09-narration-input-cursor.md) Narration & input cursor | M1, M3 | ⏳ | 0/18 | FE-02 §2, FE-08 §3 |
 | [FE-10](frontend/FE-10-goto-expected-output.md) Go to… & expected output | M1 | 🟡 | 19/20 | Every §19.8 jump and the §19.7 compare are in. Open: the backward scan, with FE-11's "Prev change" |
 | [FE-11](frontend/FE-11-watch-timeline.md) Watch panel & timeline | M3, M5 | ⏳ | 0/12 | FE-08 §3 (FE-10's change search is in; §2 adds the backward scan) |
 | [FE-12](frontend/FE-12-share-permalinks.md) Share & permalinks | M3 | ⏳ | 0/8 | FE-02 §3 (BE-12's share and revoke are in) |
 | [FE-13](frontend/FE-13-mobile-a11y-analytics.md) Mobile, a11y & analytics | M3 | ⏳ | 0/23 | FE-02 §4, FE-07 (FE-06 is in) |
 | [FE-14](frontend/FE-14-cp-data-views.md) CP data views | M5 | ⏳ | 0/32 | FE-08 (FE-06 and FE-10 are in) |
-| **Total** | | | **171/347** | |
+| **Total** | | | **227/347** | |
 
 ## Decision gates
 
@@ -99,7 +101,7 @@
 | G2 | Fri 13 Nov | `settrace` or `sys.monitoring` | BE-03 §1 | Open; S2 recommends `sys.monitoring` |
 | G3 | Fri 13 Nov | Freeze trace format | BE-04 §1, fixtures | Open |
 | G4 | Fri 25 Dec | Python beta go/no-go, team size | M1 | Open |
-| G5 | Fri 19 Feb | Safety checks, tree-sitter, big arrays | BE-07 §3, BE-09 §3, FE-08 §1 | Open; S7 recommends `_GLIBCXX_ASSERTIONS` over `_GLIBCXX_DEBUG` |
+| G5 | Fri 19 Feb | Safety checks, tree-sitter, big arrays | BE-07 §3, BE-09 §3, FE-08 §1 | Open; S7 recommends `_GLIBCXX_ASSERTIONS` over `_GLIBCXX_DEBUG`; S8 recommends BE-11 §5 |
 
 ## Handoffs (BE → FE)
 
