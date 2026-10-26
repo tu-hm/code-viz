@@ -47,8 +47,8 @@
 
 ## 5. Bits view (M5-F05 · 1 d)
 
-- [ ] Suggested for `mask` / `bits` / `state` or `<<`, `&`, `|` on the current line
-- [ ] Bit indices, value, set bits list, popcount; width 8/16/32/64/*n*
+- [x] Suggested for `mask` / `bits` / `state` or `<<`, `&`, `|` on the current line
+- [x] Bit indices, value, set bits list, popcount; width 8/16/32/64/*n*
 
 ## 6. Conditional jumps (M5-F07 · 2 d)
 

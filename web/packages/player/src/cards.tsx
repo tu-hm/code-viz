@@ -239,6 +239,8 @@ const viewLabels: Record<Exclude<ViewAs, 'container'>, string> = {
   table: 'Table',
   cells: 'Cells',
   matrix: 'Matrix',
+  bits: 'Bits',
+  number: 'Number',
 }
 
 function ViewToggle({

@@ -1,12 +1,13 @@
 import { Button, cn, Popover, PopoverAnchor, PopoverContent } from '@viz/ui'
 import { memo, useEffect, useId, useRef, useState, type Ref } from 'react'
 import { ArrowOverlay } from './arrow-overlay.tsx'
+import { BitsView } from './bits-view.tsx'
 import { HeapCard } from './cards.tsx'
 import { same, type StepState } from './engine.ts'
 import { formatterFor } from './format.ts'
 import { IndexedString } from './indexed-string.tsx'
 import { marksFor, stringMarkers, type Marker } from './marks.ts'
-import type { SourceFacts } from './source-facts.ts'
+import { lineFacts, type SourceFacts } from './source-facts.ts'
 import {
   inlineChanged,
   layoutState,
@@ -44,6 +45,7 @@ type StatePaneProps = {
 }
 
 const rowClass = 'h-(--row-height) border-b border-border align-top last:border-b-0'
+const bitNames = new Set(['mask', 'bits', 'state']) // §19.4
 
 type FrameProps = {
   view: FrameView
@@ -51,8 +53,12 @@ type FrameProps = {
   changed: string[] | undefined
   look: Look
   strings: Record<string, Marker[]> | undefined
+  views: Record<string, ViewAs>
+  bitwise: string[]
+  n: number | null
   onLine: (line: number) => void
   onShowInternals: () => void
+  onView: (variable: string, view: ViewAs) => void
   ref?: Ref<HTMLDivElement>
 }
 
@@ -64,6 +70,10 @@ function sameFrame(a: FrameProps, b: FrameProps) {
     a.active === b.active &&
     a.onLine === b.onLine &&
     a.onShowInternals === b.onShowInternals &&
+    a.onView === b.onView &&
+    a.views === b.views &&
+    a.n === b.n &&
+    sameList(a.bitwise, b.bitwise) &&
     sameList(a.changed, b.changed) &&
     same(a.strings, b.strings) &&
     sameReads(a.view.reads, b.view.reads, a.look, b.look)
@@ -77,8 +87,12 @@ const FrameTable = memo(function FrameTable({
   changed,
   look,
   strings,
+  views,
+  bitwise,
+  n,
   onLine,
   onShowInternals,
+  onView,
   ref,
 }: FrameProps) {
   const { frame, locals, hidden } = view
@@ -108,6 +122,13 @@ const FrameTable = memo(function FrameTable({
                 look.highlight &&
                 (changed?.includes(l.name) === true || inlineChanged(l.value, look))
               const marked = l.value.t === 'str' ? strings?.[l.name] : undefined
+              const integer =
+                l.value.t === 'int' && /^-?\d+$/.test(l.value.v ?? '') ? l.value.v! : null
+              const bits = integer !== null && views[l.name] === 'bits'
+              const suggest =
+                integer !== null &&
+                views[l.name] === undefined &&
+                (bitNames.has(l.name) || bitwise.includes(l.name))
               return (
                 <tr key={l.name} data-local={l.name} className={rowClass}>
                   <th
@@ -131,6 +152,23 @@ const FrameTable = memo(function FrameTable({
                       <ValueView value={l.value} look={look} />
                     )}
                     <Mark on={on} />
+                    {suggest && (
+                      <button
+                        type="button"
+                        onClick={() => onView(l.name, 'bits')}
+                        className="ml-2 rounded-full bg-secondary px-2 font-sans text-xs font-normal text-secondary-foreground hover:bg-secondary-hover"
+                      >
+                        View as Bits?
+                      </button>
+                    )}
+                    {bits && (
+                      <BitsView
+                        name={l.name}
+                        value={integer}
+                        n={n}
+                        onNumber={() => onView(l.name, 'number')}
+                      />
+                    )}
                   </td>
                 </tr>
               )
@@ -225,6 +263,16 @@ export function StatePane({
   }
   const fresh = new Set(state.newObjects)
   const strings = stringMarkers(state, facts)
+  const bitwise = [
+    ...new Set([
+      ...lineFacts(facts, state.line).bitwise,
+      ...lineFacts(facts, state.prevLine).bitwise,
+    ]),
+  ]
+  const nLocal = state.stack
+    .findLast((f) => f.locals.some((l) => l.name === 'n'))
+    ?.locals.find((l) => l.name === 'n')?.value
+  const n = nLocal?.t === 'int' && /^\d+$/.test(nLocal.v ?? '') ? Number(nLocal.v) : null
 
   return (
     <div
@@ -252,8 +300,12 @@ export function StatePane({
                 changed={state.changed.locals[view.frame.id]}
                 look={look}
                 strings={active || view.frame.kind === 'global' ? strings : undefined}
+                views={views}
+                bitwise={bitwise}
+                n={n}
                 onLine={onFrameLine}
                 onShowInternals={onShowInternals}
+                onView={onView}
               />
             )
           })}

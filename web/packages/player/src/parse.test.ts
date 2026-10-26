@@ -66,6 +66,22 @@ test.each([
   expect(accesses(facts, 1).sort()).toEqual(want.sort())
 })
 
+test.each([
+  { name: 'or-assignment of a shift', code: 'mask |= 1 << b;', want: ['mask'] },
+  { name: 'and with a shifted bit', code: 'if (state & (1 << i)) f();', want: ['state'] },
+  { name: 'a shifted variable', code: 'x = y << 2;', want: ['y'] },
+  { name: 'either side of or', code: 'z = a | b;', want: ['a', 'b'] },
+  { name: 'not a stream insertion', code: 'cout << n << (m & 1);', want: ['m'] },
+])('C++ bit operands: $name', async ({ code, want }) => {
+  const facts = await parseSource(`int main() {\n${code}\n}`, 'cpp17-gcc')
+  expect(lineFacts(facts, 2).bitwise).toEqual(want)
+})
+
+test('Python bit operands', async () => {
+  const facts = await parseSource('mask |= 1 << b\nif seen & (1 << v): pass\n', 'python3')
+  expect([lineFacts(facts, 1).bitwise, lineFacts(facts, 2).bitwise]).toEqual([['mask'], ['seen']])
+})
+
 test('a language without a grammar has no facts', async () => {
   expect(await parseSource('x', 'brainfuck')).toBeNull()
 })

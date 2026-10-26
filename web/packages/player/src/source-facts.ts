@@ -9,6 +9,7 @@ export const headers = ['if', 'while', 'for'] as const
 export type LineFacts = {
   subscripts: Subscript[]
   identifiers: string[]
+  bitwise: string[]
   inputs: string[]
   scanf: string[]
   getline: boolean
@@ -21,6 +22,7 @@ export type SourceFacts = Record<number, LineFacts>
 const none: LineFacts = {
   subscripts: [],
   identifiers: [],
+  bitwise: [],
   inputs: [],
   scanf: [],
   getline: false,
@@ -43,6 +45,9 @@ const headerTypes: Record<string, LineFacts['header']> = {
   for_range_loop: 'for',
 }
 const patterns = new Set(['pattern_list', 'tuple_pattern', 'list_pattern', 'tuple', 'list'])
+const bitOps = new Set(['<<', '&', '|'])
+const bitAssignments = new Set(['<<=', '&=', '|='])
+const streams = new Set(['cout', 'cerr', 'clog', 'std::cout', 'std::cerr', 'std::clog'])
 const conversion = /%[-+ #0]*(?:\d+|\*)?(?:\.\d+)?(?:hh|h|ll|l|L|z|j|t)?[diouxXfFeEgGaAcspn]/g
 
 function base(node: Node) {
@@ -145,6 +150,24 @@ function mode(node: Node): Mode {
   }
 }
 
+function bitOperands(node: Node): Node[] {
+  const op = node.childForFieldName('operator')?.text
+  const left = node.childForFieldName('left')
+  const right = node.childForFieldName('right')
+  if (op === undefined || !left || !right) return []
+  if (node.type === 'assignment_expression' || node.type === 'augmented_assignment') {
+    return bitAssignments.has(op) ? [left] : []
+  }
+  if ((node.type !== 'binary_expression' && node.type !== 'binary_operator') || !bitOps.has(op)) {
+    return []
+  }
+  if (op !== '<<') return [left, right]
+  let root = left
+  while (root.type === 'binary_expression' && root.childForFieldName('operator')?.text === '<<')
+    root = root.childForFieldName('left')!
+  return streams.has(root.text) ? [] : [left]
+}
+
 function subscript(node: Node): Subscript {
   const indices: (Index | null)[] = []
   let n = node
@@ -169,6 +192,7 @@ export function collectFacts(root: Node): SourceFacts {
     facts[line] ??= {
       subscripts: [],
       identifiers: [],
+      bitwise: [],
       inputs: [],
       scanf: [],
       getline: false,
@@ -200,6 +224,10 @@ export function collectFacts(root: Node): SourceFacts {
     if (node.type === 'identifier') {
       const ids = at(node).identifiers
       if (!ids.includes(node.text)) ids.push(node.text)
+    }
+    for (const operand of bitOperands(node).map(unwrap)) {
+      const names = at(node).bitwise
+      if (operand.type === 'identifier' && !names.includes(operand.text)) names.push(operand.text)
     }
     if (subscriptTypes.has(node.type) && isOutermost(node))
       at(node).subscripts.push(subscript(node))

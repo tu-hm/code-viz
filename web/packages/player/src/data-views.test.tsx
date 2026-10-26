@@ -211,6 +211,7 @@ describe('index markers (§19.4.1)', () => {
     2: {
       subscripts: names.map((n) => ({ array: 'a', indices: [{ name: n, offset: 0 }], mode: 'r' })),
       identifiers: names,
+      bitwise: [],
       inputs: [],
       scanf: [],
       getline: false,
@@ -274,6 +275,7 @@ describe('index markers (§19.4.1)', () => {
       2: {
         subscripts: [{ array: 's', indices: [{ name: 'i', offset: 0 }], mode: 'r' }],
         identifiers: ['s', 'i'],
+        bitwise: [],
         inputs: [],
         scanf: [],
         getline: false,
@@ -495,6 +497,87 @@ describe('container widgets (§19.4.6)', () => {
     )
     expect(screen.getByText('top:').closest('p')!.textContent).toBe('top ▶top:5then 9, 1')
     expect(screen.getByText(/heap order: the comparator sorts neither/i)).toBeDefined()
+  })
+})
+
+describe('bits view (§19.4.6)', () => {
+  const row = (name: string) => screen.getByRole('row', { name: new RegExp(`^${name} `) })
+  const bits = (table: HTMLElement) =>
+    within(table)
+      .getAllByRole('row')[1]!
+      .textContent.replace(/^value/, '')
+
+  test('an int used with |= and << on the line gets the chip; the shift amount does not', async () => {
+    const { onView } = await renderStep('cpp-containers', 24)
+    expect(within(row('b')).queryByRole('button', { name: 'View as Bits?' })).toBeNull()
+    fireEvent.click(within(row('mask')).getByRole('button', { name: 'View as Bits?' }))
+    expect(onView).toHaveBeenCalledWith('mask', 'bits')
+  })
+
+  test('mask = 45 reads as the mock: bits, set bits, popcount, then any width', async () => {
+    const { onView } = await renderStep('cpp-containers', 27, { views: { mask: 'bits' } })
+    const table = screen.getByRole('table', { name: 'mask in 8 bits' })
+    expect(bits(table)).toBe('00101101= 45')
+    expect(screen.getByText('set bits {0, 2, 3, 5} · popcount 4')).toBeDefined()
+    const width = screen.getByRole('group', { name: 'Width' })
+    expect(within(width).getByRole('button', { name: 'n' })).toHaveProperty('disabled', true)
+    fireEvent.click(within(width).getByRole('button', { name: '16' }))
+    expect(bits(screen.getByRole('table', { name: 'mask in 16 bits' }))).toBe(
+      '0000000000101101= 45',
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Show as number' }))
+    expect(onView).toHaveBeenCalledWith('mask', 'number')
+  })
+
+  const frameWith = (...locals: Local[]): StepState => ({
+    i: 1,
+    event: 'line',
+    prevLine: 2,
+    line: 3,
+    error: null,
+    stack: [{ id: 'f0', name: 'main', kind: 'function', line: 2, locals, returnValue: null }],
+    heap: {},
+    changed: { locals: {}, cells: {} },
+    before: { scope: {}, cells: {} },
+    newObjects: [],
+    output: [],
+  })
+  const int = (name: string, v: string): Local => ({ name, value: { t: 'int', v } })
+
+  test('a negative value shows its two’s complement; the n width uses n', () => {
+    renderState(frameWith(int('n', '5'), int('state', '-3')), 'cpp17-gcc', {
+      views: { state: 'bits' },
+    })
+    expect(bits(screen.getByRole('table', { name: 'state in 8 bits' }))).toBe('11111101= -3')
+    fireEvent.click(
+      within(screen.getByRole('group', { name: 'Width' })).getByRole('button', { name: 'n' }),
+    )
+    expect(bits(screen.getByRole('table', { name: 'state in 5 bits' }))).toBe('11101= -3')
+  })
+
+  test('a value too wide for the width says so', () => {
+    renderState(frameWith(int('n', '3'), int('mask', '12')), 'cpp17-gcc', {
+      views: { mask: 'bits' },
+    })
+    fireEvent.click(
+      within(screen.getByRole('group', { name: 'Width' })).getByRole('button', { name: 'n' }),
+    )
+    expect(screen.getByText('12 needs more than 3 bits; the low 3 are shown')).toBeDefined()
+  })
+
+  test.each([
+    { name: 'mask', chip: true },
+    { name: 'bits', chip: true },
+    { name: 'state', chip: true },
+    { name: 'masks', chip: false },
+  ])('a local named $name, used nowhere, gets the chip: $chip', ({ name, chip }) => {
+    renderState(frameWith(int(name, '6')), 'cpp17-gcc')
+    expect(screen.queryByRole('button', { name: 'View as Bits?' }) !== null).toBe(chip)
+  })
+
+  test('a declined chip stays away', () => {
+    renderState(frameWith(int('mask', '6')), 'cpp17-gcc', { views: { mask: 'number' } })
+    expect(screen.queryByRole('button', { name: 'View as Bits?' })).toBeNull()
   })
 })
 
