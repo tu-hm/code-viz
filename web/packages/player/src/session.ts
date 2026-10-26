@@ -22,6 +22,7 @@ export type LoadedTrace = NarratedTrace & {
   ending: Ending
   find: (from: number, jump: Jump) => Promise<number | null>
   history: (target: Target) => Promise<Change[]>
+  passes: (at: number, header: number, loop: [number, number]) => Promise<number[]>
 }
 
 type Session =
@@ -116,6 +117,7 @@ export function useSession(
         input: [],
         inputReads: [],
         find: (from, jump) => remote.find(from, jump),
+        passes: (at, header, loop) => remote.passes(at, header, loop),
         history(target) {
           const key = targetText(target)
           let changes = histories.get(key)

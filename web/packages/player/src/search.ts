@@ -198,3 +198,30 @@ export function findStep(steps: Step[], base: (k: number) => Base, from: number,
       return firstAfter(steps, from, (s) => s.error !== null)
   }
 }
+
+// steps where the header just ran and the body runs next, in this run of the loop in this frame
+export function loopPasses(
+  steps: Step[],
+  at: number,
+  header: number,
+  [start, end]: [number, number],
+) {
+  const { stack } = steps[at]!
+  const depth = stack.length
+  const frame = stack[depth - 1]
+  const here = (s: Step) => s.stack.length === depth && s.stack[depth - 1] === frame
+  const inside = (s: Step) =>
+    s.stack.length >= depth &&
+    s.stack[depth - 1] === frame &&
+    (s.stack.length > depth || (s.line >= start && s.line <= end))
+  let last = inside(steps[at]!) ? at : at - 1
+  while (last + 1 < steps.length && inside(steps[last + 1]!)) last++
+  let first = last
+  while (first > 0 && inside(steps[first - 1]!)) first--
+  const passes: number[] = []
+  for (let k = first; k <= last; k++) {
+    const s = steps[k]!
+    if (here(s) && s.prevLine === header && s.line >= start && s.line <= end) passes.push(k)
+  }
+  return passes
+}

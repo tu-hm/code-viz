@@ -13,6 +13,7 @@ type ControlsProps = {
   goto: ReactNode
   story: ReactNode
   narration: string | null
+  passes: ReactNode
   timeline: ReactNode
   onGo: (step: number) => void
   onStepOver: () => void
@@ -28,6 +29,7 @@ export function Controls({
   goto,
   story,
   narration,
+  passes,
   timeline,
   onGo,
   onStepOver,
@@ -36,16 +38,19 @@ export function Controls({
   const last = stepCount - 1
   return (
     <div className="flex flex-col gap-2 px-(--pane-padding) py-2">
-      <p className="truncate font-mono text-xs">
-        {state === null ? (
-          '\u00a0'
-        ) : (
-          <>
-            Step {state.i + 1} of {stepCount}
-            <span className="text-muted-foreground"> · {stepDetail(state)}</span>
-          </>
-        )}
-      </p>
+      <div className="flex items-center justify-between gap-3 font-mono text-xs">
+        <p className="min-w-0 truncate">
+          {state === null ? (
+            '\u00a0'
+          ) : (
+            <>
+              Step {state.i + 1} of {stepCount}
+              <span className="text-muted-foreground"> · {stepDetail(state)}</span>
+            </>
+          )}
+        </p>
+        {passes}
+      </div>
       <p className="min-h-5 truncate text-sm" aria-label="Step narration">
         {narration === null ? (
           '\u00a0'

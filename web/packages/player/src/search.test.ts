@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest'
 import { createEngine, type StepState } from './engine.ts'
 import { parseCondition } from './condition.ts'
 import type { HeapObject, Step, Value } from './gen/trace.ts'
-import { callSteps, changeHistory, findStep, type Jump, type Target } from './search.ts'
+import { callSteps, changeHistory, findStep, loopPasses, type Jump, type Target } from './search.ts'
 
 function find(name: string, from: number, jump: Jump) {
   const steps = loadFixture(name).chunks.flat()
@@ -354,4 +354,58 @@ test.each([
   },
 ])('next step where: $name', ({ fixture, text, from, want }) => {
   expect(find(fixture, from, where(text))).toBe(want)
+})
+
+test.each([
+  {
+    name: 'a while loop’s passes',
+    fixture: 'cpp-binary-search',
+    at: 12,
+    header: 8,
+    loop: [8, 14],
+    want: [5, 9, 13],
+  },
+  {
+    name: 'from before the loop starts',
+    fixture: 'cpp-binary-search',
+    at: 4,
+    header: 8,
+    loop: [8, 14],
+    want: [5, 9, 13],
+  },
+  {
+    name: 'from the step that leaves it',
+    fixture: 'cpp-binary-search',
+    at: 17,
+    header: 8,
+    loop: [8, 14],
+    want: [5, 9, 13],
+  },
+  {
+    name: 'an inner loop restarts each outer pass',
+    fixture: 'cpp-dp-grid',
+    at: 18,
+    header: 10,
+    loop: [10, 11],
+    want: [16, 18, 20, 22],
+  },
+  {
+    name: 'the outer loop around it',
+    fixture: 'cpp-dp-grid',
+    at: 18,
+    header: 9,
+    loop: [9, 11],
+    want: [5, 15, 25],
+  },
+] as const)('loop passes: $name', ({ fixture, at, header, loop, want }) => {
+  const steps = loadFixture(fixture).chunks.flat()
+  expect(loopPasses(steps, at, header, [...loop])).toEqual(want)
+})
+
+test('loop passes stay in their frame: a recursive call’s own loop is another run', () => {
+  const steps = loadFixture('cpp-dfs').chunks.flat()
+  const inside = steps.findIndex((s) => s.prevLine === 10 && s.stack.length > 3)
+  const passes = loopPasses(steps, inside, 10, [10, 11])
+  expect(passes.length).toBeGreaterThan(0)
+  for (const k of passes) expect(steps[k]!.stack).toEqual(steps[inside]!.stack)
 })

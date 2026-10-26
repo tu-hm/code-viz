@@ -14,6 +14,8 @@ export type LineFacts = {
   scanf: string[]
   getline: boolean
   header: (typeof headers)[number] | null
+  // a loop header's whole statement, header line to the end of its body
+  loop: [number, number] | null
   branch: { body: [number, number]; otherwise: [number, number] | null } | null
 }
 
@@ -27,6 +29,7 @@ const none: LineFacts = {
   scanf: [],
   getline: false,
   header: null,
+  loop: null,
   branch: null,
 }
 
@@ -49,6 +52,10 @@ const bitOps = new Set(['<<', '&', '|'])
 const bitAssignments = new Set(['<<=', '&=', '|='])
 const streams = new Set(['cout', 'cerr', 'clog', 'std::cout', 'std::cerr', 'std::clog'])
 const conversion = /%[-+ #0]*(?:\d+|\*)?(?:\.\d+)?(?:hh|h|ll|l|L|z|j|t)?[diouxXfFeEgGaAcspn]/g
+
+function lines(n: Node): [number, number] {
+  return [n.startPosition.row + 1, n.endPosition.row + 1]
+}
 
 function base(node: Node) {
   return node.childForFieldName('argument') ?? node.childForFieldName('value')
@@ -197,6 +204,7 @@ export function collectFacts(root: Node): SourceFacts {
       scanf: [],
       getline: false,
       header: null,
+      loop: null,
       branch: null,
     }
     return facts[line]
@@ -209,15 +217,12 @@ export function collectFacts(root: Node): SourceFacts {
     if (header) {
       const fact = at(node)
       fact.header ??= header
+      if (header !== 'if') fact.loop ??= lines(node)
       if (header === 'if' || header === 'while') {
         const body = node.childForFieldName('consequence') ?? node.childForFieldName('body')
         const alternative = node.childForFieldName('alternative')
         if (body) {
-          const range = (n: Node): [number, number] => [
-            n.startPosition.row + 1,
-            n.endPosition.row + 1,
-          ]
-          fact.branch ??= { body: range(body), otherwise: alternative ? range(alternative) : null }
+          fact.branch ??= { body: lines(body), otherwise: alternative ? lines(alternative) : null }
         }
       }
     }

@@ -12,6 +12,7 @@ import type { OutputSegment } from './engine.ts'
 import { GotoMenu } from './goto-menu.tsx'
 import { entries, locate, parseTarget, plan, runJump, type Entry } from './goto.ts'
 import { Header } from './header.tsx'
+import { LoopPasses } from './loop-passes.tsx'
 import { useHistories } from './histories.ts'
 import { useStepKeys } from './keys.ts'
 import { isTraceError, type TraceHeader, type TraceSource } from './load.ts'
@@ -26,6 +27,7 @@ import {
   type OutputEnd,
 } from './output.tsx'
 import { targetText } from './search.ts'
+import { lineFacts } from './source-facts.ts'
 import { useSession, type LoadedTrace } from './session.ts'
 import { SettingsDialog } from './settings.tsx'
 import { StatePane } from './state-pane.tsx'
@@ -200,6 +202,7 @@ function ControlsBox({ trace }: { trace: LoadedTrace }) {
         goto={<GotoBox trace={trace} />}
         story={<StoryBox trace={trace} />}
         narration={trace.narrations[step] ?? null}
+        passes={<PassesBox trace={trace} />}
         timeline={
           <TimelineStrip
             step={step}
@@ -228,6 +231,37 @@ function ControlsBox({ trace }: { trace: LoadedTrace }) {
       />
     </div>
   )
+}
+
+function PassesBox({ trace }: { trace: LoadedTrace }) {
+  const step = usePlayer((s) => s.current?.i)
+  const line = usePlayer((s) => s.current?.line)
+  const prevLine = usePlayer((s) => s.current?.prevLine)
+  const facts = usePlayer((s) => s.facts)
+  const go = usePlayer((s) => s.go)
+  const [found, setFound] = useState<{ header: number; passes: number[] } | null>(null)
+  const header = [line, prevLine].find((l) => lineFacts(facts, l).loop !== null) ?? null
+  const loop = lineFacts(facts, header).loop
+
+  useEffect(() => {
+    if (step === undefined || header === null || loop === null) return
+    let alive = true
+    trace.passes(step, header, loop).then(
+      (passes) => {
+        if (alive) setFound({ header, passes })
+      },
+      (e: unknown) => {
+        const reason = e instanceof Error ? e.message : String(e)
+        if (alive) usePlayer.setState({ notice: `Couldn't search the trace: ${reason}` })
+      },
+    )
+    return () => {
+      alive = false
+    }
+  }, [step, header, loop, trace])
+
+  if (step === undefined || header === null || found?.header !== header) return null
+  return <LoopPasses line={header} passes={found.passes} step={step} onGo={go} />
 }
 
 function StoryBox({ trace }: { trace: LoadedTrace }) {

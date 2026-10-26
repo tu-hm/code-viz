@@ -58,7 +58,7 @@
 
 ## 7. Loop-pass chips (M5-F08 · 1 d)
 
-- [ ] On a loop header line: chips `1 2 3 … 8` jumping between passes (FE-08 §3 line facts)
+- [x] On a loop header line: chips `1 2 3 … 8` jumping between passes (FE-08 §3 line facts)
 
 ## 8. Constant badges & matrix labels (M5-F09 · 1 d) ✂
 

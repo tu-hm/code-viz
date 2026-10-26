@@ -26,6 +26,21 @@ test('the dp grid line writes one cell and reads two', async () => {
   ])
 })
 
+test('a loop header knows the lines its statement spans', async () => {
+  const { source } = loadFixture('cpp-dp-grid')
+  const facts = await parseSource(source, 'cpp17-gcc')
+  expect([9, 10, 11].map((line) => lineFacts(facts, line).loop)).toEqual([[9, 11], [10, 11], null])
+  const python = await parseSource(
+    'while q:\n    u = q.pop()\n    for v in g[u]:\n        f(v)\nx = 1\n',
+    'python3',
+  )
+  expect([1, 3].map((line) => lineFacts(python, line).loop)).toEqual([
+    [1, 4],
+    [3, 4],
+  ])
+  expect(lineFacts(facts, 7).loop).toEqual([7, 7])
+})
+
 test('binary search reads a[mid] in an if header and cin fills the input operands', async () => {
   const { source } = loadFixture('cpp-binary-search')
   const facts = await parseSource(source, 'cpp17-gcc')
