@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { LoopPasses } from './loop-passes.tsx'
 import { usePlayer } from './store.ts'
@@ -41,5 +41,13 @@ test('in the player: cpp-binary-search on its while line offers three passes', a
   await screen.findByText('Step 14 of 20')
   act(() => usePlayer.getState().go(0))
   await screen.findByText('Step 1 of 20')
+  expect(screen.queryByRole('navigation', { name: /^Passes/ })).toBeNull()
+})
+
+test('a loop on one line gets no chips', async () => {
+  history.replaceState(null, '', '/?step=4')
+  renderPlayer('cpp-containers')
+  await screen.findByText('Step 4 of 27')
+  await waitFor(() => expect(usePlayer.getState().facts).not.toBeNull())
   expect(screen.queryByRole('navigation', { name: /^Passes/ })).toBeNull()
 })

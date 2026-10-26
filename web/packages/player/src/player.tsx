@@ -240,7 +240,12 @@ function PassesBox({ trace }: { trace: LoadedTrace }) {
   const facts = usePlayer((s) => s.facts)
   const go = usePlayer((s) => s.go)
   const [found, setFound] = useState<{ header: number; passes: number[] } | null>(null)
-  const header = [line, prevLine].find((l) => lineFacts(facts, l).loop !== null) ?? null
+  // one-line loop => no chips: whether its first step is a pass differs by tracer and loop form
+  const header =
+    [line, prevLine].find((l) => {
+      const loop = lineFacts(facts, l).loop
+      return loop !== null && loop[0] !== loop[1]
+    }) ?? null
   const loop = lineFacts(facts, header).loop
 
   useEffect(() => {
