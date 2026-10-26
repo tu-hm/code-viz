@@ -1,13 +1,31 @@
 import type { StepState } from './engine.ts'
 import type { Formatter } from './format.ts'
 import type { HeapObject, Value } from './gen/trace.ts'
-import { evaluate, indexText, lineFacts, type SourceFacts, type Subscript } from './source-facts.ts'
+import type { GraphShape } from './graph.ts'
+import {
+  evaluate,
+  indexText,
+  lineFacts,
+  type LineFacts,
+  type SourceFacts,
+  type Subscript,
+} from './source-facts.ts'
 import type { CardView } from './state-layout.ts'
 
 export type Marker = { label: string; at: number; axis: number; outside: boolean }
 export type Range = { from: number; to: number; label: string; empty: boolean }
 
+// arrays: the int or bool arrays in scope at least as long as the graph, to colour and label nodes by
+export type GraphMarks = {
+  current: { name: string; at: number } | null
+  checking: { name: string; from: number; to: number } | null
+  arrays: { name: string; object: HeapObject }[]
+  // the array nodes are coloured by until the student picks one
+  colour: string | null
+}
+
 export type CardMarks = {
+  graph: GraphMarks | null
   indexed: boolean
   markers: Marker[]
   hidden: number
@@ -18,6 +36,7 @@ export type CardMarks = {
 }
 
 export const noMarks: CardMarks = {
+  graph: null,
   indexed: false,
   markers: [],
   hidden: 0,
@@ -49,6 +68,10 @@ function intScope(values: Record<string, Value>): Scope {
 // once per step and per parse, not per card: synthetic-5000 7.9 => 4.8 ms p50 keydown to DOM (prod build)
 const scopes = new WeakMap<StepState, Record<string, Value>>()
 const subscripted = new WeakMap<SourceFacts, Set<string>>()
+const rangeLoops = new WeakMap<
+  SourceFacts,
+  { header: number; loop: [number, number]; iterates: NonNullable<LineFacts['iterates']> }[]
+>()
 
 function scopeOf(state: StepState) {
   const hit = scopes.get(state)
@@ -203,6 +226,100 @@ function narrationOf(
   return `${head} from ${list}`
 }
 
+function loopsIn(facts: SourceFacts) {
+  let loops = rangeLoops.get(facts)
+  if (!loops) {
+    loops = Object.entries(facts).flatMap(([line, f]) =>
+      f.iterates !== null && f.loop !== null
+        ? [{ header: Number(line), loop: f.loop, iterates: f.iterates }]
+        : [],
+    )
+    rangeLoops.set(facts, loops)
+  }
+  return loops
+}
+
+const colourNames = [
+  'dist',
+  'd',
+  'depth',
+  'dep',
+  'vis',
+  'visited',
+  'used',
+  'color',
+  'col',
+  'low',
+  'tin',
+]
+const scalars = new Set(['int', 'bool', 'char', 'float'])
+
+function graphMarks(
+  card: CardView,
+  shape: GraphShape,
+  state: StepState,
+  facts: SourceFacts | null,
+): GraphMarks {
+  const arrays = names(card)
+  const values = scopeOf(state)
+  const scope = intScope(values)
+  const node = (n: number | null) => (n !== null && n >= 0 && n < shape.size ? n : null)
+  const subscripts = [state.line, state.prevLine].flatMap((l) =>
+    lineFacts(facts, l).subscripts.filter((s) => arrays.has(s.array) && s.indices.length > 0),
+  )
+  const loop =
+    facts === null
+      ? undefined
+      : loopsIn(facts).findLast(
+          (l) => arrays.has(l.iterates.array) && state.line >= l.loop[0] && state.line <= l.loop[1],
+        )
+  let current: GraphMarks['current'] = null
+  for (const s of subscripts) {
+    const at = node(evaluate(s.indices[0]!, scope))
+    if (at !== null && s.indices[0]?.name != null) {
+      current = { name: indexText(s.indices[0]), at }
+      break
+    }
+  }
+  if (current === null && loop !== undefined && loop.iterates.index?.name != null) {
+    const at = node(evaluate(loop.iterates.index, scope))
+    if (at !== null) current = { name: indexText(loop.iterates.index), at }
+  }
+  let checking: GraphMarks['checking'] = null
+  const pair = subscripts.find((s) => s.indices.length === 2)
+  if (pair && current !== null) {
+    const row = card.object.items?.[current.at]
+    const column = evaluate(pair.indices[1]!, scope)
+    const cell =
+      row?.id === undefined || column === null ? undefined : state.heap[row.id]?.items?.[column]
+    const to = node(cell?.t === 'int' ? Number(cell.v) : null)
+    if (to !== null)
+      checking = {
+        name: `${pair.array}[${current.name}][${indexText(pair.indices[1]!)}]`,
+        from: current.at,
+        to,
+      }
+  }
+  if (checking === null && current !== null && loop !== undefined && state.line > loop.header) {
+    const to = node(scope(loop.iterates.variable) ?? null)
+    if (to !== null) checking = { name: loop.iterates.variable, from: current.at, to }
+  }
+  const candidates = Object.entries(values).flatMap(([name, v]) => {
+    const o = v.t === 'ref' && v.id !== undefined && v.id !== card.id ? state.heap[v.id] : undefined
+    if (o?.kind !== 'sequence' || (o.length ?? 0) < shape.size) return []
+    const sample = o.sparse ? [o.sparse.default] : (o.items ?? [])
+    return sample.length > 0 && sample.every((x) => scalars.has(x.t)) ? [{ name, object: o }] : []
+  })
+  const rank = (name: string) => {
+    const k = colourNames.indexOf(name)
+    return k < 0 ? colourNames.length : k
+  }
+  const sorted = candidates.sort((a, b) => rank(a.name) - rank(b.name))
+  const colour =
+    sorted[0] !== undefined && rank(sorted[0].name) < colourNames.length ? sorted[0].name : null
+  return { current, checking, arrays: sorted, colour }
+}
+
 export function marksFor(
   card: CardView,
   state: StepState,
@@ -211,16 +328,21 @@ export function marksFor(
   pins: string[],
 ): CardMarks {
   if (card.object.kind !== 'sequence') return noMarks
+  const graph =
+    card.graph !== null && card.view === card.graph.kind
+      ? graphMarks(card, card.graph.shape, state, facts)
+      : null
   const arrays = names(card)
   const indexed = facts !== null && [...arrays].some((a) => arraysIn(facts).has(a))
   const access = exactReads(card, state).length > 0
-  if (!indexed && !access && pins.length === 0) return noMarks
+  if (!indexed && !access && pins.length === 0) return { ...noMarks, graph }
   const on = (line: number | null) =>
     lineFacts(facts, line).subscripts.filter((s) => arrays.has(s.array))
   const ran = on(state.prevLine)
   const scope = intScope(scopeOf(state))
   const before = intScope(state.before.scope)
   return {
+    graph,
     indexed,
     ...markersOf(shape(card), [...on(state.line), ...ran], scope, pins),
     ...readsOf(card, ran, before, state),

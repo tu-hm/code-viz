@@ -41,6 +41,38 @@ test('a loop header knows the lines its statement spans', async () => {
   expect(lineFacts(facts, 7).loop).toEqual([7, 7])
 })
 
+test.each([
+  {
+    name: 'C++ range-for',
+    code: 'int main() {\nfor (int v : adj[u]) f(v);\n}',
+    line: 2,
+    language: 'cpp17-gcc',
+  },
+  {
+    name: 'C++ structured binding',
+    code: 'int main() {\nfor (auto [v, w] : adj[u]) f(v);\n}',
+    line: 2,
+    language: 'cpp17-gcc',
+  },
+  { name: 'Python for', code: 'for v in adj[u]:\n    f(v)\n', line: 1, language: 'python3' },
+  { name: 'Python pair', code: 'for v, w in adj[u]:\n    f(v)\n', line: 1, language: 'python3' },
+])('$name: a loop over adj[u] names v, adj and u', async ({ code, line, language }) => {
+  const facts = await parseSource(code, language)
+  expect(lineFacts(facts, line).iterates).toEqual({
+    variable: 'v',
+    array: 'adj',
+    index: { name: 'u', offset: 0 },
+  })
+})
+
+test('a counting for loop iterates over nothing', async () => {
+  const facts = await parseSource(
+    'int main() {\nfor (int i = 0; i < n; i++) f(a[i]);\n}',
+    'cpp17-gcc',
+  )
+  expect(lineFacts(facts, 2).iterates).toBeNull()
+})
+
 test('binary search reads a[mid] in an if header and cin fills the input operands', async () => {
   const { source } = loadFixture('cpp-binary-search')
   const facts = await parseSource(source, 'cpp17-gcc')

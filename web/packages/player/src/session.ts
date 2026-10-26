@@ -5,6 +5,8 @@ import type { Print } from './compare.ts'
 import type { Ending } from './ending.ts'
 import { same, type StepState } from './engine.ts'
 import type { TraceHeader, TraceSource } from './load.ts'
+import { createElk } from './elk.ts'
+import { isUndirected, layoutGraph, type GraphLayout, type GraphRequest } from './graph.ts'
 import type { NarratedTrace } from './narration.ts'
 import { targetText, type Change, type Jump, type Target } from './search.ts'
 import { spawnEngine } from './spawn-engine.ts'
@@ -23,6 +25,7 @@ export type LoadedTrace = NarratedTrace & {
   find: (from: number, jump: Jump) => Promise<number | null>
   history: (target: Target) => Promise<Change[]>
   passes: (at: number, header: number, loop: [number, number]) => Promise<number[]>
+  graphLayout: (request: GraphRequest) => Promise<GraphLayout>
 }
 
 type Session =
@@ -57,6 +60,7 @@ export function useSession(
 
   useEffect(() => {
     let alive = true
+    let elk: ReturnType<typeof createElk> | null = null
     let replied = false
     let ready = false
     let busy = false
@@ -110,6 +114,7 @@ export function useSession(
       })
       ready = true
       const histories = new Map<string, Promise<Change[]>>()
+      const layouts = new Map<string, Promise<GraphLayout>>()
       setSession({
         status: 'ready',
         ...opened,
@@ -118,6 +123,19 @@ export function useSession(
         inputReads: [],
         find: (from, jump) => remote.find(from, jump),
         passes: (at, header, loop) => remote.passes(at, header, loop),
+        graphLayout(request) {
+          const key = JSON.stringify(request)
+          let layout = layouts.get(key)
+          if (layout === undefined) {
+            layout = remote.graphUnion(request.id, request.kind).then(({ nodes, edges }) => {
+              if (elk === null) elk = createElk()
+              const undirected = request.undirected ?? isUndirected(edges)
+              return layoutGraph(request.nodes ?? nodes, edges, undirected, elk)
+            })
+            layouts.set(key, layout)
+          }
+          return layout
+        },
         history(target) {
           const key = targetText(target)
           let changes = histories.get(key)
@@ -160,6 +178,7 @@ export function useSession(
       alive = false
       unsubscribe()
       terminate()
+      elk?.terminateWorker()
     }
   }, [source])
 

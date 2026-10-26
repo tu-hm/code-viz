@@ -22,6 +22,12 @@ vi.mock('./spawn-engine.ts', async () => {
   return { spawnEngine: spawn }
 })
 
+// jsdom has no Worker: lay graphs out in-thread with the bundled build's fake worker
+vi.mock('./elk.ts', async () => {
+  const { default: ELK } = await import('elkjs/lib/elk.bundled.js')
+  return { createElk: () => Object.assign(new ELK(), { terminateWorker: () => {} }) }
+})
+
 // jsdom can't fetch the grammars' ?url paths; under Node, Language.load reads a file path itself
 vi.mock('./grammars.ts', async () => {
   const { createRequire } = await import('node:module')

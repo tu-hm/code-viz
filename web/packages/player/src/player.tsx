@@ -447,13 +447,11 @@ function CallsBox({ trace }: { trace: LoadedTrace }) {
 }
 
 function StateBox({
-  traceId,
-  languageId,
+  trace,
   pointers,
   onShowRange,
 }: {
-  traceId: string
-  languageId: string
+  trace: LoadedTrace
   pointers: boolean
   onShowRange?: (variable: string) => void
 }) {
@@ -475,7 +473,7 @@ function StateBox({
   return (
     <StatePane
       state={state}
-      languageId={languageId}
+      languageId={trace.header.language.id}
       pointers={pointers}
       settings={{
         showInternals,
@@ -489,11 +487,12 @@ function StateBox({
       facts={facts}
       pins={pins}
       onPin={setPins}
-      onWatch={(target) => watch(traceId, target)}
+      onWatch={(target) => watch(trace.header.id, target)}
       onShowInternals={() => updateSettings({ showInternals: true })}
       onFrameLine={revealLine}
       onView={setView}
       onShowRange={onShowRange}
+      layoutGraph={trace.graphLayout}
     />
   )
 }
@@ -577,8 +576,7 @@ function Shell({
             </div>
           )}
           <StateBox
-            traceId={header.id}
-            languageId={header.language.id}
+            trace={trace}
             pointers={language.visualize.capabilities.pointers}
             onShowRange={onShowRange}
           />

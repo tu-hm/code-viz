@@ -5,6 +5,7 @@ import { BigArray, bigArray } from './big-array.tsx'
 import { ContainerView } from './containers.tsx'
 import { same } from './engine.ts'
 import { containerLabels } from './format.ts'
+import { GraphBox, type LayoutGraph } from './graph-view.tsx'
 import type { HeapObject, Value } from './gen/trace.ts'
 import { isRecord } from './is-record.ts'
 import type { kinds } from './load.ts'
@@ -31,6 +32,7 @@ export type CardProps = {
   onView: (variable: string, view: ViewAs) => void
   onPin: (variable: string, names: string[]) => void
   onShowRange?: (variable: string) => void
+  layoutGraph?: LayoutGraph
 }
 
 const drawnCells = 100 // FR-11: draw the first 100
@@ -241,6 +243,8 @@ const viewLabels: Record<Exclude<ViewAs, 'container'>, string> = {
   matrix: 'Matrix',
   bits: 'Bits',
   number: 'Number',
+  graph: 'Graph',
+  tree: 'Tree',
 }
 
 function ViewToggle({
@@ -273,8 +277,26 @@ function ViewToggle({
   )
 }
 
-function SequenceBody({ card, look, marks }: Pick<CardProps, 'card' | 'look' | 'marks'>) {
-  const { id, object: o, table, matrix, container, view, variable } = card
+function SequenceBody({
+  card,
+  look,
+  marks,
+  layoutGraph,
+}: Pick<CardProps, 'card' | 'look' | 'marks' | 'layoutGraph'>) {
+  const { id, object: o, table, matrix, container, graph, view, variable } = card
+  if (graph && view === graph.kind && marks.graph !== null && layoutGraph !== undefined) {
+    return (
+      <GraphBox
+        id={id}
+        name={variable ?? `#${id}`}
+        kind={graph.kind}
+        shape={graph.shape}
+        marks={marks.graph}
+        look={look}
+        layoutGraph={layoutGraph}
+      />
+    )
+  }
   if (container && view === 'container') {
     return <ContainerView id={id} kind={container} object={o} look={look} />
   }
@@ -292,8 +314,18 @@ function SequenceBody({ card, look, marks }: Pick<CardProps, 'card' | 'look' | '
   return <Cells id={id} object={o} look={look} />
 }
 
-function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRange }: CardProps) {
-  const { id, object: o, table, matrix, container, view, variable } = card
+function SequenceCard({
+  card,
+  look,
+  isNew,
+  marks,
+  pins,
+  onView,
+  onPin,
+  onShowRange,
+  layoutGraph,
+}: CardProps) {
+  const { id, object: o, table, matrix, container, graph, suggest, view, variable } = card
   const capacity = isRecord(o.meta) ? o.meta.capacity : undefined
   const facts = [`${look.format.sizeLabel} ${(o.length ?? 0).toLocaleString('en')}`]
   if (matrix && view === 'matrix') facts[0] = `${matrix.rows.length} × ${matrix.columns}`
@@ -304,14 +336,16 @@ function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRan
     facts.push(zero ? `${set} non-zero` : `${set} not ${look.format.value(o.sparse.default).text}`)
   }
   const name = variable ?? `#${id}`
-  const options: ViewAs[] | null = container
+  const base: ViewAs[] | null = container
     ? ['container', 'cells']
     : table
       ? ['table', 'cells']
       : matrix
         ? ['matrix', 'cells']
         : null
-  const widget = container !== null && view === 'container'
+  const options = graph && suggest === null ? [...(base ?? ['cells']), graph.kind] : base
+  const widget =
+    (container !== null && view === 'container') || (graph !== null && view === graph.kind)
   return (
     <Card
       card={card}
@@ -329,6 +363,15 @@ function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRan
               onView={(v) => onView(name, v)}
             />
           )}
+          {suggest !== null && (
+            <button
+              type="button"
+              onClick={() => onView(name, suggest)}
+              className="rounded-full bg-secondary px-3 py-1 font-sans text-xs text-secondary-foreground hover:bg-secondary-hover"
+            >
+              View as {suggest === 'graph' ? 'Graph' : 'Tree'}?
+            </button>
+          )}
           {variable !== undefined && !(matrix && view === 'matrix') && !table && !widget && (
             <PinMarkers variable={variable} pins={pins ?? []} onPin={onPin} />
           )}
@@ -345,7 +388,7 @@ function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRan
         </>
       }
     >
-      <SequenceBody card={card} look={look} marks={marks} />
+      <SequenceBody card={card} look={look} marks={marks} layoutGraph={layoutGraph} />
     </Card>
   )
 }
@@ -490,6 +533,9 @@ function sameCard(a: CardProps, b: CardProps) {
     a.onView === b.onView &&
     a.onShowRange === b.onShowRange &&
     a.onPin === b.onPin &&
+    a.layoutGraph === b.layoutGraph &&
+    a.card.suggest === b.card.suggest &&
+    (a.card.graph === null) === (b.card.graph === null) &&
     sameList(a.pins, b.pins) &&
     same(a.marks, b.marks) &&
     a.card.id === b.card.id &&

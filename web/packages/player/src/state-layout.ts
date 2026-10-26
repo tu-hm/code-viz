@@ -1,6 +1,7 @@
 import type { StepState } from './engine.ts'
 import type { Container, Formatter } from './format.ts'
 import type { Frame, HeapObject, Local, Value } from './gen/trace.ts'
+import { suggestedGraph, type GraphKind, type GraphShape } from './graph.ts'
 import type { ViewAs } from './store.ts'
 
 export type Reads = { drawn: string[]; named: string[] }
@@ -23,6 +24,9 @@ export type CardView = {
   table: Table | null
   matrix: Matrix | null
   container: Container | null
+  graph: { kind: GraphKind; shape: GraphShape } | null
+  // offered as a chip until the student picks any view for this variable
+  suggest: GraphKind | null
   view: ViewAs
   reads: Reads
 }
@@ -284,8 +288,12 @@ export function layoutState(
           : matrix !== null && matrixView
             ? 'matrix'
             : 'cells'
-    const view = views[variable ?? `#${id}`] ?? fallback
+    const names = places.flatMap((p) => (p.variable === undefined ? [] : [p.variable]))
+    const graph = suggestedGraph(heap[id]!, names, (child) => heap[child], format)
+    const chosen = views[variable ?? `#${id}`]
+    const view = chosen ?? fallback
     const rows = new Set([
+      ...(graph !== null && view === graph.kind ? graph.shape.rows : []),
       ...(table !== null && view === 'table' ? table.rows.map((r) => r.id) : []),
       ...(matrix !== null && view === 'matrix' ? matrix.rows.map((r) => r.id) : []),
     ])
@@ -303,6 +311,8 @@ export function layoutState(
       table,
       matrix,
       container,
+      graph,
+      suggest: graph !== null && chosen === undefined ? graph.kind : null,
       view,
       reads: readsOf(
         [id],
@@ -316,9 +326,15 @@ export function layoutState(
   const folded = new Set<string>()
   for (const card of cards) {
     const rows =
-      card.view === 'table' ? card.table?.rows : card.view === 'matrix' ? card.matrix?.rows : null
+      card.view === 'table'
+        ? card.table?.rows.map((r) => r.id)
+        : card.view === 'matrix'
+          ? card.matrix?.rows.map((r) => r.id)
+          : card.graph !== null && card.view === card.graph.kind
+            ? card.graph.shape.rows
+            : null
     for (const row of rows ?? []) {
-      if (placesOf(row.id).every((p) => p.object === card.id && !p.pointer)) folded.add(row.id)
+      if (placesOf(row).every((p) => p.object === card.id && !p.pointer)) folded.add(row)
     }
   }
 

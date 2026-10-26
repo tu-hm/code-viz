@@ -16,6 +16,8 @@ export type LineFacts = {
   header: (typeof headers)[number] | null
   // a loop header's whole statement, header line to the end of its body
   loop: [number, number] | null
+  // a range loop over one subscript: for (int v : adj[u]), for v in adj[u]
+  iterates: { variable: string; array: string; index: Index | null } | null
   branch: { body: [number, number]; otherwise: [number, number] | null } | null
 }
 
@@ -30,6 +32,7 @@ const none: LineFacts = {
   getline: false,
   header: null,
   loop: null,
+  iterates: null,
   branch: null,
 }
 
@@ -187,6 +190,28 @@ function subscript(node: Node): Subscript {
   return { array: n.text, indices, mode: mode(node) }
 }
 
+const bindings = new Set([
+  'structured_binding_declarator',
+  'reference_declarator',
+  'pattern_list',
+  'tuple_pattern',
+])
+
+function firstName(node: Node): string | null {
+  if (node.type === 'identifier') return node.text
+  if (!bindings.has(node.type)) return null
+  return node.namedChildren.find((c) => c.type === 'identifier')?.text ?? null
+}
+
+function iterated(node: Node): LineFacts['iterates'] {
+  const target = node.childForFieldName('declarator') ?? node.childForFieldName('left')
+  const right = node.childForFieldName('right')
+  const variable = target === null ? null : firstName(target)
+  if (variable === null || right === null || !subscriptTypes.has(unwrap(right).type)) return null
+  const { array, indices } = subscript(unwrap(right))
+  return indices.length === 1 ? { variable, array, index: indices[0]! } : null
+}
+
 function isOutermost(node: Node) {
   const parent = node.parent
   return !(parent && subscriptTypes.has(parent.type) && base(parent)?.id === node.id)
@@ -205,6 +230,7 @@ export function collectFacts(root: Node): SourceFacts {
       getline: false,
       header: null,
       loop: null,
+      iterates: null,
       branch: null,
     }
     return facts[line]
@@ -218,6 +244,9 @@ export function collectFacts(root: Node): SourceFacts {
       const fact = at(node)
       fact.header ??= header
       if (header !== 'if') fact.loop ??= lines(node)
+      if (node.type === 'for_range_loop' || node.type === 'for_statement') {
+        fact.iterates ??= iterated(node)
+      }
       if (header === 'if' || header === 'while') {
         const body = node.childForFieldName('consequence') ?? node.childForFieldName('body')
         const alternative = node.childForFieldName('alternative')

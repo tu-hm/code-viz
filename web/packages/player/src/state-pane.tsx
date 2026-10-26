@@ -2,6 +2,7 @@ import { Button, cn, Popover, PopoverAnchor, PopoverContent } from '@viz/ui'
 import { memo, useEffect, useId, useRef, useState, type Ref } from 'react'
 import { ArrowOverlay } from './arrow-overlay.tsx'
 import { BitsView } from './bits-view.tsx'
+import type { LayoutGraph } from './graph-view.tsx'
 import { HeapCard } from './cards.tsx'
 import { same, type StepState } from './engine.ts'
 import { formatterFor } from './format.ts'
@@ -42,6 +43,7 @@ type StatePaneProps = {
   onFrameLine: (line: number) => void
   onView: (variable: string, view: ViewAs) => void
   onShowRange?: (variable: string) => void
+  layoutGraph?: LayoutGraph
 }
 
 const rowClass = 'h-(--row-height) border-b border-border align-top last:border-b-0'
@@ -235,6 +237,7 @@ export function StatePane({
   onFrameLine,
   onView,
   onShowRange,
+  layoutGraph,
 }: StatePaneProps) {
   const stackId = useId()
   const heapId = useId()
@@ -326,6 +329,7 @@ export function StatePane({
               onView={onView}
               onPin={onPin}
               onShowRange={onShowRange}
+              layoutGraph={layoutGraph}
             />
           ))}
         </section>

@@ -23,14 +23,14 @@
 
 ## 2. Graph view (M5-F02 · 5 d)
 
-- [ ] Detect sources: `vector<int> adj[N]`, `vector<vector<int>>` (values in `[0, N)`), weighted `vector<pair<int,int>> adj[N]`, edge lists; names `adj`, `g`, `graph`
-- [ ] "View as Graph?" suggestion chip; choice remembered per variable name
-- [ ] elkjs layered layout in a worker; positions stable between steps
-- [ ] Current node from the `adj[u]` subscript; edge being checked `(u, v)`
-- [ ] Colour / label nodes by another size-N array (`dist`, `depth`, `vis`, `color`, `low`)
-- [ ] Undirected detection (edges in both directions drawn once)
-- [ ] > 200 nodes: 2-hop neighbourhood of the current node + hidden count
-- [ ] **Done:** matches the §19.4.5 BFS mock
+- [x] Detect sources: `vector<int> adj[N]`, `vector<vector<int>>` (values in `[0, N)`), weighted `vector<pair<int,int>> adj[N]`, edge lists; names `adj`, `g`, `graph`
+- [x] "View as Graph?" suggestion chip; choice remembered per variable name
+- [x] elkjs layered layout in a worker; positions stable between steps
+- [x] Current node from the `adj[u]` subscript; edge being checked `(u, v)`
+- [x] Colour / label nodes by another size-N array (`dist`, `depth`, `vis`, `color`, `low`)
+- [x] Undirected detection (edges in both directions drawn once)
+- [x] > 200 nodes: 2-hop neighbourhood of the current node + hidden count
+- [x] **Done:** matches the §19.4.5 BFS mock
 
 ## 3. Tree view (M5-F03 · 2 d) ✂
 

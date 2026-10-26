@@ -2,7 +2,9 @@ import { callTree } from './calls.ts'
 import type { Print } from './compare.ts'
 import { ending } from './ending.ts'
 import { createEngine } from './engine.ts'
+import { formatterFor } from './format.ts'
 import type { Step } from './gen/trace.ts'
+import { graphUnion, type Edge, type GraphKind } from './graph.ts'
 import { loadTrace, type FileSource, type Manifest, type TraceSource } from './load.ts'
 import { narrate } from './narration.ts'
 import { callSteps, changeHistory, findStep, loopPasses, type Jump, type Target } from './search.ts'
@@ -11,12 +13,17 @@ import type { SourceFacts } from './source-facts.ts'
 const prefetch = [1, -1, 2, -2]
 
 export function createWorkerApi() {
-  let trace: { steps: Step[]; engine: ReturnType<typeof createEngine> } | null = null
+  let trace: {
+    steps: Step[]
+    engine: ReturnType<typeof createEngine>
+    languageId: string
+    unions: Map<string, Promise<{ nodes: number[]; edges: Edge[] }>>
+  } | null = null
 
   async function open(source: TraceSource) {
     const { header, steps, tail } = await loadTrace(source)
     const engine = createEngine(steps)
-    trace = { steps, engine }
+    trace = { steps, engine, languageId: header.language.id, unions: new Map() }
     const prints = steps
       .filter((s) => s.stdout !== '' || s.stderr !== '')
       .map((s): Print => ({ i: s.i, line: s.prevLine, stdout: s.stdout, stderr: s.stderr }))
@@ -61,6 +68,16 @@ export function createWorkerApi() {
     passes(at: number, header: number, loop: [number, number]) {
       if (trace === null) throw new Error('passes before open')
       return loopPasses(trace.steps, at, header, loop)
+    },
+    graphUnion(id: string, kind: GraphKind) {
+      if (trace === null) throw new Error('graph union before open')
+      const key = `${id}|${kind}`
+      let union = trace.unions.get(key)
+      if (union === undefined) {
+        union = graphUnion(trace.steps, id, kind, formatterFor(trace.languageId))
+        trace.unions.set(key, union)
+      }
+      return union
     },
     history(target: Target) {
       if (trace === null) throw new Error('history before open')

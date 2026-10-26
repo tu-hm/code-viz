@@ -217,6 +217,7 @@ describe('index markers (§19.4.1)', () => {
       getline: false,
       header: null,
       loop: null,
+      iterates: null,
       branch: null,
     },
   })
@@ -282,6 +283,7 @@ describe('index markers (§19.4.1)', () => {
         getline: false,
         header: null,
         loop: null,
+        iterates: null,
         branch: null,
       },
     }
