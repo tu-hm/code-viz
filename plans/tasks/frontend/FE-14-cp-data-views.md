@@ -34,9 +34,9 @@
 
 ## 3. Tree view (M5-F03 · 2 d) ✂
 
-- [ ] From parent arrays (`par`, `parent`, `p`, `fa`, values in `[-1, N)`)
-- [ ] DFS tree from first-visit edges
-- [ ] Same layout engine and highlights as §2
+- [x] From parent arrays (`par`, `parent`, `p`, `fa`, values in `[-1, N)`)
+- [x] DFS tree from first-visit edges
+- [x] Same layout engine and highlights as §2
 
 ## 4. Container widgets (M5-F04 · 2 d)
 

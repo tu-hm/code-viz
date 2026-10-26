@@ -127,9 +127,10 @@ export function useSession(
           const key = JSON.stringify(request)
           let layout = layouts.get(key)
           if (layout === undefined) {
-            layout = remote.graphUnion(request.id, request.kind).then(({ nodes, edges }) => {
+            layout = remote.graphUnion(request).then(({ nodes, edges }) => {
               if (elk === null) elk = createElk()
-              const undirected = request.undirected ?? isUndirected(edges)
+              const undirected =
+                request.visits === null && (request.undirected ?? isUndirected(edges))
               return layoutGraph(request.nodes ?? nodes, edges, undirected, elk)
             })
             layouts.set(key, layout)

@@ -3,7 +3,14 @@ import { apply, type Base } from './engine.ts'
 import type { Formatter } from './format.ts'
 import type { HeapObject, Step, Value } from './gen/trace.ts'
 
-export type Edge = { from: number; to: number; weight?: Value }
+// since, until: the steps a first-visit edge holds, until null => to the end
+export type Edge = {
+  from: number
+  to: number
+  weight?: Value
+  since?: number
+  until?: number | null
+}
 export type GraphKind = 'graph' | 'tree'
 export type GraphShape = {
   source: 'adjacency' | 'edges' | 'parents'
@@ -20,6 +27,9 @@ export type GraphRequest = {
   undirected: boolean | null
   // null => every node the graph ever has; else these only (the 2-hop view of a big graph)
   nodes: number[] | null
+  // set => draw the tree of first visits: colour is the array whose cells mark a node visited,
+  // names the variables that index the adjacency list (u in adj[u])
+  visits: { colour: string; names: string[] } | null
 }
 
 export type Point = { x: number; y: number }
@@ -30,12 +40,14 @@ export type GraphLayout = {
   nodes: Record<number, Point>
   // key: from>to, or min-max when undirected; points run from the edge's own from to its to
   edges: Record<string, Point[]>
+  // first-visit trees: when each edge holds, by key
+  spans: Record<string, [number, number | null]> | null
 }
 
 type Heap = (id: string) => HeapObject | undefined
 
-export const adjacencyNames = new Set(['adj', 'g', 'graph']) // §19.4
-export const parentNames = new Set(['par', 'parent', 'p', 'fa'])
+const adjacencyNames = new Set(['adj', 'g', 'graph']) // §19.4
+const parentNames = new Set(['par', 'parent', 'p', 'fa'])
 const maxEdgeListNode = 1_000_000
 export const nodeWidth = 44
 export const nodeHeight = 26
@@ -156,6 +168,99 @@ export function isUndirected(edges: Edge[]) {
 
 const unionBatch = 256
 
+export function cellText(v: Value | undefined, format: Formatter) {
+  if (v === undefined || v.t === 'uninit') return '·'
+  return format.value(v).text
+}
+
+function cellsOf(o: HeapObject): [number, Value][] {
+  if (o.sparse) return Object.entries(o.sparse.items).map(([k, v]) => [Number(k), v])
+  return (o.items ?? []).map((v, i) => [(o.window?.start ?? 0) + i, v])
+}
+
+// what every cell held the last time they all held one value: -1 after fill(dist, ..., -1), false for a zeroed vis[]
+async function unvisitedValue(steps: Step[], colour: string, format: Formatter) {
+  const walk: Base = { frames: new Map(), heap: new Map() }
+  let last: HeapObject | undefined
+  let value: string | null = null
+  for (let k = 0; k < steps.length; k++) {
+    if (k % unionBatch === unionBatch - 1) await new Promise((resolve) => setTimeout(resolve))
+    apply(walk, steps[k]!)
+    const o = walk.heap.get(colour)
+    if (o === undefined || o === last) continue
+    last = o
+    if (o.sparse) {
+      if (Object.keys(o.sparse.items).length === 0) value = cellText(o.sparse.default, format)
+      continue
+    }
+    const texts = new Set(cellsOf(o).map(([, v]) => cellText(v, format)))
+    if (texts.size === 1) value = [...texts][0]!
+  }
+  return value
+}
+
+// a node is visited when its colour cell leaves the unvisited value; its parent is the nearest
+// frame's index variable that names another node with an edge to it (u in BFS, the caller's u in DFS)
+export async function firstVisits(
+  steps: Step[],
+  id: string,
+  visits: NonNullable<GraphRequest['visits']>,
+  format: Formatter,
+) {
+  const unvisited = await unvisitedValue(steps, visits.colour, format)
+  const walk: Base = { frames: new Map(), heap: new Map() }
+  const was = new Map<number, boolean>()
+  const open = new Map<number, Edge>()
+  const nodes = new Set<number>()
+  const edges: Edge[] = []
+  let last: HeapObject | undefined
+  for (let k = 0; k < steps.length && unvisited !== null; k++) {
+    if (k % unionBatch === unionBatch - 1) await new Promise((resolve) => setTimeout(resolve))
+    const step = steps[k]!
+    apply(walk, step)
+    const colour = walk.heap.get(visits.colour)
+    const adj = walk.heap.get(id)
+    if (colour === undefined || adj === undefined || colour === last) continue
+    last = colour
+    const shape = adjacency(adj, (child) => walk.heap.get(child), format)
+    if (shape === null) continue
+    const linked = new Set(shape.edges.map((e) => `${e.from}>${e.to}`))
+    const parentOf = (x: number) => {
+      for (const frameId of step.stack.toReversed()) {
+        for (const local of walk.frames.get(frameId)?.locals ?? []) {
+          if (!visits.names.includes(local.name)) continue
+          const p = int(local.value)
+          if (p !== null && p !== x && linked.has(`${p}>${x}`)) return p
+        }
+      }
+      return null
+    }
+    const cells = new Map(cellsOf(colour))
+    const keys = colour.sparse
+      ? [...new Set([...cells.keys(), ...open.keys(), ...was.keys()])]
+      : [...cells.keys()]
+    for (const x of keys) {
+      const now = cellText(cells.get(x) ?? colour.sparse?.default, format) !== unvisited
+      const before = was.get(x) ?? (colour.sparse ? false : undefined)
+      was.set(x, now)
+      if (before === false && now) {
+        nodes.add(x)
+        const p = parentOf(x)
+        if (p === null) continue
+        const edge = { from: p, to: x, since: k, until: null }
+        nodes.add(p)
+        edges.push(edge)
+        open.set(x, edge)
+      } else if (before === true && !now) {
+        const edge = open.get(x)
+        if (edge !== undefined) edge.until = k
+        open.delete(x)
+      }
+    }
+  }
+  return { nodes: [...nodes].sort((a, b) => a - b), edges }
+}
+
 // every node and edge the object has at any step, so the layout never moves between steps
 export async function graphUnion(steps: Step[], id: string, kind: GraphKind, format: Formatter) {
   const walk: Base = { frames: new Map(), heap: new Map() }
@@ -237,6 +342,14 @@ export async function layoutGraph(
     }),
   }
   const result = await elk.layout(graph)
+  const spans = drawn.some((e) => e.since !== undefined)
+    ? Object.fromEntries(
+        drawn.map((e): [string, [number, number | null]] => [
+          edgeKey(e.from, e.to, undirected),
+          [e.since ?? 0, e.until ?? null],
+        ]),
+      )
+    : null
   const positions: GraphLayout['nodes'] = {}
   for (const child of result.children ?? [])
     positions[Number(child.id)] = { x: child.x ?? 0, y: child.y ?? 0 }
@@ -251,6 +364,7 @@ export async function layoutGraph(
   }
   return {
     undirected,
+    spans,
     width: result.width ?? 0,
     height: result.height ?? 0,
     nodes: positions,

@@ -6,6 +6,7 @@ import { createEngine, type StepState } from './engine.ts'
 import { formatterFor } from './format.ts'
 import type { HeapObject, Value } from './gen/trace.ts'
 import {
+  firstVisits,
   graphShape,
   graphUnion,
   isUndirected,
@@ -35,8 +36,11 @@ function layouts(name: string) {
   const steps = loadFixture(name).chunks.flat()
   const format = formatterFor(loadFixture(name).header.language.id)
   return async (request: GraphRequest) => {
-    const { nodes, edges } = await graphUnion(steps, request.id, request.kind, format)
-    const undirected = request.undirected ?? isUndirected(edges)
+    const { nodes, edges } =
+      request.visits === null
+        ? await graphUnion(steps, request.id, request.kind, format)
+        : await firstVisits(steps, request.id, request.visits, format)
+    const undirected = request.visits === null && (request.undirected ?? isUndirected(edges))
     return layoutGraph(request.nodes ?? nodes, edges, undirected, new ELK())
   }
 }
@@ -212,6 +216,33 @@ describe('graph shapes (§19.4.5)', () => {
   })
 })
 
+describe('first-visit trees (§19.4.5)', () => {
+  const edgesOf = async (name: string, colour: string) => {
+    const steps = loadFixture(name).chunks.flat()
+    const { edges } = await firstVisits(steps, 'o1', { colour, names: ['u'] }, cpp)
+    return edges.map((e) => `${e.from}>${e.to}`)
+  }
+
+  test('cpp-bfs: each node hangs from the u it was reached from', async () => {
+    expect(await edgesOf('cpp-bfs', 'o2')).toEqual(['1>2', '1>3', '1>4', '2>5', '5>6'])
+  })
+
+  test('cpp-dfs: recursion finds the parent in the caller’s frame', async () => {
+    expect(await edgesOf('cpp-dfs', 'o2')).toEqual(['1>2', '2>4', '4>3', '4>5', '2>6', '6>7'])
+  })
+
+  test('the view draws only the first visits made so far, as a tree', async () => {
+    await renderGraph('cpp-dfs', 91, { adj: 'graph' })
+    fireEvent.click(screen.getByRole('button', { name: 'First visits (DFS tree)' }))
+    await waitFor(() =>
+      expect(screen.getByRole('img', { name: /^adj as/ }).getAttribute('aria-label')).toBe(
+        'adj as the tree of first visits: 7 nodes, 6 edges',
+      ),
+    )
+    expect(screen.getByRole('checkbox', { name: /Undirected/ })).toHaveProperty('disabled', true)
+  })
+})
+
 describe('graph view (§19.4.5)', () => {
   test('cpp-bfs step 58 matches the mock: visited by dist, u current, v = 5 being checked', async () => {
     await renderGraph('cpp-bfs', 58, { adj: 'graph' })
@@ -317,6 +348,7 @@ describe('graph view (§19.4.5)', () => {
       const shown = request.nodes ?? []
       return Promise.resolve({
         undirected: true,
+        spans: null,
         width: 100,
         height: 100,
         nodes: Object.fromEntries(shown.map((v, k) => [v, { x: 0, y: 40 * k }])),

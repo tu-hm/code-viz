@@ -1,4 +1,4 @@
-import { cn } from '@viz/ui'
+import { Button, cn } from '@viz/ui'
 import { useEffect, useId, useState } from 'react'
 import type { HeapObject, Value } from './gen/trace.ts'
 import {
@@ -87,9 +87,17 @@ export function GraphView({
   const { undirected } = layout
   const nodes = Object.keys(layout.nodes).map(Number)
   const keep = shown === null ? null : new Set(shown)
+  const live =
+    layout.spans === null
+      ? shape.edges
+      : Object.entries(layout.spans).flatMap(([key, [since, until]]): Edge[] => {
+          if (since > marks.step || (until !== null && marks.step >= until)) return []
+          const [from, to] = key.split('>').map(Number)
+          return [{ from: from!, to: to! }]
+        })
   const edges = [
     ...new Map(
-      shape.edges
+      live
         .filter((e) => e.from !== e.to && (keep === null || (keep.has(e.from) && keep.has(e.to))))
         .map((e) => [edgeKey(e.from, e.to, undirected), e]),
     ).entries(),
@@ -104,14 +112,14 @@ export function GraphView({
   const checked = checking === null ? null : edgeKey(checking.from, checking.to, undirected)
   const neighbours = (n: number) => [
     ...new Set(
-      shape.edges
+      live
         .filter((e) => e.from === n || (undirected && e.to === n))
         .map((e) => (e.from === n ? e.to : e.from)),
     ),
   ]
   const nodeLabel = (n: number) => (label === null ? String(n) : text(cellValue(label, n), look))
   const summary = [
-    `${name} as a ${kind}: ${nodes.length} nodes, ${edges.length} edges`,
+    `${name} as ${layout.spans === null ? `a ${kind}` : 'the tree of first visits'}: ${nodes.length} nodes, ${edges.length} edges`,
     current !== null ? `current node ${current.at} (${current.name})` : null,
     checking !== null
       ? `checking ${checking.name} = ${checking.to}, edge ${checking.from} to ${checking.to}`
@@ -278,6 +286,7 @@ export function GraphBox({
   layoutGraph: LayoutGraph
 }) {
   const [undirected, setUndirected] = useState<boolean | null>(kind === 'tree' ? false : null)
+  const [firstVisits, setFirstVisits] = useState(false)
   const [colourPick, setColour] = useState<string | null | undefined>(undefined)
   const [labelPick, setLabel] = useState<string | null>(null)
   const [found, setFound] = useState<{ key: string; layout?: GraphLayout; error?: string } | null>(
@@ -289,13 +298,32 @@ export function GraphBox({
   const big = all.length > maxNodes
   const center = marks.current?.at ?? all[0] ?? 0
   const shown = big ? neighbourhood(shape.edges, center) : null
+  const colourName = colourPick === undefined ? marks.colour : colourPick
+  const canVisit =
+    kind === 'graph' &&
+    shape.source === 'adjacency' &&
+    colourName !== null &&
+    marks.indices.length > 0
+  const colourArray = marks.arrays.find((a) => a.name === colourName)
+  const visits =
+    canVisit && firstVisits && colourArray !== undefined
+      ? `${colourArray.id}|${marks.indices.join(',')}`
+      : null
   const nodesKey = shown?.join(',') ?? null
-  const key = `${id}|${kind}|${undirected}|${nodesKey}`
+  const key = `${id}|${kind}|${undirected}|${nodesKey}|${visits}`
 
   useEffect(() => {
     let alive = true
     const nodes = nodesKey === null ? null : nodesKey.split(',').map(Number)
-    layoutGraph({ id, kind, undirected, nodes }).then(
+    const [colour, names] = visits === null ? [] : visits.split('|')
+    layoutGraph({
+      id,
+      kind,
+      undirected,
+      nodes,
+      visits:
+        colour === undefined || names === undefined ? null : { colour, names: names.split(',') },
+    }).then(
       (layout) => {
         if (alive) setFound({ key, layout })
       },
@@ -306,9 +334,8 @@ export function GraphBox({
     return () => {
       alive = false
     }
-  }, [key, id, kind, undirected, nodesKey, layoutGraph])
+  }, [key, id, kind, undirected, nodesKey, visits, layoutGraph])
 
-  const colourName = colourPick === undefined ? marks.colour : colourPick
   const colour = marks.arrays.find((a) => a.name === colourName)?.object ?? null
   const label = marks.arrays.find((a) => a.name === labelPick)?.object ?? null
   const layout = found?.layout
@@ -349,12 +376,32 @@ export function GraphBox({
             ))}
           </select>
         </label>
+        {canVisit && (
+          <div role="group" aria-label="Edges to draw" className="flex gap-1">
+            <Button
+              size="sm"
+              variant={firstVisits ? 'ghost' : 'secondary'}
+              aria-pressed={!firstVisits}
+              onClick={() => setFirstVisits(false)}
+            >
+              All edges
+            </Button>
+            <Button
+              size="sm"
+              variant={firstVisits ? 'secondary' : 'ghost'}
+              aria-pressed={firstVisits}
+              onClick={() => setFirstVisits(true)}
+            >
+              First visits (DFS tree)
+            </Button>
+          </div>
+        )}
         {kind === 'graph' && (
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={layout?.undirected ?? false}
-              disabled={layout === undefined}
+              disabled={layout === undefined || visits !== null}
               onChange={(e) => setUndirected(e.currentTarget.checked)}
               className="size-4 accent-primary"
             />

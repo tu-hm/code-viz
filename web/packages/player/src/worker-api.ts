@@ -4,7 +4,7 @@ import { ending } from './ending.ts'
 import { createEngine } from './engine.ts'
 import { formatterFor } from './format.ts'
 import type { Step } from './gen/trace.ts'
-import { graphUnion, type Edge, type GraphKind } from './graph.ts'
+import { firstVisits, graphUnion, type Edge, type GraphRequest } from './graph.ts'
 import { loadTrace, type FileSource, type Manifest, type TraceSource } from './load.ts'
 import { narrate } from './narration.ts'
 import { callSteps, changeHistory, findStep, loopPasses, type Jump, type Target } from './search.ts'
@@ -69,12 +69,16 @@ export function createWorkerApi() {
       if (trace === null) throw new Error('passes before open')
       return loopPasses(trace.steps, at, header, loop)
     },
-    graphUnion(id: string, kind: GraphKind) {
+    graphUnion({ id, kind, visits }: Pick<GraphRequest, 'id' | 'kind' | 'visits'>) {
       if (trace === null) throw new Error('graph union before open')
-      const key = `${id}|${kind}`
+      const key = JSON.stringify([id, kind, visits])
       let union = trace.unions.get(key)
       if (union === undefined) {
-        union = graphUnion(trace.steps, id, kind, formatterFor(trace.languageId))
+        const format = formatterFor(trace.languageId)
+        union =
+          visits === null
+            ? graphUnion(trace.steps, id, kind, format)
+            : firstVisits(trace.steps, id, visits, format)
         trace.unions.set(key, union)
       }
       return union

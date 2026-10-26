@@ -17,9 +17,12 @@ export type Range = { from: number; to: number; label: string; empty: boolean }
 
 // arrays: the int or bool arrays in scope at least as long as the graph, to colour and label nodes by
 export type GraphMarks = {
+  step: number
+  // the variables that index the graph anywhere in the source: u in adj[u]
+  indices: string[]
   current: { name: string; at: number } | null
   checking: { name: string; from: number; to: number } | null
-  arrays: { name: string; object: HeapObject }[]
+  arrays: { name: string; id: string; object: HeapObject }[]
   // the array nodes are coloured by until the student picks one
   colour: string | null
 }
@@ -239,6 +242,19 @@ function loopsIn(facts: SourceFacts) {
   return loops
 }
 
+function indexNames(facts: SourceFacts, arrays: Set<string>) {
+  const names = new Set<string>()
+  for (const f of Object.values(facts)) {
+    for (const s of f.subscripts) {
+      const name = s.indices[0]?.name
+      if (arrays.has(s.array) && name != null) names.add(name)
+    }
+    const index = f.iterates?.index?.name
+    if (f.iterates !== null && arrays.has(f.iterates.array) && index != null) names.add(index)
+  }
+  return [...names]
+}
+
 const colourNames = [
   'dist',
   'd',
@@ -308,16 +324,19 @@ function graphMarks(
     const o = v.t === 'ref' && v.id !== undefined && v.id !== card.id ? state.heap[v.id] : undefined
     if (o?.kind !== 'sequence' || (o.length ?? 0) < shape.size) return []
     const sample = o.sparse ? [o.sparse.default] : (o.items ?? [])
-    return sample.length > 0 && sample.every((x) => scalars.has(x.t)) ? [{ name, object: o }] : []
+    return sample.length > 0 && sample.every((x) => scalars.has(x.t))
+      ? [{ name, id: v.id!, object: o }]
+      : []
   })
   const rank = (name: string) => {
     const k = colourNames.indexOf(name)
     return k < 0 ? colourNames.length : k
   }
+  const indices = facts === null ? [] : indexNames(facts, arrays)
   const sorted = candidates.sort((a, b) => rank(a.name) - rank(b.name))
   const colour =
     sorted[0] !== undefined && rank(sorted[0].name) < colourNames.length ? sorted[0].name : null
-  return { current, checking, arrays: sorted, colour }
+  return { step: state.i, indices, current, checking, arrays: sorted, colour }
 }
 
 export function marksFor(
