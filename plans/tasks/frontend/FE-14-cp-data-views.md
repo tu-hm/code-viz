@@ -13,13 +13,13 @@
 
 ## 1. Call tree (M5-F01 · 3 d)
 
-- [ ] Build in one pass from `callId` / `parentCallId`; args + return value per node; `…` still running
-- [ ] `↺ repeated`: exact same arguments as an earlier call
-- [ ] Collapse: > 8 siblings → "+N calls"; > 50 levels → first/last 10; "Collapse repeated calls"
-- [ ] Click → call step; Shift-click → return step
-- [ ] Tree ↔ Stack toggle; stack collapses the middle above 20 frames
-- [ ] Footer: depth now · max depth · calls so far
-- [ ] **Done:** matches the §19.4.4 mock on the fib fixture
+- [x] Build in one pass from `callId` / `parentCallId`; args + return value per node; `…` still running
+- [x] `↺ repeated`: exact same arguments as an earlier call
+- [x] Collapse: > 8 siblings → "+N calls"; > 50 levels → first/last 10; "Collapse repeated calls"
+- [x] Click → call step; Shift-click → return step
+- [x] Tree ↔ Stack toggle; stack collapses the middle above 20 frames
+- [x] Footer: depth now · max depth · calls so far
+- [x] **Done:** matches the §19.4.4 mock on the fib fixture
 
 ## 2. Graph view (M5-F02 · 5 d)
 

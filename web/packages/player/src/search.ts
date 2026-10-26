@@ -68,7 +68,7 @@ function resolve(stack: string[], base: Base, target: Target) {
 }
 
 // refs only: a ptr's value is its address, not what it points at
-function reach(value: Value, heap: Map<string, HeapObject>) {
+export function reach(value: Value, heap: Map<string, HeapObject>) {
   const objects = new Map<string, HeapObject>()
   const pending = [value]
   for (let v = pending.pop(); v !== undefined; v = pending.pop()) {

@@ -1,6 +1,7 @@
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@viz/ui'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { togglePlay, useAutoplay } from './autoplay.ts'
+import { CallsPanel } from './call-tree.tsx'
 import { CodePane } from './code-pane.tsx'
 import { compareOutput, shownAt } from './compare.ts'
 import { Controls, Notice } from './controls.tsx'
@@ -383,6 +384,24 @@ function WatchBox({ trace }: { trace: LoadedTrace }) {
   )
 }
 
+function CallsBox({ trace }: { trace: LoadedTrace }) {
+  const step = usePlayer((s) => s.current?.i)
+  const line = usePlayer((s) => s.current?.line)
+  const stack = usePlayer((s) => s.current?.stack)
+  const go = usePlayer((s) => s.go)
+  if (step === undefined || line === undefined || stack === undefined) return null
+  return (
+    <CallsPanel
+      tree={trace.tree}
+      step={step}
+      line={line}
+      stack={stack}
+      languageId={trace.header.language.id}
+      onGo={go}
+    />
+  )
+}
+
 function StateBox({
   traceId,
   languageId,
@@ -508,6 +527,11 @@ function Shell({
           <div className="px-(--pane-padding) pt-(--pane-padding)">
             <WatchBox trace={trace} />
           </div>
+          {trace.tree.some((n) => n.depth > 0) && (
+            <div className="px-(--pane-padding) pt-(--pane-padding)">
+              <CallsBox trace={trace} />
+            </div>
+          )}
           <StateBox
             traceId={header.id}
             languageId={header.language.id}

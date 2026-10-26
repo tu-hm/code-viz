@@ -1,3 +1,4 @@
+import { callTree } from './calls.ts'
 import type { Print } from './compare.ts'
 import { ending } from './ending.ts'
 import { createEngine } from './engine.ts'
@@ -25,6 +26,7 @@ export function createWorkerApi() {
       prints,
       tail,
       calls: callSteps(steps),
+      tree: callTree(steps),
       errors: steps.flatMap((s) => (s.error === null ? [] : [s.i])),
       ending: ending(steps, engine.state),
     }

@@ -1,4 +1,5 @@
 import { proxy } from 'comlink'
+import type { CallNode } from './calls.ts'
 import { useEffect, useEffectEvent, useState } from 'react'
 import type { Print } from './compare.ts'
 import type { Ending } from './ending.ts'
@@ -16,6 +17,7 @@ export type LoadedTrace = NarratedTrace & {
   prints: Print[]
   tail: string
   calls: Record<string, number[]>
+  tree: CallNode[]
   errors: number[]
   ending: Ending
   find: (from: number, jump: Jump) => Promise<number | null>
