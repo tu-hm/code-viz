@@ -1,0 +1,3706 @@
+[
+  {
+    "access": [],
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 0,
+    "keyframe": true,
+    "line": 10,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 1,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 1,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 0,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 2,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 2,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f2": {
+        "id": "f2",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 3,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 1,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f2": {
+        "id": "f2",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 4,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 3,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f3": {
+        "id": "f3",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 5,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 2,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f3": {
+        "id": "f3",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 6,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 4,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f4": {
+        "id": "f4",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 7,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 3,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f4": {
+        "id": "f4",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 8,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 5,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f5": {
+        "id": "f5",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 9,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 4,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f5": {
+        "id": "f5",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 10,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 6,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f6": {
+        "id": "f6",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 11,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 5,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f6": {
+        "id": "f6",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 12,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 6,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f6": {
+        "id": "f6",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 13,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 7,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f7": {
+        "id": "f7",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 14,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 5,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f7"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f7": {
+        "id": "f7",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 15,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f7"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 7,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f7": {
+        "id": "f7",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "0"
+        }
+      }
+    },
+    "heap": {},
+    "i": 16,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f7"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f5": {
+        "id": "f5",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 17,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 5,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f5": {
+        "id": "f5",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 18,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 8,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f8": {
+        "id": "f8",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 19,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 4,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f8"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f8": {
+        "id": "f8",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 20,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f8"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 8,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f8": {
+        "id": "f8",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 21,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f8"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f4": {
+        "id": "f4",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 22,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 4,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f4": {
+        "id": "f4",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "2"
+        }
+      }
+    },
+    "heap": {},
+    "i": 23,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 9,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f9": {
+        "id": "f9",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 24,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 3,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f9": {
+        "id": "f9",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 25,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 10,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f10": {
+        "id": "f10",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 26,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 9,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9",
+      "f10"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f10": {
+        "id": "f10",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 27,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9",
+      "f10"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 10,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f10": {
+        "id": "f10",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 28,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9",
+      "f10"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 11,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f11": {
+        "id": "f11",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 29,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 9,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9",
+      "f11"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f11": {
+        "id": "f11",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 30,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9",
+      "f11"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 11,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f11": {
+        "id": "f11",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "0"
+        }
+      }
+    },
+    "heap": {},
+    "i": 31,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9",
+      "f11"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f9": {
+        "id": "f9",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 32,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 9,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f9": {
+        "id": "f9",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 33,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f9"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f3": {
+        "id": "f3",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 34,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 3,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f3": {
+        "id": "f3",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "3"
+        }
+      }
+    },
+    "heap": {},
+    "i": 35,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f3"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 12,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f12": {
+        "id": "f12",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 36,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 2,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f12": {
+        "id": "f12",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 37,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 13,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f13": {
+        "id": "f13",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 38,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 12,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f13": {
+        "id": "f13",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 39,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 14,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f14": {
+        "id": "f14",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 40,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 13,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13",
+      "f14"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f14": {
+        "id": "f14",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 41,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13",
+      "f14"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 14,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f14": {
+        "id": "f14",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 42,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13",
+      "f14"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 15,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f15": {
+        "id": "f15",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 43,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 13,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13",
+      "f15"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f15": {
+        "id": "f15",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 44,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13",
+      "f15"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 15,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f15": {
+        "id": "f15",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "0"
+        }
+      }
+    },
+    "heap": {},
+    "i": 45,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13",
+      "f15"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f13": {
+        "id": "f13",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 46,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 13,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f13": {
+        "id": "f13",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 47,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f13"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 16,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f16": {
+        "id": "f16",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 48,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 12,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f16"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f16": {
+        "id": "f16",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 49,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f16"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 16,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [],
+        "name": "main",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      },
+      "f12": {
+        "id": "f12",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      },
+      "f16": {
+        "id": "f16",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      },
+      "f2": {
+        "id": "f2",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 50,
+    "keyframe": true,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12",
+      "f16"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f12": {
+        "id": "f12",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 51,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 12,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f12": {
+        "id": "f12",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "2"
+        }
+      }
+    },
+    "heap": {},
+    "i": 52,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2",
+      "f12"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f2": {
+        "id": "f2",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 53,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 2,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f2": {
+        "id": "f2",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "5"
+        }
+      }
+    },
+    "heap": {},
+    "i": 54,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f2"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 17,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f17": {
+        "id": "f17",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 55,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 1,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f17": {
+        "id": "f17",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 56,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 18,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f18": {
+        "id": "f18",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 57,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 17,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f18": {
+        "id": "f18",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 58,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 19,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f19": {
+        "id": "f19",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 59,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 18,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f19": {
+        "id": "f19",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 60,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 20,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f20": {
+        "id": "f20",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 61,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 19,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19",
+      "f20"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f20": {
+        "id": "f20",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 62,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19",
+      "f20"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 20,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f20": {
+        "id": "f20",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 63,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19",
+      "f20"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 21,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f21": {
+        "id": "f21",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 64,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 19,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19",
+      "f21"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f21": {
+        "id": "f21",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 65,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19",
+      "f21"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 21,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f21": {
+        "id": "f21",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "0"
+        }
+      }
+    },
+    "heap": {},
+    "i": 66,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19",
+      "f21"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f19": {
+        "id": "f19",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 67,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 19,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f19": {
+        "id": "f19",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 68,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f19"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 22,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f22": {
+        "id": "f22",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 69,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 18,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f22"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f22": {
+        "id": "f22",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 70,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f22"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 22,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f22": {
+        "id": "f22",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 71,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18",
+      "f22"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f18": {
+        "id": "f18",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 72,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 18,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f18": {
+        "id": "f18",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "2"
+        }
+      }
+    },
+    "heap": {},
+    "i": 73,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f18"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 23,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f23": {
+        "id": "f23",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 74,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 17,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f23": {
+        "id": "f23",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 75,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 24,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f24": {
+        "id": "f24",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 76,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 23,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23",
+      "f24"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f24": {
+        "id": "f24",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 77,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23",
+      "f24"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 24,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f24": {
+        "id": "f24",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 78,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23",
+      "f24"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 25,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f25": {
+        "id": "f25",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 79,
+    "keyframe": false,
+    "line": 5,
+    "parentCallId": 23,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23",
+      "f25"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f25": {
+        "id": "f25",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 80,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23",
+      "f25"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 25,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f25": {
+        "id": "f25",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "0"
+        }
+      }
+    },
+    "heap": {},
+    "i": 81,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23",
+      "f25"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f23": {
+        "id": "f23",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 82,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 23,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f23": {
+        "id": "f23",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "1"
+        }
+      }
+    },
+    "heap": {},
+    "i": 83,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17",
+      "f23"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f17": {
+        "id": "f17",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 84,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 17,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f17": {
+        "id": "f17",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "3"
+        }
+      }
+    },
+    "heap": {},
+    "i": 85,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1",
+      "f17"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 86,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 1,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "fib",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "8"
+        }
+      }
+    },
+    "heap": {},
+    "i": 87,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0",
+      "f1"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 11,
+        "locals": [],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 88,
+    "keyframe": false,
+    "line": 11,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": "8\n"
+  },
+  {
+    "access": [],
+    "callId": 0,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 11,
+        "locals": [],
+        "name": "main",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "0"
+        }
+      }
+    },
+    "heap": {},
+    "i": 89,
+    "keyframe": false,
+    "line": 11,
+    "prevLine": 11,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  }
+]
