@@ -52,9 +52,9 @@
 
 ## 6. Conditional jumps (M5-F07 · 2 d)
 
-- [ ] Small expression evaluator over step state: identifiers, subscripts, `== != < <= > >= && || !`, arithmetic
-- [ ] "Next step where `i == 5`" / "where `dp[i][j] > 100`" in Go to…
-- [ ] Safe: no `eval`, parse errors shown inline
+- [x] Small expression evaluator over step state: identifiers, subscripts, `== != < <= > >= && || !`, arithmetic
+- [x] "Next step where `i == 5`" / "where `dp[i][j] > 100`" in Go to…
+- [x] Safe: no `eval`, parse errors shown inline
 
 ## 7. Loop-pass chips (M5-F08 · 1 d)
 

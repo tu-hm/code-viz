@@ -4,6 +4,7 @@ import { togglePlay, useAutoplay } from './autoplay.ts'
 import { CallsPanel } from './call-tree.tsx'
 import { CodePane } from './code-pane.tsx'
 import { compareOutput, shownAt } from './compare.ts'
+import { parseCondition } from './condition.ts'
 import { Controls, Notice } from './controls.tsx'
 import { useDisplayOptions } from './display.ts'
 import { Divider } from './divider.tsx'
@@ -79,21 +80,27 @@ function useFrameThrottle(fn: (value: number) => void) {
   }
 }
 
+function conditionError(text: string) {
+  const parsed = parseCondition(text)
+  return 'error' in parsed ? parsed.error : null
+}
+
 function GotoPanel({ trace, onRun }: { trace: LoadedTrace; onRun: (entry: Entry) => void }) {
   const step = usePlayer((s) => s.step)
   const stack = usePlayer((s) => s.current?.stack)
   const breakpoints = usePlayer((s) => s.breakpoints)
   const jumpLine = usePlayer((s) => s.jumpLine)
   const jumpChange = usePlayer((s) => s.jumpChange)
+  const jumpWhere = usePlayer((s) => s.jumpWhere)
   const jumpCall = usePlayer((s) => s.jumpCall)
   const expected = usePlayer((s) => s.expected)
   const exact = usePlayer((s) => s.exact)
   const [found, setFound] = useState<Partial<Record<Entry, boolean>>>({})
-  const params = { breakpoints, jumpLine, jumpChange, jumpCall, expected, exact }
+  const params = { breakpoints, jumpLine, jumpChange, jumpWhere, jumpCall, expected, exact }
 
   useEffect(() => {
     let alive = true
-    const params = { breakpoints, jumpLine, jumpChange, jumpCall, expected, exact }
+    const params = { breakpoints, jumpLine, jumpChange, jumpWhere, jumpCall, expected, exact }
     Promise.all(entries.map((e) => locate(plan(e, params, trace), step, trace))).then(
       (targets) => {
         if (alive) setFound(Object.fromEntries(entries.map((e, i) => [e, targets[i] !== null])))
@@ -106,7 +113,7 @@ function GotoPanel({ trace, onRun }: { trace: LoadedTrace; onRun: (entry: Entry)
     return () => {
       alive = false
     }
-  }, [step, breakpoints, jumpLine, jumpChange, jumpCall, expected, exact, trace])
+  }, [step, breakpoints, jumpLine, jumpChange, jumpWhere, jumpCall, expected, exact, trace])
 
   const frames = [...(stack ?? [])].reverse()
   const variables = frames.flatMap((f) => f.locals.filter((l) => !l.internal).map((l) => l.name))
@@ -121,12 +128,15 @@ function GotoPanel({ trace, onRun }: { trace: LoadedTrace; onRun: (entry: Entry)
       found={found}
       line={jumpLine}
       change={jumpChange}
+      where={jumpWhere}
+      whereError={jumpWhere.trim() === '' ? null : conditionError(jumpWhere)}
       call={jumpCall}
       breakpoints={breakpoints}
       variables={[...new Set(variables)]}
       functions={Object.keys(trace.calls)}
       onLine={(jumpLine) => usePlayer.setState({ jumpLine })}
       onChange={(jumpChange) => usePlayer.setState({ jumpChange })}
+      onWhere={(jumpWhere) => usePlayer.setState({ jumpWhere })}
       onCall={(jumpCall) => usePlayer.setState({ jumpCall })}
       onRun={onRun}
     />

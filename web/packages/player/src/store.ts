@@ -40,6 +40,7 @@ type PlayerState = {
   comparing: boolean
   jumpLine: string
   jumpChange: string
+  jumpWhere: string
   jumpCall: string | null
   notice: string | null
   views: Record<string, ViewAs>
@@ -132,6 +133,7 @@ export const usePlayer = create<PlayerState>()(
       comparing: false,
       jumpLine: '',
       jumpChange: '',
+      jumpWhere: '',
       jumpCall: null,
       notice: null,
       views: {},

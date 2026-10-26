@@ -1,9 +1,20 @@
 import { compareOutput, jumpTarget } from './compare.ts'
+import { parseCondition } from './condition.ts'
 import type { Jump, Target } from './search.ts'
 import type { LoadedTrace } from './session.ts'
 import { usePlayer } from './store.ts'
 
-export const entries = ['over', 'out', 'line', 'change', 'call', 'print', 'diff', 'error'] as const
+export const entries = [
+  'over',
+  'out',
+  'line',
+  'change',
+  'where',
+  'call',
+  'print',
+  'diff',
+  'error',
+] as const
 export type Entry = (typeof entries)[number]
 
 export const shortcuts: Record<Entry, string> = {
@@ -11,6 +22,7 @@ export const shortcuts: Record<Entry, string> = {
   out: 'Shift + ↑',
   line: 'L',
   change: 'C',
+  where: 'W',
   call: 'F',
   print: 'P',
   diff: 'D',
@@ -19,7 +31,7 @@ export const shortcuts: Record<Entry, string> = {
 
 type Params = Pick<
   ReturnType<typeof usePlayer.getState>,
-  'breakpoints' | 'jumpLine' | 'jumpChange' | 'jumpCall' | 'expected' | 'exact'
+  'breakpoints' | 'jumpLine' | 'jumpChange' | 'jumpWhere' | 'jumpCall' | 'expected' | 'exact'
 >
 
 type Plan = { label: string } & ({ jump: Jump } | { at: number } | { missing: string })
@@ -61,6 +73,12 @@ export function plan(entry: Entry, p: Params, trace: LoadedTrace): Plan {
         }
       }
       return { label: `Next change of ${p.jumpChange.trim()}`, jump: { kind: 'change', target } }
+    }
+    case 'where': {
+      const typed = p.jumpWhere.trim()
+      const parsed = parseCondition(typed)
+      if ('error' in parsed) return { label: 'Next step where…', missing: parsed.error }
+      return { label: `Next step where ${typed}`, jump: { kind: 'where', expr: parsed.expr } }
     }
     case 'call': {
       const name = p.jumpCall ?? Object.keys(trace.calls)[0]

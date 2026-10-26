@@ -2,6 +2,7 @@
 import { fixtureNames, loadFixture } from '@viz/fixtures'
 import { describe, expect, test } from 'vitest'
 import { createEngine, type StepState } from './engine.ts'
+import { parseCondition } from './condition.ts'
 import type { HeapObject, Step, Value } from './gen/trace.ts'
 import { callSteps, changeHistory, findStep, type Jump, type Target } from './search.ts'
 
@@ -299,4 +300,58 @@ describe.each(fixtureNames)('%s', (name) => {
     }
     expect((await changeHistory(steps, target(variable))).map((c) => c.step)).toEqual(want)
   })
+})
+
+function where(text: string) {
+  const parsed = parseCondition(text)
+  if ('error' in parsed) throw new Error(parsed.error)
+  return { kind: 'where' as const, expr: parsed.expr }
+}
+
+test.each([
+  {
+    name: 'the first step a variable has a value',
+    fixture: 'cpp-binary-search',
+    text: 'mid == 5',
+    from: 0,
+    want: 10,
+  },
+  {
+    name: 'the next step it still holds',
+    fixture: 'cpp-binary-search',
+    text: 'mid == 5',
+    from: 10,
+    want: 11,
+  },
+  { name: 'two locals compared', fixture: 'cpp-binary-search', text: 'l > r', from: 0, want: 16 },
+  {
+    name: 'a cell picked by the loop variables',
+    fixture: 'cpp-dp-grid',
+    text: 'dp[i][j] > 5',
+    from: 0,
+    want: 19,
+  },
+  {
+    name: 'skipping steps where the cell is not set yet',
+    fixture: 'cpp-dp-grid',
+    text: 'dp[i][j] > 5',
+    from: 19,
+    want: 21,
+  },
+  {
+    name: 'a global array cell in Python',
+    fixture: 'python-bfs',
+    text: 'dist[5] == 2',
+    from: 0,
+    want: 56,
+  },
+  {
+    name: 'nothing when it never holds',
+    fixture: 'cpp-binary-search',
+    text: 'mid == 100',
+    from: 0,
+    want: null,
+  },
+])('next step where: $name', ({ fixture, text, from, want }) => {
+  expect(find(fixture, from, where(text))).toBe(want)
 })

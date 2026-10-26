@@ -44,7 +44,7 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 - [Arrow overlay](frontend/arrow-overlay.md): arrows find cards and `●` through data attributes and highlight with `data-active`, so hover never re-renders a card; only the on-screen slice is measured
 - [Code pane keyboard](frontend/code-pane-keyboard.md): the code pane takes focus for the caret and Enter, but ← → Home End Space Esc stay the player's
 - [Empty trace](frontend/empty-trace.md): a trace with no steps gets the IDE's own screen with the tail, never the player
-- [Go to… search rules](frontend/goto-search.md): "next change" reads the innermost frame that declares the name and follows refs, not pointers; a line jump skips return steps
+- [Go to… search rules](frontend/goto-search.md): "next change" reads the innermost frame that declares the name and follows refs, not pointers; a line jump skips return steps; "next step where" is literal and false when a name is out of scope
 - [Run error banner](frontend/run-error-banner.md): the status bar explains only the error the program died of, found by walking back over its unwinding; a caught error gets no banner
 - [Array markers and windows](frontend/array-markers.md): markers read the current values, inferred reads the previous step's; `access[]` wins; a known pair joins only an array the line already indexes; a big array's window keeps its place between steps
 - [State pane folding](frontend/state-pane-folding.md): internals' objects hide with them; pairs read inline, C++ by-value structs nest, table and matrix rows fold; "Show range…" only on truncated sequences

@@ -7,12 +7,15 @@ type GotoMenuProps = {
   found: Partial<Record<Entry, boolean>>
   line: string
   change: string
+  where: string
+  whereError: string | null
   call: string | null
   breakpoints: number[]
   variables: string[]
   functions: string[]
   onLine: (line: string) => void
   onChange: (target: string) => void
+  onWhere: (condition: string) => void
   onCall: (name: string) => void
   onRun: (entry: Entry) => void
 }
@@ -32,16 +35,20 @@ export function GotoMenu({
   found,
   line,
   change,
+  where,
+  whereError,
   call,
   breakpoints,
   variables,
   functions,
   onLine,
   onChange,
+  onWhere,
   onCall,
   onRun,
 }: GotoMenuProps) {
   const variableList = useId()
+  const whereErrorId = useId()
 
   function row(entry: Entry, text: string, input?: ReactNode, after?: string) {
     const disabled = found[entry] === false
@@ -112,6 +119,25 @@ export function GotoMenu({
             ))}
           </datalist>
         </>,
+      )}
+      {row(
+        'where',
+        'Next step where',
+        <input
+          aria-label="Condition"
+          aria-invalid={whereError !== null}
+          aria-describedby={whereError === null ? undefined : whereErrorId}
+          value={where}
+          placeholder="i == 5"
+          spellCheck={false}
+          onChange={(e) => onWhere(e.currentTarget.value)}
+          className={cn(field, 'w-40')}
+        />,
+      )}
+      {whereError !== null && (
+        <li id={whereErrorId} className="col-span-3 pb-1 pl-3 text-xs text-danger">
+          {whereError}
+        </li>
       )}
       {row(
         'call',

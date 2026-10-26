@@ -1,3 +1,4 @@
+import { holds, type Expr, type Scope } from './condition.ts'
 import { apply, same, type Base } from './engine.ts'
 import type { HeapObject, Step, Value } from './gen/trace.ts'
 
@@ -16,6 +17,7 @@ export type Jump =
   | { kind: 'line'; lines: number[] }
   | { kind: 'change'; target: Target }
   | { kind: 'previousChange'; target: Target }
+  | { kind: 'where'; expr: Expr }
   | { kind: 'call'; name: string }
   | { kind: 'print' }
   | { kind: 'error' }
@@ -125,6 +127,26 @@ export async function changeHistory(steps: Step[], target: Target) {
   return changes
 }
 
+function scopeAt(stack: string[], base: Base): Scope {
+  return {
+    name: (name) => lookup(stack, base, name),
+    index(value, index) {
+      if (value.t !== 'ref' || value.id === undefined) return undefined
+      const o = base.heap.get(value.id)
+      return o && cell(o, index)
+    },
+  }
+}
+
+function findWhere(steps: Step[], start: Base, from: number, expr: Expr) {
+  const walk: Base = { frames: new Map(start.frames), heap: new Map(start.heap) }
+  for (let k = from + 1; k < steps.length; k++) {
+    apply(walk, steps[k]!)
+    if (holds(expr, scopeAt(steps[k]!.stack, walk))) return k
+  }
+  return null
+}
+
 function findPreviousChange(
   steps: Step[],
   base: (k: number) => Base,
@@ -166,6 +188,8 @@ export function findStep(steps: Step[], base: (k: number) => Base, from: number,
       return findChange(steps, base(from), from, jump.target)
     case 'previousChange':
       return findPreviousChange(steps, base, from, jump.target)
+    case 'where':
+      return findWhere(steps, base(from), from, jump.expr)
     case 'call':
       return firstAfter(steps, from, (s) => s.event === 'call' && callee(s) === jump.name)
     case 'print':

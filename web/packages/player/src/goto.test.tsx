@@ -79,6 +79,36 @@ test('C goes to the next change of the variable entered in Go to…', async () =
   await counter(11, 20)
 })
 
+test('W goes to the next step where the condition entered in Go to… holds', async () => {
+  await openAt('cpp-binary-search', 1)
+  const menu = await openMenu()
+  fireEvent.change(menu.getByRole('textbox', { name: 'Condition' }), {
+    target: { value: 'l > r' },
+  })
+  press('Escape')
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  press('w')
+  await counter(17, 20)
+})
+
+test('a condition that doesn’t parse says why under the field, and its entry is off', async () => {
+  await openAt('cpp-binary-search', 1)
+  const menu = await openMenu()
+  const field = menu.getByRole('textbox', { name: 'Condition' })
+  expect(menu.getByRole('button', { name: 'Next step where…' })).toHaveProperty('disabled', true)
+  fireEvent.change(field, { target: { value: 'mid = 5' } })
+  expect(field.getAttribute('aria-invalid')).toBe('true')
+  expect(document.getElementById(field.getAttribute('aria-describedby')!)!.textContent).toBe(
+    'use == to compare, not = (character 5)',
+  )
+  fireEvent.change(field, { target: { value: 'mid == 5' } })
+  expect(field.getAttribute('aria-invalid')).toBe('false')
+  const entry = menu.getByRole('button', { name: 'Next step where mid == 5' })
+  await waitFor(() => expect(entry).toHaveProperty('disabled', false))
+  fireEvent.click(entry)
+  await counter(11, 20)
+})
+
 test('D goes to the step that printed the first wrong character', async () => {
   await openAt('cpp-binary-search', 1)
   act(() => {

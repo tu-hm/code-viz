@@ -6,6 +6,7 @@ import { usePlayer } from './store.ts'
 const jumpKeys: Record<string, Entry> = {
   l: 'line',
   c: 'change',
+  w: 'where',
   f: 'call',
   p: 'print',
   d: 'diff',

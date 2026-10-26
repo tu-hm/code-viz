@@ -101,6 +101,7 @@ export function useSession(
         exact: false,
         jumpLine: '',
         jumpChange: '',
+        jumpWhere: '',
         jumpCall: null,
         lane: null,
         notice: null,
