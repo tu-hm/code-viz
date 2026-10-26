@@ -301,6 +301,7 @@ describe('graph view (§19.4.5)', () => {
     expect([...svg.querySelectorAll('text')].map((t) => t.textContent)).toEqual(
       expect.arrayContaining(['5', '3', '9']),
     )
+    expect(screen.queryByText('┊ edge being checked')).toBeNull()
   })
 
   test('above 200 nodes only the 2-hop neighbourhood of the current node is laid out', async () => {

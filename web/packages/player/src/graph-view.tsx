@@ -153,7 +153,9 @@ function GraphView({
             const points = layout.edges[key]
             if (points === undefined) return null
             const on = key === checked
-            const mid = points[Math.floor(points.length / 2)]!
+            const k = Math.max(1, Math.floor(points.length / 2))
+            const [a, b] = [points[k - 1]!, points[k]!]
+            const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
             return (
               <g key={key}>
                 <path
@@ -165,7 +167,12 @@ function GraphView({
                   className={on ? 'stroke-trace-index' : 'stroke-trace-arrow'}
                 />
                 {e.weight !== undefined && (
-                  <text x={mid.x + 4} y={mid.y - 2} className="fill-muted-foreground">
+                  <text
+                    x={mid.x + 4}
+                    y={mid.y - 2}
+                    strokeWidth={3}
+                    className="fill-muted-foreground stroke-card [paint-order:stroke]"
+                  >
                     {cellText(e.weight, look.format)}
                   </text>
                 )}
@@ -249,18 +256,20 @@ function GraphView({
           {undirected ? '–' : '→'} {checking.to}
         </p>
       )}
-      <p className="flex flex-wrap gap-x-6 text-xs text-muted-foreground">
-        {colour !== null && (
-          <>
-            <span>
-              [x] visited: {colourName} ≠ {empty}
-            </span>
-            <span>(x) not visited</span>
-          </>
-        )}
-        <span>┊ edge being checked</span>
-        {current !== null && <span>◀ current node</span>}
-      </p>
+      {(colour !== null || current !== null || checking !== null) && (
+        <p className="flex flex-wrap gap-x-6 text-xs text-muted-foreground">
+          {colour !== null && (
+            <>
+              <span>
+                [x] visited: {colourName} ≠ {empty}
+              </span>
+              <span>(x) not visited</span>
+            </>
+          )}
+          {checking !== null && <span>┊ edge being checked</span>}
+          {current !== null && <span>◀ current node</span>}
+        </p>
+      )}
     </div>
   )
 }

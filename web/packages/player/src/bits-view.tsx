@@ -36,7 +36,7 @@ export function BitsView({
   const { width, ones, set, fits } = bitsOf(value, picked === 'n' ? (usable ? n : null) : picked)
   const indices = ones.map((_, k) => width - 1 - k)
   return (
-    <div className="mt-1 flex flex-col gap-1 border-l-2 border-border pl-2 text-xs">
+    <div className="mt-1 flex flex-col gap-1 border-l-2 border-border pl-2 text-xs break-normal">
       <div className="overflow-x-auto">
         <table aria-label={`${name} in ${width} bits`} className="text-center">
           <tbody>
