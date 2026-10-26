@@ -585,6 +585,64 @@ describe('bits view (§19.4.6)', () => {
   })
 })
 
+describe('constant badges and matrix labels (§19.4.6, §19.4.3)', () => {
+  const value = (name: string) =>
+    screen
+      .getAllByRole('row')
+      .find((r) => r.querySelector('th')?.textContent === name)!
+      .querySelector('td')!.textContent
+
+  test('cpp-lcs: INF, MOD and the limits read as badges, the number for screen readers', async () => {
+    await renderStep('cpp-lcs', 48)
+    expect(value('INF')).toBe('∞ INF (1061109567)')
+    expect(value('best')).toBe('∞ INF (1061109567)')
+    expect(value('MOD')).toBe('MOD (1000000007)')
+    expect(value('top')).toBe('INT_MAX (2147483647)')
+    expect(value('cap')).toBe('LLONG_MAX (9223372036854775807)')
+    expect(value('ways')).toBe('3')
+  })
+
+  test('without an INF variable, 0x3f3f3f3f is named for what it is', () => {
+    const local: Local = { name: 'd', value: { t: 'int', v: '1061109567' } }
+    renderState(
+      {
+        i: 1,
+        event: 'line',
+        prevLine: 2,
+        line: 3,
+        error: null,
+        stack: [
+          { id: 'f0', name: 'main', kind: 'function', line: 2, locals: [local], returnValue: null },
+        ],
+        heap: {},
+        changed: { locals: {}, cells: {} },
+        before: { scope: {}, cells: {} },
+        newObjects: [],
+        output: [],
+      },
+      'cpp17-gcc',
+    )
+    expect(value('d')).toBe('0x3f3f3f3f (1061109567)')
+  })
+
+  test('string DP: one click labels the rows by s and the columns by t', async () => {
+    await renderStep('cpp-lcs', 48)
+    fireEvent.click(screen.getByRole('button', { name: 'Label rows by s, columns by t' }))
+    const grid = screen.getByRole('table', { name: 'dp, 5 by 5' })
+    expect(
+      within(grid)
+        .getAllByRole('columnheader')
+        .map((h) => h.textContent),
+    ).toEqual(['0 empty prefix', '1 b', '2 d', '3 c', '4 b'])
+    expect(
+      within(grid)
+        .getAllByRole('rowheader')
+        .map((h) => h.textContent.trim()),
+    ).toEqual(['0 empty prefix', '1 a', '2 b', '3 c', 'n=4 ▶ 4 b'])
+    expect(screen.getByRole('combobox', { name: 'Label rows by' })).toHaveProperty('value', 's')
+  })
+})
+
 describe.each(fixtureNames)('%s', (name) => {
   test('every step draws its markers and grids without holes', { timeout: 30_000 }, async () => {
     const steps = loadFixture(name).chunks.flat()

@@ -62,8 +62,8 @@
 
 ## 8. Constant badges & matrix labels (M5-F09 · 1 d) ✂
 
-- [ ] Badges: `INT_MAX`, `LLONG_MAX`, `0x3f3f3f3f`; **∞ INF** when equal to a variable named `INF`/`inf`; **MOD** for `1e9+7`, `998244353`
-- [ ] Matrix: "Label rows by `s`, columns by `t`" for string DP
+- [x] Badges: `INT_MAX`, `LLONG_MAX`, `0x3f3f3f3f`; **∞ INF** when equal to a variable named `INF`/`inf`; **MOD** for `1e9+7`, `998244353`
+- [x] Matrix: "Label rows by `s`, columns by `t`" for string DP
 
 ## 9. Usability fixes (M5-F10 · 2 d)
 

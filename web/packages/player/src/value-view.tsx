@@ -4,6 +4,22 @@ import { inlineChanged, type Look } from './state-layout.ts'
 
 export const changedClass = 'bg-trace-changed font-semibold'
 
+// §19.4.6: limits and moduli CP code compares against, by value
+const constants: Record<string, string> = {
+  '2147483647': 'INT_MAX',
+  '9223372036854775807': 'LLONG_MAX',
+  '1061109567': '0x3f3f3f3f',
+  '1000000007': 'MOD',
+  '998244353': 'MOD',
+}
+
+function badge(v: Value, inf: string | null) {
+  if (v.t !== 'int' || v.v === undefined) return null
+  if (inf !== null && v.v === inf) return '∞ INF'
+  if (inf !== null && inf !== '0' && v.v === `-${inf}`) return '-∞ INF'
+  return constants[v.v] ?? null
+}
+
 function hover(...parts: (string | undefined)[]) {
   const text = parts.filter((p) => p !== undefined && p !== '').join(' · ')
   return text === '' ? undefined : text
@@ -152,6 +168,17 @@ export function ValueView({ value, look }: { value: Value; look: Look }) {
       )
     default: {
       const { text, detail } = look.format.value(value)
+      const named = badge(value, look.inf)
+      if (named !== null) {
+        return (
+          <span title={hover(value.type, detail ?? text)}>
+            <span className="rounded-sm bg-secondary px-1 font-sans text-xs whitespace-nowrap">
+              {named}
+            </span>
+            <span className="sr-only"> ({text})</span>
+          </span>
+        )
+      }
       return <span title={hover(value.type, detail)}>{text}</span>
     }
   }

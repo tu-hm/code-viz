@@ -12,6 +12,20 @@ function numeric(v: Value) {
   return v.t === 'int' || v.t === 'float' ? Number(v.v) : null
 }
 
+const field = 'h-8 rounded-lg border border-input bg-background px-2 font-mono text-base sm:text-sm'
+
+// a string one shorter than its side labels from index 1: dp[0] is the empty prefix
+function charAt(chars: string[] | undefined, size: number, i: number) {
+  if (chars === undefined) return null
+  return chars[i - (size - chars.length)] ?? ''
+}
+
+function Label({ char }: { char: string | null }) {
+  if (char === null) return null
+  if (char === '') return <span className="sr-only"> empty prefix</span>
+  return <span className="font-semibold text-foreground"> {char}</span>
+}
+
 function MarkerLabel({ markers, size }: { markers: Marker[]; size: number }) {
   if (markers.length === 0) return null
   return (
@@ -34,7 +48,17 @@ export function MatrixView({
   marks: CardMarks
 }) {
   const [tinted, setTinted] = useState(false)
+  const [rowsBy, setRowsBy] = useState<string | null>(null)
+  const [columnsBy, setColumnsBy] = useState<string | null>(null)
   const { rows, columns } = matrix
+  const fit = (n: number) =>
+    marks.labels.filter((l) => l.chars.length === n || l.chars.length === n - 1)
+  const rowOptions = fit(rows.length)
+  const columnOptions = fit(columns)
+  const rowChars = rowOptions.find((l) => l.name === rowsBy)?.chars
+  const columnChars = columnOptions.find((l) => l.name === columnsBy)?.chars
+  const pick = rowOptions[0]
+  const pickColumns = columnOptions.find((l) => l.name !== pick?.name) ?? columnOptions[0]
   const grid = rows.map((r) => look.heap[r.id]?.items ?? [])
   const edge = (m: Marker, size: number) => (m.outside ? (m.at < 0 ? 0 : size - 1) : m.at)
   const rowMarkers = (r: number) =>
@@ -64,6 +88,22 @@ export function MatrixView({
             {marks.narration}
           </p>
         )}
+        {pick !== undefined &&
+          pickColumns !== undefined &&
+          rowsBy === null &&
+          columnsBy === null && (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="font-sans"
+              onClick={() => {
+                setRowsBy(pick.name)
+                setColumnsBy(pickColumns.name)
+              }}
+            >
+              Label rows by {pick.name}, columns by {pickColumns.name}
+            </Button>
+          )}
         <Button
           size="sm"
           variant="ghost"
@@ -74,6 +114,30 @@ export function MatrixView({
           Heat tint
         </Button>
       </div>
+      {(rowOptions.length > 0 || columnOptions.length > 0) && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-sans text-sm">
+          {[
+            ['rows', rowOptions, rowsBy, setRowsBy] as const,
+            ['columns', columnOptions, columnsBy, setColumnsBy] as const,
+          ].map(([axis, options, value, set]) => (
+            <label key={axis} className="flex items-center gap-2">
+              Label {axis} by
+              <select
+                value={value ?? ''}
+                onChange={(e) => set(e.currentTarget.value === '' ? null : e.currentTarget.value)}
+                className={field}
+              >
+                <option value="">index</option>
+                {options.map((o) => (
+                  <option key={o.name} value={o.name}>
+                    {o.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      )}
       <div className="max-h-[calc(31*(var(--cell-size)+0.25rem))] max-w-full overflow-auto">
         <table
           aria-label={`${name}, ${rows.length} by ${columns}`}
@@ -97,6 +161,7 @@ export function MatrixView({
               {Array.from({ length: columns }, (_, c) => (
                 <th key={c} scope="col" className="text-xs font-normal text-muted-foreground">
                   {c}
+                  <Label char={charAt(columnChars, columns, c)} />
                 </th>
               ))}
             </tr>
@@ -117,6 +182,7 @@ export function MatrixView({
                       </span>
                     )}{' '}
                     <span className={cn(here.length > 0 && 'sr-only')}>{row.index}</span>
+                    <Label char={charAt(rowChars, rows.length, r)} />
                   </th>
                   {grid[r]!.map((value, c) => {
                     const write = look.highlight && written.includes(String(c))

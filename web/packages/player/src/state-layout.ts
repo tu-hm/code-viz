@@ -39,6 +39,8 @@ export type Look = {
   changed: StepState['changed']['cells']
   highlight: boolean
   addresses: boolean
+  // the value of a variable named INF or inf in scope, drawn as ∞ (§19.4.6)
+  inf: string | null
 }
 
 export type StateLayout = {
@@ -70,7 +72,12 @@ export function sameList(a: readonly string[] | undefined, b: readonly string[] 
 }
 
 export function sameReads(a: Reads, b: Reads, x: Look, y: Look) {
-  if (x.format !== y.format || x.highlight !== y.highlight || x.addresses !== y.addresses) {
+  if (
+    x.format !== y.format ||
+    x.highlight !== y.highlight ||
+    x.addresses !== y.addresses ||
+    x.inf !== y.inf
+  ) {
     return false
   }
   if (!sameList(a.drawn, b.drawn) || !sameList(a.named, b.named)) return false

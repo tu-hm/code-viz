@@ -208,6 +208,14 @@ const FrameTable = memo(function FrameTable({
   )
 }, sameFrame)
 
+function infIn(state: StepState) {
+  for (const frame of state.stack.toReversed()) {
+    const v = frame.locals.find((l) => l.name === 'INF' || l.name === 'inf')?.value
+    if (v?.t === 'int' && v.v !== undefined) return v.v
+  }
+  return null
+}
+
 function watchTarget(el: EventTarget, cards: CardView[]) {
   if (!(el instanceof Element)) return null
   const name = el.closest('[data-local]')?.getAttribute('data-local')
@@ -263,6 +271,7 @@ export function StatePane({
     changed: state.changed.cells,
     highlight: settings.highlightChanges,
     addresses: settings.showAddresses,
+    inf: infIn(state),
   }
   const fresh = new Set(state.newObjects)
   const strings = stringMarkers(state, facts)

@@ -29,6 +29,8 @@ export type GraphMarks = {
 
 export type CardMarks = {
   graph: GraphMarks | null
+  // strings in scope as long as a matrix side, or one shorter (an empty-prefix row): §19.4.3 labels
+  labels: { name: string; chars: string[] }[]
   indexed: boolean
   markers: Marker[]
   hidden: number
@@ -40,6 +42,7 @@ export type CardMarks = {
 
 export const noMarks: CardMarks = {
   graph: null,
+  labels: [],
   indexed: false,
   markers: [],
   hidden: 0,
@@ -339,6 +342,18 @@ function graphMarks(
   return { step: state.i, indices, current, checking, arrays: sorted, colour }
 }
 
+function labelsFor(card: CardView, state: StepState) {
+  if (card.view !== 'matrix' || card.matrix === null) return []
+  const sides = [card.matrix.rows.length, card.matrix.columns]
+  return Object.entries(scopeOf(state)).flatMap(([name, v]) => {
+    if (v.t !== 'str' || v.v === undefined || v.truncated) return []
+    const chars = [...v.v]
+    return chars.length > 0 && sides.some((n) => chars.length === n || chars.length === n - 1)
+      ? [{ name, chars }]
+      : []
+  })
+}
+
 export function marksFor(
   card: CardView,
   state: StepState,
@@ -354,7 +369,8 @@ export function marksFor(
   const arrays = names(card)
   const indexed = facts !== null && [...arrays].some((a) => arraysIn(facts).has(a))
   const access = exactReads(card, state).length > 0
-  if (!indexed && !access && pins.length === 0) return { ...noMarks, graph }
+  const labels = labelsFor(card, state)
+  if (!indexed && !access && pins.length === 0) return { ...noMarks, graph, labels }
   const on = (line: number | null) =>
     lineFacts(facts, line).subscripts.filter((s) => arrays.has(s.array))
   const ran = on(state.prevLine)
@@ -362,6 +378,7 @@ export function marksFor(
   const before = intScope(state.before.scope)
   return {
     graph,
+    labels,
     indexed,
     ...markersOf(shape(card), [...on(state.line), ...ran], scope, pins),
     ...readsOf(card, ran, before, state),
