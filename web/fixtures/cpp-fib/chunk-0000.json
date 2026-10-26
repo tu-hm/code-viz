@@ -20,9 +20,7 @@
     "line": 10,
     "prevLine": null,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -57,10 +55,7 @@
     "parentCallId": 0,
     "prevLine": 10,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1"
-    ],
+    "stack": ["f0", "f1"],
     "stderr": "",
     "stdout": ""
   },
@@ -93,10 +88,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1"
-    ],
+    "stack": ["f0", "f1"],
     "stderr": "",
     "stdout": ""
   },
@@ -131,11 +123,7 @@
     "parentCallId": 1,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2"
-    ],
+    "stack": ["f0", "f1", "f2"],
     "stderr": "",
     "stdout": ""
   },
@@ -168,11 +156,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2"
-    ],
+    "stack": ["f0", "f1", "f2"],
     "stderr": "",
     "stdout": ""
   },
@@ -207,12 +191,7 @@
     "parentCallId": 2,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3"
-    ],
+    "stack": ["f0", "f1", "f2", "f3"],
     "stderr": "",
     "stdout": ""
   },
@@ -245,12 +224,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3"
-    ],
+    "stack": ["f0", "f1", "f2", "f3"],
     "stderr": "",
     "stdout": ""
   },
@@ -285,13 +259,7 @@
     "parentCallId": 3,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4"],
     "stderr": "",
     "stdout": ""
   },
@@ -324,13 +292,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4"],
     "stderr": "",
     "stdout": ""
   },
@@ -365,14 +327,7 @@
     "parentCallId": 4,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5"],
     "stderr": "",
     "stdout": ""
   },
@@ -405,14 +360,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5"],
     "stderr": "",
     "stdout": ""
   },
@@ -447,15 +395,7 @@
     "parentCallId": 5,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5",
-      "f6"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5", "f6"],
     "stderr": "",
     "stdout": ""
   },
@@ -488,15 +428,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5",
-      "f6"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5", "f6"],
     "stderr": "",
     "stdout": ""
   },
@@ -534,15 +466,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5",
-      "f6"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5", "f6"],
     "stderr": "",
     "stdout": ""
   },
@@ -577,15 +501,7 @@
     "parentCallId": 5,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5",
-      "f7"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5", "f7"],
     "stderr": "",
     "stdout": ""
   },
@@ -618,15 +534,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5",
-      "f7"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5", "f7"],
     "stderr": "",
     "stdout": ""
   },
@@ -664,15 +572,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5",
-      "f7"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5", "f7"],
     "stderr": "",
     "stdout": ""
   },
@@ -705,14 +605,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5"],
     "stderr": "",
     "stdout": ""
   },
@@ -750,14 +643,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f5"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f5"],
     "stderr": "",
     "stdout": ""
   },
@@ -792,14 +678,7 @@
     "parentCallId": 4,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f8"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f8"],
     "stderr": "",
     "stdout": ""
   },
@@ -832,14 +711,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f8"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f8"],
     "stderr": "",
     "stdout": ""
   },
@@ -877,14 +749,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4",
-      "f8"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4", "f8"],
     "stderr": "",
     "stdout": ""
   },
@@ -917,13 +782,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4"],
     "stderr": "",
     "stdout": ""
   },
@@ -961,13 +820,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f4"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f4"],
     "stderr": "",
     "stdout": ""
   },
@@ -1002,13 +855,7 @@
     "parentCallId": 3,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9"],
     "stderr": "",
     "stdout": ""
   },
@@ -1041,13 +888,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9"],
     "stderr": "",
     "stdout": ""
   },
@@ -1082,14 +923,7 @@
     "parentCallId": 9,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9",
-      "f10"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9", "f10"],
     "stderr": "",
     "stdout": ""
   },
@@ -1122,14 +956,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9",
-      "f10"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9", "f10"],
     "stderr": "",
     "stdout": ""
   },
@@ -1167,14 +994,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9",
-      "f10"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9", "f10"],
     "stderr": "",
     "stdout": ""
   },
@@ -1209,14 +1029,7 @@
     "parentCallId": 9,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9",
-      "f11"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9", "f11"],
     "stderr": "",
     "stdout": ""
   },
@@ -1249,14 +1062,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9",
-      "f11"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9", "f11"],
     "stderr": "",
     "stdout": ""
   },
@@ -1294,14 +1100,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9",
-      "f11"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9", "f11"],
     "stderr": "",
     "stdout": ""
   },
@@ -1334,13 +1133,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9"],
     "stderr": "",
     "stdout": ""
   },
@@ -1378,13 +1171,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3",
-      "f9"
-    ],
+    "stack": ["f0", "f1", "f2", "f3", "f9"],
     "stderr": "",
     "stdout": ""
   },
@@ -1417,12 +1204,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3"
-    ],
+    "stack": ["f0", "f1", "f2", "f3"],
     "stderr": "",
     "stdout": ""
   },
@@ -1460,12 +1242,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f3"
-    ],
+    "stack": ["f0", "f1", "f2", "f3"],
     "stderr": "",
     "stdout": ""
   },
@@ -1500,12 +1277,7 @@
     "parentCallId": 2,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12"
-    ],
+    "stack": ["f0", "f1", "f2", "f12"],
     "stderr": "",
     "stdout": ""
   },
@@ -1538,12 +1310,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12"
-    ],
+    "stack": ["f0", "f1", "f2", "f12"],
     "stderr": "",
     "stdout": ""
   },
@@ -1578,13 +1345,7 @@
     "parentCallId": 12,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13"],
     "stderr": "",
     "stdout": ""
   },
@@ -1617,13 +1378,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13"],
     "stderr": "",
     "stdout": ""
   },
@@ -1658,14 +1413,7 @@
     "parentCallId": 13,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13",
-      "f14"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13", "f14"],
     "stderr": "",
     "stdout": ""
   },
@@ -1698,14 +1446,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13",
-      "f14"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13", "f14"],
     "stderr": "",
     "stdout": ""
   },
@@ -1743,14 +1484,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13",
-      "f14"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13", "f14"],
     "stderr": "",
     "stdout": ""
   },
@@ -1785,14 +1519,7 @@
     "parentCallId": 13,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13",
-      "f15"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13", "f15"],
     "stderr": "",
     "stdout": ""
   },
@@ -1825,14 +1552,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13",
-      "f15"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13", "f15"],
     "stderr": "",
     "stdout": ""
   },
@@ -1870,14 +1590,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13",
-      "f15"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13", "f15"],
     "stderr": "",
     "stdout": ""
   },
@@ -1910,13 +1623,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13"],
     "stderr": "",
     "stdout": ""
   },
@@ -1954,13 +1661,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f13"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f13"],
     "stderr": "",
     "stdout": ""
   },
@@ -1995,13 +1696,7 @@
     "parentCallId": 12,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f16"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f16"],
     "stderr": "",
     "stdout": ""
   },
@@ -2034,13 +1729,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f16"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f16"],
     "stderr": "",
     "stdout": ""
   },
@@ -2137,13 +1826,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12",
-      "f16"
-    ],
+    "stack": ["f0", "f1", "f2", "f12", "f16"],
     "stderr": "",
     "stdout": ""
   },
@@ -2176,12 +1859,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12"
-    ],
+    "stack": ["f0", "f1", "f2", "f12"],
     "stderr": "",
     "stdout": ""
   },
@@ -2219,12 +1897,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2",
-      "f12"
-    ],
+    "stack": ["f0", "f1", "f2", "f12"],
     "stderr": "",
     "stdout": ""
   },
@@ -2257,11 +1930,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2"
-    ],
+    "stack": ["f0", "f1", "f2"],
     "stderr": "",
     "stdout": ""
   },
@@ -2299,11 +1968,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f2"
-    ],
+    "stack": ["f0", "f1", "f2"],
     "stderr": "",
     "stdout": ""
   },
@@ -2338,11 +2003,7 @@
     "parentCallId": 1,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17"
-    ],
+    "stack": ["f0", "f1", "f17"],
     "stderr": "",
     "stdout": ""
   },
@@ -2375,11 +2036,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17"
-    ],
+    "stack": ["f0", "f1", "f17"],
     "stderr": "",
     "stdout": ""
   },
@@ -2414,12 +2071,7 @@
     "parentCallId": 17,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18"
-    ],
+    "stack": ["f0", "f1", "f17", "f18"],
     "stderr": "",
     "stdout": ""
   },
@@ -2452,12 +2104,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18"
-    ],
+    "stack": ["f0", "f1", "f17", "f18"],
     "stderr": "",
     "stdout": ""
   },
@@ -2492,13 +2139,7 @@
     "parentCallId": 18,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19"],
     "stderr": "",
     "stdout": ""
   },
@@ -2531,13 +2172,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19"],
     "stderr": "",
     "stdout": ""
   },
@@ -2572,14 +2207,7 @@
     "parentCallId": 19,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19",
-      "f20"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19", "f20"],
     "stderr": "",
     "stdout": ""
   },
@@ -2612,14 +2240,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19",
-      "f20"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19", "f20"],
     "stderr": "",
     "stdout": ""
   },
@@ -2657,14 +2278,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19",
-      "f20"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19", "f20"],
     "stderr": "",
     "stdout": ""
   },
@@ -2699,14 +2313,7 @@
     "parentCallId": 19,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19",
-      "f21"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19", "f21"],
     "stderr": "",
     "stdout": ""
   },
@@ -2739,14 +2346,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19",
-      "f21"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19", "f21"],
     "stderr": "",
     "stdout": ""
   },
@@ -2784,14 +2384,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19",
-      "f21"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19", "f21"],
     "stderr": "",
     "stdout": ""
   },
@@ -2824,13 +2417,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19"],
     "stderr": "",
     "stdout": ""
   },
@@ -2868,13 +2455,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f19"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f19"],
     "stderr": "",
     "stdout": ""
   },
@@ -2909,13 +2490,7 @@
     "parentCallId": 18,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f22"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f22"],
     "stderr": "",
     "stdout": ""
   },
@@ -2948,13 +2523,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f22"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f22"],
     "stderr": "",
     "stdout": ""
   },
@@ -2992,13 +2561,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18",
-      "f22"
-    ],
+    "stack": ["f0", "f1", "f17", "f18", "f22"],
     "stderr": "",
     "stdout": ""
   },
@@ -3031,12 +2594,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18"
-    ],
+    "stack": ["f0", "f1", "f17", "f18"],
     "stderr": "",
     "stdout": ""
   },
@@ -3074,12 +2632,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f18"
-    ],
+    "stack": ["f0", "f1", "f17", "f18"],
     "stderr": "",
     "stdout": ""
   },
@@ -3114,12 +2667,7 @@
     "parentCallId": 17,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23"
-    ],
+    "stack": ["f0", "f1", "f17", "f23"],
     "stderr": "",
     "stdout": ""
   },
@@ -3152,12 +2700,7 @@
     "line": 6,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23"
-    ],
+    "stack": ["f0", "f1", "f17", "f23"],
     "stderr": "",
     "stdout": ""
   },
@@ -3192,13 +2735,7 @@
     "parentCallId": 23,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23",
-      "f24"
-    ],
+    "stack": ["f0", "f1", "f17", "f23", "f24"],
     "stderr": "",
     "stdout": ""
   },
@@ -3231,13 +2768,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23",
-      "f24"
-    ],
+    "stack": ["f0", "f1", "f17", "f23", "f24"],
     "stderr": "",
     "stdout": ""
   },
@@ -3275,13 +2806,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23",
-      "f24"
-    ],
+    "stack": ["f0", "f1", "f17", "f23", "f24"],
     "stderr": "",
     "stdout": ""
   },
@@ -3316,13 +2841,7 @@
     "parentCallId": 23,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23",
-      "f25"
-    ],
+    "stack": ["f0", "f1", "f17", "f23", "f25"],
     "stderr": "",
     "stdout": ""
   },
@@ -3355,13 +2874,7 @@
     "line": 7,
     "prevLine": 5,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23",
-      "f25"
-    ],
+    "stack": ["f0", "f1", "f17", "f23", "f25"],
     "stderr": "",
     "stdout": ""
   },
@@ -3399,13 +2912,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23",
-      "f25"
-    ],
+    "stack": ["f0", "f1", "f17", "f23", "f25"],
     "stderr": "",
     "stdout": ""
   },
@@ -3438,12 +2945,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23"
-    ],
+    "stack": ["f0", "f1", "f17", "f23"],
     "stderr": "",
     "stdout": ""
   },
@@ -3481,12 +2983,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17",
-      "f23"
-    ],
+    "stack": ["f0", "f1", "f17", "f23"],
     "stderr": "",
     "stdout": ""
   },
@@ -3519,11 +3016,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17"
-    ],
+    "stack": ["f0", "f1", "f17"],
     "stderr": "",
     "stdout": ""
   },
@@ -3561,11 +3054,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1",
-      "f17"
-    ],
+    "stack": ["f0", "f1", "f17"],
     "stderr": "",
     "stdout": ""
   },
@@ -3598,10 +3087,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1"
-    ],
+    "stack": ["f0", "f1"],
     "stderr": "",
     "stdout": ""
   },
@@ -3639,10 +3125,7 @@
     "line": 7,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0",
-      "f1"
-    ],
+    "stack": ["f0", "f1"],
     "stderr": "",
     "stdout": ""
   },
@@ -3666,9 +3149,7 @@
     "line": 11,
     "prevLine": 10,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": "8\n"
   },
@@ -3697,9 +3178,7 @@
     "line": 11,
     "prevLine": 11,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   }

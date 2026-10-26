@@ -29,9 +29,7 @@
     "line": 6,
     "prevLine": null,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -78,9 +76,7 @@
     "line": 7,
     "prevLine": 6,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -89,16 +85,12 @@
       {
         "mode": "r",
         "obj": "o1",
-        "path": [
-          0
-        ]
+        "path": [0]
       },
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          0
-        ]
+        "path": [0]
       }
     ],
     "error": null,
@@ -222,9 +214,7 @@
     "line": 8,
     "prevLine": 7,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -281,9 +271,7 @@
     "line": 8,
     "prevLine": 8,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -376,9 +364,7 @@
     "line": 8,
     "prevLine": 8,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -471,9 +457,7 @@
     "line": 8,
     "prevLine": 8,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -566,9 +550,7 @@
     "line": 8,
     "prevLine": 8,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -661,9 +643,7 @@
     "line": 8,
     "prevLine": 8,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -755,9 +735,7 @@
     "line": 9,
     "prevLine": 8,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -814,9 +792,7 @@
     "line": 9,
     "prevLine": 9,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -825,16 +801,12 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          0
-        ]
+        "path": [0]
       },
       {
         "mode": "r",
         "obj": "o1",
-        "path": [
-          0
-        ]
+        "path": [0]
       }
     ],
     "error": null,
@@ -888,9 +860,7 @@
     "line": 9,
     "prevLine": 9,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -899,16 +869,12 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          1
-        ]
+        "path": [1]
       },
       {
         "mode": "r",
         "obj": "o1",
-        "path": [
-          1
-        ]
+        "path": [1]
       }
     ],
     "error": null,
@@ -998,9 +964,7 @@
     "line": 9,
     "prevLine": 9,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -1009,16 +973,12 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          2
-        ]
+        "path": [2]
       },
       {
         "mode": "r",
         "obj": "o1",
-        "path": [
-          2
-        ]
+        "path": [2]
       }
     ],
     "error": null,
@@ -1108,9 +1068,7 @@
     "line": 9,
     "prevLine": 9,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -1119,16 +1077,12 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          3
-        ]
+        "path": [3]
       },
       {
         "mode": "r",
         "obj": "o1",
-        "path": [
-          3
-        ]
+        "path": [3]
       }
     ],
     "error": null,
@@ -1218,9 +1172,7 @@
     "line": 9,
     "prevLine": 9,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -1229,16 +1181,12 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          4
-        ]
+        "path": [4]
       },
       {
         "mode": "r",
         "obj": "o1",
-        "path": [
-          4
-        ]
+        "path": [4]
       }
     ],
     "error": null,
@@ -1327,9 +1275,7 @@
     "line": 10,
     "prevLine": 9,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -1386,9 +1332,7 @@
     "line": 10,
     "prevLine": 10,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   },
@@ -1397,9 +1341,7 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          1
-        ]
+        "path": [1]
       }
     ],
     "error": null,
@@ -1453,9 +1395,7 @@
     "line": 10,
     "prevLine": 10,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": "0 "
   },
@@ -1464,9 +1404,7 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          2
-        ]
+        "path": [2]
       }
     ],
     "error": null,
@@ -1520,9 +1458,7 @@
     "line": 10,
     "prevLine": 10,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": "3 "
   },
@@ -1531,9 +1467,7 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          3
-        ]
+        "path": [3]
       }
     ],
     "error": null,
@@ -1587,9 +1521,7 @@
     "line": 10,
     "prevLine": 10,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": "4 "
   },
@@ -1598,9 +1530,7 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          4
-        ]
+        "path": [4]
       }
     ],
     "error": null,
@@ -1654,9 +1584,7 @@
     "line": 10,
     "prevLine": 10,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": "8 "
   },
@@ -1665,9 +1593,7 @@
       {
         "mode": "r",
         "obj": "o2",
-        "path": [
-          5
-        ]
+        "path": [5]
       }
     ],
     "error": null,
@@ -1713,9 +1639,7 @@
     "line": 11,
     "prevLine": 10,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": "9\n"
   },
@@ -1769,9 +1693,7 @@
     "line": 11,
     "prevLine": 11,
     "removedObjects": [],
-    "stack": [
-      "f0"
-    ],
+    "stack": ["f0"],
     "stderr": "",
     "stdout": ""
   }
