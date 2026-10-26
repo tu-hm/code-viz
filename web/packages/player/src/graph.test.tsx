@@ -295,12 +295,14 @@ describe('graph view (§19.4.5)', () => {
     expect(screen.queryByRole('checkbox', { name: /Undirected/ })).toBeNull()
   })
 
-  test('a weighted edge list draws its weights', async () => {
+  test('a weighted edge list names each edge’s weight', async () => {
     await renderGraph('cpp-edge-list', 14, { roads: 'graph' })
-    const svg = screen.getByRole('img', { name: /roads as a graph/ })
-    expect([...svg.querySelectorAll('text')].map((t) => t.textContent)).toEqual(
-      expect.arrayContaining(['5', '3', '9']),
-    )
+    expect(nodes('roads')).toEqual([
+      'node 0, edges to 1 (weight 5), 3 (weight 9)',
+      'node 1, edges to 2 (weight 3)',
+      'node 2, edges to none',
+      'node 3, edges to none',
+    ])
     expect(screen.queryByText('┊ edge being checked')).toBeNull()
   })
 

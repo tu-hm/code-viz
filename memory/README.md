@@ -51,7 +51,7 @@ Write it the way AGENTS.md asks for prose: short, plain, no hedging.
 - [State pane skips unchanged](frontend/state-pane-skips-unchanged.md): unchanged objects keep their identity across steps, and cards and frames compare what they draw; measure on a production build
 - [Visualize run](frontend/visualize-run.md): the create keeps its promise so Close can delete an unanswered run; the long-poll is one `queryFn` loop that resumes from the cached version; only unfinished runs are deleted; Retry keeps the `Idempotency-Key`, a re-run gets a new one
 - [Watch history](frontend/watch-history.md): the watch history, lanes and Prev / Next change share one forward walk per target that yields every 256 steps; auto-watch skips refs; pins last per trace until reload
-- [Graph view](frontend/graph-view.md): one elkjs layout per object over every step's edges, in elkjs's own worker; visited is the colour array off its unvisited value, stated in the legend
+- [Graph view](frontend/graph-view.md): one elkjs layout per object over every step's edges, in elkjs's own worker, drawn 1:1 by sigma loaded on demand with captions and weights on a DOM layer; visited is the colour array off its unvisited value, stated in the legend
 - [Vendored agent skills](frontend/vendored-agent-skills.md): React, composition and web design skills live as plain copies in `web/.claude/skills`; `web/AGENTS.md` wins over them
 
 ## Backend

@@ -28,6 +28,16 @@ vi.mock('./elk.ts', async () => {
   return { createElk: () => Object.assign(new ELK(), { terminateWorker: () => {} }) }
 })
 
+// jsdom has no WebGL, and sigma's renderers read WebGL2RenderingContext on import
+vi.mock('./graph-canvas.ts', () => {
+  const camera = { zoomIn: async () => {}, zoomOut: async () => {}, reset: async () => {} }
+  const drawGraph: typeof import('./graph-canvas.ts').drawGraph = () => ({
+    getCamera: () => camera,
+    kill: () => {},
+  })
+  return { drawGraph }
+})
+
 // jsdom can't fetch the grammars' ?url paths; under Node, Language.load reads a file path itself
 vi.mock('./grammars.ts', async () => {
   const { createRequire } = await import('node:module')

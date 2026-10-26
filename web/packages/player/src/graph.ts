@@ -37,8 +37,8 @@ export type GraphLayout = {
   width: number
   height: number
   nodes: Record<number, Point>
-  // key: from>to, or min-max when undirected; points run from the edge's own from to its to
-  edges: Record<string, Point[]>
+  // key: from>to, or min-max when undirected
+  edges: Record<string, [number, number]>
   // first-visit trees: when each edge holds, by key
   spans: Record<string, [number, number | null]> | null
 }
@@ -51,6 +51,7 @@ const maxEdgeListNode = 1_000_000
 export const nodeWidth = 44
 export const nodeHeight = 26
 export const captionHeight = 16
+export const graphPadding = 24
 
 function int(v: Value | undefined): number | null {
   if (v?.t !== 'int' || v.v === undefined || !/^-?\d+$/.test(v.v)) return null
@@ -350,21 +351,17 @@ export async function layoutGraph(
   const positions: GraphLayout['nodes'] = {}
   for (const child of result.children ?? [])
     positions[Number(child.id)] = { x: child.x ?? 0, y: child.y ?? 0 }
-  const routes: GraphLayout['edges'] = {}
-  const byId = new Map(drawn.map((e) => [`${e.from}>${e.to}`, e]))
-  for (const edge of result.edges ?? []) {
-    const e = byId.get(edge.id)
-    const section = edge.sections?.[0]
-    if (e === undefined || section === undefined) continue
-    const points = [section.startPoint, ...(section.bendPoints ?? []), section.endPoint]
-    routes[edgeKey(e.from, e.to, undirected)] = down(e) ? points : points.toReversed()
-  }
   return {
     undirected,
     spans,
     width: result.width ?? 0,
     height: result.height ?? 0,
     nodes: positions,
-    edges: routes,
+    edges: Object.fromEntries(
+      drawn.map((e): [string, [number, number]] => [
+        edgeKey(e.from, e.to, undirected),
+        [e.from, e.to],
+      ]),
+    ),
   }
 }

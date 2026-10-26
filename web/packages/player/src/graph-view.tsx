@@ -1,10 +1,12 @@
-import { Button, cn } from '@viz/ui'
-import { useEffect, useId, useState } from 'react'
+import { Button } from '@viz/ui'
+import { useEffect, useId, useRef, useState } from 'react'
+import Graph from 'graphology'
+import type { Canvas, CanvasGraph, EdgeData, NodeData } from './graph-canvas.ts'
 import type { HeapObject } from './gen/trace.ts'
 import {
-  captionHeight,
   cellText,
   edgeKey,
+  graphPadding,
   nodeHeight,
   nodeWidth,
   type Edge,
@@ -50,8 +52,40 @@ function neighbourhood(edges: Edge[], center: number) {
   return [...near].sort((a, b) => a - b)
 }
 
-function path(points: Point[]) {
-  return points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ')
+// a straight edge through another node's box => curved, so it can't read as two edges
+function crosses(a: Point, b: Point, nodes: Point[]) {
+  const [dx, dy] = [b.x - a.x, b.y - a.y]
+  const length = dx * dx + dy * dy
+  return nodes.some((p) => {
+    if (p === a || p === b || length === 0) return false
+    const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / length))
+    const [x, y] = [a.x + t * dx - p.x, a.y + t * dy - p.y]
+    return Math.abs(x) < nodeWidth / 2 && Math.abs(y) < nodeHeight / 2
+  })
+}
+
+// elkjs's positions, y flipped: sigma's y axis points up
+function graphOf(layout: GraphLayout): CanvasGraph {
+  const graph: CanvasGraph = new Graph({ type: layout.undirected ? 'undirected' : 'directed' })
+  const centres = Object.entries(layout.nodes).map(([n, p]): [string, Point] => [
+    n,
+    { x: p.x + nodeWidth / 2, y: p.y + nodeHeight / 2 },
+  ])
+  const at = new Map(centres)
+  for (const [n, p] of centres) graph.addNode(n, { x: p.x, y: -p.y })
+  for (const [key, [from, to]] of Object.entries(layout.edges)) {
+    const [a, b] = [at.get(String(from))!, at.get(String(to))!]
+    const curvature = crosses(a, b, [...at.values()]) ? 0.3 : 0
+    graph.addEdgeWithKey(key, String(from), String(to), { curvature })
+  }
+  return graph
+}
+
+type Drawn = { graph: CanvasGraph; canvas: Canvas | null }
+
+// module level: React Compiler can't build import() inside a component
+function loadCanvas() {
+  return import('./graph-canvas.ts')
 }
 
 type GraphViewProps = {
@@ -79,7 +113,9 @@ function GraphView({
   colourName,
   label,
 }: GraphViewProps) {
-  const arrowId = useId()
+  const box = useRef<HTMLDivElement>(null)
+  const drawn = useRef<Drawn | null>(null)
+  const [failed, setFailed] = useState<string | null>(null)
   const { undirected } = layout
   const nodes = Object.keys(layout.nodes).map(Number)
   const keep = shown === null ? null : new Set(shown)
@@ -110,11 +146,67 @@ function GraphView({
     ...new Set(
       live
         .filter((e) => e.from === n || (undirected && e.to === n))
-        .map((e) => (e.from === n ? e.to : e.from)),
+        .map((e) => {
+          const to = e.from === n ? e.to : e.from
+          return e.weight === undefined
+            ? String(to)
+            : `${to} (weight ${cellText(e.weight, look.format)})`
+        }),
     ),
   ]
   const nodeLabel = (n: number) =>
     label === null ? String(n) : cellText(cellValue(label, n), look.format)
+  const nodeData = nodes.map((n): [string, NodeData] => {
+    const seen = visited(n)
+    return [
+      String(n),
+      {
+        text: seen === null ? nodeLabel(n) : seen ? `[${nodeLabel(n)}]` : `(${nodeLabel(n)})`,
+        seen,
+        here: current?.at === n,
+        caption:
+          colour === null ? null : `${colourName}=${cellText(cellValue(colour, n), look.format)}`,
+        pointer: current?.at === n ? `◀ ${current.name}` : null,
+      },
+    ]
+  })
+  const liveEdges = new Map(edges)
+  const edgeData = Object.keys(layout.edges).map((key): [string, EdgeData] => {
+    const weight = liveEdges.get(key)?.weight
+    return [
+      key,
+      {
+        live: liveEdges.has(key),
+        on: key === checked,
+        weight: weight === undefined ? '' : cellText(weight, look.format),
+      },
+    ]
+  })
+
+  useEffect(() => {
+    const graph = graphOf(layout)
+    const shown: Drawn = { graph, canvas: null }
+    let alive = true
+    drawn.current = shown
+    loadCanvas()
+      .then(({ drawGraph }) => {
+        if (alive) shown.canvas = drawGraph(box.current!, graph, layout.undirected)
+      })
+      .catch((e: unknown) => {
+        if (alive) setFailed(e instanceof Error ? e.message : String(e))
+      })
+    return () => {
+      alive = false
+      shown.canvas?.kill()
+      drawn.current = null
+    }
+  }, [layout])
+
+  useEffect(() => {
+    const { graph } = drawn.current!
+    for (const [n, data] of nodeData) graph.mergeNodeAttributes(n, data)
+    for (const [key, data] of edgeData) graph.mergeEdgeAttributes(key, data)
+  }, [layout, nodeData, edgeData])
   const summary = [
     `${name} as ${layout.spans === null ? `a ${kind}` : 'the tree of first visits'}: ${nodes.length} nodes, ${edges.length} edges`,
     current !== null ? `current node ${current.at} (${current.name})` : null,
@@ -127,116 +219,51 @@ function GraphView({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="max-h-[32rem] max-w-full overflow-auto">
-        <svg
-          role="img"
-          aria-label={summary}
-          width={layout.width + 40}
-          height={layout.height}
-          viewBox={`0 0 ${layout.width + 40} ${layout.height}`}
-          className="font-mono text-xs"
-        >
-          <defs>
-            <marker
-              id={arrowId}
-              viewBox="0 0 8 8"
-              refX="8"
-              refY="4"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto-start-reverse"
-            >
-              <path d="M0,0 L8,4 L0,8 z" className="fill-trace-arrow" />
-            </marker>
-          </defs>
-          {edges.map(([key, e]) => {
-            const points = layout.edges[key]
-            if (points === undefined) return null
-            const on = key === checked
-            const k = Math.max(1, Math.floor(points.length / 2))
-            const [a, b] = [points[k - 1]!, points[k]!]
-            const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
-            return (
-              <g key={key}>
-                <path
-                  d={path(points)}
-                  fill="none"
-                  strokeWidth={on ? 2 : 1.25}
-                  strokeDasharray={on ? '4 3' : undefined}
-                  markerEnd={undirected ? undefined : `url(#${arrowId})`}
-                  className={on ? 'stroke-trace-index' : 'stroke-trace-arrow'}
-                />
-                {e.weight !== undefined && (
-                  <text
-                    x={mid.x + 4}
-                    y={mid.y - 2}
-                    strokeWidth={3}
-                    className="fill-muted-foreground stroke-card [paint-order:stroke]"
-                  >
-                    {cellText(e.weight, look.format)}
-                  </text>
-                )}
-              </g>
-            )
-          })}
-          {nodes.map((n) => {
-            const at = layout.nodes[n]!
-            const seen = visited(n)
-            const here = current?.at === n
-            const cx = at.x + nodeWidth / 2
-            return (
-              <g key={n}>
-                <rect
-                  x={at.x}
-                  y={at.y}
-                  width={nodeWidth}
-                  height={nodeHeight}
-                  rx={6}
-                  strokeWidth={here ? 2.5 : 1.25}
-                  className={cn(
-                    seen === true ? 'fill-brand-subtle' : 'fill-background',
-                    here
-                      ? 'stroke-brand'
-                      : seen === false
-                        ? 'stroke-trace-unset'
-                        : 'stroke-border-strong',
-                  )}
-                />
-                <text
-                  x={cx}
-                  y={at.y + nodeHeight / 2}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  className={cn('fill-foreground', seen === true && 'font-semibold')}
-                >
-                  {seen === null ? nodeLabel(n) : seen ? `[${nodeLabel(n)}]` : `(${nodeLabel(n)})`}
-                </text>
-                {colour !== null && (
-                  <text
-                    x={cx}
-                    y={at.y + nodeHeight + captionHeight / 2 + 1}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    className="fill-muted-foreground"
-                  >
-                    {colourName}={cellText(cellValue(colour, n), look.format)}
-                  </text>
-                )}
-                {here && (
-                  <text
-                    x={at.x + nodeWidth + 4}
-                    y={at.y + nodeHeight / 2}
-                    dominantBaseline="central"
-                    className="fill-trace-index"
-                  >
-                    ◀ {current.name}
-                  </text>
-                )}
-              </g>
-            )
-          })}
-        </svg>
+      <div className="relative">
+        <div className="max-h-[32rem] overflow-auto rounded-lg border border-border">
+          <div
+            ref={box}
+            role="img"
+            aria-label={summary}
+            style={{
+              minWidth: layout.width + 2 * graphPadding,
+              height: layout.height + 2 * graphPadding,
+            }}
+            className="w-full"
+          />
+        </div>
+        <div className="absolute top-1 right-1 flex gap-0.5 rounded-full bg-card/90">
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-label="Zoom in"
+            onClick={() => void drawn.current?.canvas?.getCamera().zoomIn()}
+          >
+            +
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-label="Zoom out"
+            onClick={() => void drawn.current?.canvas?.getCamera().zoomOut()}
+          >
+            −
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-label="Fit the graph"
+            onClick={() => void drawn.current?.canvas?.getCamera().reset()}
+          >
+            Fit
+          </Button>
+        </div>
       </div>
+      {failed !== null && (
+        <p role="alert" className="text-sm text-danger">
+          Couldn&apos;t draw the graph: {failed}
+        </p>
+      )}
       <ul aria-label={`Nodes of ${name}`} className="sr-only">
         {nodes.map((n) => (
           <li key={n}>
