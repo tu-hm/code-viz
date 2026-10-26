@@ -67,7 +67,7 @@
 
 ## 9. Usability fixes (M5-F10 · 2 d)
 
-- [ ] Support DS + Lead running the 8-student test (build, fixtures, tasks scripted)
+- [x] Support DS + Lead running the 8-student test (build, fixtures, tasks scripted): [script](../../usability-test-m5.md), fixtures `cpp-prefix-sum` and `cpp-fib`
 - [ ] Fix the top issues; re-check §19.11 targets and SUS ≥ 75
 
 ## Done when
