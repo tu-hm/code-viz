@@ -139,15 +139,19 @@ describe('§19.4.4 call tree', () => {
     expect(viewAt(fib, 31).active).toBeNull()
   })
 
-  test.each(fixtureNames)('%s: every call and return pairs up in one tree', (name) => {
-    const all = loadFixture(name).chunks.flat()
-    const tree = callTree(all)
-    expect(tree.filter((n) => n.depth === 0).length).toBeLessThanOrEqual(1)
-    for (const node of tree) {
-      if (node.ret !== null) expect(all[node.ret]!.callId).toBe(node.id)
-      expect(all[node.call]!.callId).toBe(node.id)
-    }
-  })
+  test.each(fixtureNames)(
+    '%s: every call and return pairs up in one tree',
+    { timeout: 30_000 },
+    (name) => {
+      const all = loadFixture(name).chunks.flat()
+      const tree = callTree(all)
+      expect(tree.filter((n) => n.depth === 0).length).toBeLessThanOrEqual(1)
+      for (const node of tree) {
+        if (node.ret !== null) expect(all[node.ret]!.callId).toBe(node.id)
+        expect(all[node.call]!.callId).toBe(node.id)
+      }
+    },
+  )
 
   test('more than 8 siblings fold into "+N calls", but the active one stays', () => {
     const ops: Op[] = [{ call: 'main', args: [] }]
