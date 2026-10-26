@@ -1,0 +1,49 @@
+{
+  "encoding": {
+    "keyframeInterval": 50,
+    "mode": "delta"
+  },
+  "id": "trc_232fcab65b2fc7f17536ab010efdc141",
+  "language": {
+    "adapter": "cpp-gdb/0.5.0",
+    "id": "cpp17-gcc",
+    "runtime": "GCC 13.5.0"
+  },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "source": {
+    "file": "main.cpp",
+    "lineCount": 19
+  },
+  "summary": {
+    "exit": {
+      "code": 0,
+      "kind": "normal",
+      "message": null,
+      "signal": null
+    },
+    "lineHits": {
+      "10": 5,
+      "11": 1,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "17": 5,
+      "18": 1,
+      "5": 1,
+      "6": 4,
+      "7": 1,
+      "8": 1,
+      "9": 1
+    },
+    "lineHitsSource": "gcov",
+    "stepCount": 27,
+    "truncated": false,
+    "truncation": null
+  },
+  "version": "1.2"
+}

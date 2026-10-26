@@ -1,0 +1,9295 @@
+[
+  {
+    "access": [],
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 1,
+        "locals": [],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 0,
+    "keyframe": true,
+    "line": 1,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "kind": "class",
+        "name": "deque"
+      }
+    },
+    "i": 1,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 1,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 4,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 2,
+    "keyframe": false,
+    "line": 4,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o2": {
+        "items": [
+          {
+            "id": "o3",
+            "t": "ref"
+          },
+          {
+            "id": "o4",
+            "t": "ref"
+          },
+          {
+            "id": "o5",
+            "t": "ref"
+          },
+          {
+            "id": "o6",
+            "t": "ref"
+          },
+          {
+            "id": "o7",
+            "t": "ref"
+          },
+          {
+            "id": "o8",
+            "t": "ref"
+          }
+        ],
+        "kind": "sequence",
+        "length": 6,
+        "truncated": false,
+        "type": "list"
+      },
+      "o3": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "2"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o4": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o5": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o6": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o7": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "4"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o8": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          },
+          {
+            "t": "int",
+            "v": "6"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      }
+    },
+    "i": 3,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 4,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "_",
+            "value": {
+              "t": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 4,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "_",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 5,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "_",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 6,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "_",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 7,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "_",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 8,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "_",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 9,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "_",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 10,
+    "keyframe": false,
+    "line": 5,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o10": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "list"
+      },
+      "o11": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "list"
+      },
+      "o12": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "list"
+      },
+      "o13": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "list"
+      },
+      "o14": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "list"
+      },
+      "o15": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "list"
+      },
+      "o16": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "list"
+      },
+      "o9": {
+        "items": [
+          {
+            "id": "o10",
+            "t": "ref"
+          },
+          {
+            "id": "o11",
+            "t": "ref"
+          },
+          {
+            "id": "o12",
+            "t": "ref"
+          },
+          {
+            "id": "o13",
+            "t": "ref"
+          },
+          {
+            "id": "o14",
+            "t": "ref"
+          },
+          {
+            "id": "o15",
+            "t": "ref"
+          },
+          {
+            "id": "o16",
+            "t": "ref"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 11,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 7,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 12,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 8,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o11": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 13,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          2
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o12": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 14,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 7,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 15,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 8,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o11": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 16,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          3
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o13": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 17,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 7,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 18,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 8,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o11": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 19,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          4
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o14": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 20,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 7,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 21,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          2
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 8,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o12": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 22,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          5
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o15": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 23,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 7,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 24,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          4
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 8,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o14": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 25,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          5
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o15": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 26,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 7,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 27,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          5
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 8,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o15": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          },
+          {
+            "t": "int",
+            "v": "6"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 28,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          6
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o16": {
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 29,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 9,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 30,
+    "keyframe": false,
+    "line": 9,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 10,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o17": {
+        "items": [
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 31,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 9,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 11,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o17": {
+        "items": [
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 32,
+    "keyframe": false,
+    "line": 11,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 33,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 11,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 13,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 34,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 35,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 36,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          2
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 17,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 37,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 18,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o17": {
+        "items": [
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 38,
+    "keyframe": false,
+    "line": 18,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 39,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 18,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 40,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          3
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 17,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 41,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 18,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o17": {
+        "items": [
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 42,
+    "keyframe": false,
+    "line": 18,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 43,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 18,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 44,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          4
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 17,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 45,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 18,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o17": {
+        "items": [
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 46,
+    "keyframe": false,
+    "line": 18,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 47,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 18,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 48,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 13,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 49,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "kind": "class",
+        "name": "deque"
+      },
+      "o10": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "list"
+      },
+      "o11": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "truncated": false,
+        "type": "list"
+      },
+      "o12": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "list"
+      },
+      "o13": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "list"
+      },
+      "o14": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "list"
+      },
+      "o15": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          },
+          {
+            "t": "int",
+            "v": "6"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "truncated": false,
+        "type": "list"
+      },
+      "o16": {
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "list"
+      },
+      "o17": {
+        "items": [
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      },
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "3"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "deque"
+      },
+      "o2": {
+        "items": [
+          {
+            "id": "o3",
+            "t": "ref"
+          },
+          {
+            "id": "o4",
+            "t": "ref"
+          },
+          {
+            "id": "o5",
+            "t": "ref"
+          },
+          {
+            "id": "o6",
+            "t": "ref"
+          },
+          {
+            "id": "o7",
+            "t": "ref"
+          },
+          {
+            "id": "o8",
+            "t": "ref"
+          }
+        ],
+        "kind": "sequence",
+        "length": 6,
+        "truncated": false,
+        "type": "list"
+      },
+      "o3": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "2"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o4": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o5": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o6": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o7": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "4"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o8": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          },
+          {
+            "t": "int",
+            "v": "6"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "tuple"
+      },
+      "o9": {
+        "items": [
+          {
+            "id": "o10",
+            "t": "ref"
+          },
+          {
+            "id": "o11",
+            "t": "ref"
+          },
+          {
+            "id": "o12",
+            "t": "ref"
+          },
+          {
+            "id": "o13",
+            "t": "ref"
+          },
+          {
+            "id": "o14",
+            "t": "ref"
+          },
+          {
+            "id": "o15",
+            "t": "ref"
+          },
+          {
+            "id": "o16",
+            "t": "ref"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 50,
+    "keyframe": true,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          2
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 51,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 16,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 52,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 53,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 54,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          5
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 17,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 55,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          2
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 18,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o17": {
+        "items": [
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "-1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 56,
+    "keyframe": false,
+    "line": 18,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "3"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 57,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 18,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 58,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 13,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 59,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "4"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 60,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          3
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 61,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 16,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 62,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 63,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 64,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 13,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 65,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 66,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          4
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 67,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 16,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 68,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 69,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 70,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          5
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 16,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 71,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 72,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 73,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 13,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 74,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 75,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          5
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 76,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          2
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 16,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 77,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 78,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 79,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          4
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 16,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 80,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 81,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 82,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          6
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 17,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 83,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          5
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 18,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o17": {
+        "items": [
+          {
+            "t": "int",
+            "v": "-1"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          }
+        ],
+        "kind": "sequence",
+        "length": 7,
+        "truncated": false,
+        "type": "list"
+      }
+    },
+    "i": 84,
+    "keyframe": false,
+    "line": 18,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [
+          {
+            "t": "int",
+            "v": "6"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 85,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 18,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 86,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 13,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 87,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o18": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "truncated": false,
+        "type": "deque"
+      }
+    },
+    "i": 88,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o9",
+        "path": [
+          6
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 89,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o17",
+        "path": [
+          5
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 16,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 90,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 91,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 92,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 19,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 93,
+    "keyframe": false,
+    "line": 19,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 20,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o19",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o19": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "4"
+          }
+        ],
+        "kind": "set",
+        "length": 3,
+        "ordered": false,
+        "truncated": false,
+        "type": "set"
+      }
+    },
+    "i": 94,
+    "keyframe": false,
+    "line": 20,
+    "prevLine": 19,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 21,
+        "locals": [
+          {
+            "name": "deque",
+            "value": {
+              "id": "o1",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "edges",
+            "value": {
+              "id": "o2",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "adj",
+            "value": {
+              "id": "o9",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "u",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "v",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "dist",
+            "value": {
+              "id": "o17",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o18",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o19",
+              "t": "ref"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o20",
+              "t": "ref"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o20": {
+        "entries": [
+          {
+            "key": {
+              "t": "str",
+              "v": "b"
+            },
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "key": {
+              "t": "str",
+              "v": "a"
+            },
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "kind": "mapping",
+        "length": 2,
+        "ordered": true,
+        "truncated": false,
+        "type": "dict"
+      }
+    },
+    "i": 95,
+    "keyframe": false,
+    "line": 21,
+    "prevLine": 20,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "callId": 0,
+    "error": null,
+    "event": "return",
+    "frames": {},
+    "heap": {},
+    "i": 96,
+    "keyframe": false,
+    "line": 21,
+    "prevLine": 21,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": "0 1 1 1 2 3\n"
+  }
+]

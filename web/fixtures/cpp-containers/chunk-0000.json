@@ -1,0 +1,2136 @@
+[
+  {
+    "access": [],
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "t": "uninit",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 0,
+    "keyframe": true,
+    "line": 5,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "meta": {
+          "adapter": "stack"
+        },
+        "truncated": false,
+        "type": "std::stack<int, std::deque<int>>"
+      }
+    },
+    "i": 1,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "-1"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 2,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "meta": {
+          "adapter": "stack"
+        },
+        "truncated": false,
+        "type": "std::stack<int, std::deque<int>>"
+      }
+    },
+    "i": 3,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "meta": {
+          "adapter": "stack"
+        },
+        "truncated": false,
+        "type": "std::stack<int, std::deque<int>>"
+      }
+    },
+    "i": 4,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "t": "uninit",
+              "type": "std::deque<int>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          },
+          {
+            "t": "int",
+            "v": "8"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "meta": {
+          "adapter": "stack"
+        },
+        "truncated": false,
+        "type": "std::stack<int, std::deque<int>>"
+      }
+    },
+    "i": 5,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o2": {
+        "items": [
+          {
+            "t": "int",
+            "v": "4"
+          },
+          {
+            "t": "int",
+            "v": "7"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "truncated": false,
+        "type": "std::deque<int>"
+      }
+    },
+    "i": 6,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "t": "uninit",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o2": {
+        "items": [
+          {
+            "t": "int",
+            "v": "4"
+          },
+          {
+            "t": "int",
+            "v": "7"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "truncated": false,
+        "type": "std::deque<int>"
+      }
+    },
+    "i": 7,
+    "keyframe": false,
+    "line": 9,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "meta": {
+          "adapter": "priority_queue"
+        },
+        "truncated": false,
+        "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+      }
+    },
+    "i": 8,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 9,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 9,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          0
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "items": [
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "meta": {
+          "adapter": "priority_queue"
+        },
+        "truncated": false,
+        "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+      }
+    },
+    "i": 10,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          0
+        ]
+      },
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          1
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "9"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "items": [
+          {
+            "t": "int",
+            "v": "9"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "meta": {
+          "adapter": "priority_queue"
+        },
+        "truncated": false,
+        "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+      }
+    },
+    "i": 11,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          0
+        ]
+      },
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          1
+        ]
+      },
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          2
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "items": [
+          {
+            "t": "int",
+            "v": "9"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          },
+          {
+            "t": "int",
+            "v": "2"
+          }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "meta": {
+          "adapter": "priority_queue"
+        },
+        "truncated": false,
+        "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+      }
+    },
+    "i": 12,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          0
+        ]
+      },
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          1
+        ]
+      },
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          2
+        ]
+      },
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          3
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "t": "uninit",
+              "type": "std::map<std::string, int>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "items": [
+          {
+            "t": "int",
+            "v": "9"
+          },
+          {
+            "t": "int",
+            "v": "7"
+          },
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "sequence",
+        "length": 4,
+        "meta": {
+          "adapter": "priority_queue"
+        },
+        "truncated": false,
+        "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+      }
+    },
+    "i": 13,
+    "keyframe": false,
+    "line": 11,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 12,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "entries": [],
+        "kind": "mapping",
+        "length": 0,
+        "ordered": true,
+        "truncated": false,
+        "type": "std::map<std::string, int>"
+      }
+    },
+    "i": 14,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 11,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 13,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "entries": [
+          {
+            "key": {
+              "t": "str",
+              "v": "ab"
+            },
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "kind": "mapping",
+        "length": 1,
+        "ordered": true,
+        "truncated": false,
+        "type": "std::map<std::string, int>"
+      }
+    },
+    "i": 15,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 14,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "t": "uninit",
+              "type": "std::multiset<int>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "entries": [
+          {
+            "key": {
+              "t": "str",
+              "v": "ab"
+            },
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          },
+          {
+            "key": {
+              "t": "str",
+              "v": "cd"
+            },
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "kind": "mapping",
+        "length": 2,
+        "ordered": true,
+        "truncated": false,
+        "type": "std::map<std::string, int>"
+      }
+    },
+    "i": 16,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 15,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "t": "uninit",
+              "type": "std::set<int>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o5": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          },
+          {
+            "t": "int",
+            "v": "5"
+          }
+        ],
+        "kind": "set",
+        "length": 4,
+        "ordered": true,
+        "truncated": false,
+        "type": "std::multiset<int>"
+      }
+    },
+    "i": 17,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 16,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o6": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "3"
+          }
+        ],
+        "kind": "set",
+        "length": 2,
+        "ordered": true,
+        "truncated": false,
+        "type": "std::set<int>"
+      }
+    },
+    "i": 18,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 17,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          },
+          {
+            "name": "b",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 19,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 17,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          },
+          {
+            "name": "b",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "65535"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 20,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 17,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "b",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 21,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 17,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          },
+          {
+            "name": "b",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 22,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 17,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "13"
+            }
+          },
+          {
+            "name": "b",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 23,
+    "keyframe": false,
+    "line": 17,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 18,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "45"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 24,
+    "keyframe": false,
+    "line": 18,
+    "prevLine": 17,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "access": [
+      {
+        "mode": "r",
+        "obj": "o3",
+        "path": [
+          0
+        ]
+      }
+    ],
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 19,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "45"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 25,
+    "keyframe": false,
+    "line": 19,
+    "prevLine": 18,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": "8 4 9 45\n"
+  },
+  {
+    "access": [],
+    "callId": 0,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 19,
+        "locals": [
+          {
+            "name": "st",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::stack<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "q",
+            "value": {
+              "id": "o2",
+              "t": "ref",
+              "type": "std::deque<int>"
+            }
+          },
+          {
+            "name": "pq",
+            "value": {
+              "id": "o3",
+              "t": "ref",
+              "type": "std::priority_queue<int, std::vector<int>, std::less<int>>"
+            }
+          },
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o4",
+              "t": "ref",
+              "type": "std::map<std::string, int>"
+            }
+          },
+          {
+            "name": "ms",
+            "value": {
+              "id": "o5",
+              "t": "ref",
+              "type": "std::multiset<int>"
+            }
+          },
+          {
+            "name": "seen",
+            "value": {
+              "id": "o6",
+              "t": "ref",
+              "type": "std::set<int>"
+            }
+          },
+          {
+            "name": "mask",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "45"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": {
+          "t": "int",
+          "type": "int",
+          "v": "0"
+        }
+      }
+    },
+    "heap": {},
+    "i": 26,
+    "keyframe": false,
+    "line": 19,
+    "prevLine": 19,
+    "removedObjects": [],
+    "stack": [
+      "f0"
+    ],
+    "stderr": "",
+    "stdout": ""
+  }
+]
