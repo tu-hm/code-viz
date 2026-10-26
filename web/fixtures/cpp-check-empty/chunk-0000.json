@@ -1,0 +1,199 @@
+[
+  {
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "q",
+            "value": {
+              "t": "uninit",
+              "type": "std::queue<int, std::deque<int>>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 0,
+    "keyframe": true,
+    "line": 5,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "q",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::queue<int, std::deque<int>>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "meta": {
+          "adapter": "queue"
+        },
+        "truncated": false,
+        "type": "std::queue<int, std::deque<int>>"
+      }
+    },
+    "i": 1,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "q",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::queue<int, std::deque<int>>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [
+          {
+            "t": "int",
+            "v": "1"
+          }
+        ],
+        "kind": "sequence",
+        "length": 1,
+        "meta": {
+          "adapter": "queue"
+        },
+        "truncated": false,
+        "type": "std::queue<int, std::deque<int>>"
+      }
+    },
+    "i": 2,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "q",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::queue<int, std::deque<int>>"
+            }
+          },
+          {
+            "name": "first",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [],
+        "kind": "sequence",
+        "length": 0,
+        "meta": {
+          "adapter": "queue"
+        },
+        "truncated": false,
+        "type": "std::queue<int, std::deque<int>>"
+      }
+    },
+    "i": 3,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": {
+      "kind": "empty_container",
+      "line": 8,
+      "message": "Assertion '!this->empty()' failed.",
+      "type": "libstdc++",
+      "values": {
+        "call": "front",
+        "name": "q",
+        "type": "std::queue<int, std::deque<int>>"
+      }
+    },
+    "event": "exception",
+    "frames": {},
+    "heap": {},
+    "i": 4,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "/usr/local/include/c++/13.5.0/bits/stl_queue.h:235: std::queue<_Tp, _Sequence>::reference std::queue<_Tp, _Sequence>::front() [with _Tp = int; _Sequence = std::__debug::deque<int, std::allocator<int> >; reference = int&]: Assertion '!this->empty()' failed.\n",
+    "stdout": ""
+  }
+]

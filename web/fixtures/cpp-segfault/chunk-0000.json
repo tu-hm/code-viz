@@ -1,0 +1,512 @@
+[
+  {
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 10,
+        "locals": [
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "int [10]"
+            }
+          }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          }
+        ],
+        "kind": "sequence",
+        "length": 10,
+        "truncated": false,
+        "type": "int [10]"
+      }
+    },
+    "i": 0,
+    "keyframe": true,
+    "line": 10,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 11,
+        "locals": [
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "int [10]"
+            }
+          }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 1,
+    "keyframe": false,
+    "line": 11,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "callId": 1,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "int [10]"
+            }
+          }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f2": {
+        "id": "f2",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "arr",
+            "value": {
+              "addr": "0xdeadbeef",
+              "index": 0,
+              "t": "ptr",
+              "target": "o1",
+              "type": "int *"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "bump",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 2,
+    "keyframe": false,
+    "line": 6,
+    "parentCallId": 0,
+    "prevLine": 11,
+    "removedObjects": [],
+    "stack": ["f0", "f1", "f2"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 7,
+        "locals": [
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "int [10]"
+            }
+          }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f2": {
+        "id": "f2",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "arr",
+            "value": {
+              "addr": "0xdeadbeef",
+              "index": 0,
+              "t": "ptr",
+              "target": "o1",
+              "type": "int *"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "bump",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "fixed": true,
+        "items": [
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "1"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          },
+          {
+            "t": "int",
+            "v": "0"
+          }
+        ],
+        "kind": "sequence",
+        "length": 10,
+        "truncated": false,
+        "type": "int [10]"
+      }
+    },
+    "i": 3,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": ["f0", "f1", "f2"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "callId": 1,
+    "error": null,
+    "event": "return",
+    "frames": {},
+    "heap": {},
+    "i": 4,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": ["f0", "f1", "f2"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "int [10]"
+            }
+          }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 12,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 5,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 11,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 13,
+        "locals": [
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "int [10]"
+            }
+          }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 13,
+        "locals": [
+          {
+            "name": "n",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 6,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": "1\n"
+  },
+  {
+    "callId": 2,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 6,
+        "locals": [
+          {
+            "name": "cnt",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "int [10]"
+            }
+          }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f3": {
+        "id": "f3",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "arr",
+            "value": {
+              "addr": "0xdeadbeef",
+              "index": 0,
+              "t": "ptr",
+              "target": "o1",
+              "type": "int *"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "500000000"
+            }
+          }
+        ],
+        "name": "bump",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 7,
+    "keyframe": false,
+    "line": 6,
+    "parentCallId": 0,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": ["f0", "f1", "f3"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": {
+      "line": 6,
+      "message": "Segmentation fault",
+      "type": "SIGSEGV"
+    },
+    "event": "exception",
+    "frames": {},
+    "heap": {},
+    "i": 8,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": ["f0", "f1", "f3"],
+    "stderr": "",
+    "stdout": ""
+  }
+]

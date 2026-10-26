@@ -1,0 +1,204 @@
+[
+  {
+    "i": 0,
+    "event": "call",
+    "prevLine": null,
+    "line": 1,
+    "keyframe": true,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "<module>",
+        "kind": "global",
+        "line": 1,
+        "locals": [],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "callId": 0
+  },
+  {
+    "i": 1,
+    "event": "line",
+    "prevLine": null,
+    "line": 1,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {},
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 2,
+    "event": "line",
+    "prevLine": 1,
+    "line": 4,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "<module>",
+        "kind": "global",
+        "line": 4,
+        "locals": [
+          {
+            "name": "f",
+            "value": { "t": "ref", "id": "o1" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": { "kind": "function", "name": "f", "signature": "f(arr, i)" }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 3,
+    "event": "line",
+    "prevLine": 4,
+    "line": 5,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "<module>",
+        "kind": "global",
+        "line": 5,
+        "locals": [
+          {
+            "name": "f",
+            "value": { "t": "ref", "id": "o1" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "ref", "id": "o2" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o2": {
+        "kind": "sequence",
+        "type": "list",
+        "length": 2,
+        "items": [
+          { "t": "int", "v": "10" },
+          { "t": "int", "v": "20" }
+        ]
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 4,
+    "event": "call",
+    "prevLine": 5,
+    "line": 2,
+    "keyframe": false,
+    "stack": ["f0", "f1"],
+    "frames": {
+      "f1": {
+        "id": "f1",
+        "name": "f",
+        "kind": "function",
+        "line": 2,
+        "locals": [
+          {
+            "name": "arr",
+            "value": { "t": "ref", "id": "o2" }
+          },
+          {
+            "name": "i",
+            "value": { "t": "int", "v": "5" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "callId": 1,
+    "parentCallId": 0
+  },
+  {
+    "i": 5,
+    "event": "exception",
+    "prevLine": 2,
+    "line": 2,
+    "keyframe": false,
+    "stack": ["f0", "f1"],
+    "frames": {},
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": { "type": "IndexError", "message": "list index out of range", "line": 2 }
+  },
+  {
+    "i": 6,
+    "event": "return",
+    "prevLine": 2,
+    "line": 2,
+    "keyframe": false,
+    "stack": ["f0", "f1"],
+    "frames": {},
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "callId": 1
+  },
+  {
+    "i": 7,
+    "event": "exception",
+    "prevLine": 5,
+    "line": 5,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {},
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": { "type": "IndexError", "message": "list index out of range", "line": 5 }
+  },
+  {
+    "i": 8,
+    "event": "return",
+    "prevLine": 5,
+    "line": 5,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {},
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"main.py\", line 5, in <module>\n    print(f(x, 5))\n          ^^^^^^^\n  File \"main.py\", line 2, in f\n    return arr[i]\n           ~~~^^^\nIndexError: list index out of range\n",
+    "error": null,
+    "callId": 0
+  }
+]

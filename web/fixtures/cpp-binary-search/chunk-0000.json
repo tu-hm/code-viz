@@ -1,0 +1,959 @@
+[
+  {
+    "i": 0,
+    "event": "call",
+    "prevLine": null,
+    "line": 4,
+    "keyframe": true,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 4,
+        "locals": [],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "callId": 0
+  },
+  {
+    "i": 1,
+    "event": "line",
+    "prevLine": 4,
+    "line": 5,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "stdinPos": { "bytes": 4, "token": 2, "inferred": true }
+  },
+  {
+    "i": 2,
+    "event": "line",
+    "prevLine": 5,
+    "line": 6,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "kind": "sequence",
+        "type": "vector<int>",
+        "length": 8,
+        "items": [
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" },
+          { "t": "int", "v": "0" }
+        ],
+        "meta": { "capacity": 8 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 3,
+    "event": "line",
+    "prevLine": 6,
+    "line": 7,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "kind": "sequence",
+        "type": "vector<int>",
+        "length": 8,
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "5" },
+          { "t": "int", "v": "7" },
+          { "t": "int", "v": "9" },
+          { "t": "int", "v": "11" },
+          { "t": "int", "v": "13" },
+          { "t": "int", "v": "15" }
+        ],
+        "meta": { "capacity": 8 }
+      }
+    },
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "stdinPos": { "bytes": 23, "token": 10, "inferred": true }
+  },
+  {
+    "i": 4,
+    "event": "line",
+    "prevLine": 7,
+    "line": 8,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "0", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 5,
+    "event": "line",
+    "prevLine": 8,
+    "line": 9,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "0", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 6,
+    "event": "line",
+    "prevLine": 9,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "0", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          },
+          {
+            "name": "mid",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 7,
+    "event": "line",
+    "prevLine": 10,
+    "line": 13,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 13,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "0", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          },
+          {
+            "name": "mid",
+            "value": { "t": "int", "v": "3", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 8,
+    "event": "line",
+    "prevLine": 13,
+    "line": 8,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 9,
+    "event": "line",
+    "prevLine": 8,
+    "line": 9,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 10,
+    "event": "line",
+    "prevLine": 9,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          },
+          {
+            "name": "mid",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 11,
+    "event": "line",
+    "prevLine": 10,
+    "line": 13,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 13,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "4", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          },
+          {
+            "name": "mid",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 12,
+    "event": "line",
+    "prevLine": 13,
+    "line": 8,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 13,
+    "event": "line",
+    "prevLine": 8,
+    "line": 9,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 14,
+    "event": "line",
+    "prevLine": 9,
+    "line": 10,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          },
+          {
+            "name": "mid",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 15,
+    "event": "line",
+    "prevLine": 10,
+    "line": 11,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "7", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "-1", "type": "int" }
+          },
+          {
+            "name": "mid",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 16,
+    "event": "line",
+    "prevLine": 11,
+    "line": 8,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 17,
+    "event": "line",
+    "prevLine": 8,
+    "line": 15,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 15,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 18,
+    "event": "line",
+    "prevLine": 15,
+    "line": 16,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 16,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          }
+        ],
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "6\n",
+    "stderr": "",
+    "error": null
+  },
+  {
+    "i": 19,
+    "event": "return",
+    "prevLine": 16,
+    "line": 16,
+    "keyframe": false,
+    "stack": ["f0"],
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "name": "main",
+        "kind": "function",
+        "line": 16,
+        "locals": [
+          {
+            "name": "n",
+            "value": { "t": "int", "v": "8", "type": "int" }
+          },
+          {
+            "name": "x",
+            "value": { "t": "int", "v": "13", "type": "int" }
+          },
+          {
+            "name": "a",
+            "value": { "t": "ref", "id": "o1", "type": "vector<int>" }
+          },
+          {
+            "name": "l",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          },
+          {
+            "name": "r",
+            "value": { "t": "int", "v": "5", "type": "int" }
+          },
+          {
+            "name": "ans",
+            "value": { "t": "int", "v": "6", "type": "int" }
+          }
+        ],
+        "returnValue": { "t": "int", "v": "0", "type": "int" }
+      }
+    },
+    "heap": {},
+    "removedObjects": [],
+    "stdout": "",
+    "stderr": "",
+    "error": null,
+    "callId": 0
+  }
+]

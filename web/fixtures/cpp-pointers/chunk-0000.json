@@ -1,0 +1,497 @@
+[
+  {
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 8,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 8,
+        "locals": [{ "name": "v", "value": { "t": "uninit", "type": "std::vector<int>" } }],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "fixed": true,
+        "kind": "sequence",
+        "length": 200005,
+        "sparse": { "default": { "t": "int", "v": "0" }, "items": {} },
+        "type": "int [200005]"
+      }
+    },
+    "i": 0,
+    "keyframe": true,
+    "line": 8,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 9,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 9,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          { "name": "cnt", "value": { "t": "uninit", "type": "std::map<std::string, int>" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o2": {
+        "items": [
+          { "t": "int", "v": "4" },
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "3" }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "meta": { "capacity": 3 },
+        "truncated": false,
+        "type": "std::vector<int>"
+      }
+    },
+    "i": 1,
+    "keyframe": false,
+    "line": 9,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 10,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 10,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          {
+            "name": "cnt",
+            "value": { "id": "o3", "t": "ref", "type": "std::map<std::string, int>" }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "entries": [],
+        "kind": "mapping",
+        "length": 0,
+        "ordered": true,
+        "truncated": false,
+        "type": "std::map<std::string, int>"
+      }
+    },
+    "i": 2,
+    "keyframe": false,
+    "line": 10,
+    "prevLine": 9,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 11,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 11,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          {
+            "name": "cnt",
+            "value": { "id": "o3", "t": "ref", "type": "std::map<std::string, int>" }
+          },
+          { "name": "head", "value": { "t": "uninit", "type": "Node *" } }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o3": {
+        "entries": [{ "key": { "t": "str", "v": "ab" }, "value": { "t": "int", "v": "2" } }],
+        "kind": "mapping",
+        "length": 1,
+        "ordered": true,
+        "truncated": false,
+        "type": "std::map<std::string, int>"
+      }
+    },
+    "i": 3,
+    "keyframe": false,
+    "line": 11,
+    "prevLine": 10,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 12,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 12,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          {
+            "name": "cnt",
+            "value": { "id": "o3", "t": "ref", "type": "std::map<std::string, int>" }
+          },
+          {
+            "name": "head",
+            "value": { "addr": "0xdeadbeef", "t": "ptr", "target": "o4", "type": "Node *" }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "fields": [
+          { "name": "val", "value": { "t": "int", "type": "int", "v": "1" } },
+          { "name": "next", "value": { "addr": "0x0", "t": "ptr", "type": "Node *" } }
+        ],
+        "kind": "record",
+        "type": "Node"
+      }
+    },
+    "i": 4,
+    "keyframe": false,
+    "line": 12,
+    "prevLine": 11,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 13,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 13,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          {
+            "name": "cnt",
+            "value": { "id": "o3", "t": "ref", "type": "std::map<std::string, int>" }
+          },
+          {
+            "name": "head",
+            "value": { "addr": "0xdeadbeef", "t": "ptr", "target": "o4", "type": "Node *" }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o4": {
+        "fields": [
+          { "name": "val", "value": { "t": "int", "type": "int", "v": "1" } },
+          {
+            "name": "next",
+            "value": { "addr": "0xdeadbeef", "t": "ptr", "target": "o5", "type": "Node *" }
+          }
+        ],
+        "kind": "record",
+        "type": "Node"
+      },
+      "o5": {
+        "fields": [
+          { "name": "val", "value": { "t": "int", "type": "int", "v": "2" } },
+          { "name": "next", "value": { "addr": "0x0", "t": "ptr", "type": "Node *" } }
+        ],
+        "kind": "record",
+        "type": "Node"
+      }
+    },
+    "i": 5,
+    "keyframe": false,
+    "line": 13,
+    "prevLine": 12,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 14,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 14,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          {
+            "name": "cnt",
+            "value": { "id": "o3", "t": "ref", "type": "std::map<std::string, int>" }
+          },
+          {
+            "name": "head",
+            "value": { "addr": "0xdeadbeef", "t": "ptr", "target": "o4", "type": "Node *" }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "kind": "sequence",
+        "length": 200005,
+        "patch": { "3": { "t": "int", "v": "7" } },
+        "type": "int [200005]"
+      }
+    },
+    "i": 6,
+    "keyframe": false,
+    "line": 14,
+    "prevLine": 13,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 15,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 15,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          {
+            "name": "cnt",
+            "value": { "id": "o3", "t": "ref", "type": "std::map<std::string, int>" }
+          },
+          {
+            "name": "head",
+            "value": { "addr": "0xdeadbeef", "t": "ptr", "target": "o4", "type": "Node *" }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o2": {
+        "items": [
+          { "t": "int", "v": "1" },
+          { "t": "int", "v": "3" },
+          { "t": "int", "v": "4" }
+        ],
+        "kind": "sequence",
+        "length": 3,
+        "meta": { "capacity": 3 },
+        "truncated": false,
+        "type": "std::vector<int>"
+      }
+    },
+    "i": 7,
+    "keyframe": false,
+    "line": 15,
+    "prevLine": 14,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 16,
+        "locals": [
+          { "name": "MAXN", "value": { "t": "int", "type": "const int", "v": "200005" } },
+          { "name": "depth", "value": { "id": "o1", "t": "ref", "type": "int [200005]" } }
+        ],
+        "name": "Globals",
+        "returnValue": null
+      },
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 16,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          {
+            "name": "cnt",
+            "value": { "id": "o3", "t": "ref", "type": "std::map<std::string, int>" }
+          },
+          {
+            "name": "head",
+            "value": { "addr": "0xdeadbeef", "t": "ptr", "target": "o4", "type": "Node *" }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 8,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 15,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": "1\n"
+  },
+  {
+    "callId": 0,
+    "error": null,
+    "event": "return",
+    "frames": {
+      "f1": {
+        "id": "f1",
+        "kind": "function",
+        "line": 16,
+        "locals": [
+          { "name": "v", "value": { "id": "o2", "t": "ref", "type": "std::vector<int>" } },
+          {
+            "name": "cnt",
+            "value": { "id": "o3", "t": "ref", "type": "std::map<std::string, int>" }
+          },
+          {
+            "name": "head",
+            "value": { "addr": "0xdeadbeef", "t": "ptr", "target": "o4", "type": "Node *" }
+          }
+        ],
+        "name": "main",
+        "returnValue": { "t": "int", "type": "int", "v": "0" }
+      }
+    },
+    "heap": {},
+    "i": 9,
+    "keyframe": false,
+    "line": 16,
+    "prevLine": 16,
+    "removedObjects": [],
+    "stack": ["f0", "f1"],
+    "stderr": "",
+    "stdout": ""
+  }
+]

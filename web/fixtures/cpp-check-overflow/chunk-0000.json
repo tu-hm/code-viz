@@ -1,0 +1,309 @@
+[
+  {
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 5,
+        "locals": [
+          {
+            "name": "a",
+            "value": {
+              "t": "uninit",
+              "type": "std::vector<int>"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 0,
+    "keyframe": true,
+    "line": 5,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 6,
+        "locals": [
+          {
+            "name": "a",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::vector<int>"
+            }
+          },
+          {
+            "name": "sum",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {
+      "o1": {
+        "items": [
+          {
+            "t": "int",
+            "v": "2000000000"
+          },
+          {
+            "t": "int",
+            "v": "1000000000"
+          }
+        ],
+        "kind": "sequence",
+        "length": 2,
+        "meta": {
+          "capacity": 2
+        },
+        "truncated": false,
+        "type": "std::vector<int>"
+      }
+    },
+    "i": 1,
+    "keyframe": false,
+    "line": 6,
+    "prevLine": 5,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "a",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::vector<int>"
+            }
+          },
+          {
+            "name": "sum",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "uninit",
+              "type": "int"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 2,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 6,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "a",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::vector<int>"
+            }
+          },
+          {
+            "name": "sum",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "0"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2000000000"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 3,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 7,
+        "locals": [
+          {
+            "name": "a",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::vector<int>"
+            }
+          },
+          {
+            "name": "sum",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2000000000"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2000000000"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 4,
+    "keyframe": false,
+    "line": 7,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "function",
+        "line": 8,
+        "locals": [
+          {
+            "name": "a",
+            "value": {
+              "id": "o1",
+              "t": "ref",
+              "type": "std::vector<int>"
+            }
+          },
+          {
+            "name": "sum",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "2000000000"
+            }
+          },
+          {
+            "name": "x",
+            "value": {
+              "t": "int",
+              "type": "int",
+              "v": "1000000000"
+            }
+          }
+        ],
+        "name": "main",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 5,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 7,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdout": ""
+  },
+  {
+    "error": {
+      "kind": "signed_overflow",
+      "line": 8,
+      "message": "signed integer overflow: 2000000000 + 1000000000 cannot be represented in type 'int'",
+      "type": "UBSan",
+      "values": {
+        "max": "2147483647",
+        "op": "+",
+        "operands": ["2000000000", "1000000000"],
+        "type": "int"
+      }
+    },
+    "event": "exception",
+    "frames": {},
+    "heap": {},
+    "i": 6,
+    "keyframe": false,
+    "line": 8,
+    "prevLine": 8,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "main.cpp:8:13: runtime error: signed integer overflow: 2000000000 + 1000000000 cannot be represented in type 'int'\n",
+    "stdout": ""
+  }
+]

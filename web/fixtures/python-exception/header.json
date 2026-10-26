@@ -1,0 +1,24 @@
+{
+  "version": "1.1",
+  "id": "trc_86214b1fad0d6b1d977ef5b9f33f819e",
+  "language": { "id": "python3", "runtime": "CPython 3.12.4", "adapter": "py-settrace/1.2.0" },
+  "source": { "file": "main.py", "lineCount": 5 },
+  "options": {
+    "maxSteps": 1000,
+    "startAtLines": []
+  },
+  "summary": {
+    "stepCount": 9,
+    "truncated": false,
+    "truncation": null,
+    "exit": {
+      "kind": "exception",
+      "code": 1,
+      "signal": null,
+      "message": "IndexError: list index out of range"
+    },
+    "lineHits": { "1": 1, "2": 1, "4": 1, "5": 1 },
+    "lineHitsSource": "counter"
+  },
+  "encoding": { "mode": "delta", "keyframeInterval": 50 }
+}
