@@ -113,6 +113,7 @@ Code that looks right and isn't. When you hit a new one, add it here in the same
 - **Testing Library drops a space at the edge of an inline element in an accessible name.** `<span className="sr-only">points to </span>#o4` is named `points to#o4`, so `getByRole('button', { name: 'points to #o4' })` finds nothing. Put the space outside the span: `<span className="sr-only">points to</span> #o4` (`RefLabel` in `value-view.tsx`).
 - **Prettier run inside a package ignores `web/.prettierignore`.** `prettier --write src` from `apps/ide` reformats `src/gen/`. Run it from `web/` (`pnpm fmt`).
 - **A space alone in an element has no height.** `{marked ? '▼' : ' '}` in a `flex-col` collapses the empty rows to 0 px, so unmarked characters ride up beside the marked one. Hold the row with `'\u00a0'` (`IndexedString` in `indexed-string.tsx`).
+- **`overflow-x-auto` inside a table cell doesn't scroll.** The cell grows to the scroller's content width and the frame table spills out of its card. Give the view `w-0 min-w-full`, so it adds nothing to the cell's width and still fills it (`BitsView` in `bits-view.tsx`).
 
 ## Before you hand back
 

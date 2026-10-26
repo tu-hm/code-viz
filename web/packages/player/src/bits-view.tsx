@@ -36,7 +36,7 @@ export function BitsView({
   const { width, ones, set, fits } = bitsOf(value, picked === 'n' ? (usable ? n : null) : picked)
   const indices = ones.map((_, k) => width - 1 - k)
   return (
-    <div className="mt-1 flex flex-col gap-1 border-l-2 border-border pl-2 text-xs break-normal">
+    <div className="mt-1 flex w-0 min-w-full flex-col gap-1 border-l-2 border-border pl-2 text-xs break-normal">
       <div className="overflow-x-auto">
         <table aria-label={`${name} in ${width} bits`} className="text-center">
           <tbody>
@@ -90,7 +90,7 @@ export function BitsView({
         <span id={groupId} className="text-muted-foreground">
           Width
         </span>
-        <div role="group" aria-labelledby={groupId} className="flex gap-1">
+        <div role="group" aria-labelledby={groupId} className="flex flex-wrap gap-1">
           {[...widths, 'n' as const].map((w) => {
             const on = w === 'n' ? picked === 'n' : picked !== 'n' && width === w
             return (
