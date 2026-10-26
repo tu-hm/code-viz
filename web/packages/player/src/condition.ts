@@ -24,7 +24,7 @@ export type Expr =
   | { kind: 'negate'; arg: Expr }
   | { kind: 'binary'; op: Binary; left: Expr; right: Expr }
 
-export type Parsed = { expr: Expr } | { error: string }
+type Parsed = { expr: Expr } | { error: string }
 
 type Token = { text: string; at: number }
 
@@ -137,13 +137,10 @@ export type Scope = {
   index: (value: Value, index: number) => Value | undefined
 }
 
-class NoValue extends Error {}
-
-function number(v: Value | undefined): Num {
-  if (v === undefined) throw new NoValue()
-  switch (v.t) {
+function number(v: Value | undefined): Num | null {
+  switch (v?.t) {
     case 'int':
-      return BigInt(v.v ?? '')
+      return /^-?\d+$/.test(v.v ?? '') ? BigInt(v.v!) : null
     case 'float':
       return Number(v.v)
     case 'bool':
@@ -151,7 +148,7 @@ function number(v: Value | undefined): Num {
     case 'char':
       return BigInt(v.code ?? [...(v.v ?? '')][0]?.codePointAt(0) ?? 0)
     default:
-      throw new NoValue()
+      return null
   }
 }
 
@@ -159,9 +156,9 @@ function literal(text: string): Num {
   return /[.e]/i.test(text) && !/^0x/i.test(text) ? Number(text) : BigInt(text)
 }
 
-function arithmetic(op: Binary, a: Num, b: Num): Num {
+function arithmetic(op: Binary, a: Num, b: Num): Num | null {
   if (typeof a === 'bigint' && typeof b === 'bigint') {
-    if ((op === '/' || op === '//' || op === '%') && b === 0n) throw new NoValue()
+    if ((op === '/' || op === '//' || op === '%') && b === 0n) return null
     switch (op) {
       case '+':
         return a + b
@@ -224,26 +221,30 @@ function value(expr: Expr, scope: Scope): Value | undefined {
   return scope.index(target, Number(i))
 }
 
-function num(expr: Expr, scope: Scope): Num {
+function num(expr: Expr, scope: Scope): Num | null {
   switch (expr.kind) {
     case 'number':
       return literal(expr.text)
     case 'name':
     case 'index':
       return number(value(expr, scope))
-    case 'not':
-      return truth(num(expr.arg, scope)) === 0n ? 1n : 0n
-    case 'negate':
-      return -num(expr.arg, scope)
+    case 'not': {
+      const a = num(expr.arg, scope)
+      return a === null ? null : truth(a) === 0n ? 1n : 0n
+    }
+    case 'negate': {
+      const a = num(expr.arg, scope)
+      return a === null ? null : -a
+    }
     case 'binary': {
       const { op } = expr
-      if (op === '&&') {
-        return truth(num(expr.left, scope)) === 0n ? 0n : truth(num(expr.right, scope))
-      }
-      if (op === '||') {
-        return truth(num(expr.left, scope)) === 1n ? 1n : truth(num(expr.right, scope))
-      }
-      const [a, b] = [num(expr.left, scope), num(expr.right, scope)]
+      const a = num(expr.left, scope)
+      if (a === null) return null
+      if (op === '&&' && truth(a) === 0n) return 0n
+      if (op === '||' && truth(a) === 1n) return 1n
+      const b = num(expr.right, scope)
+      if (b === null) return null
+      if (op === '&&' || op === '||') return truth(b)
       if (comparisons.includes(op)) return compare(op, a, b) ? 1n : 0n
       return arithmetic(op, a, b)
     }
@@ -252,10 +253,6 @@ function num(expr: Expr, scope: Scope): Num {
 
 // a name out of scope, an index past the end or a division by zero => false at that step
 export function holds(expr: Expr, scope: Scope) {
-  try {
-    return truth(num(expr, scope)) === 1n
-  } catch (e) {
-    if (e instanceof NoValue) return false
-    throw e
-  }
+  const n = num(expr, scope)
+  return n !== null && truth(n) === 1n
 }

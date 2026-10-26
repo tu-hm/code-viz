@@ -2,7 +2,7 @@ import { apply, same, type Base } from './engine.ts'
 import type { HeapObject, Step, Value } from './gen/trace.ts'
 import { reach } from './search.ts'
 
-export type Arg = { name: string; value: Value }
+type Arg = { name: string; value: Value }
 
 export type CallNode = {
   id: number
@@ -20,7 +20,7 @@ export type CallNode = {
   repeated: boolean
 }
 
-export type CallStatus = 'running' | 'returned' | 'raised' | 'left'
+type CallStatus = 'running' | 'returned' | 'raised' | 'left'
 
 export type CallRow =
   | {

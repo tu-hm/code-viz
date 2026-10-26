@@ -1,8 +1,9 @@
 import { Button, cn } from '@viz/ui'
 import { useEffect, useId, useState } from 'react'
-import type { HeapObject, Value } from './gen/trace.ts'
+import type { HeapObject } from './gen/trace.ts'
 import {
   captionHeight,
+  cellText,
   edgeKey,
   nodeHeight,
   nodeWidth,
@@ -21,15 +22,10 @@ const field = 'h-8 rounded-lg border border-input bg-background px-2 font-mono t
 
 export type LayoutGraph = (request: GraphRequest) => Promise<GraphLayout>
 
-function text(v: Value | undefined, look: Look) {
-  if (v === undefined || v.t === 'uninit') return '·'
-  return look.format.value(v).text
-}
-
 // what an unvisited node holds: the sparse default, else -1, else an INF-sized value, else 0
 function unvisited(o: HeapObject, look: Look) {
-  if (o.sparse) return text(o.sparse.default, look)
-  const values = (o.items ?? []).map((v) => text(v, look))
+  if (o.sparse) return cellText(o.sparse.default, look.format)
+  const values = (o.items ?? []).map((v) => cellText(v, look.format))
   if (values.includes('-1')) return '-1'
   const big = values.find((v) => /^-?\d+$/.test(v) && Math.abs(Number(v)) >= 1e9)
   if (big !== undefined) return big
@@ -71,7 +67,7 @@ type GraphViewProps = {
   label: HeapObject | null
 }
 
-export function GraphView({
+function GraphView({
   name,
   kind,
   shape,
@@ -106,7 +102,7 @@ export function GraphView({
   const visited = (n: number) => {
     if (colour === null) return null
     const v = cellValue(colour, n)
-    return v !== undefined && v.t !== 'uninit' && text(v, look) !== empty
+    return v !== undefined && v.t !== 'uninit' && cellText(v, look.format) !== empty
   }
   const { current, checking } = marks
   const checked = checking === null ? null : edgeKey(checking.from, checking.to, undirected)
@@ -117,7 +113,8 @@ export function GraphView({
         .map((e) => (e.from === n ? e.to : e.from)),
     ),
   ]
-  const nodeLabel = (n: number) => (label === null ? String(n) : text(cellValue(label, n), look))
+  const nodeLabel = (n: number) =>
+    label === null ? String(n) : cellText(cellValue(label, n), look.format)
   const summary = [
     `${name} as ${layout.spans === null ? `a ${kind}` : 'the tree of first visits'}: ${nodes.length} nodes, ${edges.length} edges`,
     current !== null ? `current node ${current.at} (${current.name})` : null,
@@ -169,7 +166,7 @@ export function GraphView({
                 />
                 {e.weight !== undefined && (
                   <text x={mid.x + 4} y={mid.y - 2} className="fill-muted-foreground">
-                    {text(e.weight, look)}
+                    {cellText(e.weight, look.format)}
                   </text>
                 )}
               </g>
@@ -215,7 +212,7 @@ export function GraphView({
                     dominantBaseline="central"
                     className="fill-muted-foreground"
                   >
-                    {colourName}={text(cellValue(colour, n), look)}
+                    {colourName}={cellText(cellValue(colour, n), look.format)}
                   </text>
                 )}
                 {here && (
@@ -240,7 +237,7 @@ export function GraphView({
             {label !== null && `, labelled ${nodeLabel(n)}`}
             {visited(n) === true && ', visited'}
             {visited(n) === false && ', not visited'}
-            {colour !== null && `, ${colourName} ${text(cellValue(colour, n), look)}`}
+            {colour !== null && `, ${colourName} ${cellText(cellValue(colour, n), look.format)}`}
             {current?.at === n && ', current'}
             {`, edges to ${neighbours(n).join(', ') || 'none'}`}
           </li>

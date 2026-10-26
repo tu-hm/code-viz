@@ -27,8 +27,7 @@ export type GraphRequest = {
   undirected: boolean | null
   // null => every node the graph ever has; else these only (the 2-hop view of a big graph)
   nodes: number[] | null
-  // set => draw the tree of first visits: colour is the array whose cells mark a node visited,
-  // names the variables that index the adjacency list (u in adj[u])
+  // set => tree of first visits: colour marks a node visited, names index the list (u in adj[u])
   visits: { colour: string; names: string[] } | null
 }
 
@@ -107,8 +106,7 @@ function edgeList(o: HeapObject, heap: Heap, format: Formatter): GraphShape | nu
   return { source: 'edges', size, edges, rows }
 }
 
-// a sparse array's default cells have no parent, and a dense array of one value holds no tree yet:
-// a zeroed global par[] isn't every node under 0
+// sparse default cell, or a dense array of one value => no parent: a zeroed par[] isn't all under 0
 function parents(o: HeapObject): GraphShape | null {
   if (o.kind !== 'sequence') return null
   const size = o.length ?? 0
@@ -199,8 +197,7 @@ async function unvisitedValue(steps: Step[], colour: string, format: Formatter) 
   return value
 }
 
-// a node is visited when its colour cell leaves the unvisited value; its parent is the nearest
-// frame's index variable that names another node with an edge to it (u in BFS, the caller's u in DFS)
+// visited: colour cell leaves the unvisited value; parent: nearest frame's index variable naming a neighbour
 export async function firstVisits(
   steps: Step[],
   id: string,
