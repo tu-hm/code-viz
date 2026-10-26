@@ -112,6 +112,7 @@ Code that looks right and isn't. When you hit a new one, add it here in the same
 - **React's dev build makes step timings meaningless.** It logs every component render for the Performance panel and diffs each changed prop deeply (`addObjectDiffToProperties`). 500 heap cards that each got the step's heap took 1 s a step under `pnpm dev` and 16 ms in a production build. Time steps on a production build; `?fixture=` is dev-only, so the measuring build swaps `main.tsx`'s `import.meta.env.DEV` check for one on `?fixture=` locally, with `VITE_FLAGS=visualize`.
 - **Testing Library drops a space at the edge of an inline element in an accessible name.** `<span className="sr-only">points to </span>#o4` is named `points to#o4`, so `getByRole('button', { name: 'points to #o4' })` finds nothing. Put the space outside the span: `<span className="sr-only">points to</span> #o4` (`RefLabel` in `value-view.tsx`).
 - **Prettier run inside a package ignores `web/.prettierignore`.** `prettier --write src` from `apps/ide` reformats `src/gen/`. Run it from `web/` (`pnpm fmt`).
+- **A space alone in an element has no height.** `{marked ? '▼' : ' '}` in a `flex-col` collapses the empty rows to 0 px, so unmarked characters ride up beside the marked one. Hold the row with `'\u00a0'` (`IndexedString` in `indexed-string.tsx`).
 
 ## Before you hand back
 

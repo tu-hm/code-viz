@@ -19,10 +19,10 @@ export function IndexedString({ value, markers }: { value: Value; markers: Marke
           return (
             <span key={i} className="flex flex-col items-center">
               <span aria-hidden className="text-xs text-trace-index">
-                {here.length > 0 ? here.map((m) => m.label).join(' ') : ' '}
+                {here.length > 0 ? here.map((m) => m.label).join(' ') : '\u00a0'}
               </span>
               <span aria-hidden className="text-xs text-trace-index">
-                {here.length > 0 ? '▼' : ' '}
+                {here.length > 0 ? '▼' : '\u00a0'}
               </span>
               <span className={cn(here.length > 0 && 'rounded-sm bg-background px-0.5')}>
                 {ch === ' ' ? '␣' : ch}
