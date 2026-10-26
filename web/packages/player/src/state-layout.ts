@@ -1,5 +1,5 @@
 import type { StepState } from './engine.ts'
-import type { Formatter } from './format.ts'
+import type { Container, Formatter } from './format.ts'
 import type { Frame, HeapObject, Local, Value } from './gen/trace.ts'
 import type { ViewAs } from './store.ts'
 
@@ -22,6 +22,7 @@ export type CardView = {
   unreachable: boolean
   table: Table | null
   matrix: Matrix | null
+  container: Container | null
   view: ViewAs
   reads: Reads
 }
@@ -272,9 +273,17 @@ export function layoutState(
   const cards = candidates.map((id): CardView => {
     const places = placesOf(id)
     const variable = places.find((p) => p.variable !== undefined)?.variable
-    const table = tableOf(heap[id]!, heap, format)
-    const matrix = table === null ? matrixOf(heap[id]!, heap) : null
-    const fallback = table !== null ? 'table' : matrix !== null && matrixView ? 'matrix' : 'cells'
+    const container = format.container(heap[id]!)
+    const table = container === null ? tableOf(heap[id]!, heap, format) : null
+    const matrix = container === null && table === null ? matrixOf(heap[id]!, heap) : null
+    const fallback =
+      container !== null
+        ? 'container'
+        : table !== null
+          ? 'table'
+          : matrix !== null && matrixView
+            ? 'matrix'
+            : 'cells'
     const view = views[variable ?? `#${id}`] ?? fallback
     const rows = new Set([
       ...(table !== null && view === 'table' ? table.rows.map((r) => r.id) : []),
@@ -293,6 +302,7 @@ export function layoutState(
       unreachable: !reachable.has(id),
       table,
       matrix,
+      container,
       view,
       reads: readsOf(
         [id],

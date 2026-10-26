@@ -2,7 +2,9 @@ import { Button, cn } from '@viz/ui'
 import { memo, useId, type ReactNode } from 'react'
 import { ArrayView } from './array-view.tsx'
 import { BigArray, bigArray } from './big-array.tsx'
+import { ContainerView } from './containers.tsx'
 import { same } from './engine.ts'
+import { containerLabels } from './format.ts'
 import type { HeapObject, Value } from './gen/trace.ts'
 import { isRecord } from './is-record.ts'
 import type { kinds } from './load.ts'
@@ -100,11 +102,13 @@ function Gap({ count }: { count: number }) {
 function Cell({
   value,
   index,
+  count,
   on,
   look,
 }: {
   value: Value
   index?: number
+  count?: number
   on: boolean
   look: Look
 }) {
@@ -113,6 +117,9 @@ function Cell({
       <span className={cn(cellClass, on && changedClass)}>
         {index !== undefined && <span className="sr-only">[{index}] </span>}
         <ValueView value={value} look={look} />
+        {count !== undefined && count > 1 && (
+          <span className="pl-1 text-muted-foreground"> ×{count.toLocaleString('en')}</span>
+        )}
         <Mark on={on} />
       </span>
       {index !== undefined && (
@@ -228,17 +235,23 @@ function RowTable({
   )
 }
 
-const viewLabels: Record<ViewAs, string> = { table: 'Table', cells: 'Cells', matrix: 'Matrix' }
+const viewLabels: Record<Exclude<ViewAs, 'container'>, string> = {
+  table: 'Table',
+  cells: 'Cells',
+  matrix: 'Matrix',
+}
 
 function ViewToggle({
   name,
   view,
   options,
+  labels,
   onView,
 }: {
   name: string
   view: ViewAs
   options: readonly ViewAs[]
+  labels: (view: ViewAs) => string
   onView: (view: ViewAs) => void
 }) {
   return (
@@ -251,7 +264,7 @@ function ViewToggle({
           aria-pressed={v === view}
           onClick={() => onView(v)}
         >
-          {viewLabels[v]}
+          {labels(v)}
         </Button>
       ))}
     </div>
@@ -259,7 +272,10 @@ function ViewToggle({
 }
 
 function SequenceBody({ card, look, marks }: Pick<CardProps, 'card' | 'look' | 'marks'>) {
-  const { id, object: o, table, matrix, view, variable } = card
+  const { id, object: o, table, matrix, container, view, variable } = card
+  if (container && view === 'container') {
+    return <ContainerView id={id} kind={container} object={o} look={look} />
+  }
   if (table && view === 'table') return <RowTable id={id} object={o} table={table} look={look} />
   if (matrix && view === 'matrix') {
     return <MatrixView name={variable ?? `#${id}`} matrix={matrix} look={look} marks={marks} />
@@ -275,7 +291,7 @@ function SequenceBody({ card, look, marks }: Pick<CardProps, 'card' | 'look' | '
 }
 
 function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRange }: CardProps) {
-  const { id, object: o, table, matrix, view, variable } = card
+  const { id, object: o, table, matrix, container, view, variable } = card
   const capacity = isRecord(o.meta) ? o.meta.capacity : undefined
   const facts = [`${look.format.sizeLabel} ${(o.length ?? 0).toLocaleString('en')}`]
   if (matrix && view === 'matrix') facts[0] = `${matrix.rows.length} × ${matrix.columns}`
@@ -286,7 +302,14 @@ function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRan
     facts.push(zero ? `${set} non-zero` : `${set} not ${look.format.value(o.sparse.default).text}`)
   }
   const name = variable ?? `#${id}`
-  const options: ViewAs[] | null = table ? ['table', 'cells'] : matrix ? ['matrix', 'cells'] : null
+  const options: ViewAs[] | null = container
+    ? ['container', 'cells']
+    : table
+      ? ['table', 'cells']
+      : matrix
+        ? ['matrix', 'cells']
+        : null
+  const widget = container !== null && view === 'container'
   return (
     <Card
       card={card}
@@ -296,9 +319,15 @@ function SequenceCard({ card, look, isNew, marks, pins, onView, onPin, onShowRan
       actions={
         <>
           {options && (
-            <ViewToggle name={name} view={view} options={options} onView={(v) => onView(name, v)} />
+            <ViewToggle
+              name={name}
+              view={view}
+              options={options}
+              labels={(v) => (v === 'container' ? containerLabels[container!] : viewLabels[v])}
+              onView={(v) => onView(name, v)}
+            />
           )}
-          {variable !== undefined && !(matrix && view === 'matrix') && !table && (
+          {variable !== undefined && !(matrix && view === 'matrix') && !table && !widget && (
             <PinMarkers variable={variable} pins={pins ?? []} onPin={onPin} />
           )}
           {o.truncated && variable !== undefined && onShowRange && (
@@ -331,6 +360,14 @@ function SetCard({ card, look, isNew }: CardProps) {
   const changed = look.changed[id] ?? []
   const items = (o.items ?? []).map((value, i) => ({ value, on: changed.includes(String(i)) }))
   if (!o.ordered) items.sort((a, b) => readingOrder(a.value, b.value, look))
+  const groups: { value: Value; on: boolean; count: number }[] = []
+  for (const item of items) {
+    const last = groups.at(-1)
+    if (last !== undefined && same(last.value, item.value)) {
+      last.count++
+      last.on = last.on || item.on
+    } else groups.push({ ...item, count: 1 })
+  }
   return (
     <Card
       card={card}
@@ -342,8 +379,8 @@ function SetCard({ card, look, isNew }: CardProps) {
         <p className="text-muted-foreground">empty</p>
       ) : (
         <ol className="flex flex-wrap items-start gap-1">
-          {items.map(({ value, on }, i) => (
-            <Cell key={i} value={value} on={look.highlight && on} look={look} />
+          {groups.map(({ value, on, count }, i) => (
+            <Cell key={i} value={value} count={count} on={look.highlight && on} look={look} />
           ))}
           <Gap count={(o.length ?? 0) - items.length} />
         </ol>
@@ -459,6 +496,7 @@ function sameCard(a: CardProps, b: CardProps) {
     a.card.view === b.card.view &&
     (a.card.table === null) === (b.card.table === null) &&
     (a.card.matrix === null) === (b.card.matrix === null) &&
+    a.card.container === b.card.container &&
     sameList(a.card.referrers, b.card.referrers) &&
     sameReads(a.card.reads, b.card.reads, a.look, b.look)
   )

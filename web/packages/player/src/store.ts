@@ -8,7 +8,7 @@ export const speeds = [0.5, 1, 2, 4] as const
 export const densities = ['compact', 'comfortable'] as const
 export const fontSizes = ['s', 'm', 'l'] as const
 export const themes = ['system', 'light', 'dark'] as const
-export const viewAs = ['table', 'cells', 'matrix'] as const
+export const viewAs = ['table', 'cells', 'matrix', 'container'] as const
 
 export type ViewAs = (typeof viewAs)[number]
 

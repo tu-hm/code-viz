@@ -1,4 +1,15 @@
 import type { HeapObject, Value } from './gen/trace.ts'
+import { isRecord } from './is-record.ts'
+
+const containers = ['stack', 'queue', 'deque', 'priority_queue'] as const
+export type Container = (typeof containers)[number]
+
+export const containerLabels: Record<Container, string> = {
+  stack: 'Stack',
+  queue: 'Queue',
+  deque: 'Deque',
+  priority_queue: 'Heap',
+}
 
 export type Shown = { text: string; detail?: string }
 export type Member = { name: string; value: Value }
@@ -10,6 +21,7 @@ export type Formatter = {
   tupleMembers: (o: HeapObject) => Member[] | null
   tupleText: (members: string[]) => string
   nestsRecords: boolean
+  container: (o: HeapObject) => Container | null
 }
 
 function grouped(digits: string) {
@@ -104,6 +116,12 @@ const cpp: Formatter = {
     o.kind === 'record' && /^(std::)?(pair|tuple)</.test(o.type ?? '') ? (o.fields ?? []) : null,
   tupleText: (members) => `(${members.join(', ')})`,
   nestsRecords: true,
+  container(o) {
+    const adapter = isRecord(o.meta) ? o.meta.adapter : undefined
+    const kind = containers.find((c) => c === adapter)
+    if (kind !== undefined) return kind
+    return o.kind === 'sequence' && /^(std::)?deque</.test(o.type ?? '') ? 'deque' : null
+  },
 }
 
 const python: Formatter = {
@@ -128,6 +146,7 @@ const python: Formatter = {
   },
   tupleText: (members) => (members.length === 1 ? `(${members[0]},)` : `(${members.join(', ')})`),
   nestsRecords: false,
+  container: (o) => (o.kind === 'sequence' && o.type === 'deque' ? 'deque' : null),
 }
 
 const fallback: Formatter = {
@@ -150,6 +169,7 @@ const fallback: Formatter = {
   tupleMembers: () => null,
   tupleText: (members) => `(${members.join(', ')})`,
   nestsRecords: false,
+  container: () => null,
 }
 
 const formatters: Record<string, Formatter> = { 'cpp17-gcc': cpp, python3: python }

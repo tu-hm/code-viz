@@ -382,6 +382,122 @@ describe('big arrays (§19.4.2)', () => {
   })
 })
 
+describe('container widgets (§19.4.6)', () => {
+  const items = (name: string) =>
+    within(screen.getByRole('list', { name }))
+      .getAllByRole('listitem')
+      .map((li) => li.textContent)
+
+  test('cpp-containers at the end matches the mock: stack, deque, heap, map, multiset', async () => {
+    await renderStep('cpp-containers', 27)
+    expect(items('Stack, top first')).toEqual(['8', '3', '5'])
+    expect(within(card('o1')).getByText('top:')).toBeDefined()
+    expect(items('Deque, front first')).toEqual(['4', '7', '1'])
+    expect(within(card('o2')).getByText('back')).toBeDefined()
+    const pq = card('o3')
+    expect(within(pq).getByText('top:').closest('p')!.textContent).toBe('top ▶top:9then 7, 5, 2')
+    fireEvent.click(within(pq).getByRole('button', { name: 'Heap order' }))
+    expect(items('Heap order')).toEqual(['90', '71', '22', '53'])
+    expect(
+      within(card('o4'))
+        .getAllByRole('row')
+        .map((r) => r.textContent),
+    ).toEqual(['"ab"2', '"cd"1'])
+    expect(
+      within(card('o5'))
+        .getAllByRole('listitem')
+        .map((li) => li.textContent),
+    ).toEqual(['2', '5 ×3'])
+  })
+
+  test('a push marks the new item; a pop at the front marks nothing', async () => {
+    const pushed = await renderStep('cpp-bfs', 50)
+    expect(items('Queue, front first')).toEqual(['2', '3', '4* (changed)'])
+    pushed.unmount()
+    await renderStep('cpp-bfs', 55)
+    expect(items('Queue, front first')).toEqual(['3', '4'])
+  })
+
+  test('a push on a stack marks its new top', async () => {
+    await renderStep('cpp-containers', 6)
+    expect(items('Stack, top first')).toEqual(['8* (changed)', '3', '5'])
+  })
+
+  test('Cells is the other view, picked per variable', async () => {
+    const { onView, unmount } = await renderStep('cpp-containers', 27)
+    fireEvent.click(
+      within(screen.getByRole('group', { name: 'View st as' })).getByRole('button', {
+        name: 'Cells',
+      }),
+    )
+    expect(onView).toHaveBeenCalledWith('st', 'cells')
+    unmount()
+    await renderStep('cpp-containers', 27, { views: { st: 'cells' } })
+    expect(screen.queryByRole('list', { name: 'Stack, top first' })).toBeNull()
+    expect(screen.getByRole('list', { name: 'Deque, front first' })).toBeDefined()
+  })
+
+  test('python-bfs: a deque is a queue widget too', async () => {
+    await renderStep('python-bfs', 48)
+    expect(items('Deque, front first')).toEqual(['2', '3', '4* (changed)'])
+  })
+
+  const container = (o: HeapObject): StepState => ({
+    i: 1,
+    event: 'line',
+    prevLine: 2,
+    line: 3,
+    error: null,
+    stack: [
+      {
+        id: 'f0',
+        name: 'main',
+        kind: 'function',
+        line: 2,
+        locals: [{ name: 'c', value: { t: 'ref', id: 'o1' } }],
+        returnValue: null,
+      },
+    ],
+    heap: { o1: o },
+    changed: { locals: {}, cells: {} },
+    before: { scope: {}, cells: {} },
+    newObjects: [],
+    output: [],
+  })
+  const ints = (...v: number[]) => v.map((n) => ({ t: 'int', v: String(n) }))
+
+  test('a stack recorded only from the bottom says its top is missing', () => {
+    renderState(
+      container({
+        kind: 'sequence',
+        type: 'std::stack<int, std::deque<int>>',
+        meta: { adapter: 'stack' },
+        length: 5,
+        items: ints(1, 2, 3),
+        truncated: true,
+      }),
+      'cpp17-gcc',
+    )
+    expect(items('Stack, top first')).toEqual(['… +2 not recorded, toward the top', '3', '2', '1'])
+    expect(screen.queryByText('top:')).toBeNull()
+  })
+
+  test('a heap whose comparator sorts neither way stays in heap order', () => {
+    renderState(
+      container({
+        kind: 'sequence',
+        type: 'std::priority_queue<int, std::vector<int>, cmp>',
+        meta: { adapter: 'priority_queue' },
+        length: 3,
+        items: ints(5, 9, 1),
+      }),
+      'cpp17-gcc',
+    )
+    expect(screen.getByText('top:').closest('p')!.textContent).toBe('top ▶top:5then 9, 1')
+    expect(screen.getByText(/heap order: the comparator sorts neither/i)).toBeDefined()
+  })
+})
+
 describe.each(fixtureNames)('%s', (name) => {
   test('every step draws its markers and grids without holes', { timeout: 30_000 }, async () => {
     const steps = loadFixture(name).chunks.flat()

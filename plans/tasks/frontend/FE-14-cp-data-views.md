@@ -40,10 +40,10 @@
 
 ## 4. Container widgets (M5-F04 · 2 d)
 
-- [ ] `stack` vertical, top first; `queue`/`deque` horizontal with front/back
-- [ ] `priority_queue` sorted with top first; heap order on hover
-- [ ] `set`/`map` sorted table; `multiset` repeats as `5 ×3`
-- [ ] Auto-switch on (§19.4 table); Cells as alternative
+- [x] `stack` vertical, top first; `queue`/`deque` horizontal with front/back
+- [x] `priority_queue` sorted with top first; heap order on hover
+- [x] `set`/`map` sorted table; `multiset` repeats as `5 ×3`
+- [x] Auto-switch on (§19.4 table); Cells as alternative
 
 ## 5. Bits view (M5-F05 · 1 d)
 
