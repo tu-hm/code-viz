@@ -1,0 +1,1478 @@
+import array
+import bisect
+import collections
+import fcntl
+import itertools
+import json
+import math
+import os
+import re
+import signal
+import struct
+import termios
+import traceback
+
+import gdb
+
+LANGUAGE = "cpp17-gcc"
+ADAPTER = "cpp-gdb/0.5.0"
+SOURCE = "main.cpp"
+STDIN = "/work/stdin"
+WIRE_FD = 3
+MAX_ITEMS = 100  # per container read item by item; at 1,000 a map through the printers took 13.5 s per 1,000 steps
+SPARSE_MIN = 64  # longer arrays of scalars go sparse (§19.9.1)
+MAX_CELLS = 10000  # non-default cells per sparse sequence; more => window only (§19.9.1)
+WINDOW = 1000  # cells a window-only sequence keeps (§11 items per container)
+MAX_ARRAY_BYTES = 4 << 20  # whole reads per array, else window only (§19.9.1)
+MAX_READ_BYTES = 16 << 20  # whole reads per step (§19.9.1)
+BLOCK = 4096
+CHUNK = 64
+MAX_STR = 1000  # per string (§11); a std::string counts bytes
+MAX_OBJECTS = 500  # heap objects per step (§11)
+MAX_SUMMARY = 200  # opaque text, as python cuts repr (§10.3)
+PAGE = 4096
+MAX_DEPTH = 32  # pointer hops from a local or global (§11 maxPointerDepth)
+MAX_FRAMES = 100  # innermost, besides the globals frame; the core keeps the same (§11)
+MAX_LOADS = 4096  # = viz_reads' size in reads.cpp; more loads since the last step => no reads
+CHARS = ("char", "signed char", "unsigned char")
+INT_FORMATS = {1: "b", 2: "h", 4: "i", 8: "q"}
+FLOAT_FORMATS = {4: "f", 8: "d"}
+# libstdc++ printers raise these on garbage memory, such as a dangling std::string
+UNREADABLE = (gdb.error, OverflowError, ValueError)
+CHECKS = ("^__ubsan_handle_", "^__gnu_debug::_Error_formatter::_M_error", "^std::__glibcxx_assert_fail")
+# vptr checks call it on every cache miss; it reports only when the dynamic type is wrong
+VPTR_CHECK = "__ubsan_handle_dynamic_type_cache_miss"
+# check functions have no debug info: arguments by calling convention
+ARGS = {"aarch64": ("x0", "x1", "x2", "x3"), "i386:x86-64": ("rdi", "rsi", "rdx", "rcx")}
+OVERFLOWS = {"add_overflow": "+", "sub_overflow": "-", "mul_overflow": "*", "negate_overflow": "-", "divrem_overflow": "/"}
+SUBSCRIPT = "attempt to subscript container with out-of-bounds index %2;, but container only holds %3; elements"
+EMPTY = "attempt to access an element in an empty container"
+DEREFERENCE = "attempt to dereference a %1.state; iterator"
+SUBSCRIPT_ASSERTION = re.compile(r"(\w+) <=? (?:this->)?size\(\)$")
+PLACEHOLDER = re.compile(r"%(\d+)(?:\.(\w+))?;")
+STATES = {"__singular": "singular", "__begin": "dereferenceable (start-of-sequence)", "__middle": "dereferenceable",
+          "__end": "past-the-end", "__before_begin": "before-begin", "__singular_value_init": "singular (value-initialized)"}
+STACK_SLACK = 64 << 10  # a fault this close to sp is the stack running out
+
+DW_LNS_COPY = 1
+DW_LNS_ADVANCE_PC = 2
+DW_LNS_ADVANCE_LINE = 3
+DW_LNS_SET_FILE = 4
+DW_LNS_SET_COLUMN = 5
+DW_LNS_NEGATE_STMT = 6
+DW_LNS_CONST_ADD_PC = 8
+DW_LNS_FIXED_ADVANCE_PC = 9
+DW_LNE_END_SEQUENCE = 1
+DW_LNE_SET_ADDRESS = 2
+DW_LNCT_PATH = 1
+DW_FORM_STRING = 0x08
+DW_FORM_UDATA = 0x0F
+DW_FORM_LINE_STRP = 0x1F
+DW_FORM_SIZES = {0x05: 2, 0x06: 4, 0x07: 8, 0x0B: 1, 0x0E: 4, 0x1E: 16}
+GCOV_FUNCTION = 0x01000000
+GCOV_ARCS = 0x01430000
+GCOV_LINES = 0x01450000
+GCOV_ARC_COUNTS = 0x01A10000
+GCOV_ON_TREE = 1
+
+wire = os.fdopen(WIRE_FD, "w", buffering=1)
+os.set_inheritable(WIRE_FD, False)
+stops = []
+returning = []
+call_ids = itertools.count()
+temps = itertools.count()
+user_types = {}
+declarations = {}
+type_names = {}
+shown = {}  # key => sparse sequence as the core holds it after the last step message
+loads_at = []  # addresses of reads.o's viz_reads_count and viz_reads
+capture = {}  # variable name => (first index, count) to record of a sequence too long to record whole (FR-11)
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "typemap.json")) as f:
+    TYPEMAP = json.load(f)
+# _GLIBCXX_DEBUG containers live in std::__debug, list and string in std::__cxx11
+TEMPLATE = re.compile(r"std::(?:(?:__debug|__cxx11|__cxx1998)::)*(\w+)(?:<.*>)?$")
+STRING = "std::basic_string<char, std::char_traits<char>, std::allocator<char> >"
+
+
+class Return(gdb.FinishBreakpoint):
+    def stop(self):
+        returning.append(self)
+        return True
+
+
+def send(msg):
+    wire.write(json.dumps(msg, separators=(",", ":")) + "\n")
+    # program writes fd 1/2 itself => keep it stopped until viz-shim has read this line, or its next output can overtake it (§10.1)
+    while struct.unpack("i", fcntl.ioctl(WIRE_FD, termios.FIONREAD, bytes(4)))[0]:
+        os.sched_yield()  # sleep(10 µs) instead: 1,000 steps 0.2 s => 1.5 s in a 1-vCPU box
+
+
+def run(cmd):
+    return gdb.execute(cmd, to_string=True)
+
+
+def ours(symtab):
+    return symtab is not None and os.path.basename(symtab.filename) == SOURCE
+
+
+def string(s):
+    # gdb 14 doesn't export gdb.LazyString
+    if type(s).__name__ != "LazyString":
+        return {"t": "str", "v": str(s)}
+    raw = gdb.selected_inferior().read_memory(s.address, min(s.length, MAX_STR) * s.type.target().sizeof)
+    out = {"t": "str", "v": raw.tobytes().decode("utf-8", "replace")}
+    if s.length > MAX_STR:
+        out["len"], out["truncated"] = s.length, True
+    return out
+
+
+def float_text(x, size):
+    if size == 4 and math.isfinite(x):
+        for digits in range(1, 10):
+            short = float("%.*g" % (digits, x))
+            if array.array("f", [short])[0] == x:
+                return repr(short)
+    return repr(x)
+
+
+def number(t, x):
+    if t.code == gdb.TYPE_CODE_BOOL:
+        return {"t": "bool", "v": "true" if x else "false"}
+    if t.code == gdb.TYPE_CODE_FLT:
+        return {"t": "float", "v": float_text(x, t.sizeof)}
+    if t.name in CHARS:
+        return {"t": "char", "v": chr(x % 256), "code": x}
+    return {"t": "int", "v": str(x)}
+
+
+def scalar(value, t):
+    if t.code in (gdb.TYPE_CODE_INT, gdb.TYPE_CODE_CHAR, gdb.TYPE_CODE_BOOL) and t.sizeof > 8:
+        # gdb 14 int() refuses __int128; its text is exact
+        return {"t": "int", "v": str(value)}
+    if t.code in (gdb.TYPE_CODE_INT, gdb.TYPE_CODE_CHAR, gdb.TYPE_CODE_BOOL):
+        return number(t, int(value))
+    if t.code == gdb.TYPE_CODE_FLT and t.sizeof <= 8:
+        return number(t, float(value))
+    if t.code == gdb.TYPE_CODE_FLT:
+        # float() rounds long double to double; gdb's text keeps every digit
+        return {"t": "float", "v": str(value)}
+    if t.code == gdb.TYPE_CODE_ENUM:
+        return {"t": "int", "v": str(value)}
+    return None
+
+
+def type_name(t):
+    key = str(t)
+    # whatis on a VLA reads its bound outside the frame: int [281474976709841]
+    if "std::" not in key:
+        return key
+    if key not in type_names:
+        # gdb applies libstdc++'s type printers in whatis only: std::vector<int>, not std::vector<int, std::allocator<int> >
+        gdb.set_convenience_variable("viz", gdb.Value(0).cast(t.pointer()))
+        text = gdb.execute("whatis *$viz", to_string=True).removeprefix("type = ").rstrip("\n")
+        # ...but not to template arguments: std::vector<std::__cxx11::basic_string<char, ...> >
+        for inner, short in (("std::__debug::", "std::"), ("std::__cxx11::", "std::"), (STRING, "std::string"), (" >", ">")):
+            text = text.replace(inner, short)
+        type_names[key] = text
+    return type_names[key]
+
+
+def encode(value, snap, depth):
+    out = item(value, snap, depth)
+    out["type"] = type_name(value.type)
+    return out
+
+
+def item(value, snap, depth):
+    try:
+        return convert(value, snap, depth)
+    except UNREADABLE:
+        return {"t": "unavailable", "reason": "unreadable"}
+
+
+def convert(value, snap, depth):
+    if value.is_optimized_out:
+        return {"t": "unavailable", "reason": "optimized_out"}
+    t = value.type.strip_typedefs()
+    if t.code in (gdb.TYPE_CODE_REF, gdb.TYPE_CODE_RVALUE_REF):
+        return convert(value.referenced_value(), snap, depth)
+    if t.code != gdb.TYPE_CODE_PTR:
+        return scalar(value, t) or reference(value, snap, depth)
+    pointee = t.target()
+    if pointee == pointee.const() and pointee.strip_typedefs().unqualified().name == "char" and int(value) != 0:
+        return c_string(int(value)) or pointer(value, pointee, snap, depth)
+    return pointer(value, pointee, snap, depth)
+
+
+def c_string(addr):
+    raw = b""
+    # reads end on page boundaries: a short literal at the end of a mapping is readable
+    while b"\0" not in raw and len(raw) <= MAX_STR:
+        at = addr + len(raw)
+        try:
+            raw += gdb.selected_inferior().read_memory(at, min(MAX_STR + 1 - len(raw), PAGE - at % PAGE)).tobytes()
+        except gdb.MemoryError:
+            return None
+    text = raw.split(b"\0", 1)[0]
+    out = {"t": "str", "v": text[:MAX_STR].decode("utf-8", "replace")}
+    if len(text) > MAX_STR:
+        out["truncated"] = True
+    return out
+
+
+def user_type(t):
+    t = t.strip_typedefs()
+    if t.code not in (gdb.TYPE_CODE_STRUCT, gdb.TYPE_CODE_UNION) or t.name is None:
+        return False
+    if t.name not in user_types:
+        sym = gdb.lookup_symbol(t.name, domain=gdb.SYMBOL_STRUCT_DOMAIN)[0]
+        user_types[t.name] = sym is not None and ours(sym.symtab)
+    return user_types[t.name]
+
+
+def pointer(value, pointee, snap, depth):
+    addr = int(value)
+    out = {"t": "ptr", "addr": hex(addr)}
+    if addr == 0 or depth == MAX_DEPTH:
+        return out
+    if not user_type(pointee):
+        snap["ptrs"].append((out, addr, pointee))
+        return out
+    target = value.dereference()
+    try:
+        target.fetch_lazy()
+    except gdb.MemoryError:
+        return out
+    key = add(target, snap, depth + 1)
+    if key is not None:
+        out["target"] = key
+    return out
+
+
+def reference(value, snap, depth):
+    if row(value.type).get("kind") == "str":
+        return string(gdb.default_visualizer(value).to_string())
+    key = add(value, snap, depth)
+    if key is None:
+        return {"t": "unavailable", "reason": "object_limit"}
+    return {"t": "ref", "id": key}
+
+
+def row(t):
+    m = TEMPLATE.match(t.strip_typedefs().tag or "")
+    return TYPEMAP.get("std::" + m.group(1), {}) if m else {}
+
+
+def address(value):
+    # gdb 14 mallocs in the inferior for .address of an array outside memory; an element's .address doesn't
+    while value.type.strip_typedefs().code == gdb.TYPE_CODE_ARRAY:
+        value = value[0]
+    return None if value.address is None else int(value.address)
+
+
+def add(value, snap, depth):
+    addr = address(value)
+    where = "tmp%d" % next(temps) if addr is None else hex(addr)
+    key = "%s:%s" % (where, value.type.strip_typedefs().unqualified())
+    heap = snap["heap"]
+    if key not in heap:
+        if len(heap) == MAX_OBJECTS:
+            return None
+        heap[key] = None
+        snap["todo"].append((key, value, depth))
+    return key
+
+
+def heap_object(key, value, snap, depth):
+    name = type_name(value.type.unqualified())
+    t = value.type.strip_typedefs()
+    if t.code == gdb.TYPE_CODE_ARRAY:
+        return dict(c_array(key, value, snap, depth), type=name)
+    r = row(t)
+    if r:
+        return dict(READERS[r.get("read", "printer")](key, value, r, snap, depth), type=name)
+    if t.code not in (gdb.TYPE_CODE_STRUCT, gdb.TYPE_CODE_UNION) or not (t.name is None or user_type(t)):
+        return {"kind": "opaque", "type": name, "summary": str(value)[:MAX_SUMMARY]}
+    found = fields(value, t, snap, depth)
+    count = collections.Counter(field for _, field, _ in found)
+    return {"kind": "record", "type": name,
+            "fields": [{"name": field if owner is None or count[field] == 1 else "%s::%s" % (owner, field), "value": v}
+                       for owner, field, v in found]}
+
+
+def fields(value, t, snap, depth):
+    out = []
+    for f in t.fields():
+        # static members have no bitpos
+        if f.artificial or not hasattr(f, "bitpos"):
+            continue
+        if f.is_base_class and user_type(f.type) or f.name is None:
+            inner = value.cast(f.type) if f.is_base_class else value[f]
+            out += [(owner or f.type.name, field, v) for owner, field, v in fields(inner, f.type.strip_typedefs(), snap, depth)]
+        elif f.is_base_class:
+            out.append((None, type_name(f.type), encode(value.cast(f.type), snap, depth)))
+        else:
+            out.append((None, f.name, encode(value[f], snap, depth)))
+    return out
+
+
+def checked_length(n):
+    # a dangling or uninitialised container reads garbage
+    if not 0 <= n < 1 << 32:
+        raise ValueError("length %d" % n)
+    return n
+
+
+def sequence(items, length, start=0):
+    obj = {"kind": "sequence", "length": length, "items": items, "truncated": len(items) < length}
+    if len(items) < length:
+        obj["window"] = {"start": start, "count": len(items)}
+    return obj
+
+
+def window(span, length, most):
+    start, count = span or (0, most)
+    start = min(start, length)
+    return start, min(count, most, length - start)
+
+
+def contiguous(base, addr, elem, length, head, span, snap, depth):
+    t = elem.strip_typedefs()
+    if addr is not None:
+        head = dict(head, buffer=(addr, t.sizeof))
+    if addr is not None and length > SPARSE_MIN and unpack_format(t):
+        size = t.sizeof
+        whole = length * size <= MAX_ARRAY_BYTES and snap["read"] + length * size <= MAX_READ_BYTES
+        start, n = (0, length) if whole else window(span, length, WINDOW)
+        snap["read"] += n * size
+        # one read per array per step, diffed when the step is sent: 200k ints 0.1 ms (S6)
+        raw = gdb.selected_inferior().read_memory(addr + start * size, n * size).tobytes()
+        return dict(head, kind="sequence", length=length, read=(t, raw, start, span))
+    start, n = (0, length) if length <= MAX_ITEMS else window(span, length, MAX_ITEMS)
+    items = scalars(None if addr is None else addr + start * t.sizeof, elem, n) if n else []
+    if items is None:
+        items = [item(base[i], snap, depth) for i in range(start, start + n)]
+    return dict(sequence(items, length, start), **head)
+
+
+def c_array(key, value, snap, depth):
+    t = value.type.strip_typedefs()
+    lo, hi = t.range()
+    length = hi - lo + 1
+    elem = t.target()
+    addr = address(value)
+    if addr is not None:
+        e = elem.strip_typedefs()
+        snap["arrays"].append((addr, length, e.sizeof, str(e.unqualified()), key))
+    return contiguous(value, addr, elem, length, {"fixed": True}, snap["spans"].get(key), snap, depth)
+
+
+def bits(addr, n):
+    raw = gdb.selected_inferior().read_memory(addr, (n + 7) // 8).tobytes() if n else b""
+    # little-endian words: bit i is in byte i // 8
+    return [{"t": "bool", "v": "true" if raw[i // 8] >> i % 8 & 1 else "false"} for i in range(n)]
+
+
+def printer(key, value, r, snap, depth):
+    length = value
+    for field in r["length"].split("."):
+        length = length[field]
+    return children(value, r, checked_length(int(length)), snap, depth)
+
+
+def children(value, r, length, snap, depth):
+    n = min(length, MAX_ITEMS)
+    kids = gdb.default_visualizer(value).children()
+    if r["kind"] == "mapping":
+        got = [c for _, c in itertools.islice(kids, 2 * n)]
+        entries = [{"key": item(k, snap, depth), "value": item(v, snap, depth)} for k, v in zip(got[::2], got[1::2])]
+        return {"kind": "mapping", "length": length, "entries": entries, "ordered": r["ordered"],
+                "truncated": len(entries) < length}
+    items = [item(c, snap, depth) for _, c in itertools.islice(kids, n)]
+    if r["kind"] == "set":
+        return {"kind": "set", "length": length, "items": items, "ordered": r["ordered"], "truncated": len(items) < length}
+    return sequence(items, length)
+
+
+def std_deque(key, value, r, snap, depth):
+    start, finish = value["_M_impl"]["_M_start"], value["_M_impl"]["_M_finish"]
+    per = max(512 // value.type.strip_typedefs().template_argument(0).sizeof, 1)
+    length = (per * int(finish["_M_node"] - start["_M_node"] - 1) + int(start["_M_last"] - start["_M_cur"])
+              + int(finish["_M_cur"] - finish["_M_first"]))
+    return children(value, r, checked_length(length), snap, depth)
+
+
+def std_vector(key, value, r, snap, depth):
+    impl = value["_M_impl"]
+    elem = value.type.strip_typedefs().template_argument(0)
+    if elem.strip_typedefs().code == gdb.TYPE_CODE_BOOL:
+        start, finish = impl["_M_start"]["_M_p"], impl["_M_finish"]["_M_p"]
+        word = 8 * start.dereference().type.sizeof
+        length = checked_length(word * int(finish - start) + int(impl["_M_finish"]["_M_offset"]))
+        obj = sequence(bits(int(start), min(length, MAX_ITEMS)), length)
+        obj["meta"] = {"capacity": word * int(impl["_M_end_of_storage"] - start)}
+        return obj
+    start = impl["_M_start"]
+    head = {"meta": {"capacity": int(impl["_M_end_of_storage"] - start)}}
+    length = checked_length(int(impl["_M_finish"] - start))
+    return contiguous(start, int(start), elem, length, head, snap["spans"].get(key), snap, depth)
+
+
+def std_array(key, value, r, snap, depth):
+    # array<T, 0> holds an empty struct, not a T[0]
+    if int(value.type.strip_typedefs().template_argument(1)) == 0:
+        return dict(sequence([], 0), fixed=True)
+    return c_array(key, value["_M_elems"], snap, depth)
+
+
+def std_bitset(key, value, r, snap, depth):
+    length = int(value.type.strip_typedefs().template_argument(0))
+    # bitset<0> has no _M_w
+    items = bits(int(value["_M_w"].address), min(length, MAX_ITEMS)) if length else []
+    return dict(sequence(items, length), fixed=True)
+
+
+def std_adapter(key, value, r, snap, depth):
+    obj = heap_object(key, value["c"], snap, depth)
+    obj["meta"] = {"adapter": TEMPLATE.match(value.type.strip_typedefs().tag).group(1)}
+    return obj
+
+
+def std_pair(key, value, r, snap, depth):
+    return {"kind": "record", "fields": [{"name": f, "value": encode(value[f], snap, depth)} for f in ("first", "second")]}
+
+
+def std_tuple(key, value, r, snap, depth):
+    kids = gdb.default_visualizer(value).children()
+    return {"kind": "record", "fields": [{"name": str(i), "value": encode(c, snap, depth)} for i, (_, c) in enumerate(kids)]}
+
+
+READERS = {"printer": printer, "deque": std_deque, "vector": std_vector, "array": std_array, "bitset": std_bitset,
+           "adapter": std_adapter, "pair": std_pair, "tuple": std_tuple}
+
+
+def scalars(addr, elem, n):
+    t = elem.strip_typedefs()
+    fmt = unpack_format(t)
+    if fmt is None or addr is None:
+        return None
+    # one read per array, not one gdb.Value per item: 100 ints 0.13 ms => 0.02 ms
+    raw = gdb.selected_inferior().read_memory(addr, n * t.sizeof)
+    return [number(t, x) for x in struct.unpack("=%d%s" % (n, fmt), raw)]
+
+
+def unpack_format(t):
+    if t.code == gdb.TYPE_CODE_FLT:
+        return FLOAT_FORMATS.get(t.sizeof)
+    if t.code not in (gdb.TYPE_CODE_INT, gdb.TYPE_CODE_CHAR, gdb.TYPE_CODE_BOOL) or t.sizeof not in INT_FORMATS:
+        return None
+    if t.is_signed:
+        return INT_FORMATS[t.sizeof]
+    return INT_FORMATS[t.sizeof].upper()
+
+
+def new_snap():
+    return {"heap": {}, "todo": collections.deque(), "arrays": [], "ptrs": [], "read": 0, "spans": {}}
+
+
+def send_step(msg):
+    global shown
+    now = {}
+    loads = recorded_loads()
+    if loads is not None:
+        msg["reads"] = reads(loads, msg["heap"])
+    msg["heap"] = {key: wire_object(key, obj, now) for key, obj in msg["heap"].items()}
+    shown = now
+    send(msg)
+
+
+def recorded_loads():
+    inferior = gdb.selected_inferior()
+    n = struct.unpack("=Q", inferior.read_memory(loads_at[0], 8))[0]
+    inferior.write_memory(loads_at[0], bytes(8))
+    if n > MAX_LOADS:
+        return None
+    return struct.unpack("=%dQ" % n, inferior.read_memory(loads_at[1], 8 * n)) if n else ()
+
+
+def reads(loads, heap):
+    buffers = sorted((obj["buffer"][0], obj["buffer"][0] + obj["length"] * obj["buffer"][1], obj["buffer"][1], key)
+                     for key, obj in heap.items() if "buffer" in obj)
+    starts = [b[0] for b in buffers]
+    reach = list(itertools.accumulate((b[1] for b in buffers), max))
+    out = {}
+    for addr in loads:
+        inner = None
+        # buffers nest (a struct's array inside a vector's): the innermost one names the cell
+        i = bisect.bisect_right(starts, addr) - 1
+        while i >= 0 and reach[i] > addr:
+            lo, hi, _, _ = buffers[i]
+            if addr < hi and (inner is None or hi - lo < inner[1] - inner[0]):
+                inner = buffers[i]
+            i -= 1
+        if inner is not None:
+            out[inner[3], (addr - inner[0]) // inner[2]] = None
+    return [{"obj": key, "index": index} for key, index in out]
+
+
+def wire_object(key, obj, now):
+    if "buffer" in obj:
+        obj = {k: v for k, v in obj.items() if k != "buffer"}
+    if "read" in obj:
+        out, now[key] = sparse(obj, shown.get(key))
+        return out
+    if "sparse" not in obj and "patch" not in obj:
+        return obj
+    # a return step reuses its frame's objects from an earlier step
+    if key in shown:
+        now[key] = shown[key]
+        return {"kind": "sequence", "type": obj["type"], "length": obj["length"], "patch": {}}
+    if "sparse" in obj:
+        return obj
+    return {"kind": "opaque", "type": obj["type"], "summary": "unavailable"}
+
+
+def sparse(obj, prev):
+    t, raw, first, span = obj["read"]
+    head = {k: v for k, v in obj.items() if k != "read"}
+    size, length = t.sizeof, obj["length"]
+    pattern, real = "=" + INT_FORMATS[size], "=" + unpack_format(t)
+    again = prev is not None and prev["head"] == head and len(prev["raw"]) == len(raw)
+    if again:
+        default, count = prev["default"], prev["count"]
+        dirty = changed_cells(prev["raw"], raw, size)
+        for i in dirty:
+            old, new = struct.unpack_from(pattern, prev["raw"], i * size)[0], struct.unpack_from(pattern, raw, i * size)[0]
+            count += (new != default) - (old != default)
+        # pick the default again once per crossing: Counter over 200k ints takes 5 ms
+        if count > min(MAX_CELLS, length // 2) >= prev["count"]:
+            default, count = most_common(raw, size)
+    else:
+        default, count = most_common(raw, size)
+    whole = len(raw) == length * size
+    if whole and count <= MAX_CELLS:
+        shows = None
+    else:
+        shows = window(span, length, WINDOW) if whole else (first, len(raw) // size)
+    state = {"head": head, "raw": raw, "default": default, "count": count, "window": shows}
+    # cells numbered from the array's start; raw holds them from first
+    lo, hi = (first, first + len(raw) // size) if shows is None else (shows[0], shows[0] + shows[1])
+
+    def cell(i):
+        return number(t, struct.unpack_from(real, raw, (i - first) * size)[0])
+
+    if again and default == prev["default"] and shows == prev["window"]:
+        return {"kind": "sequence", "type": obj["type"], "length": length,
+                "patch": {str(first + i): cell(first + i) for i in dirty if lo <= first + i < hi}}, state
+    values = struct.unpack("=%d%s" % (len(raw) // size, INT_FORMATS[size]), raw)
+    out = dict(head, sparse={"default": number(t, struct.unpack(real, struct.pack(pattern, default))[0]),
+                             "items": {str(i): cell(i) for i in range(lo, hi) if values[i - first] != default}})
+    if shows is not None:
+        out["truncated"], out["window"] = True, {"start": shows[0], "count": shows[1]}
+    return out, state
+
+
+def most_common(raw, size):
+    if raw.count(0) == len(raw):
+        return 0, 0
+    values = struct.unpack("=%d%s" % (len(raw) // size, INT_FORMATS[size]), raw)
+    default = collections.Counter(values).most_common(1)[0][0]
+    return default, len(values) - values.count(default)
+
+
+def changed_cells(old, new, size):
+    if old == new:
+        return []
+    n = len(new)
+    blocks = [b for b in range(0, n, BLOCK) if old[b:b + BLOCK] != new[b:b + BLOCK]]
+    if 2 * len(blocks) * BLOCK > n:
+        # most blocks dirty (sort, fill): one unpack beats slicing every chunk, 22 ms => 6 ms at 200k ints (S6)
+        fmt = "=%d%s" % (n // size, INT_FORMATS[size])
+        return [i for i, (x, y) in enumerate(zip(struct.unpack(fmt, old), struct.unpack(fmt, new))) if x != y]
+    out = []
+    for b in blocks:
+        for c in range(b, min(b + BLOCK, n), CHUNK):
+            if old[c:c + CHUNK] != new[c:c + CHUNK]:
+                out += [i // size for i in range(c, min(c + CHUNK, n), size) if old[i:i + size] != new[i:i + size]]
+    return out
+
+
+def fill(snap):
+    heap, todo = snap["heap"], snap["todo"]
+    while todo:
+        key, value, depth = todo.popleft()
+        try:
+            heap[key] = heap_object(key, value, snap, depth)
+        except UNREADABLE:
+            heap[key] = {"kind": "opaque", "type": type_name(value.type.unqualified()), "summary": "unreadable"}
+    for out, addr, pointee in snap["ptrs"]:
+        name = str(pointee.strip_typedefs().unqualified())
+        for start, length, size, elem, key in snap["arrays"]:
+            if elem == name and start <= addr < start + length * size and (addr - start) % size == 0:
+                out["target"], out["index"] = key, (addr - start) // size
+                break
+    return heap
+
+
+def local(name, value):
+    out = {"name": name, "value": value}
+    if name.startswith("__"):
+        out["internal"] = True
+    return out
+
+
+def local_values(frame, line, snap, scope, again):
+    blocks = []
+    block = frame.block()
+    while block is not None:
+        blocks.append(block)
+        if block.function is not None:
+            break
+        block = block.superblock
+
+    keys = [(b.start, b.end) for b in blocks]
+    if scope["line"] is not None and (scope["line"] != line or again):
+        for k in scope["live"]:
+            scope["ran"][k].add(scope["line"])
+    for k in keys:
+        if k not in scope["live"]:
+            scope["ran"][k] = set()
+    scope["line"], scope["live"] = line, keys
+
+    out = []
+    for block, k in reversed(list(zip(blocks, keys))):
+        # gdb lists a function's own block in declaration order, nested blocks in hash order
+        syms = block if block.function is not None else sorted(block, key=lambda s: (s.line, s.name))
+        for sym in syms:
+            if not (sym.is_variable or sym.is_argument) or (not sym.is_argument and sym.line > line):
+                continue
+            if not sym.is_argument and sym.line == line and line not in scope["ran"][k]:
+                value = {"t": "uninit", "type": type_name(sym.type)}
+            else:
+                value = variable(sym, frame, snap)
+            out.append(local(sym.name, value))
+    return out
+
+
+def variable(sym, frame, snap):
+    try:
+        value = sym.value() if frame is None else sym.value(frame)
+    except UNREADABLE:
+        return {"t": "unavailable", "reason": "unreadable", "type": type_name(sym.type)}
+    out = encode(value, snap, 0)
+    if sym.name in capture and out["t"] == "ref":
+        snap["spans"][out["id"]] = capture[sym.name]
+    return out
+
+
+def global_symbols(symtab):
+    syms = [s for block in (symtab.global_block(), symtab.static_block()) for s in block
+            if s.is_variable and ours(s.symtab)]
+    return sorted(syms, key=lambda s: (s.line, s.name))
+
+
+def sections(path):
+    with open(path, "rb") as f:
+        elf = f.read()
+    table, = struct.unpack_from("<Q", elf, 0x28)
+    size, count, names = struct.unpack_from("<HHH", elf, 0x3A)
+    headers = [struct.unpack_from("<IIQQQQ", elf, table + i * size) for i in range(count)]
+    strtab = headers[names][4]
+    return {elf[strtab + name:elf.index(b"\0", strtab + name)].decode(): elf[offset:offset + length]
+            for name, _, _, _, offset, length in headers}
+
+
+def uleb(data, pos):
+    value = shift = 0
+    while True:
+        byte = data[pos]
+        pos += 1
+        value |= (byte & 0x7F) << shift
+        shift += 7
+        if byte < 0x80:
+            return value, pos
+
+
+def sleb(data, pos):
+    value, end = uleb(data, pos)
+    if data[end - 1] & 0x40:
+        value -= 1 << (7 * (end - pos))
+    return value, end
+
+
+def paths(data, pos, strings):
+    count, pos = data[pos], pos + 1
+    formats = []
+    for _ in range(count):
+        kind, pos = uleb(data, pos)
+        form, pos = uleb(data, pos)
+        formats.append((kind, form))
+    count, pos = uleb(data, pos)
+    out = []
+    for _ in range(count):
+        for kind, form in formats:
+            if form == DW_FORM_LINE_STRP:
+                at, = struct.unpack_from("<I", data, pos)
+                value, pos = strings[at:strings.index(b"\0", at)], pos + 4
+            elif form == DW_FORM_STRING:
+                end = data.index(b"\0", pos)
+                value, pos = data[pos:end], end + 1
+            elif form == DW_FORM_UDATA:
+                value, pos = uleb(data, pos)
+            else:
+                value, pos = None, pos + DW_FORM_SIZES[form]
+            if kind == DW_LNCT_PATH:
+                out.append(value.decode())
+    return out, pos
+
+
+def unit_rows(data, unit, end, strings):
+    addr_size = data[unit + 6]
+    header_length, min_length, _, default_stmt, line_base, line_range, opcode_base = struct.unpack_from(
+        "<IBBBbBB", data, unit + 8)
+    operands = data[unit + 18:unit + 17 + opcode_base]
+    _, pos = paths(data, unit + 17 + opcode_base, strings)
+    files, _ = paths(data, pos, strings)
+    source = {i for i, path in enumerate(files) if os.path.basename(path) == SOURCE}
+
+    rows = []
+    pos = unit + 12 + header_length
+    addr, file, line, col, stmt = 0, 1, 1, 0, default_stmt
+    while pos < end:
+        op = data[pos]
+        pos += 1
+        if op >= opcode_base:
+            addr += (op - opcode_base) // line_range * min_length
+            line += line_base + (op - opcode_base) % line_range
+        elif op == DW_LNS_ADVANCE_PC:
+            n, pos = uleb(data, pos)
+            addr += n * min_length
+        elif op == DW_LNS_ADVANCE_LINE:
+            n, pos = sleb(data, pos)
+            line += n
+        elif op == DW_LNS_SET_FILE:
+            file, pos = uleb(data, pos)
+        elif op == DW_LNS_SET_COLUMN:
+            col, pos = uleb(data, pos)
+        elif op == DW_LNS_NEGATE_STMT:
+            stmt = not stmt
+        elif op == DW_LNS_CONST_ADD_PC:
+            addr += (255 - opcode_base) // line_range * min_length
+        elif op == DW_LNS_FIXED_ADVANCE_PC:
+            addr += struct.unpack_from("<H", data, pos)[0]
+            pos += 2
+        elif op == 0:
+            n, pos = uleb(data, pos)
+            if data[pos] == DW_LNE_END_SEQUENCE:
+                addr, file, line, col, stmt = 0, 1, 1, 0, default_stmt
+            elif data[pos] == DW_LNE_SET_ADDRESS:
+                addr = int.from_bytes(data[pos + 1:pos + 1 + addr_size], "little")
+            pos += n
+        elif op != DW_LNS_COPY:
+            for _ in range(operands[op - 1]):
+                _, pos = uleb(data, pos)
+        if (op >= opcode_base or op == DW_LNS_COPY) and stmt and file in source:
+            rows.append((addr, line, col))
+    return rows
+
+
+def statement_rows(path):
+    # gdb's own line table drops rows whose line repeats with a new discriminator: a one-line loop's back edge
+    secs = sections(path)
+    data, strings = secs[".debug_line"], secs[".debug_line_str"]
+    rows = []
+    unit = 0
+    while unit < len(data):
+        length, version = struct.unpack_from("<IH", data, unit)
+        if version == 5:
+            rows += unit_rows(data, unit, unit + 4 + length, strings)
+        unit += 4 + length
+    return rows
+
+
+def gcov_records(data, pos):
+    # gcda ends with a zero tag, gcno with its last record
+    while pos < len(data) and (tag := struct.unpack_from("<I", data, pos)[0]):
+        length, = struct.unpack_from("<i", data, pos + 4)
+        pos += 8
+        # gcc 13 writes a record of zero counters as its negated length, without the counters
+        if length < 0:
+            yield tag, bytes(-length)
+            continue
+        yield tag, data[pos:pos + length]
+        pos += length
+
+
+def gcov_string(data, pos):
+    n, = struct.unpack_from("<I", data, pos)
+    return data[pos + 4:pos + 4 + n].rstrip(b"\0").decode(), pos + 4 + n
+
+
+def gcov_notes(path):
+    with open(path, "rb") as f:
+        data = f.read()
+    _, pos = gcov_string(data, 16)
+    functions, current = {}, ""
+    for tag, rec in gcov_records(data, pos + 4):
+        if tag == GCOV_FUNCTION:
+            ident, = struct.unpack_from("<I", rec)
+            _, at = gcov_string(rec, 12)
+            artificial, = struct.unpack_from("<I", rec, at)
+            fn = functions[ident] = {"artificial": artificial, "arcs": [], "lines": collections.defaultdict(set)}
+        elif tag == GCOV_ARCS:
+            src, = struct.unpack_from("<I", rec)
+            fn["arcs"] += [(src,) + struct.unpack_from("<II", rec, at) for at in range(4, len(rec), 8)]
+        elif tag == GCOV_LINES:
+            block, = struct.unpack_from("<I", rec)
+            at = 4
+            while at < len(rec):
+                line, = struct.unpack_from("<I", rec, at)
+                at += 4
+                if line == 0:
+                    name, at = gcov_string(rec, at)
+                    current = name or current
+                elif os.path.basename(current) == SOURCE:
+                    fn["lines"][block].add(line)
+    return functions
+
+
+def gcov_counts(path):
+    with open(path, "rb") as f:
+        data = f.read()
+    counts, ident = {}, None
+    for tag, rec in gcov_records(data, 16):
+        if tag == GCOV_FUNCTION:
+            ident = struct.unpack_from("<I", rec)[0] if rec else None
+        elif tag == GCOV_ARC_COUNTS:
+            counts[ident] = struct.unpack("<%dq" % (len(rec) // 8), rec)
+    return counts
+
+
+def block_counts(arcs, measured):
+    known = iter(measured)
+    # arcs on gcc's spanning tree have no counter: solve them by flow conservation, as gcov does
+    count = [None if flags & GCOV_ON_TREE else next(known) for _, _, flags in arcs] + [None]
+    blocks = max(max(src, dst) for src, dst, _ in arcs) + 1
+    ins, outs = [[] for _ in range(blocks)], [[] for _ in range(blocks)]
+    for i, (src, dst, _) in enumerate(arcs):
+        outs[src].append(i)
+        ins[dst].append(i)
+    # block 0 is entry, 1 exit: an arc exit => entry makes them conserve flow like the rest
+    outs[1].append(len(arcs))
+    ins[0].append(len(arcs))
+    solved = True
+    while solved:
+        solved = False
+        for b in range(blocks):
+            for side, other in ((ins[b], outs[b]), (outs[b], ins[b])):
+                unknown = [i for i in side if count[i] is None]
+                if len(unknown) == 1 and all(count[i] is not None for i in other):
+                    count[unknown[0]] = sum(count[i] for i in other) - sum(count[i] for i in side if count[i] is not None)
+                    solved = True
+    return [sum(count[i] for i in ins[b]) for b in range(blocks)]
+
+
+def line_hits(lines):
+    # gcc -o main main.cpp names its coverage files main-main.gcno and main-main.gcda
+    base = "%s-%s" % (gdb.current_progspace().filename, os.path.splitext(SOURCE)[0])
+    # gcda is written at exit: none after _exit(), a signal or a sanitizer's report
+    if not os.path.exists(base + ".gcda"):
+        return {}
+    counts = gcov_counts(base + ".gcda")
+    # lines that get steps, minus closing braces: gcc puts the epilogue's block there in some functions only
+    stops = {line for line, closing in lines.values() if not closing}
+    hits = collections.Counter()
+    for ident, fn in gcov_notes(base + ".gcno").items():
+        if fn["artificial"] or not fn["lines"]:
+            continue
+        blocks = block_counts(fn["arcs"], counts[ident])
+        # a line's count is its busiest block: inlined library code splits a line into blocks that gcov adds up
+        top = {}
+        for block, nums in fn["lines"].items():
+            for line in nums & stops:
+                top[line] = max(top.get(line, 0), blocks[block])
+        hits.update(top)
+    return {"lineHits": {str(line): n for line, n in sorted(hits.items()) if n}, "lineHitsSource": "gcov"}
+
+
+def function_block(pc):
+    block = gdb.block_for_pc(pc)
+    while block is not None and block.function is None:
+        block = block.superblock
+    return block
+
+
+def declaration(cls):
+    name = str(cls)
+    if name not in declarations:
+        gdb.set_convenience_variable("viz", gdb.Value(0).cast(cls.pointer()))
+        declarations[name] = gdb.execute("ptype/r *$viz", to_string=True)
+    return declarations[name]
+
+
+def generated(block):
+    fn = block.function
+    # reserved names: gcc's __tcf_0, _GLOBAL__sub_I_main, a lambda's _FUN
+    if re.match(r"_[_A-Z]", fn.name):
+        return True
+    params = fn.type.fields()
+    if not params or not params[0].artificial or any(s.is_argument and s.name == "__closure" for s in block):
+        return False
+    cls = params[0].type.target().unqualified()
+    prefix = str(cls) + "::"
+    # gdb names a lambda's other members without their class: ~<lambda>(void)
+    rest = fn.name[len(prefix):] if fn.name.startswith(prefix) else fn.name
+    name = "operator()" if rest.startswith("operator()") else rest.split("(")[0]
+    signature = " %s(%s)" % (name, ", ".join(str(p.type) for p in params[1:]) or "void")
+    # gdb 14 has no Symbol.is_artificial; ptype leaves out methods marked DW_AT_artificial (implicit ones)
+    return signature not in declaration(cls)
+
+
+def return_row(block, pcs):
+    arch = gdb.selected_inferior().architecture()
+    for pc, end in reversed(list(zip(pcs, pcs[1:] + [block.end]))):
+        if any(insn["asm"].startswith("ret") for insn in arch.disassemble(pc, end - 1)):
+            return pc
+    return None
+
+
+def body_stops(block, rows):
+    pcs = sorted(rows)
+    end = return_row(block, pcs)
+    # gcc -O0 returns from the closing brace's row; VLA saves, temporaries and cleanups share its position
+    closing = None if end is None else rows[end]
+    body = pcs[1:]
+    start = next((i for i, pc in enumerate(body) if rows[pc] != closing), 0)
+    return {pc: (rows[pc][0], rows[pc] == closing) for pc in body[start:]}
+
+
+def line_stops(path):
+    blocks, rows = {}, collections.defaultdict(dict)
+    for pc, line, col in statement_rows(path):
+        block = function_block(pc)
+        if block is not None and ours(block.function.symtab):
+            blocks[block.start] = block
+            rows[block.start][pc] = (line, col)
+    stops_at = {}
+    for start, block in blocks.items():
+        if not generated(block):
+            stops_at.update(body_stops(block, rows[start]))
+    return stops_at
+
+
+def frame_kind(frame):
+    block = frame.block()
+    while block.function is None:
+        block = block.superblock
+    args = [s.name for s in block if s.is_argument]
+    # gcc names a lambda's object parameter __closure
+    if "__closure" in args:
+        return "lambda"
+    if "this" in args:
+        return "method"
+    return "function"
+
+
+def frame_name(frame, kind):
+    if kind == "lambda":
+        return "<lambda>"
+    # gdb 14 keeps the parameter list of an abi-tagged name: make_str[abi:cxx11](int)
+    return frame.name().split("[abi:")[0]
+
+
+def result_in_memory(frame, returns):
+    arch = frame.architecture()
+    if arch.name() != "aarch64" or returns.strip_typedefs().code not in (gdb.TYPE_CODE_STRUCT, gdb.TYPE_CODE_UNION):
+        return False
+    # aapcs64 result address in x8 isn't kept, gdb 14 reads x8 at return; gcc -O0 saves it iff result in memory
+    start = int(frame.function().value().address)
+    prologue = arch.disassemble(start, gdb.find_pc_line(start).last)
+    return any(re.search(r"\bx8\b", insn["asm"]) for insn in prologue)
+
+
+def result_address(frame, returns):
+    return int(frame.read_register("x8")) if result_in_memory(frame, returns) else None
+
+
+def stack_of(calls, globals_, snap, line, again=None):
+    stack = []
+    if globals_:
+        stack.append({"id": "globals", "name": "Globals", "kind": "global", "line": line,
+                      "locals": [local(s.name, variable(s, None, snap)) for s in globals_], "returnValue": None})
+    shown = calls[-MAX_FRAMES:]
+    for call in shown:
+        frame = call["frame"]
+        if again is None or call is not shown[-1]:
+            frame_line, frame_again = frame.find_sal().line, False
+        else:
+            frame_line, frame_again = line, again
+        stack.append({"id": str(call["id"]), "name": call["name"], "kind": call["kind"], "line": frame_line,
+                      "locals": local_values(frame, frame_line, snap, call["scope"], frame_again),
+                      "returnValue": None})
+    return stack
+
+
+def snapshot(event, line, prev_line, calls, globals_, again=False):
+    snap = new_snap()
+    stack = stack_of(calls, globals_, snap, line, again)
+    return step(event, line, prev_line, stack, fill(snap))
+
+
+def step(event, line, prev_line, stack, heap, error=None):
+    return {"type": "step", "event": event, "line": line, "prevLine": prev_line, "stack": stack, "heap": heap,
+            "error": error}
+
+
+def armed(call):
+    return call["finish"] is not None and call["finish"].is_valid()
+
+
+def arm(call):
+    call["finish"] = None
+    # gdb 14 never fires a FinishBreakpoint under an inline caller (allocator destroy); outer one shares return address
+    frame, caller = call["frame"], call["frame"].older()
+    while caller is not None and caller.type() == gdb.INLINE_FRAME:
+        frame, caller = caller, caller.older()
+    if caller is None:
+        return
+    try:
+        gdb.selected_inferior().read_memory(caller.pc(), 1)
+    except gdb.MemoryError:
+        # smashed return address: no breakpoint fits there, and the return itself faults
+        return
+    call["finish"] = Return(frame, internal=True)
+
+
+def disarm(call):
+    if armed(call):
+        call["finish"].delete()
+    call["finish"] = None
+
+
+def flush(call):
+    pending = call["pending"]
+    if pending["sent"] or not pending["due"]:
+        return []
+    pending["sent"] = True
+    msg = pending["msg"]
+    call["line"], call["pc"], call["shown"], call["seen"] = msg["line"], pending["pc"], pending["pc"], msg
+    return [msg]
+
+
+def called(frame, pc, line, calls, globals_):
+    kind = frame_kind(frame)
+    name = frame_name(frame, kind)
+    msgs = []
+    prev_line = None
+    if calls:
+        pending = calls[-1]["pending"]
+        # closing-brace code that runs a destructor is the epilogue; one that runs a constructor sets up a temporary
+        if pending is not None and not pending["stale"] and "::~" in name:
+            msgs = flush(calls[-1])
+        prev_line = calls[-1]["frame"].find_sal().line
+        # finish breakpoint on innermost call only: gdb unwinds to each one's frame per stop (depth 300: 3.3 s => 0.6 s)
+        disarm(calls[-1])
+    returns = frame.function().type.target()
+    call = {"id": next(call_ids), "frame": frame, "name": name, "kind": kind,
+            "returns": returns, "result_at": result_address(frame, returns), "result_lost": False, "line": line, "pc": pc,
+            "shown": pc, "pending": None, "finish": None, "scope": {"line": None, "live": [], "ran": {}}}
+    calls.append(call)
+    arm(call)
+    msg = snapshot("call", line, prev_line, calls, globals_)
+    msg["callId"] = call["id"]
+    if len(calls) > 1:
+        msg["parentCallId"] = calls[-2]["id"]
+    call["seen"] = msg
+    return msgs + [msg]
+
+
+def joined(frame, pc, line, lines, calls, globals_):
+    # first start line: the user's calls already running get records, outermost first, and this stop is a line step
+    traced = {function_block(at).start for at in lines}
+    frames, older = [], frame
+    while older is not None:
+        block = function_block(older.pc())
+        if older.type() == gdb.NORMAL_FRAME and block is not None and block.start in traced:
+            frames.append(older)
+        older = older.older()
+    for f in reversed(frames):
+        kind = frame_kind(f)
+        returns = f.function().type.target()
+        # x8 was reused since the call: a result returned in memory can't be found
+        calls.append({"id": next(call_ids), "frame": f, "name": frame_name(f, kind), "kind": kind, "returns": returns,
+                      "result_at": None, "result_lost": result_in_memory(f, returns), "line": f.find_sal().line,
+                      "pc": f.pc(), "shown": f.pc(), "pending": None, "finish": None,
+                      "scope": {"line": None, "live": [], "ran": {}}})
+    arm(calls[-1])
+    msg = snapshot("line", line, None, calls, globals_)
+    calls[-1]["line"], calls[-1]["pc"], calls[-1]["shown"] = line, pc, pc
+    shown = {entry["id"]: entry for entry in msg["stack"]}
+    for call in calls:
+        entry = shown.get(str(call["id"]), {"id": str(call["id"]), "name": call["name"], "kind": call["kind"],
+                                             "line": call["line"], "locals": [], "returnValue": None})
+        call["seen"] = {"stack": [entry], "heap": msg["heap"]}
+    calls[-1]["seen"] = msg
+    return [msg]
+
+
+def at_row(frame, pc, row, calls, globals_):
+    line, closing = row
+    # an exception or longjmp left these frames without a return
+    while calls and not calls[-1]["frame"].is_valid():
+        disarm(calls.pop())
+    if not calls or frame != calls[-1]["frame"]:
+        return called(frame, pc, line, calls, globals_)
+    call = calls[-1]
+    if not armed(call):
+        arm(call)
+    backward = pc <= call["pc"]
+    # same line => step only on a jump back past what it showed: a one-line loop's next iteration, not a range-for's
+    due = line != call["line"] or (backward and call["shown"] <= pc)
+    pending = call["pending"]
+    if closing:
+        if pending is None or pending["stale"]:
+            msg = snapshot("line", line, call["line"], calls, globals_, line == call["line"])
+            call["pending"] = {"msg": msg, "pc": pc, "due": due, "before": call["line"], "sent": False, "stale": False}
+        return []
+    call["pc"] = pc
+    if pending is not None and line == pending["before"] and pc > pending["pc"]:
+        # same statement after a temporary's setup, or its return value moved after the epilogue's destructors
+        pending["stale"] = True
+        return []
+    call["pending"] = None
+    if backward:
+        call["shown"] = 0
+    if not due:
+        return []
+    msg = snapshot("line", line, call["line"], calls, globals_, line == call["line"])
+    call["line"], call["shown"], call["seen"] = line, pc, msg
+    return [msg]
+
+
+def returned(call, calls, globals_):
+    msgs = flush(call) if call["pending"] is not None else []
+    seen = call["seen"] if call["pending"] is None else call["pending"]["msg"]
+    snap = new_snap()
+    stack = stack_of(calls[-(MAX_FRAMES - 1):], globals_, snap, call["line"])
+    value = call["finish"].return_value
+    if call["result_at"] is not None:
+        value = gdb.Value(gdb.selected_inferior().read_memory(call["result_at"], call["returns"].sizeof),
+                          call["returns"])
+    if call["returns"].code == gdb.TYPE_CODE_VOID:
+        result = None
+    elif value is None or call["result_lost"]:
+        result = {"t": "unavailable", "reason": "unknown_return", "type": type_name(call["returns"])}
+    else:
+        result = encode(value, snap, 0)
+    heap = fill(snap)
+    # frame already popped: its locals and objects come from its last stop, the epilogue's when it had one
+    stack.append(dict(seen["stack"][-1], line=call["line"], returnValue=result))
+    msg = step("return", call["line"], call["line"], stack, dict(seen["heap"], **heap))
+    msg["callId"] = call["id"]
+    return msgs + [msg]
+
+
+def check_functions():
+    found = {}
+    for pattern in CHECKS:
+        for row in run("info functions " + pattern).splitlines():
+            if row.startswith("0x") and "@plt" not in row and VPTR_CHECK not in row:
+                addr, name = row.split(None, 1)
+                found[int(addr, 16)] = name
+    return found
+
+
+def failed(name, frame, calls, globals_):
+    args = [int(frame.read_register(r)) & ((1 << 64) - 1) for r in ARGS[frame.architecture().name()]]
+    if name.startswith("__ubsan_handle_"):
+        return sanitizer(name, args)
+    user = calls[-1]["frame"]
+    called = frame
+    while called.older() != user:
+        called = called.older()
+    if name.startswith("std::__glibcxx_assert_fail"):
+        return assertion(c_string(args[3])["v"], called, user, globals_)
+    return debug_check(args[0], called, user, globals_)
+
+
+def sanitizer(name, args):
+    check = re.sub(r"_v\d+$", "", name.removeprefix("__ubsan_handle_").removesuffix("_abort"))
+    error = {"type": "UBSan", "message": check.replace("_", " ")}
+    if check != "out_of_bounds" and check not in OVERFLOWS:
+        return error
+    # args[0] points at {file, line, column, type descriptors}
+    types = gdb.selected_inferior().read_memory(args[0] + 16, 16 if check == "out_of_bounds" else 8)
+    if check == "out_of_bounds":
+        array, index_type = (descriptor(at) for at in struct.unpack("=2Q", types))
+        index = ubsan_value(index_type[0], args[1])
+        values = {"index": str(index), "type": array[1]}
+        size = re.search(r"\[(\d+)\]", array[1])
+        if size:
+            values["size"] = int(size.group(1))
+        return dict(error, message="index %d out of bounds for type '%s'" % (index, array[1]),
+                    kind="index_out_of_range", values=values)
+    info, type_ = descriptor(struct.unpack("=Q", types)[0])
+    operands = [ubsan_value(info, a) for a in (args[1:2] if check == "negate_overflow" else args[1:3])]
+    if check == "divrem_overflow" and operands[1] == 0:
+        return dict(error, message="division by zero", kind="division_by_zero")
+    if check == "negate_overflow":
+        message = "negation of %d cannot be represented in type '%s'" % (operands[0], type_)
+    elif check == "divrem_overflow":
+        message = "division of %d by -1 cannot be represented in type '%s'" % (operands[0], type_)
+    else:
+        message = "signed integer overflow: %d %s %d cannot be represented in type '%s'" % (
+            operands[0], OVERFLOWS[check], operands[1], type_)
+    width = 1 << (info >> 1)
+    values = {"op": OVERFLOWS[check], "operands": [str(x) for x in operands], "type": type_,
+              "max": str((1 << (width - 1)) - 1)}
+    return dict(error, message=message, kind="signed_overflow", values=values)
+
+
+def descriptor(at):
+    # {kind: u16, info: u16, name}; an integer's info is log2(bits) << 1 | signed
+    info = struct.unpack("=2H", gdb.selected_inferior().read_memory(at, 4))[1]
+    return info, c_string(at + 4)["v"].strip("'")
+
+
+def ubsan_value(info, handle):
+    width = 1 << (info >> 1)
+    # the value itself when it fits a pointer, else a pointer to it
+    if width > 64:
+        handle = int.from_bytes(gdb.selected_inferior().read_memory(handle, width // 8), "little")
+    value = handle & ((1 << width) - 1)
+    if info & 1 and value >= 1 << (width - 1):
+        value -= 1 << width
+    return value
+
+
+def assertion(condition, called, user, globals_):
+    error = {"type": "libstdc++", "message": "Assertion '%s' failed." % condition}
+    if condition == "!this->empty()":
+        return dict(error, kind="empty_container", values=emptied(called.read_var("this").dereference(), called, user,
+                                                                   globals_))
+    index = SUBSCRIPT_ASSERTION.match(condition)
+    if index is None:
+        return error
+    container = called.read_var("this").dereference()
+    n = int(called.read_var(index.group(1)))
+    # size_t index: v[i - 1] at i = 0 reads as -1, as the program wrote it
+    if n >= 1 << 63:
+        n -= 1 << 64
+    return dict(error, kind="index_out_of_range", values=subscripted(container, n, length(container), user, globals_))
+
+
+def debug_check(at, called, user, globals_):
+    formatter = gdb.Value(at).cast(gdb.lookup_type("__gnu_debug::_Error_formatter").pointer()).dereference()
+    params = [formatter["_M_parameters"][i] for i in range(int(formatter["_M_num_parameters"]))]
+    text = formatter["_M_text"].string()
+    error = {"type": "libstdc++",
+             "message": PLACEHOLDER.sub(lambda m: placeholder(params[int(m.group(1)) - 1], m.group(2)), text)}
+    if text == SUBSCRIPT:
+        index, size = (int(variant(p)["_M_value"]) for p in params[1:])
+        return dict(error, kind="index_out_of_range",
+                    values=subscripted(called.read_var("this").dereference(), index, size, user, globals_))
+    if text == EMPTY:
+        return dict(error, kind="empty_container", values=emptied(called.read_var("this").dereference(), called, user,
+                                                                   globals_))
+    if text != DEREFERENCE or not str(variant(params[0])["_M_state"]).endswith("::__end"):
+        return error
+    # *s.begin() on an empty set: past the end of a container with nothing in it
+    sequence = called.read_var("this").dereference().type.strip_typedefs().template_argument(1)
+    container = gdb.Value(int(variant(params[0])["_M_sequence"])).cast(sequence.pointer()).dereference()
+    if length(container):
+        return error
+    return dict(error, kind="empty_container", values=emptied(container, called, user, globals_))
+
+
+def variant(param):
+    kind = str(param["_M_kind"]).rsplit("::", 1)[1]
+    return param["_M_variant"]["_M_" + kind.lstrip("_")]
+
+
+def placeholder(param, field):
+    v = variant(param)
+    if field is None and str(param["_M_kind"]).endswith("::__integer"):
+        return str(int(v["_M_value"]))
+    if field == "state":
+        state = str(v["_M_state"]).rsplit("::", 1)[1]
+        return STATES.get(state, state.strip("_"))
+    return v["_M_name"].string()
+
+
+def length(container):
+    if row(container.type).get("kind") == "str":
+        return int(container["_M_string_length"])
+    return heap_object("length", container, new_snap(), 0)["length"]
+
+
+def subscripted(container, index, size, user, globals_):
+    values = {"index": str(index), "size": size, "type": type_name(container.type.unqualified())}
+    return dict(values, **named(container, user, globals_))
+
+
+def emptied(container, called, user, globals_):
+    values = {"call": called.name().rsplit("::", 1)[1], "type": type_name(container.type.unqualified())}
+    return dict(values, **named(container, user, globals_))
+
+
+def named(container, frame, globals_):
+    want = (address(container), str(container.type.strip_typedefs().unqualified()))
+    syms = []
+    block = frame.block()
+    while block is not None:
+        syms += [(s, frame) for s in block if s.is_variable or s.is_argument]
+        if block.function is not None:
+            break
+        block = block.superblock
+    for sym, where in syms + [(s, None) for s in globals_]:
+        try:
+            value = sym.value() if where is None else sym.value(where)
+            if value.type.strip_typedefs().code in (gdb.TYPE_CODE_REF, gdb.TYPE_CODE_RVALUE_REF):
+                value = value.referenced_value()
+        except UNREADABLE:
+            continue
+        # a struct and its first member share an address
+        if (address(value), str(value.type.strip_typedefs().unqualified())) == want:
+            return {"name": sym.name}
+    return {}
+
+
+def signalled(name, calls):
+    error = {"type": name, "message": signal.strsignal(signal.Signals[name])}
+    if name != "SIGSEGV":
+        return error
+    fault = int(gdb.parse_and_eval("$_siginfo._sifields._sigfault.si_addr"))
+    if abs(fault - int(gdb.parse_and_eval("$sp"))) < STACK_SLACK:
+        error["kind"], error["values"] = "recursion_too_deep", {"depth": len(calls)}
+    return error
+
+
+def crashed(error, calls, globals_, last):
+    while calls and not calls[-1]["frame"].is_valid():
+        calls.pop()
+    if not calls:
+        # no frame left to read (a smashed return address): the last step's state
+        error["line"] = last["line"]
+        return step("exception", last["line"], last["line"], last["stack"], last["heap"], error)
+    line = calls[-1]["frame"].find_sal().line
+    error["line"] = line
+    return snapshot("exception", line, calls[-1]["line"], calls, globals_) | {"error": error}
+
+
+def finished(stop, lines):
+    if isinstance(stop, gdb.SignalEvent):
+        return {"type": "exit", "kind": "signal", "code": None, "signal": stop.stop_signal, "message": None}
+    if hasattr(stop, "exit_code"):
+        msg = {"type": "exit", "kind": "normal", "code": stop.exit_code, "signal": None, "message": None}
+        return msg | line_hits(lines)
+    killed = signal.Signals(int(gdb.convenience_variable("_exitsignal")))
+    # SIGKILL comes from outside (oom killer): die the same way so the core applies its limits (§11)
+    if killed == signal.SIGKILL:
+        os.kill(os.getpid(), signal.SIGKILL)
+    return {"type": "exit", "kind": "signal", "code": None, "signal": killed.name, "message": None}
+
+
+def untraced(breaks, calls, lines):
+    for bp in breaks:
+        bp.delete()
+    for call in calls:
+        disarm(call)
+    run("continue")
+    return finished(stops[-1], lines)
+
+
+def open_stdin():
+    try:
+        fd = os.open(STDIN, os.O_RDONLY)
+    except FileNotFoundError:
+        fd = os.open(os.devnull, os.O_RDONLY)
+    os.dup2(fd, 0)
+    os.close(fd)
+
+
+def trace():
+    max_steps = int(os.environ.get("VIZ_MAX_STEPS", "1000"))
+    start_lines = {int(line) for line in os.environ.get("VIZ_START_AT_LINES", "").split(",") if line}
+    for name, ranges in json.loads(os.environ.get("VIZ_CAPTURE_RANGES", "{}")).items():
+        first = min(start for start, _ in ranges)
+        capture[name] = (first, max(end for _, end in ranges) - first + 1)
+    for cmd in ("set pagination off", "set confirm off", "set suppress-cli-notifications on",
+                "set print inferior-events off", "set print thread-events off", "set startup-with-shell off",
+                "set disable-randomization on", "set backtrace past-main on",
+                # breakpoints stay in memory between stops: 700 of them, 1.8 s => 0.5 s per 1,000 steps
+                "set breakpoint always-inserted on"):
+        run(cmd)
+
+    main = gdb.lookup_global_symbol("main")
+    producer = (main.symtab.producer or "").split()
+    runtime = "GCC " + producer[2] if len(producer) > 2 and producer[0] == "GNU" else "unknown"
+    send({"type": "hello", "protocol": 1, "language": LANGUAGE, "runtime": runtime, "adapter": ADAPTER})
+
+    globals_ = global_symbols(main.symtab)
+    loads_at[:] = [int(gdb.parse_and_eval("(long)&%s" % name)) for name in ("viz_reads_count", "viz_reads")]
+    lines = line_stops(gdb.current_progspace().filename)
+    body = function_block(int(main.value().address))
+    entry = min(pc for pc in lines if body.start <= pc < body.end)
+    # breakpoints only once main runs, or a start line: until then the program runs untraced and fast
+    starts = [pc for pc, (line, _) in lines.items() if line in start_lines] if start_lines else [entry]
+    breaks = [gdb.Breakpoint("*%#x" % pc, internal=True) for pc in starts]
+    open_stdin()
+    run("run")
+    null = os.open(os.devnull, os.O_RDWR)
+    for fd in (0, 1, 2):
+        os.dup2(null, fd)
+    os.close(null)
+
+    calls, last, sent, checks = [], None, 0, {}
+    while True:
+        stop = stops[-1]
+        stops.clear()
+        if isinstance(stop, gdb.ExitedEvent):
+            return finished(stop, lines)
+        if isinstance(stop, gdb.SignalEvent):
+            if calls:
+                send_step(crashed(signalled(stop.stop_signal, calls), calls, globals_, last))
+            return finished(stop, lines)
+        frame = gdb.newest_frame()
+        pc = frame.pc()
+        if pc in checks:
+            send_step(crashed(failed(checks[pc], frame, calls, globals_), calls, globals_, last))
+            return untraced(breaks, calls, lines)
+        if last is None:
+            # loads before the first step (global constructors, or the run up to a start line) aren't any step's
+            gdb.selected_inferior().write_memory(loads_at[0], bytes(8))
+            for bp in breaks:
+                bp.delete()
+            checks = check_functions()
+            breaks = [gdb.Breakpoint("*%#x" % at, internal=True) for at in list(lines) + list(checks)]
+            if start_lines:
+                msgs = joined(frame, pc, lines[pc][0], lines, calls, globals_)
+            else:
+                msgs = called(frame, pc, lines[pc][0], calls, globals_)
+        else:
+            msgs = []
+            if returning:
+                returning.clear()
+                msgs = returned(calls.pop(), calls, globals_)
+                if calls:
+                    arm(calls[-1])
+            if calls and pc in lines:
+                msgs += at_row(frame, pc, lines[pc], calls, globals_)
+        for msg in msgs:
+            send_step(msg)
+            last, sent = msg, sent + 1
+            if sent > max_steps:
+                return untraced(breaks, calls, lines)
+        if not calls:
+            return untraced(breaks, calls, lines)
+        run("continue")
+
+
+gdb.events.stop.connect(stops.append)
+gdb.events.exited.connect(stops.append)
+try:
+    send(trace())
+except Exception as e:
+    where = " < ".join(str(f.lineno) for f in reversed(traceback.extract_tb(e.__traceback__)) if f.filename == __file__)
+    send({"type": "log", "level": "error", "message": "%s at trace.py:%s" % (type(e).__name__, where)})
+    send({"type": "exit", "kind": "internal_error", "code": None, "signal": None, "message": None})
