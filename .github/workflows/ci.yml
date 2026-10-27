@@ -95,6 +95,17 @@ jobs:
       - name: test
         run: go test -vet=off ${{ github.event_name == 'pull_request' && '-short' || '' }} ./...
 
+  backend-nsjail:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: make test-nsjail
+
   golden-arm64:
     runs-on: ubuntu-24.04-arm
     defaults:
