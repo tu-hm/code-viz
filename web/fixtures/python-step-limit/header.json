@@ -1,0 +1,52 @@
+{
+  "version": "1.2",
+  "id": "trc_e8a12e495602235aa951be4dff200d0b",
+  "language": {
+    "id": "python3",
+    "adapter": "py-settrace/0.3.0",
+    "runtime": "CPython 3.12.15"
+  },
+  "source": {
+    "file": "main.py",
+    "lineCount": 4
+  },
+  "options": {
+    "maxSteps": 30,
+    "startAtLines": []
+  },
+  "summary": {
+    "exit": {
+      "code": null,
+      "kind": "step_limit",
+      "signal": null,
+      "message": null
+    },
+    "lineHits": {
+      "1": 1,
+      "2": 2001,
+      "3": 2000,
+      "4": 1
+    },
+    "stepCount": 30,
+    "truncated": true,
+    "truncation": {
+      "atLine": 2,
+      "reason": "step_limit"
+    },
+    "untracedTail": {
+      "exit": {
+        "code": 0,
+        "kind": "normal",
+        "signal": null,
+        "message": null
+      },
+      "completed": true,
+      "stdoutBytes": 8
+    },
+    "lineHitsSource": "counter"
+  },
+  "encoding": {
+    "mode": "delta",
+    "keyframeInterval": 50
+  }
+}

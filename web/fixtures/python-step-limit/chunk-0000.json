@@ -1,0 +1,1271 @@
+[
+  {
+    "callId": 0,
+    "error": null,
+    "event": "call",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 1,
+        "locals": [],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 0,
+    "keyframe": true,
+    "line": 1,
+    "prevLine": null,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 1,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 1,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "0"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 2,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "0"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "0"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 3,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "0"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 4,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 5,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "1"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 6,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "2"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 7,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 8,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "3"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 9,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 10,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "10"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "4"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 11,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "10"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 12,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "15"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "5"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 13,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "15"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 14,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "21"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "6"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 15,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "21"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "7"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 16,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "28"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "7"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 17,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "28"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "8"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 18,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "36"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "8"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 19,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "36"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "9"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 20,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "45"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "9"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 21,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "45"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "10"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 22,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "55"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "10"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 23,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "55"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "11"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 24,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "66"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "11"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 25,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "66"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "12"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 26,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "78"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "12"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 27,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 3,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "78"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "13"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 28,
+    "keyframe": false,
+    "line": 3,
+    "prevLine": 2,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  },
+  {
+    "error": null,
+    "event": "line",
+    "frames": {
+      "f0": {
+        "id": "f0",
+        "kind": "global",
+        "line": 2,
+        "locals": [
+          {
+            "name": "total",
+            "value": {
+              "t": "int",
+              "v": "91"
+            }
+          },
+          {
+            "name": "i",
+            "value": {
+              "t": "int",
+              "v": "13"
+            }
+          }
+        ],
+        "name": "<module>",
+        "returnValue": null
+      }
+    },
+    "heap": {},
+    "i": 29,
+    "keyframe": false,
+    "line": 2,
+    "prevLine": 3,
+    "removedObjects": [],
+    "stack": ["f0"],
+    "stderr": "",
+    "stdinPos": {
+      "bytes": 0,
+      "inferred": false,
+      "token": 0
+    },
+    "stdout": ""
+  }
+]
