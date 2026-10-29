@@ -1,0 +1,3 @@
+/usr/bin/ld: /work/ccXODBkl.o: in function `main':
+/work/main.cpp:7: undefined reference to `solve(int)'
+collect2: error: ld returned 1 exit status

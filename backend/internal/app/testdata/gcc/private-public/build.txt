@@ -1,0 +1,8 @@
+In file included from /usr/local/include/c++/13.5.0/aarch64-linux-gnu/bits/stdc++.h:77,
+                 from main.cpp:2:
+/usr/local/include/c++/13.5.0/any:370:7: error: 'struct std::any::_Manager_internal<_Tp>' redeclared with different access
+/usr/local/include/c++/13.5.0/any:402:7: error: 'struct std::any::_Manager_external<_Tp>' redeclared with different access
+In file included from /usr/local/include/c++/13.5.0/complex:45,
+                 from /usr/local/include/c++/13.5.0/ccomplex:39,
+                 from /usr/local/include/c++/13.5.0/aarch64-linux-gnu/bits/stdc++.h:127:
+/usr/local/include/c++/13.5.0/sstream:460:7: error: 'struct std::__cxx11::basic_stringbuf<_CharT, _Traits, _Alloc>::__xfer_bufptrs' redeclared with different access
