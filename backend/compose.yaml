@@ -1,0 +1,52 @@
+name: code-viz
+
+services:
+  mysql:
+    image: mysql:8.4.13@sha256:76f0358884cb92d9a086d24e5671c38048d3fef40f2588703d73eb55392d6b69
+    # §7.13; 8.4's defaults already, pinned so an image or my.cnf change can't move them
+    command:
+      - --default-storage-engine=InnoDB
+      - --character-set-server=utf8mb4
+      - --default-time-zone=+00:00
+      - --binlog-format=ROW
+      - --sql-mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_DATABASE: viz
+      MYSQL_USER: viz
+      MYSQL_PASSWORD: viz
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    ports:
+      - "127.0.0.1:13306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=127.0.0.1", "--user=viz", "--password=viz"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.48@sha256:4e61d15fd35994cb1e43e1e553dff106794841fd9a99ade2fc8c8bfce4d7872d
+    # a bucket takes 7 volume slots; default cap = free disk / 1 GB => 2 buckets on a 14 GB ci runner
+    command: ["server", "-s3", "-dir=/data", "-volume.max=1000"]
+    ports:
+      - "127.0.0.1:8333:8333"
+    volumes:
+      - seaweedfs:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8333/healthz"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  # optional: docker compose --profile tracing up -d, then set OTEL_EXPORTER_OTLP_ENDPOINT in .env
+  jaeger:
+    image: jaegertracing/jaeger:2.22.0@sha256:836b967b5abcf1f7758066aa6b348619267a2f1459f72d472840570f9bd88a17
+    profiles: [tracing]
+    ports:
+      - "127.0.0.1:4318:4318"
+      - "127.0.0.1:16686:16686"
+
+volumes:
+  mysql:
+  seaweedfs:
