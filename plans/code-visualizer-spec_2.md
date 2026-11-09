@@ -108,6 +108,7 @@
 | v1.16 | 2026-10-24 | **Observability and the beta deploy path (BE-13 §1–§2).** `jobs.traceparent` keeps the W3C trace context of the create request that queued the job, so the worker's `job` span and its stage spans (`sandbox`, `build`, `trace`, `store`) continue that request's OpenTelemetry trace (§7.5, §18.2). vizd exports spans over OTLP/HTTP only when `OTEL_EXPORTER_OTLP_ENDPOINT` is set, and serves Prometheus metrics at `GET /metrics` only with `VIZ_METRICS=true`; both are off by default. Log lines inside a span carry `otel_trace_id` and `otel_span_id`, since `trace_id` already names the `trc_` ID. **Deploy path for the M1 beta:** one server running MySQL, SeaweedFS, the API and the worker as Docker Compose containers (`docs/deploy.md`), not native packages and systemd units; Kubernetes (D15) stays the target after the beta. |
 | v1.17 | 2026-10-25 | **Exact read hints (BE-11 §5).** Spike S8 found tree-sitter inference right on 77.6% of subscript lines in contest-style code, against a 95% target, mostly on indices it can't evaluate (`t[p ^ 1]`, `a[l++]`, `dp[c - w[i]]`), so G5 triggered BE-11 §5. Both tracers now send the sequence cells each step read, and the core turns them into `access` (§19.9.2). **C++:** the build adds `-fsanitize=kernel-address` with every check made a call (`asan-instrumentation-with-call-threshold=0`) and links `/opt/viz/reads.o`, whose hooks record each load's address; the tracer maps addresses onto the arrays, `std::array`s and `vector`s it records. Pointer arithmetic, struct fields and loads inside library code (`max(dp[c], …)`) count. GCC leaves out the call for a constant index into a named C array (`a[0]`), so those reads are missing. With the safety checks on, the hooks add 12–18% to the program's run time; without them, 1.3–2.3× (§7.11.2). **Python:** a `sys.monitoring` INSTRUCTION callback on `main.py`'s code, beside `sys.settrace`, evaluates each subscript's container and index just before it runs, from names, constants and integer arithmetic only (§7.11.1). Writes still come from the diff. A new §11 limit: 1,000 distinct cells read per step; past it the step has no `access`. |
 | v1.18 | 2026-10-26 | **Graph and tree views draw with sigma.js 4 (§18.1, §19.4.5).** elkjs still lays out every node once per object, so positions never move between steps; sigma draws them in WebGL with pan and zoom (Ctrl or ⌘ + wheel, pinch, or the + − Fit buttons), loaded only when a graph view opens. elkjs's edge routes are no longer drawn: an edge is straight unless that line crosses another node, then curved. The marks don't change: `[x]` filled and `(x)` hollow, `◀ u`, the edge being checked dashed, captions and weights upright. The node list for screen readers now names each edge's weight. |
+| v1.19 | 2026-11-08 | **Signed-in callers from an embedding site (vforge-code-viz#15).** AlgoMaster embeds the visualizer behind its own reverse proxy on another host, so every one of its users reached vizd from the proxy's address and shared one `ip:` identity: one daily quota, and delete and share rights over each other's visualizations. The embedding site's backend now mints a JWT for its signed-in user, and its frontend sends it as `Authorization: Bearer` on every call. vizd checks it against the issuer's Ed25519 public keys from static config, chosen by `kid`; the caller becomes `user:<sub>` and counts as signed in (1,000 a day, jobs first). A request without `Authorization` stays anonymous (D16). An expired token answers `401 token_expired`, any other bad token `401 token_invalid`, never an anonymous fallback; the client mints a new token and repeats the request once (§7.8, §8, §8.7, §11, §12). A trusted-proxy list for `X-Forwarded-For` was considered and dropped: an IP is not a user. |
 
 ---
 
@@ -776,6 +777,7 @@ stateDiagram-v2
 | The change poller's query fails | It retries on the next tick. Parked requests re-read their row when they time out, so no update is lost, at worst it's late. | At most one `wait` period of delay |
 | The nightly cleanup can't delete a trace's chunks | Its rows are already gone, so the chunks stay as orphans. The cleanup logs the trace ID and goes on. | Nothing |
 | Deadlock or lock-wait timeout (MySQL 1213, 1205) | The transaction is retried up to 3 times with jitter (§7.13.4) | Nothing, or a short delay |
+| A signed-in caller's token is expired or invalid (wrong signature, `kid`, `iss` or `aud`) | `401 token_expired` or `401 token_invalid` with `WWW-Authenticate: Bearer`; the request is not run as anonymous. The client mints a new token and repeats the request once. | Nothing, or the embedding site's own error after the second `401` |
 
 ### 7.9 Scaling model
 
@@ -975,7 +977,7 @@ CREATE TABLE jobs (
 ## 8. API specification
 
 - **Base:** `/api/v1`. All bodies are JSON, UTF-8.
-- **Auth:** optional; anonymous users get lower limits (§11).
+- **Auth:** optional; anonymous users get lower limits (§11). An embedding site's signed-in user sends `Authorization: Bearer <jwt>`, minted by that site's backend: EdDSA (Ed25519) with a `kid` in the header, and the claims `iss` (the configured issuer), `aud` = `viz`, `sub` (the site's user ID, 1–250 bytes) and `exp`. A valid token makes the caller `user:<sub>`, signed in. Without the header the caller is anonymous (`ip:` plus the keyed hash of its IP). Any route answers `401` for a bad token (§8.7, v1.19).
 - **Errors:** every error uses the same envelope (§8.7).
 - **Endpoints:** six in all. Trace chunks are **not** served by the API; they come from signed URLs (§8.4).
 
@@ -1185,7 +1187,9 @@ Returns `200` with `{"url": "https://ide.example.com/viz/viz_c41e…", "expiresA
 }
 ```
 
-Error codes: `invalid_request`, `payload_too_large`, `unsupported_language`, `rate_limited`, `capacity`, `not_found`, `expired` and `internal_error`.
+Error codes: `invalid_request`, `payload_too_large`, `unsupported_language`, `rate_limited`, `capacity`, `not_found`, `expired`, `token_expired`, `token_invalid` and `internal_error`.
+
+`token_expired` (`401`) means the bearer token is past its `exp`. `token_invalid` (`401`) means any other problem with it: not a JWT, an algorithm other than EdDSA, an unknown `kid`, a bad signature, the wrong `iss` or `aud`, or a missing `sub` or `exp`. Both send `WWW-Authenticate: Bearer error="invalid_token"`. A missing token is not an error: the caller is anonymous.
 
 ## 9. Trace format v1
 
@@ -1473,7 +1477,7 @@ All of these are configurable per language in the manifest, with global ceilings
 | Output recorded | 64 KB | 1 MB | `exit.kind = output_limit` if the program keeps writing |
 | Trace size, uncompressed | 20 MB | 50 MB | `truncation.reason = size_limit`, `exit.kind = step_limit` (there is no size exit kind) |
 | Create rate per IP (ingress) | 30/min | — | `429` with `Retry-After` |
-| Daily quota (MySQL) | Anonymous 100 per IPv4 address or IPv6 /64 (one home gets a whole /64), signed in 1,000 | — | `429` with `Retry-After` (next UTC midnight) |
+| Daily quota (MySQL) | Anonymous 100 per IPv4 address or IPv6 /64 (one home gets a whole /64), signed in 1,000 per `user:<sub>` | — | `429` with `Retry-After` (next UTC midnight) |
 | Active visualizations per user | 2 | — | A third request detaches the oldest queued one (§8.5 rules) |
 | Trace retention | 7 days; 90 days once shared (`t7/` and `t90/`; the nightly cleanup deletes rows and chunks, §7.5) | — | `410 expired` |
 
@@ -1494,6 +1498,7 @@ All of these are configurable per language in the manifest, with global ceilings
 | Credentials | Runner nodes hold only **scoped** credentials. The database role can lease jobs and update the trace it runs, and nothing else. The storage key is write-only to `t7/`. The API's storage key can read, sign and copy. |
 | Trace access | Chunks are only reachable through signed URLs that expire after 15 minutes. Buckets are private, and object keys use random `trc_` IDs. |
 | IDs | Visualization IDs are 128-bit random values. Cache keys (content hashes) are never exposed, so nobody can find someone else's code by hashing guesses. The ID is the read key: whoever has it can `GET` the visualization, so permalinks and an anonymous caller whose IP changed keep working. `DELETE` also checks that the caller created it (v1.7). A share link is its own ID, so revoking it never touches the owner's (v1.14). |
+| Callers | A caller is `user:<sub>` from a bearer token, or else `ip:` plus an HMAC of its IP. The token is checked against the issuer's Ed25519 public keys in static config (`VIZ_TOKEN_ISSUER`, `VIZ_TOKEN_KEYS`), chosen by the header's `kid`; only `alg` = `EdDSA` is accepted. To rotate, add the new key, let the issuer sign with it, and remove the old key once its last token is past `exp` (15 minutes). A bad token is a `401`, never an anonymous request, so an embedding site's user never falls back to the proxy's shared IP identity (v1.19). |
 | Request bodies | `POST` bodies must be `application/json`; any other type gets `400 invalid_request`. A `text/plain` form post skips the browser's CORS preflight, so without this a foreign page could spend its visitors' quota (v1.7). |
 | Rendering | The UI renders every string from the trace as **text**, never as HTML. Control characters are escaped, and long lines wrap. |
 | Privacy | Traces are private to their owner until shared. Share links can be revoked. Anonymous traces are deleted after 7 days. |
