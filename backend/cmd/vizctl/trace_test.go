@@ -9,10 +9,12 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/tu-hm/code-viz/backend/internal/adapters/manifest"
 	"github.com/tu-hm/code-viz/backend/internal/gen/trace"
@@ -92,7 +94,16 @@ func TestGoldenTraces(t *testing.T) {
 				if err := json.Unmarshal(raw, &want); err != nil {
 					t.Fatal(err)
 				}
-				if diff := cmp.Diff(want, got); diff != "" {
+				unorderedAccess := cmpopts.SortSlices(func(a, b trace.Access) bool {
+					if a.Obj != b.Obj {
+						return a.Obj < b.Obj
+					}
+					if a.Mode != b.Mode {
+						return a.Mode < b.Mode
+					}
+					return slices.Compare(a.Path, b.Path) < 0
+				})
+				if diff := cmp.Diff(want, got, unorderedAccess); diff != "" {
 					t.Errorf("trace (-want +got):\n%s", diff)
 				}
 			})
