@@ -36,6 +36,12 @@ var ErrNotFound = errors.New("not found")
 // ErrExpired means the visualization is past its retention (§11).
 var ErrExpired = errors.New("expired")
 
+// ErrTokenExpired means the caller's bearer token is past its exp (§8.7).
+var ErrTokenExpired = errors.New("token expired")
+
+// ErrTokenInvalid means the caller sent a bearer token the service does not accept (§8.7).
+var ErrTokenInvalid = errors.New("token invalid")
+
 // RetryError is ErrQuotaExceeded or ErrCapacity with how long the caller should wait before trying again (§8.7).
 type RetryError struct {
 	Err   error

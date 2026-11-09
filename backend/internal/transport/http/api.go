@@ -24,13 +24,14 @@ const (
 )
 
 // HandleAPI registers the visualization API (§8) under /api/v1 on mux, and its metrics with reg. ipKey keys the hash that
-// stands for a caller's IP; origins are the browser origins allowed to call the API.
-func HandleAPI(mux *http.ServeMux, viz *app.Visualizations, ipKey []byte, origins []string, reg prometheus.Registerer) {
+// stands for an anonymous caller's IP, and iss signs the tokens of signed-in ones; origins are the browser origins allowed
+// to call the API.
+func HandleAPI(mux *http.ServeMux, viz *app.Visualizations, ipKey []byte, iss Issuer, origins []string, reg prometheus.Registerer) {
 	routes := http.NewServeMux()
 	routes.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
 		writeError(w, r, fmt.Errorf("no route %s %s: %w", r.Method, r.URL.Path, domain.ErrNotFound))
 	})
-	strict := api.NewStrictHandlerWithOptions(&server{viz: viz}, []api.StrictMiddlewareFunc{jsonOnly}, api.StrictHTTPServerOptions{
+	strict := api.NewStrictHandlerWithOptions(&server{viz: viz}, []api.StrictMiddlewareFunc{jsonOnly, authenticate(iss, viz.Now)}, api.StrictHTTPServerOptions{
 		RequestErrorHandlerFunc:  writeBodyError,
 		ResponseErrorHandlerFunc: writeError,
 	})
@@ -127,6 +128,8 @@ var errorStatuses = []struct {
 	{domain.ErrInfra, http.StatusServiceUnavailable, api.ErrorCodeCapacity, "Visualizer is busy, try again in a few seconds."},
 	{domain.ErrNotFound, http.StatusNotFound, api.ErrorCodeNotFound, "Not found."},
 	{domain.ErrExpired, http.StatusGone, api.ErrorCodeExpired, "This visualization has expired."},
+	{domain.ErrTokenExpired, http.StatusUnauthorized, api.ErrorCodeTokenExpired, "The sign-in token has expired."},
+	{domain.ErrTokenInvalid, http.StatusUnauthorized, api.ErrorCodeTokenInvalid, ""},
 }
 
 func writeError(w http.ResponseWriter, r *http.Request, err error) {
@@ -156,6 +159,9 @@ func writeError(w http.ResponseWriter, r *http.Request, err error) {
 		sec := int(math.Ceil(after.Seconds()))
 		e.RetryAfterSec = &sec
 		w.Header().Set("Retry-After", strconv.Itoa(sec))
+	}
+	if status == http.StatusUnauthorized {
+		w.Header().Set("WWW-Authenticate", `Bearer error="invalid_token"`)
 	}
 	if status >= http.StatusInternalServerError {
 		slog.ErrorContext(ctx, "request failed", "request_id", e.RequestID, "route", r.Pattern, "status", status, "err", err)

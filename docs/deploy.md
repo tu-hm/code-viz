@@ -186,6 +186,8 @@ What each variable does, from `backend/cmd/vizd/main.go`:
 | `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | api, worker | Read by the AWS SDK's default chain |
 | `CORS_ORIGINS` | api | Comma-separated origins allowed to call the API |
 | `VIZ_IP_HASH_KEY` | api, required | HMAC key for anonymous callers' IPs, 32 bytes or more. Keep it stable: a new key gives every caller a new identity, with a fresh quota and no delete rights on what they made before |
+| `VIZ_TOKEN_ISSUER` | api | The `iss` of an embedding site's tokens, such as `amoj`. Set it with `VIZ_TOKEN_KEYS` or not at all. Unset: no token is accepted and every caller is anonymous |
+| `VIZ_TOKEN_KEYS` | api | Comma-separated `kid:key`, each key the issuer's raw Ed25519 public key in base64url, as a JWK's `x`. From a PEM: `openssl pkey -pubin -in pub.pem -outform DER \| tail -c 32 \| basenc --base64url \| tr -d =`. To rotate, add the new `kid:key`, let the issuer sign with it, and remove the old one 15 minutes later, once its last token is past `exp` |
 | `VIZ_SLOTS` | api, required | Worker slots behind this API: one per worker container. `POST` returns `503 capacity` once `VIZ_SLOTS × 10` jobs are queued |
 | `VIZ_WEB_ORIGIN` | api, required | The IDE's origin. Share links are `VIZ_WEB_ORIGIN/viz/{id}` |
 | `VIZ_METRICS` | all | `true` serves Prometheus metrics at `GET /metrics` on `VIZ_HTTP_ADDR`. Off by default. Caddy doesn't proxy `/metrics`, so it stays on the host |
@@ -440,7 +442,7 @@ The locked target (D15, §18.4) is Kubernetes with a separate runner node pool, 
 
 **Has to change first:**
 
-- **Client IPs.** vizd trusts `X-Forwarded-For` only from a loopback peer. Behind an ingress in another pod, every caller would look like the ingress. That needs a code change, or a proxy sidecar in each API pod.
+- **Client IPs.** vizd trusts `X-Forwarded-For` only from a loopback peer. Behind an ingress in another pod, every anonymous caller would look like the ingress. That needs a code change, or a proxy sidecar in each API pod. Callers with a bearer token are named by the token, not the IP.
 - **`VIZ_SLOTS`** is a fixed number. With autoscaled workers, set it to the pool's maximum slots, or make it follow the pool.
 - **Credentials.** The worker's database role and storage key drop to what §12 lists: lease jobs and update its trace, write-only to `t7/`. Workload identity instead of keys in env files.
 - **Runner images on nodes**, the worker pod spec and a staging run (BE-13 §3, sandbox doc).

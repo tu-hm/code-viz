@@ -46,6 +46,8 @@ const (
 	ErrorCodeNotFound            ErrorCode = "not_found"
 	ErrorCodePayloadTooLarge     ErrorCode = "payload_too_large"
 	ErrorCodeRateLimited         ErrorCode = "rate_limited"
+	ErrorCodeTokenExpired        ErrorCode = "token_expired"
+	ErrorCodeTokenInvalid        ErrorCode = "token_invalid"
 	ErrorCodeUnsupportedLanguage ErrorCode = "unsupported_language"
 )
 
@@ -65,6 +67,10 @@ func (e ErrorCode) Valid() bool {
 	case ErrorCodePayloadTooLarge:
 		return true
 	case ErrorCodeRateLimited:
+		return true
+	case ErrorCodeTokenExpired:
+		return true
+	case ErrorCodeTokenInvalid:
 		return true
 	case ErrorCodeUnsupportedLanguage:
 		return true
@@ -352,6 +358,9 @@ type PayloadTooLarge = ErrorResponse
 
 // RateLimited defines model for RateLimited.
 type RateLimited = ErrorResponse
+
+// Unauthorized defines model for Unauthorized.
+type Unauthorized = ErrorResponse
 
 // UnsupportedLanguage defines model for UnsupportedLanguage.
 type UnsupportedLanguage = ErrorResponse
@@ -751,6 +760,15 @@ type RateLimitedJSONResponse struct {
 	Headers RateLimitedResponseHeaders
 }
 
+type UnauthorizedResponseHeaders struct {
+	WWWAuthenticate string
+}
+type UnauthorizedJSONResponse struct {
+	Body ErrorResponse
+
+	Headers UnauthorizedResponseHeaders
+}
+
 type UnsupportedLanguageJSONResponse ErrorResponse
 
 type ListLanguagesRequestObject struct {
@@ -778,6 +796,21 @@ func (response ListLanguages200JSONResponse) VisitListLanguagesResponse(w http.R
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", fmt.Sprint(response.Headers.CacheControl))
 	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListLanguages401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response ListLanguages401JSONResponse) VisitListLanguagesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("WWW-Authenticate", fmt.Sprint(response.Headers.WWWAuthenticate))
+	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -837,6 +870,21 @@ func (response CreateVisualization400JSONResponse) VisitCreateVisualizationRespo
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateVisualization401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response CreateVisualization401JSONResponse) VisitCreateVisualizationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("WWW-Authenticate", fmt.Sprint(response.Headers.WWWAuthenticate))
+	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -931,6 +979,21 @@ func (response DeleteVisualization204Response) VisitDeleteVisualizationResponse(
 	return nil
 }
 
+type DeleteVisualization401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response DeleteVisualization401JSONResponse) VisitDeleteVisualizationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("WWW-Authenticate", fmt.Sprint(response.Headers.WWWAuthenticate))
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type DeleteVisualization404JSONResponse struct{ NotFoundJSONResponse }
 
 func (response DeleteVisualization404JSONResponse) VisitDeleteVisualizationResponse(w http.ResponseWriter) error {
@@ -1019,6 +1082,21 @@ func (response GetVisualization400JSONResponse) VisitGetVisualizationResponse(w 
 	return err
 }
 
+type GetVisualization401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response GetVisualization401JSONResponse) VisitGetVisualizationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("WWW-Authenticate", fmt.Sprint(response.Headers.WWWAuthenticate))
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetVisualization404JSONResponse struct{ NotFoundJSONResponse }
 
 func (response GetVisualization404JSONResponse) VisitGetVisualizationResponse(w http.ResponseWriter) error {
@@ -1090,6 +1168,21 @@ type RevokeShare204Response struct {
 func (response RevokeShare204Response) VisitRevokeShareResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
+}
+
+type RevokeShare401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response RevokeShare401JSONResponse) VisitRevokeShareResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("WWW-Authenticate", fmt.Sprint(response.Headers.WWWAuthenticate))
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
 }
 
 type RevokeShare404JSONResponse struct{ NotFoundJSONResponse }
@@ -1167,6 +1260,21 @@ func (response ShareVisualization400JSONResponse) VisitShareVisualizationRespons
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ShareVisualization401JSONResponse struct{ UnauthorizedJSONResponse }
+
+func (response ShareVisualization401JSONResponse) VisitShareVisualizationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("WWW-Authenticate", fmt.Sprint(response.Headers.WWWAuthenticate))
+	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
 }

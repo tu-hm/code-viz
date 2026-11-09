@@ -5,10 +5,12 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"crypto/ed25519"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"io"
@@ -46,6 +48,9 @@ const (
 var (
 	day0  = time.Date(2026, 10, 24, 8, 0, 0, 0, time.UTC)
 	ipKey = []byte("test-ip-hash-key-of-at-least-32-bytes")
+
+	signer = ed25519.NewKeyFromSeed(bytes.Repeat([]byte{7}, ed25519.SeedSize))
+	issuer = httptransport.Issuer{Name: "amoj", Keys: map[string]ed25519.PublicKey{"k1": signer.Public().(ed25519.PublicKey)}}
 )
 
 func TestEachErrorCodeAnswersWithItsStatusAndTheEnvelope(t *testing.T) {
@@ -152,6 +157,16 @@ func TestEachErrorCodeAnswersWithItsStatusAndTheEnvelope(t *testing.T) {
 		{
 			name: "visualization past its retention", s: s, method: http.MethodGet, path: "/visualizations/{id}", target: "/api/v1/visualizations/" + old.ID,
 			code: api.ErrorCodeExpired, status: http.StatusGone,
+		},
+		{
+			name: "bearer token past its exp", s: s, method: http.MethodPost, path: "/visualizations", target: "/api/v1/visualizations",
+			body: createBody(t, nil), header: bearer(t, signer, nil, func(c map[string]any) { c["exp"] = day0.Unix() }),
+			code: api.ErrorCodeTokenExpired, status: http.StatusUnauthorized,
+		},
+		{
+			name: "bearer token from an unknown key", s: s, method: http.MethodGet, path: "/languages", target: "/api/v1/languages",
+			header: bearer(t, signer, func(h map[string]any) { h["kid"] = "k9" }, nil),
+			code:   api.ErrorCodeTokenInvalid, status: http.StatusUnauthorized,
 		},
 		{
 			name: "trace row the server cannot read", s: s, method: http.MethodGet, path: "/visualizations/{id}", target: "/api/v1/visualizations/" + broken.ID,
@@ -415,6 +430,94 @@ func TestCallerIsAKeyedHashOfTheClientIPv4OrIPv6Slash64(t *testing.T) {
 	}
 }
 
+func TestBearerTokenMakesTheCallerItsSignedInUser(t *testing.T) {
+	t.Parallel()
+	s := newStack(t, newDB(t), 100)
+	long := strings.Repeat("u", 250)
+	tests := []struct {
+		name   string
+		header http.Header
+		sub    string
+	}{
+		{"token names its user", bearer(t, signer, nil, func(c map[string]any) { c["sub"] = "42" }), "42"},
+		{"token a second before its exp", bearer(t, signer, nil, func(c map[string]any) { c["sub"], c["exp"] = "43", day0.Unix()+1 }), "43"},
+		{"sub of 250 bytes", bearer(t, signer, nil, func(c map[string]any) { c["sub"] = long }), long},
+		{"scheme in lowercase", http.Header{"Authorization": {"bearer " + token(t, signer, nil, func(c map[string]any) { c["sub"] = "44" })}}, "44"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := s.db.ExecContext(t.Context(), "INSERT INTO usage_daily (subject, day, count) VALUES (?, ?, 100)", "user:"+tt.sub, domain.QuotaDay(s.now))
+			if err != nil {
+				t.Fatal(err)
+			}
+			r := newRequest(t, http.MethodPost, "/api/v1/visualizations", createBody(t, nil))
+			r.RemoteAddr = "198.51.100.20:41000"
+			maps.Copy(r.Header, tt.header)
+			rec := s.serve(r)
+			if rec.Code != http.StatusCreated {
+				t.Fatalf("create past the anonymous quota: got %d: %s", rec.Code, rec.Body)
+			}
+
+			var subject string
+			err = s.db.QueryRowContext(t.Context(), "SELECT subject FROM visualizations WHERE id = ?", decode[api.Visualization](t, rec).ID).Scan(&subject)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if subject != "user:"+tt.sub {
+				t.Errorf("subject %s, want user:%s", subject, tt.sub)
+			}
+		})
+	}
+}
+
+func TestBadBearerTokenAnswers401AndRunsNothing(t *testing.T) {
+	t.Parallel()
+	s := newStack(t, newDB(t), 100)
+	other := ed25519.NewKeyFromSeed(bytes.Repeat([]byte{8}, ed25519.SeedSize))
+	claims := func(change func(c map[string]any)) http.Header { return bearer(t, signer, nil, change) }
+	good := token(t, signer, nil, nil)
+	tests := []struct {
+		name   string
+		header http.Header
+		code   api.ErrorCode
+	}{
+		{"exp is now", claims(func(c map[string]any) { c["exp"] = day0.Unix() }), api.ErrorCodeTokenExpired},
+		{"exp an hour ago", claims(func(c map[string]any) { c["exp"] = day0.Add(-time.Hour).Unix() }), api.ErrorCodeTokenExpired},
+		{"another audience", claims(func(c map[string]any) { c["aud"] = "judge" }), api.ErrorCodeTokenInvalid},
+		{"another issuer", claims(func(c map[string]any) { c["iss"] = "evil" }), api.ErrorCodeTokenInvalid},
+		{"no sub", claims(func(c map[string]any) { delete(c, "sub") }), api.ErrorCodeTokenInvalid},
+		{"sub over 250 bytes", claims(func(c map[string]any) { c["sub"] = strings.Repeat("u", 251) }), api.ErrorCodeTokenInvalid},
+		{"no exp", claims(func(c map[string]any) { delete(c, "exp") }), api.ErrorCodeTokenInvalid},
+		{"unknown kid", bearer(t, signer, func(h map[string]any) { h["kid"] = "k9" }, nil), api.ErrorCodeTokenInvalid},
+		{"signed by another key", bearer(t, other, nil, nil), api.ErrorCodeTokenInvalid},
+		{"alg other than EdDSA", bearer(t, signer, func(h map[string]any) { h["alg"] = "none" }, nil), api.ErrorCodeTokenInvalid},
+		{"signature cut short", http.Header{"Authorization": {"Bearer " + good[:len(good)-4]}}, api.ErrorCodeTokenInvalid},
+		{"not a JWT", http.Header{"Authorization": {"Bearer abc"}}, api.ErrorCodeTokenInvalid},
+		{"basic credentials", http.Header{"Authorization": {"Basic dTpw"}}, api.ErrorCodeTokenInvalid},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newRequest(t, http.MethodPost, "/api/v1/visualizations", createBody(t, nil))
+			maps.Copy(r.Header, tt.header)
+			rec := s.serve(r)
+
+			if e := decode[api.ErrorResponse](t, rec).Error; rec.Code != http.StatusUnauthorized || e.Code != tt.code {
+				t.Errorf("got %d %s, want 401 %s", rec.Code, e.Code, tt.code)
+			}
+			if got := rec.Header().Get("WWW-Authenticate"); got != `Bearer error="invalid_token"` {
+				t.Errorf("WWW-Authenticate %q", got)
+			}
+		})
+	}
+	var n int
+	if err := s.db.QueryRowContext(t.Context(), "SELECT COUNT(*) FROM visualizations").Scan(&n); err != nil {
+		t.Fatal(err)
+	}
+	if n != 0 {
+		t.Errorf("%d visualizations created with a bad token, want 0", n)
+	}
+}
+
 func TestRequestIDComesFromTheProxyOrIsGenerated(t *testing.T) {
 	t.Parallel()
 	s := newStack(t, newDB(t), 100)
@@ -513,7 +616,7 @@ func TestCORSAllowsOnlyTheIDEOrigins(t *testing.T) {
 		{"preflight from the IDE", preflight(ide), http.StatusNoContent, map[string]string{
 			"Access-Control-Allow-Origin":  ide,
 			"Access-Control-Allow-Methods": "GET, POST, DELETE",
-			"Access-Control-Allow-Headers": "Content-Type, Idempotency-Key",
+			"Access-Control-Allow-Headers": "Authorization, Content-Type, Idempotency-Key",
 			"Vary":                         "Origin",
 		}},
 		{"preflight from another origin", preflight("https://evil.example"), http.StatusNotFound, map[string]string{"Vary": "Origin"}},
@@ -671,7 +774,7 @@ func newStack(t *testing.T, db *sql.DB, maxQueued int) *stack {
 		WebOrigin: ide,
 	}
 	mux := http.NewServeMux()
-	httptransport.HandleAPI(mux, s.viz, ipKey, []string{ide}, s.reg)
+	httptransport.HandleAPI(mux, s.viz, ipKey, issuer, []string{ide}, s.reg)
 	s.h = mux
 	return s
 }
@@ -753,6 +856,33 @@ func decode[T any](t *testing.T, rec *httptest.ResponseRecorder) T {
 		t.Fatalf("decode %d response %q: %v", rec.Code, rec.Body, err)
 	}
 	return v
+}
+
+func token(t *testing.T, key ed25519.PrivateKey, changeHeader, changeClaims func(map[string]any)) string {
+	t.Helper()
+	header := map[string]any{"alg": "EdDSA", "typ": "JWT", "kid": "k1"}
+	claims := map[string]any{"iss": "amoj", "aud": "viz", "sub": "42", "iat": day0.Unix(), "exp": day0.Add(15 * time.Minute).Unix()}
+	if changeHeader != nil {
+		changeHeader(header)
+	}
+	if changeClaims != nil {
+		changeClaims(claims)
+	}
+	var segs []string
+	for _, v := range []map[string]any{header, claims} {
+		b, err := json.Marshal(v)
+		if err != nil {
+			t.Fatal(err)
+		}
+		segs = append(segs, base64.RawURLEncoding.EncodeToString(b))
+	}
+	signed := strings.Join(segs, ".")
+	return signed + "." + base64.RawURLEncoding.EncodeToString(ed25519.Sign(key, []byte(signed)))
+}
+
+func bearer(t *testing.T, key ed25519.PrivateKey, changeHeader, changeClaims func(map[string]any)) http.Header {
+	t.Helper()
+	return http.Header{"Authorization": {"Bearer " + token(t, key, changeHeader, changeClaims)}}
 }
 
 func subjectOf(ip string) string {

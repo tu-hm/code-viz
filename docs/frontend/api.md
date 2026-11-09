@@ -17,7 +17,7 @@ Every response shown below was captured from a local `make dev` run on 24 Oct 20
 
 `VITE_API_BASE_URL` sets the base; `config.apiBaseUrl` in `apps/ide/src/config.ts` reads it.
 
-**CORS.** The API answers browser calls only from the origins in `CORS_ORIGINS` (`http://localhost:5173` in dev). It allows the request headers `Content-Type` and `Idempotency-Key` and the methods `GET`, `POST` and `DELETE`, and exposes `Location`, `Retry-After` and `X-Request-ID`. Any other custom header fails the preflight. The bucket that serves chunks allows the same origins; `make seed` sets that up, so rerun it after you change `CORS_ORIGINS`.
+**CORS.** The API answers browser calls only from the origins in `CORS_ORIGINS` (`http://localhost:5173` in dev). It allows the request headers `Authorization`, `Content-Type` and `Idempotency-Key` and the methods `GET`, `POST` and `DELETE`, and exposes `Location`, `Retry-After` and `X-Request-ID`. Any other custom header fails the preflight. The bucket that serves chunks allows the same origins; `make seed` sets that up, so rerun it after you change `CORS_ORIGINS`.
 
 ## Endpoints
 
@@ -132,6 +132,7 @@ Idempotency-Key: 7d3c1c3e-5a1e-4c55-9d7c-2f0e0b1a9e11
 | Header | Required | Meaning |
 |---|---|---|
 | `Content-Type: application/json` | Yes | Anything else, `text/plain` included, is `400 invalid_request`. A JSON content type makes the browser send a CORS preflight, so another site can't spend your user's quota |
+| `Authorization` | No | `Bearer <jwt>` minted by an embedding site's backend for its signed-in user (spec §8). Without it the caller is anonymous; a bad one is `401` on any route |
 | `Idempotency-Key` | No, but send it | A UUID. A repeat of the key from the same caller within 24 h returns the visualization the first request created, in its current state, whatever the body says, and doesn't count against the quota. A key that isn't a UUID is `400` |
 
 Make one key per **Visualize** click, and reuse it when you retry that click's POST after a network error or a `503`. A new click gets a new key.
@@ -325,10 +326,12 @@ Every error has the same body (§8.7):
 | `invalid_request` | 400 | Malformed JSON, wrong `Content-Type`, invalid options, bad `wait` or `since`, an `Idempotency-Key` that isn't a UUID, a share before the visualization is `completed` | No | A client bug: log `message` |
 | `payload_too_large` | 413 | Source or stdin over 64 KB | No | The limit. FE-04 checks sizes before sending, so this is rare |
 | `unsupported_language` | 422 | Unknown language, or visualize disabled for it | No | Hide **Visualize** for that language (FE-04) |
-| `rate_limited` | 429 | Daily quota used up: 100 a day per anonymous caller, reset at midnight UTC | After `Retry-After` | A message with the wait time (FE-05) |
+| `rate_limited` | 429 | Daily quota used up: 100 a day per anonymous caller, 1,000 per signed-in user, reset at midnight UTC | After `Retry-After` | A message with the wait time (FE-05) |
 | `capacity` | 503 | Queue full, too many held long-polls, or the database down | After `Retry-After` (5 s), with backoff | "Visualizer is busy, try again in a few seconds" and **Retry** (§5.6) |
 | `not_found` | 404 | No such visualization, no such route, deleting, sharing or revoking someone else's, or a revoked share link | No | The not-found state (FE-05); for a permalink, FE-12's expired screen |
 | `expired` | 410 | The trace is past its 7-day retention | No | The expired state (FE-05); for a permalink, FE-12's expired screen |
+| `token_expired` | 401 | The bearer token is past its `exp` | Once, with a new token | Nothing: mint a token and repeat the request. The IDE sends no token, so it never sees this |
+| `token_invalid` | 401 | Any other bad bearer token: not a JWT, not EdDSA, unknown `kid`, bad signature, wrong `iss` or `aud`, no `sub` or `exp` | Once, with a new token | As `token_expired`; a second `401` is a configuration error between the issuer and vizd |
 | `internal_error` | 500 | The server failed | No | "Something went wrong on our side", the request ID and a Report link (§5.6) |
 
 - **Branch on `code`, never on `message`.** For `invalid_request`, `payload_too_large` and `unsupported_language`, `message` is written for a developer and names what was wrong, such as `source is 70000 bytes, over the 64 KB limit: payload too large`. Log it, and show your own text. For the other codes `message` is fixed text you may show as is.
@@ -379,7 +382,7 @@ A runtime error doesn't fail the visualization: it ends with `exit.kind: "except
 | `captureRanges` | 4 KB as JSON | `400 invalid_request` |
 | `wait` | 20 s | `400 invalid_request` |
 | Active visualizations | 2 queued or running per caller | A third detaches the oldest queued one, which reads `canceled` |
-| Daily quota | 100 per anonymous caller per UTC day | `429 rate_limited` until midnight UTC |
+| Daily quota | 100 per anonymous caller, 1,000 per signed-in user, per UTC day | `429 rate_limited` until midnight UTC |
 | Chunk URLs | 15 minutes | Storage refuses the URL; GET the visualization again |
 | Retention | 7 days; 90 days from a share | `410 expired` |
 
@@ -387,5 +390,5 @@ Spec §11 has the full list, including the ones only the trace shows (wall time,
 
 ## Not built yet
 
-- **Sign-in**: every caller is anonymous. The signed-in quota (1,000 a day) waits for it.
+- **Sign-in in the IDE**: the IDE sends no token, so its callers are anonymous. An embedding site's backend can mint one (`Authorization: Bearer`, spec §8).
 - **The per-IP rate limit** (30 creates a minute, `429`) is a reverse proxy rule, not part of vizd, so you won't hit it locally.

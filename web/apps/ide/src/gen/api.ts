@@ -232,7 +232,7 @@ export interface components {
         };
         Error: {
             /** @enum {string} */
-            code: "invalid_request" | "payload_too_large" | "unsupported_language" | "rate_limited" | "capacity" | "not_found" | "expired" | "internal_error";
+            code: "invalid_request" | "payload_too_large" | "unsupported_language" | "rate_limited" | "capacity" | "not_found" | "expired" | "token_expired" | "token_invalid" | "internal_error";
             message: string;
             /** @description Set with rate_limited and capacity. */
             retryAfterSec?: number;
@@ -366,6 +366,16 @@ export interface components {
                 "application/json": components["schemas"]["ErrorResponse"];
             };
         };
+        /** @description The bearer token is past its `exp` (token_expired), or is not one the service accepts (token_invalid). Mint a new token and repeat the request once. */
+        Unauthorized: {
+            headers: {
+                "WWW-Authenticate": components["headers"]["WWWAuthenticate"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
         /** @description The server failed. */
         InternalError: {
             headers: {
@@ -383,6 +393,8 @@ export interface components {
     headers: {
         /** @description Seconds to wait before trying again. */
         RetryAfter: number;
+        /** @description Always `Bearer error="invalid_token"`. */
+        WWWAuthenticate: string;
     };
     pathItems: never;
 }
@@ -407,6 +419,7 @@ export interface operations {
                     "application/json": components["schemas"]["Languages"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -437,6 +450,7 @@ export interface operations {
                 };
             };
             400: components["responses"]["InvalidRequest"];
+            401: components["responses"]["Unauthorized"];
             413: components["responses"]["PayloadTooLarge"];
             422: components["responses"]["UnsupportedLanguage"];
             429: components["responses"]["RateLimited"];
@@ -472,6 +486,7 @@ export interface operations {
                 };
             };
             400: components["responses"]["InvalidRequest"];
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
             410: components["responses"]["Expired"];
             500: components["responses"]["InternalError"];
@@ -496,6 +511,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["Capacity"];
@@ -522,6 +538,7 @@ export interface operations {
                 };
             };
             400: components["responses"]["InvalidRequest"];
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
             410: components["responses"]["Expired"];
             500: components["responses"]["InternalError"];
@@ -546,6 +563,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["Capacity"];

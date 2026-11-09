@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/ed25519"
 	"crypto/rand"
 	"database/sql"
+	"encoding/base64"
 	"errors"
 	"flag"
 	"fmt"
@@ -12,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -161,6 +164,8 @@ type apiConfig struct {
 	CORSOrigins      []string `env:"CORS_ORIGINS"`
 	WebOrigin        string   `env:"VIZ_WEB_ORIGIN,required"`
 	IPHashKey        string   `env:"VIZ_IP_HASH_KEY,required"`
+	TokenIssuer      string   `env:"VIZ_TOKEN_ISSUER"`
+	TokenKeys        []string `env:"VIZ_TOKEN_KEYS"`
 	Slots            int      `env:"VIZ_SLOTS,required"`
 }
 
@@ -174,6 +179,10 @@ func newAPI(ctx context.Context, db *sql.DB, mux *http.ServeMux, reg prometheus.
 	}
 	if len(cfg.IPHashKey) < 32 {
 		return nil, nil, errors.New("load api config: VIZ_IP_HASH_KEY must be 32 bytes or more")
+	}
+	iss, err := tokenIssuer(cfg.TokenIssuer, cfg.TokenKeys)
+	if err != nil {
+		return nil, nil, fmt.Errorf("load api config: %w", err)
 	}
 	adapters, err := manifest.Load(cfg.AdaptersDir)
 	if err != nil {
@@ -199,9 +208,34 @@ func newAPI(ctx context.Context, db *sql.DB, mux *http.ServeMux, reg prometheus.
 		Random:    rand.Reader,
 		WebOrigin: cfg.WebOrigin,
 	}
-	httptransport.HandleAPI(mux, viz, []byte(cfg.IPHashKey), cfg.CORSOrigins, reg)
+	httptransport.HandleAPI(mux, viz, []byte(cfg.IPHashKey), iss, cfg.CORSOrigins, reg)
 	reg.MustRegister(mysql.NewQueueDepth(db))
 	return viz, poller, nil
+}
+
+// tokenIssuer reads VIZ_TOKEN_KEYS, each kid:key with the raw Ed25519 public key in base64url, as a JWK's x. Without
+// an issuer and keys no token is accepted, and every caller is anonymous.
+func tokenIssuer(name string, keys []string) (httptransport.Issuer, error) {
+	if (name == "") != (len(keys) == 0) {
+		return httptransport.Issuer{}, errors.New("VIZ_TOKEN_ISSUER and VIZ_TOKEN_KEYS must be set together")
+	}
+	iss := httptransport.Issuer{Name: name, Keys: map[string]ed25519.PublicKey{}}
+	for _, k := range keys {
+		i := strings.LastIndex(k, ":")
+		if i < 1 {
+			return httptransport.Issuer{}, fmt.Errorf("VIZ_TOKEN_KEYS entry %q is not kid:key", k)
+		}
+		kid := k[:i]
+		key, err := base64.RawURLEncoding.DecodeString(k[i+1:])
+		if err != nil || len(key) != ed25519.PublicKeySize {
+			return httptransport.Issuer{}, fmt.Errorf("VIZ_TOKEN_KEYS key %q is not a base64url Ed25519 public key", kid)
+		}
+		if _, dup := iss.Keys[kid]; dup {
+			return httptransport.Issuer{}, fmt.Errorf("VIZ_TOKEN_KEYS has kid %q twice", kid)
+		}
+		iss.Keys[kid] = key
+	}
+	return iss, nil
 }
 
 func cleanDaily(ctx context.Context, viz *app.Visualizations) {
