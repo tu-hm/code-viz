@@ -33,6 +33,7 @@ const (
 	workDir  = "/work"
 	uid      = 65534
 	envPath  = "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+	envHome  = "HOME=" + workDir // no HOME => gdb warns on stderr, which reads as the user's output
 
 	// §11, §12
 	workSize    = "64m"
@@ -218,6 +219,7 @@ func (b *box) Run(ctx context.Context, cmd ports.Command) (ports.Exit, error) {
 		"--cgroup_cpu_ms_per_sec", cpuMsPerSec,
 		"--seccomp_string", seccompPolicy,
 		"--env", envPath,
+		"--env", envHome,
 	}
 	for _, d := range devices {
 		args = append(args, "--bindmount", d)

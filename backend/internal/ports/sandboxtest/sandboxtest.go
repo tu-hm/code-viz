@@ -166,6 +166,10 @@ func Run(t *testing.T, sb ports.Sandbox, image string) {
 			name:  "aslr can be turned off",
 			steps: []step{{args: []string{"setarch", "linux64", "-R", "cat", "/proc/self/personality"}, want: result{Stdout: "00040000\n"}}},
 		},
+		{
+			name:  "home is set",
+			steps: []step{{args: sh(`[ -n "$HOME" ] && printf set`), want: result{Stdout: "set"}}},
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
