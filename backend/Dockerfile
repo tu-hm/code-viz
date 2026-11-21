@@ -21,7 +21,7 @@ RUN git clone --branch 3.6 https://github.com/google/nsjail /nsjail \
     && test "$(git -C /nsjail rev-parse HEAD)" = f78475530b46d0186111a9096b30725f816b55fe \
     && make -C /nsjail -j"$(nproc)"
 
-FROM gcr.io/distroless/static-debian13:nonroot@sha256:18f4cc26c9ffa7f20a359298be7deadac5c607c8e03a02b8119f1a5fc2f82c99 AS api
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:aafe993665bf6200db38a02c11a9351e782a84b6a45e7f33b6695638c88e3931 AS api
 COPY --from=build /out/vizd /usr/local/bin/vizd
 ENTRYPOINT ["/usr/local/bin/vizd"]
 CMD ["--role=api"]
