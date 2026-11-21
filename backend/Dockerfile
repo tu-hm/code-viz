@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /out/ ./cmd/vizd ./cmd/viz-shim
 
-FROM debian:trixie-slim@sha256:62bd423aeee912639ca8ee681c2b762cb3e25137e0a92b20be455898a9f034ad AS nsjail
+FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2 AS nsjail
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates git make g++ pkg-config bison flex protobuf-compiler libprotobuf-dev libnl-route-3-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -27,7 +27,7 @@ ENTRYPOINT ["/usr/local/bin/vizd"]
 CMD ["--role=api"]
 
 # runs as root: nsjail needs a privileged pod on the runner node pool (BE-02 §1)
-FROM debian:trixie-slim@sha256:62bd423aeee912639ca8ee681c2b762cb3e25137e0a92b20be455898a9f034ad AS worker
+FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2 AS worker
 RUN apt-get update && apt-get install -y --no-install-recommends libprotobuf32t64 libnl-route-3-200 \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=nsjail /nsjail/nsjail /usr/local/bin/nsjail
